@@ -1,0 +1,8 @@
+{
+  "name": "anton-toolkit",
+  "version": "0.1.0",
+  "description": "Personal toolkit with custom skills for Anton",
+  "author": {
+    "name": "Anton"
+  }
+}
