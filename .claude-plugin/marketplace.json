@@ -1,0 +1,14 @@
+{
+  "name": "anton-toolkit-marketplace",
+  "description": "Personal plugin marketplace for Anton",
+  "plugins": [
+    {
+      "name": "anton-toolkit",
+      "description": "Personal toolkit with custom skills for Anton",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/lopatuxin/anton-toolkit.git"
+      }
+    }
+  ]
+}
