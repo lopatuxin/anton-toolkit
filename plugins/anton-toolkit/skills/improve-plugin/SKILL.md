@@ -1,15 +1,21 @@
 ---
 name: improve-plugin
 description: >
-  This skill should be triggered automatically when the user has corrected
-  Claude's behavior that was caused by a skill or configuration in the
-  anton-toolkit plugin, and the user is satisfied with the correction.
-  Triggers when: a skill from anton-toolkit produced incorrect output or
-  behavior, the user pointed out the issue, Claude fixed it in the conversation,
-  and the fix should be persisted back into the plugin so the mistake doesn't
-  repeat. Also triggers on: "улучши плагин", "обнови скилл", "запомни это
-  в плагине", "исправь скилл", "/improve", or any request to update the
-  anton-toolkit plugin based on feedback from the current conversation.
+  IMPORTANT: Invoke this skill via the Skill tool IMMEDIATELY (do NOT just
+  save to memory) when the user corrects behavior produced by any
+  anton-toolkit skill (commit, improve-plugin, or any future skill).
+
+  Concrete trigger situations:
+  - User says the commit message format is wrong (e.g. "убери Co-Authored-By",
+    "не добавляй подпись", "формат коммита не тот")
+  - User corrects any output or behavior that came from an anton-toolkit skill
+  - User says "улучши плагин", "обнови скилл", "запомни это в плагине",
+    "исправь скилл", "/improve"
+  - After Claude fixes the behavior in conversation AND the user confirms
+    the fix is correct — persist the fix into the plugin source code
+
+  This skill edits SKILL.md files and plugin config in the anton-toolkit
+  repository, commits and pushes so the fix applies on all devices.
 ---
 
 # Improve Plugin — самосовершенствование anton-toolkit
@@ -72,9 +78,7 @@ description: >
 ```bash
 cd C:/projects/anton-toolkit
 git add <изменённые файлы>
-git commit -m "<сообщение на русском>
-
-Co-Authored-By: Claude <noreply@anthropic.com>"
+git commit -m "<сообщение на русском>"
 git push
 ```
 
