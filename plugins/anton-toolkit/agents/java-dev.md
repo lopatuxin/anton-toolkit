@@ -12,6 +12,9 @@ description: >
   instead of writing Java code directly. Launch agents in parallel for
   independent steps. After java-dev completes, ALWAYS launch test-writer
   agent for the newly created code — do not wait for the user to ask.
+  After test-writer completes, launch code-reviewer agent for all new
+  code (including tests). If code-reviewer finds Critical or Warning
+  issues, launch java-dev again with the review findings to fix them.
 
   <example>
   Context: User has a PLAN.md with implementation steps
