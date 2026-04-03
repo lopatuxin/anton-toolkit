@@ -7,6 +7,11 @@ description: >
   code, and compiles. Do NOT use for exploratory or unclear tasks — use
   a skill or direct conversation instead.
 
+  IMPORTANT: When the user asks to implement a plan (PLAN.md) that contains
+  Java/Spring Boot steps, you MUST use this agent for each backend step
+  instead of writing Java code directly. Launch agents in parallel for
+  independent steps.
+
   <example>
   Context: User has a PLAN.md with implementation steps
   user: "Реализуй шаг 3 из плана"
