@@ -6,7 +6,7 @@ description: >
   build something. Do NOT start planning without loading this skill first.
 
   Trigger phrases: "напиши план", "план реализации", "спланируй", "как
-  реализовать", "план на основе доки", "план по фронту", "план по конфе",
+  реализовать", "составить план", "план на основе доки", "план по фронту", "план по конфе",
   "implementation plan", "/plan", or any request to create a step-by-step
   plan for a development task.
 
