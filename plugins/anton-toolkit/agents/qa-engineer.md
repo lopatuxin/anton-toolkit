@@ -186,6 +186,8 @@ curl -s -X POST http://localhost:8080/api/v1/orders \
 ```bash
 # Удали все скриншоты и временные файлы, созданные во время тестов
 rm -f /tmp/screenshot*.png /tmp/test_*.* screenshot*.png
+# Удали папку .playwright-mcp с логами и снапшотами Playwright
+rm -rf .playwright-mcp
 ```
 
 Не оставляй мусор в рабочей директории проекта или в /tmp.
