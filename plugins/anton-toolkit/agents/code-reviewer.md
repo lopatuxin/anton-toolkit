@@ -1,9 +1,21 @@
 ---
 name: code-reviewer
 description: >
+  This agent should be used proactively. After java-dev or frontend-dev
+  agents complete implementation or refactoring work, AUTOMATICALLY launch
+  this agent to review the changes — do not wait for the user to ask.
+
   Use this agent to review Java code for bugs, security issues, and
   adherence to project patterns. Give it a file, package, or git diff —
   it returns a structured report. Works autonomously.
+
+  <example>
+  Context: java-dev agent just finished implementing a feature
+  assistant: "Запускаю code-reviewer для проверки написанного кода."
+  <commentary>
+  Proactive launch — java-dev finished, automatically review the result.
+  </commentary>
+  </example>
 
   <example>
   Context: User finished implementing a feature
