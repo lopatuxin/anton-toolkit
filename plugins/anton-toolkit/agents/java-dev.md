@@ -6,9 +6,14 @@ description: >
   to this agent. Do NOT write Java code directly in conversation.
   The only exception is tests — those go to test-writer agent.
 
+  RULE: If the task results in creating or editing a .java file (except tests) — you MUST use this agent. No exceptions.
+  It does not matter how the user phrased the request. Even if they said "добавь валидацию",
+  "навесь аннотацию", "поправь ошибку" — if it touches Java code, delegate here.
+
   This includes: new features, bug fixes, refactoring, adding endpoints,
   modifying services, fixing compilation errors, implementing plan steps,
-  changing entities, updating configs, and any other Java code changes.
+  changing entities, updating configs, adding annotations, adding validation,
+  creating exception handlers, and any other Java code changes.
 
   <example>
   Context: User has a PLAN.md with implementation steps
