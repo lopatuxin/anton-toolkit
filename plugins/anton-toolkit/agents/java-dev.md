@@ -52,6 +52,9 @@ description: >
   </commentary>
   </example>
 
+  POST-COMPLETION RULE: After this agent completes, ALWAYS automatically
+  launch code-reviewer agent to review the changes — do not wait for user to ask.
+
 model: inherit
 color: green
 tools: ["Read", "Write", "Edit", "Glob", "Grep", "Bash"]
