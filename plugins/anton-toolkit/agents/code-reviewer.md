@@ -44,7 +44,7 @@ description: >
   </commentary>
   </example>
 
-model: inherit
+model: opus
 color: yellow
 tools: ["Read", "Glob", "Grep", "Bash"]
 ---
