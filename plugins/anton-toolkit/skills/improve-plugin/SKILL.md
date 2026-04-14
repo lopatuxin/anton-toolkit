@@ -34,7 +34,16 @@ description: >
 
 ### 1. Найди репозиторий плагина
 
-Репозиторий может лежать в разных местах на разных устройствах. Найди его:
+**Шаг 1: Проверь CLAUDE.md** — если в глобальном `~/.claude/CLAUDE.md` или проектном `CLAUDE.md` есть явно указанный путь к плагину (секция вида `Plugin Repositories` с путём и пометкой «no cloning needed») — используй его напрямую. Не клонируй, не ищи дальше.
+
+Пример: если в CLAUDE.md написано:
+```
+Plugins are located at: `C:\Users\User\.claude\plugins\marketplaces\anton-toolkit-marketplace`
+When the `improve-plugin` skill needs to edit plugin files, use this path — no cloning needed.
+```
+Тогда `PLUGIN_REPO=~/.claude/plugins/marketplaces/anton-toolkit-marketplace`.
+
+**Шаг 2: Если CLAUDE.md не указывает путь** — ищи репозиторий:
 
 ```bash
 # Вариант 1: Проверь типичные пути
@@ -42,18 +51,13 @@ ls -d ~/projects/anton-toolkit /c/projects/anton-toolkit ~/anton-toolkit 2>/dev/
 
 # Вариант 2: Найди через git
 find ~ /c/projects -maxdepth 3 -name "plugin.json" -path "*/anton-toolkit/*" 2>/dev/null | head -5
-
-# Вариант 3: Проверь кеш маркетплейса (только для чтения!)
-ls ~/.claude/plugins/marketplaces/anton-toolkit-marketplace/ 2>/dev/null
 ```
 
-**Если репозиторий НЕ найден** — склонируй:
+**Если репозиторий НЕ найден нигде** — склонируй:
 ```bash
 git clone git@github.com:lopatuxin/anton-toolkit.git /tmp/anton-toolkit
 ```
 Работай в склонированной копии, после push удали её.
-
-**Если найден только кеш маркетплейса** — это НЕ рабочая копия, её редактировать НЕЛЬЗЯ. Клонируй в /tmp/.
 
 Сохрани путь к найденному репозиторию в переменную `PLUGIN_REPO` для дальнейших шагов.
 Путь к файлам плагина: `$PLUGIN_REPO/plugins/anton-toolkit/`
