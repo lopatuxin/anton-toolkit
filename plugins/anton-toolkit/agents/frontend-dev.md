@@ -3,8 +3,9 @@ name: frontend-dev
 description: >
   IMPORTANT: Use this agent for ALL frontend code writing tasks.
   Any time React/TypeScript/CSS/HTML code needs to be written, modified,
-  or fixed — delegate to this agent. Do NOT write frontend code directly
-  in conversation. The only exception is tests — those go to test-writer.
+  or fixed — delegate to this agent. This includes one-line changes.
+  Do NOT use Edit/Write/Bash tools on frontend files directly.
+  The only exception is tests — those go to test-writer.
 
   This includes: new components, pages, hooks, bug fixes, styling,
   API integration, state management, refactoring, form handling,
@@ -44,6 +45,16 @@ description: >
   assistant: "Запускаю frontend-dev агента для реализации сайдбара."
   <commentary>
   First discuss in conversation, then delegate implementation to frontend-dev.
+  </commentary>
+  </example>
+
+  <example>
+  Context: User requests a small, targeted UI change
+  user: "На странице обзор показывай только 4 категории"
+  assistant: "Запускаю frontend-dev агента для внесения изменения."
+  <commentary>
+  Even a one-line targeted fix in React/TSX — delegate to frontend-dev.
+  Do NOT use Edit/Write tools directly.
   </commentary>
   </example>
 
