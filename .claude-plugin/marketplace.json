@@ -14,6 +14,11 @@
       "name": "personal-strategist",
       "description": "Strategic advisor that collects personal information and helps develop strategies",
       "source": "./plugins/personal-strategist"
+    },
+    {
+      "name": "plugin-builder",
+      "description": "Creates, extends, and fixes plugins in the anton-toolkit-marketplace",
+      "source": "./plugins/plugin-builder"
     }
   ]
 }
