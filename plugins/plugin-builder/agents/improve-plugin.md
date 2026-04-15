@@ -19,21 +19,54 @@ description: >
   "скилл не сработал", "не был вызван <агент/скилл>", "забыл про агента",
   "должен был вызвать", "почему сам делал".
 
+  Triggers (non-imperative complaint / error statement — ANY evaluative
+  remark about wrong output of a skill/agent counts as a trigger, even
+  without an explicit command to fix): "это косяк", "косяк", "косячит",
+  "бага", "баг же", "сломано", "сломался", "не так", "неправильно",
+  "неправильно работает", "неверно", "фигня", "хрень", "вот эта фигня",
+  "ерунда", "что за", "почему X сделал Y", "почему он так", "зачем он",
+  "опять то же самое", "опять", "снова", "не должно быть так", "не должно
+  так быть", "плохо", "лажа", "глючит". ANY statement that describes a
+  skill/agent output as wrong, broken, or inappropriate — WITHOUT an
+  imperative verb like "fix" or "improve" — is still a trigger for this
+  agent. The user's evaluative comment IS the correction signal.
+
   MANDATORY PROACTIVE RULE: If the user corrects the behavior of a plugin
   component (agent or skill) AND the correction is about behavior that should
   persist across sessions (wrong description, missing trigger phrase, wrong
-  routing, wrong delegation, missed invocation of an agent/skill) —
+  routing, wrong delegation, missed invocation of an agent/skill, skill
+  produced artifact in wrong language / wrong format / wrong style) —
   **PROACTIVELY offer to run `improve-plugin` in the SAME reply where you
   acknowledge the mistake**. Do not wait for a second prompt. Do not ask
   "should I fix the plugin?" — just say "Правлю плагин через improve-plugin"
-  and proceed. The only time to skip is when the correction is a one-off
-  factual point ("in THIS specific file use X") with no plugin-level
-  generalization.
+  and proceed.
 
-  Test for "is this a plugin-level correction?": if you can phrase the fix as
-  "in the agent/skill description, add/change <rule or trigger>" — it IS
-  plugin-level. Proactively run improve-plugin. If the fix is only "in this
-  file, change value X" — it is NOT plugin-level, skip.
+  CRITICAL — manual patch does NOT substitute plugin fix: if you already
+  fixed the symptom manually in the project (via Edit / Write / Bash) after
+  the user complained about a plugin component's output, you MUST STILL
+  invoke `improve-plugin` in the same reply. Fixing the artifact in the
+  current project does NOT fix the skill/agent that produced it — on the
+  next invocation the same bug will return. Project-level patch ≠
+  plugin-level patch. The user's complaint about plugin output stays open
+  until the plugin source is updated and committed.
+
+  Correct example of detection: the user says "концепт на русском, а
+  заголовки на английском — это косяк". You translated the headings via
+  Edit. Regardless, the `system-designer` skill just produced English
+  headings in a Russian-language project — that is a plugin-level bug in
+  the skill's language rules. You MUST run improve-plugin on
+  `system-designer` in the same reply. Do not treat "I already fixed the
+  file" as closure.
+
+  Incorrect example: "in this specific file use 'foo' instead of 'bar'" —
+  one-off factual override with no generalization to the skill's behavior.
+  Skip improve-plugin.
+
+  Test for "is this a plugin-level correction?": if you can phrase the fix
+  as "in the agent/skill description/body, add/change <rule, trigger, or
+  language/format constraint>" — it IS plugin-level. Proactively run
+  improve-plugin. If the fix is only "in this file, change value X with no
+  downstream rule" — it is NOT plugin-level, skip.
 
   Discrimination: only trigger when there was a concrete incident with a
   plugin skill/agent earlier in the current session. An "incident" includes
