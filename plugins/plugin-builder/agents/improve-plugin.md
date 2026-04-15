@@ -2,19 +2,49 @@
 name: improve-plugin
 description: >
   Reactively fix a plugin in the anton-toolkit-marketplace after an incident
-  in the current session — a skill or agent just behaved incorrectly, the
-  user corrected it in conversation, and now wants the fix persisted in the
-  plugin source.
+  in the current session — a skill or agent just behaved incorrectly, OR was
+  NOT invoked when it should have been, the user corrected the behavior in
+  conversation, and the correction should be persisted in the plugin source.
 
-  Triggers: "улучши плагин", "обнови скилл", "запомни это в плагине",
+  Triggers (explicit): "улучши плагин", "обнови скилл", "запомни это в плагине",
   "исправь скилл", "так не должно быть", "убери <X>", "не добавляй <X>",
   "запомни", "улучши стратега", "исправь интервьюера", "улучши плагин
   personal-strategist", "/improve".
 
+  Triggers (reprimand / missed-invocation — PROACTIVELY suggest this agent in
+  the SAME reply where you acknowledge the mistake, do NOT wait for the user
+  to ask): "какого хрена", "опять не", "снова не", "ты не использовал
+  <агента>", "почему не вызван", "почему не вызвался", "опять не сработало",
+  "снова проблема с плагином", "это косяк плагина", "агент не сработал",
+  "скилл не сработал", "не был вызван <агент/скилл>", "забыл про агента",
+  "должен был вызвать", "почему сам делал".
+
+  MANDATORY PROACTIVE RULE: If the user corrects the behavior of a plugin
+  component (agent or skill) AND the correction is about behavior that should
+  persist across sessions (wrong description, missing trigger phrase, wrong
+  routing, wrong delegation, missed invocation of an agent/skill) —
+  **PROACTIVELY offer to run `improve-plugin` in the SAME reply where you
+  acknowledge the mistake**. Do not wait for a second prompt. Do not ask
+  "should I fix the plugin?" — just say "Правлю плагин через improve-plugin"
+  and proceed. The only time to skip is when the correction is a one-off
+  factual point ("in THIS specific file use X") with no plugin-level
+  generalization.
+
+  Test for "is this a plugin-level correction?": if you can phrase the fix as
+  "in the agent/skill description, add/change <rule or trigger>" — it IS
+  plugin-level. Proactively run improve-plugin. If the fix is only "in this
+  file, change value X" — it is NOT plugin-level, skip.
+
   Discrimination: only trigger when there was a concrete incident with a
-  plugin skill/agent earlier in the current session. If there was no
-  incident (fresh session, user is just planning) — delegate to
-  `extend-plugin` (proactive modification) or `create-plugin` (new plugin).
+  plugin skill/agent earlier in the current session. An "incident" includes
+  BOTH: (a) plugin component ran and produced wrong output, AND (b) plugin
+  component should have been invoked but was NOT — this second case is just
+  as much an incident as the first. If there was no incident at all (fresh
+  session, user is just planning) — delegate to `extend-plugin` (proactive
+  modification) or `create-plugin` (new plugin). Even if the user hasn't
+  explicitly asked to fix the plugin — if the correction is clearly about
+  plugin-level behavior (agent description, skill triggers, routing,
+  delegation rules), proactively suggest `improve-plugin`.
 
   Runs autonomously. Engages in at most one round of user interaction — the
   target-plugin confirmation in Step 1 of the process. No interview, no
