@@ -1,0 +1,6 @@
+{
+  "name": "system-designer",
+  "version": "0.1.0",
+  "description": "Iteratively design software systems and modules — orchestrates requirements, architecture, and module documentation inside a repo's docs/ folder",
+  "author": { "name": "Anton" }
+}

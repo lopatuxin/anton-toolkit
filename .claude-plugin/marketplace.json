@@ -19,6 +19,11 @@
       "name": "plugin-builder",
       "description": "Creates, extends, and fixes plugins in the anton-toolkit-marketplace",
       "source": "./plugins/plugin-builder"
+    },
+    {
+      "name": "system-designer",
+      "description": "Iteratively design software systems and modules — orchestrates requirements, architecture, and module documentation inside a repo's docs/ folder",
+      "source": "./plugins/system-designer"
     }
   ]
 }
