@@ -1,15 +1,35 @@
 ---
 name: frontend-dev
 description: >
-  IMPORTANT: Use this agent for ALL frontend code writing tasks.
-  Any time React/TypeScript/CSS/HTML code needs to be written, modified,
-  or fixed — delegate to this agent. This includes one-line changes.
-  Do NOT use Edit/Write/Bash tools on frontend files directly.
-  The only exception is tests — those go to test-writer.
+  STOP. READ THIS FIRST. ABSOLUTE RULE WITH NO EXCEPTIONS:
+  Any change that touches a frontend file (*.tsx, *.ts, *.jsx, *.js, *.css,
+  *.scss, *.html, public/*, package.json в frontend-репо) MUST be delegated
+  to this agent. Not "should" — MUST. If you are about to call Edit/Write/Bash
+  on a frontend file yourself, you are violating this rule. Stop and launch
+  frontend-dev instead.
+
+  "Too simple for an agent" is NOT a valid reason. "Just one line" is NOT
+  a valid reason. "Trivial change" is NOT a valid reason. "It's faster to
+  do it myself" is NOT a valid reason. There are zero exceptions based on
+  task size. The agent handles one-line changes exactly the same way as
+  full features — that is by design.
+
+  Tasks that LOOK trivial but STILL go through frontend-dev (non-exhaustive):
+  - Copy an image/asset into public/ and update its src or import path
+  - Update a logo, favicon, or static asset reference
+  - Change a className, a style value, a color, a padding
+  - Fix a typo in JSX text or a string literal
+  - Rename/update an import path
+  - Swap an icon
+  - Toggle a boolean prop or flag
+  - Add/remove a single line
+  - Any "quick fix" in a .tsx/.ts/.css file
+
+  The only exception is tests — those go to test-writer. Nothing else.
 
   This includes: new components, pages, hooks, bug fixes, styling,
   API integration, state management, refactoring, form handling,
-  routing, and any other frontend code changes.
+  routing, asset updates, and any other frontend code changes.
 
   <example>
   Context: User needs a new page
@@ -55,6 +75,18 @@ description: >
   <commentary>
   Even a one-line targeted fix in React/TSX — delegate to frontend-dev.
   Do NOT use Edit/Write tools directly.
+  </commentary>
+  </example>
+
+  <example>
+  Context: User asks to update a static asset (logo, image, icon)
+  user: "Обнови логотип — вот PNG в docs/, положи в public и поменяй src в Sidebar"
+  assistant: "Запускаю frontend-dev агента — копирование ассета и правка src в .tsx идут через агента."
+  <commentary>
+  Выглядит как «просто скопировать файл и поменять одну строку» — но это правка
+  frontend-файла, значит ОБЯЗАТЕЛЬНО через frontend-dev. НЕ использовать Edit/Write
+  напрямую, даже если изменение буквально 1–3 строки. Это реальный инцидент, который
+  и породил это правило.
   </commentary>
   </example>
 
