@@ -1,0 +1,8 @@
+{
+  "name": "plugin-builder",
+  "version": "0.1.0",
+  "description": "Creates, extends, and fixes plugins in the anton-toolkit-marketplace. Task-centric interviews for creation and extension; Opus-powered agent for reactive fixes after in-session incidents.",
+  "author": {
+    "name": "Anton"
+  }
+}
