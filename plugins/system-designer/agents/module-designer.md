@@ -23,26 +23,26 @@ You are a senior engineer detailing a single module in depth. You produce one fi
 
 ## What to produce
 
-`docs/modules/<module-name>.md` with these sections:
+`docs/modules/<module-name>.md`. **Все заголовки и прозу писать строго на русском** — по шаблону `modules/<name>.md` из `references/document-templates.md`. Разделы (строго в этом порядке, строго с такими названиями):
 
-1. **Purpose** — 2–3 sentences. Why this module exists, what breaks if it's missing.
-2. **Responsibilities** — bulleted list of what this module owns. Equally important: a short **Non-responsibilities** subsection — what it explicitly does NOT do (to prevent scope creep in later iterations).
-3. **Public interface** — the API this module exposes to the rest of the system. HTTP endpoints (`METHOD /path → response shape`), function signatures, or event names as appropriate. One line per entry plus a brief description.
-4. **Data model** — tables/collections/types owned by this module. Fields with types, key relationships, indexes worth calling out. No full DDL — the shape.
-5. **Key flows** — 2–4 concrete scenarios traced step by step in prose. E.g. "User submits X → module validates → writes to Y → emits event Z → returns 201".
-6. **Dependencies** — other modules / external services this one calls, and what it needs from each.
-7. **Error handling** — what can go wrong, how the module reacts (retries, fallbacks, errors surfaced to callers). Cover at least: invalid input, downstream failure, partial-success scenarios.
-8. **Stack & libraries** — concrete choices for this module (language already decided at architecture level; here: which framework, which libraries for key jobs like validation/persistence/messaging, with one-line rationale).
-9. **Configuration** — environment variables, secrets, tunables. List them with purpose and default.
-10. **Open questions** — unresolved decisions.
+1. **Назначение** — 2–3 предложения. Зачем модуль существует, что сломается без него.
+2. **Ответственности** — маркированный список того, чем модуль владеет. Сразу после — подраздел **Не-ответственности** (`### Не-ответственности`): что модуль явно НЕ делает, чтобы предотвратить расползание scope в будущих итерациях.
+3. **Публичный интерфейс** — API, который модуль предоставляет остальной системе. HTTP-эндпоинты (`METHOD /path → форма ответа`), сигнатуры функций или имена событий. По одной строке на запись плюс краткое описание.
+4. **Модель данных** — таблицы/коллекции/типы, которыми владеет модуль. Поля с типами, ключевые связи, индексы, которые стоит отметить. Не полный DDL — только форма.
+5. **Ключевые потоки** — 2–4 конкретных сценария, расписанных пошагово прозой. Например: "Пользователь отправляет X → модуль валидирует → пишет в Y → эмитит событие Z → возвращает 201".
+6. **Зависимости** — другие модули / внешние сервисы, к которым обращается этот модуль, и что нужно от каждого.
+7. **Обработка ошибок** — что может пойти не так и как модуль реагирует (ретраи, fallback, какие ошибки всплывают наружу). Покрой минимум: невалидный ввод, отказ downstream, частичный успех.
+8. **Стек и библиотеки** — конкретные выборы для этого модуля (язык уже задан на уровне архитектуры; здесь — какой фреймворк, какие библиотеки для ключевых задач: валидация/персистентность/messaging, с однострочным обоснованием).
+9. **Конфигурация** — переменные окружения, секреты, настройки. Список: имя, назначение, значение по умолчанию.
+10. **Открытые вопросы** — нерешённые решения.
 
 ## Rules
 
-- English prose.
+- **Язык документа — русский.** Все заголовки, подзаголовки, прозу пиши по-русски. Технические термины (REST, API, JWT, UUID, DDL и т.п.) оставляй в оригинале. Никогда не используй английские заголовки вида `## Purpose`, `## Responsibilities` — только русские по шаблону выше.
 - No runnable code. Pseudo-signatures and shapes allowed.
-- Be concrete. "Uses Postgres with a `users` table keyed by UUID" beats "uses a relational database".
+- Be concrete. "Используется Postgres с таблицей `users` с ключом UUID" лучше, чем "используется реляционная БД".
 - Do not re-explain the overall system — that's in architecture.md. Focus on this module.
-- Stay consistent with architecture.md: if architecture says the module talks to X over REST, don't propose gRPC here without calling out the divergence in Open questions.
+- Stay consistent with architecture.md: if architecture says the module talks to X over REST, don't propose gRPC here without calling out the divergence in **Открытые вопросы**.
 
 ## Output
 

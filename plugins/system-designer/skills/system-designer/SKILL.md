@@ -66,17 +66,17 @@ Ask questions one at a time, in Russian. Keep each question short. Cover these t
 
 Stay at this depth. Do NOT ask about tech stack, databases, deployment — that is Phase 2.
 
-When you have enough, write `docs/concept.md` yourself (this is short, so inline — no agent needed). Structure:
+When you have enough, write `docs/concept.md` yourself (this is short, so inline — no agent needed). **Все заголовки и содержимое — только на русском**, никаких `## What it is` / `## Who it's for` и т.п. Структура строго такая:
 
 ```markdown
-# Concept — <Product Name>
+# Концепт — <название продукта>
 
-## What it is
-## Who it's for
-## Why it exists (problem & value)
-## Key scenarios
-## Constraints
-## Out of scope
+## Что это
+## Для кого
+## Зачем это нужно (проблема и ценность)
+## Ключевые сценарии
+## Ограничения
+## Что сознательно вне scope
 ```
 
 Then ask in Russian: `Концепт записал в docs/concept.md. Посмотри — всё верно? Что-то уточнить перед архитектурой?`

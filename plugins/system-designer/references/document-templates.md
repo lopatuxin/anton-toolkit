@@ -2,102 +2,104 @@
 
 Canonical section structure for each document type in `docs/`. All agents and the orchestrator skill follow these templates so documents stay consistent across projects and iterations.
 
-All documents are English Markdown. No runnable code. Pseudo-API shapes and pseudo-types are welcome.
+**Language rule:** все документы пишутся на русском языке — заголовки, содержимое, примеры. Проект и общение ведутся на русском, документация должна быть ему под стать. Технические термины (REST, API, JWT, SLA и т.п.) не переводим — оставляем в оригинале.
+
+No runnable code. Pseudo-API shapes and pseudo-types are welcome.
 
 ## concept.md
 
 ```markdown
-# Concept — <Product Name>
+# Концепт — <название продукта>
 
-## What it is
-One paragraph. Plain language. A non-technical reader should understand the product after this section.
+## Что это
+Один абзац. Простым языком. После этого раздела не-технический читатель должен понимать, что за продукт.
 
-## Who it's for
-The user types. For each: one sentence on who they are and what they need.
+## Для кого
+Типы пользователей. Для каждого — одно предложение: кто это и что ему нужно.
 
-## Why it exists (problem & value)
-The pain being solved. What's missing today. Why this specific solution is the right shape for it.
+## Зачем это нужно (проблема и ценность)
+Какую боль решаем. Чего не хватает сегодня. Почему именно такая форма решения подходит.
 
-## Key scenarios
-Numbered list of the 2–5 most common flows the product supports. One paragraph each, user's perspective.
+## Ключевые сценарии
+Нумерованный список 2–5 самых частых сценариев использования. По одному абзацу на каждый, от лица пользователя.
 
-## Constraints
-Hard limits: platforms, regulatory, scale, budget, timeline. Bullet list.
+## Ограничения
+Жёсткие рамки: платформы, регуляторика, масштаб, бюджет, сроки. Маркированный список.
 
-## Out of scope
-Explicit non-goals. What the product deliberately does NOT do. Bullet list.
+## Что сознательно вне scope
+Явные не-цели. Что продукт намеренно НЕ делает. Маркированный список.
 ```
 
 ## architecture.md
 
 ```markdown
-# Architecture — <Product Name>
+# Архитектура — <название продукта>
 
-## Overview
-3–5 sentence technical summary.
+## Обзор
+3–5 предложений технического саммари.
 
-## Key architectural decisions
-Bulleted list. Each entry: decision + one-line rationale.
+## Ключевые архитектурные решения
+Маркированный список. Каждый пункт: решение + однострочное обоснование.
 
-## Components
-For each component: **Name** — responsibility (1 sentence), owned data, exposed interfaces, dependencies.
+## Компоненты
+Для каждого компонента: **Название** — ответственность (1 предложение), какие данные владеет, какие интерфейсы предоставляет, зависимости.
 
-## Data flow
-2–4 most important end-to-end flows, traced in prose.
+## Потоки данных
+2–4 самых важных end-to-end потока, описанных прозой.
 
-## Data model (high level)
-Main entities and relationships. Shape only, not full schemas.
+## Модель данных (верхний уровень)
+Основные сущности и связи между ними. Только форма, не полные схемы.
 
-## Stack
-Technology choices per layer, each with one-line rationale.
+## Стек
+Технологические выборы по слоям, каждый с однострочным обоснованием.
 
-## Cross-cutting concerns
-Auth, logging, error handling, configuration, observability. One short section each.
+## Сквозная функциональность
+Аутентификация, логирование, обработка ошибок, конфигурация, observability. По одному короткому разделу на каждое.
 
-## Deployment topology
-Where each component runs. How they're packaged and connected in production.
+## Топология деплоя
+Где запускается каждый компонент. Как они упаковываются и соединяются в проде.
 
-## Open questions
-Unresolved decisions the user should weigh in on.
+## Открытые вопросы
+Нерешённые моменты, по которым нужно мнение пользователя.
 ```
 
 ## modules/<name>.md
 
 ```markdown
-# Module — <Name>
+# Модуль — <название>
 
-## Purpose
-2–3 sentences. Why this module exists.
+## Назначение
+2–3 предложения. Зачем этот модуль существует.
 
-## Responsibilities
-Bulleted list of what this module owns.
+## Ответственности
+Маркированный список того, чем владеет этот модуль.
 
-### Non-responsibilities
-Bulleted list of what it explicitly does NOT do.
+### Не-ответственности
+Маркированный список того, что модуль явно НЕ делает.
 
-## Public interface
-API exposed to the rest of the system. One line per entry.
+## Публичный интерфейс
+API, который модуль предоставляет остальной системе. По одной строке на эндпоинт/функцию.
 
-## Data model
-Tables / collections / types owned by this module. Fields with types, key relationships.
+## Модель данных
+Таблицы/коллекции/типы, которыми владеет модуль. Поля с типами, ключевые связи.
 
-## Key flows
-2–4 scenarios traced step by step in prose.
+## Ключевые потоки
+2–4 сценария, расписанных пошагово прозой.
 
-## Dependencies
-Other modules / external services this one calls. What it needs from each.
+## Зависимости
+Другие модули / внешние сервисы, к которым обращается этот модуль. Что нужно от каждого.
 
-## Error handling
-What can go wrong, how the module reacts.
+## Обработка ошибок
+Что может пойти не так и как модуль на это реагирует.
 
-## Stack & libraries
-Concrete choices for this module, one-line rationale each.
+## Стек и библиотеки
+Конкретные выборы для этого модуля, по однострочному обоснованию.
 
-## Configuration
-Environment variables, secrets, tunables. Name, purpose, default.
+## Конфигурация
+Переменные окружения, секреты, настройки. Имя, назначение, значение по умолчанию.
 
-## Open questions
-Unresolved decisions.
+## Открытые вопросы
+Нерешённые моменты.
 ```
 
 ## Consistency rules across documents
