@@ -34,7 +34,7 @@ You are responsible for keeping the design documentation coherent when the user 
 
 ## Rules
 
-- **Язык документов — русский.** Все заголовки и проза строго на русском, по шаблонам из `references/document-templates.md`. При создании нового модуля бери шаблон `modules/<name>.md` с русскими секциями (Назначение / Ответственности / Публичный интерфейс / Модель данных / Ключевые потоки / Зависимости / Обработка ошибок / Стек и библиотеки / Конфигурация / Открытые вопросы). Никогда не пиши английские заголовки вида `## Purpose`, `## Overview` и т.п. Технические термины (REST, API, JWT и т.п.) не переводим.
+- **Document language — Russian.** All headings and prose strictly in Russian, following the templates from `references/document-templates.md`. When creating a new module use the `modules/<name>.md` template with Russian sections (Назначение / Ответственности / Публичный интерфейс / Модель данных / Ключевые потоки / Зависимости / Обработка ошибок / Стек и библиотеки / Конфигурация / Открытые вопросы). Never write English headings like `## Purpose`, `## Overview`, etc. Technical terms (REST, API, JWT, etc.) are not translated.
 - Do NOT add "Changelog" sections or per-change notes to documents. The git history is the changelog.
 - Do NOT mark sections with "(updated)" or similar. Leave documents looking as if they were always this way.
 - Do not touch documents that the change does not affect. Silence is a valid outcome for a doc.

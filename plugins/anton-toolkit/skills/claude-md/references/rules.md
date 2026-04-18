@@ -1,186 +1,186 @@
-# Правила оформления CLAUDE.md
+# CLAUDE.md formatting rules
 
-Этот документ — reference для skill'а, который редактирует CLAUDE.md.
-Skill ДОЛЖЕН следовать этим правилам при любом изменении файла.
-
----
-
-## 1. Бюджет инструкций
-
-Системный промпт Claude Code занимает ~50 инструкций из ~150–200, которые модель способна надёжно выполнять. На CLAUDE.md остаётся ~100–150 инструкций максимум.
-
-**Лимиты:**
-- Целевой размер: 80–120 строк, ≤2500 токенов
-- Жёсткий потолок: 150 строк / 3000 токенов
-- При превышении — compliance падает РАВНОМЕРНО для ВСЕХ правил
-
-**Перед добавлением новой инструкции** спроси: "Будет ли Claude делать ошибку БЕЗ этой строки?" Если нет — не добавляй.
+This document is a reference for the skill that edits CLAUDE.md.
+The skill MUST follow these rules on every change to the file.
 
 ---
 
-## 2. Структура файла
+## 1. Instruction budget
 
-Файл состоит из трёх обязательных секций + одна опциональная:
+The Claude Code system prompt occupies ~50 instructions out of ~150–200 that the model can reliably follow. CLAUDE.md has ~100–150 instructions at most.
+
+**Limits:**
+- Target size: 80–120 lines, ≤2500 tokens
+- Hard cap: 150 lines / 3000 tokens
+- When exceeded — compliance drops UNIFORMLY for ALL rules
+
+**Before adding a new instruction** ask: "Will Claude make a mistake WITHOUT this line?" If not — don't add it.
+
+---
+
+## 2. File structure
+
+The file consists of three mandatory sections + one optional:
 
 ```markdown
 # Project
 # Stack & Build
-# Code Style        ← ОПЦИОНАЛЬНО: только если код пишется без агентов
+# Code Style        ← OPTIONAL: only if code is written without agents
 # Common Mistakes
 ```
 
 ### 2.1. `# Project`
-- 1–3 строки: что за проект, ключевая архитектура
-- НЕ описывай то, что Claude увидит из файлов (package.json, docker-compose.yml, структуру папок)
-- Указывай только то, что НЕЛЬЗЯ вывести из кода (например: "Каждый сервис — отдельный git-репозиторий")
+- 1–3 lines: what the project is, key architecture
+- DO NOT describe what Claude will see from files (package.json, docker-compose.yml, folder structure)
+- Include only what CANNOT be derived from code (e.g. "Each service is a separate git repository")
 
 ### 2.2. `# Stack & Build`
-- Таблица или список: сервис → команды сборки, тестов, запуска
-- ТОЛЬКО команды, которые Claude НЕ может угадать из build-файлов
-- Если команда стандартная (`npm install`, `./gradlew build`) и присутствует в build-файле — НЕ дублируй
-- Нестандартные команды, алиасы, docker-compose конфигурации — ОБЯЗАТЕЛЬНО
+- Table or list: service → build, test, run commands
+- ONLY commands Claude CANNOT guess from build files
+- If a command is standard (`npm install`, `./gradlew build`) and present in the build file — DO NOT duplicate
+- Non-standard commands, aliases, docker-compose configurations — MANDATORY
 
-### 2.3. `# Code Style` (ОПЦИОНАЛЬНАЯ секция)
-- Включай ТОЛЬКО если код иногда пишется БЕЗ агентов (напрямую в основной сессии)
-- Если ВЕСЬ код пишется через агентов (java-dev, frontend-dev и т.д.) — секцию НЕ создавай. Правила стиля живут в агентах
-- Если секция нужна — только правила, которые Claude НАРУШАЕТ без явного указания
+### 2.3. `# Code Style` (OPTIONAL section)
+- Include ONLY if code is sometimes written WITHOUT agents (directly in the main session)
+- If ALL code is written via agents (java-dev, frontend-dev, etc.) — do NOT create the section. Style rules live in agents.
+- If the section is needed — only rules that Claude VIOLATES without explicit instruction
 
-**Если секция используется — формат правила:**
+**If the section is used — rule format:**
 ```
-ХОРОШО (конкретное, ~89% compliance):
-- Entities: @Builder @Getter @Setter — НИКОГДА @Data
-- ID: @GeneratedValue(strategy = GenerationType.UUID) с java.util.UUID
+GOOD (specific, ~89% compliance):
+- Entities: @Builder @Getter @Setter — NEVER @Data
+- ID: @GeneratedValue(strategy = GenerationType.UUID) with java.util.UUID
 
-ПЛОХО (размытое, ~35% compliance):
-- Пиши чистый код
-- Следуй лучшим практикам
+BAD (vague, ~35% compliance):
+- Write clean code
+- Follow best practices
 ```
 
-**Правила форматирования инструкций (применимо ко ВСЕМ секциям):**
-- Используй НИКОГДА / ВСЕГДА / ТОЛЬКО для жёстких ограничений
-- Если запрещаешь что-то — ВСЕГДА давай альтернативу: "НИКОГДА @Data — используй @Builder @Getter @Setter"
-- Если Claude и так делает правильно по умолчанию — НЕ пиши правило
+**Instruction formatting rules (apply to ALL sections):**
+- Use NEVER / ALWAYS / ONLY for hard constraints
+- When prohibiting something — ALWAYS provide an alternative: "NEVER @Data — use @Builder @Getter @Setter"
+- If Claude already does the right thing by default — DO NOT write the rule
 
 ### 2.4. `# Common Mistakes`
-- Ошибки, которые Claude УЖЕ допускал в этом проекте
-- Формат: "НЕ делай X — делай Y. Причина: Z"
-- Эта секция растёт органически через feedback loop
-- Если секция пуста — оставь заглушку: `[Пока пусто]`
+- Mistakes Claude has ALREADY made in this project
+- Format: "DO NOT do X — do Y instead. Reason: Z"
+- This section grows organically through the feedback loop
+- If the section is empty — leave a placeholder: `[Пока пусто]`
 
 ---
 
-## 3. Что ЗАПРЕЩЕНО в CLAUDE.md
+## 3. What is FORBIDDEN in CLAUDE.md
 
-### 3.1. Информация, которую Claude получит из кода
-Claude при старте сессии читает файлы проекта. НЕ дублируй:
-- Таблицы портов, Docker port mapping
-- Списки entities, controllers, endpoints
-- Описание того как работает конкретный filter/service
-- Environment variables (Claude прочитает .env, application.yml, docker-compose.yml)
-- Описание frontend-стека (Claude прочитает package.json)
-- Описание зависимостей (Claude прочитает build.gradle / pom.xml)
+### 3.1. Information Claude can derive from code
+Claude reads project files at session start. DO NOT duplicate:
+- Port tables, Docker port mapping
+- Lists of entities, controllers, endpoints
+- Descriptions of how a specific filter/service works
+- Environment variables (Claude will read .env, application.yml, docker-compose.yml)
+- Frontend stack description (Claude will read package.json)
+- Dependency descriptions (Claude will read build.gradle / pom.xml)
 
-### 3.2. Reference-материалы
-Архитектура, API-контракты, спецификации — это НЕ инструкции, а справочные данные. Они нужны не каждую сессию.
+### 3.2. Reference materials
+Architecture, API contracts, specifications — these are NOT instructions, they are reference data. They are not needed every session.
 
-**Вместо** описания архитектуры в CLAUDE.md:
+**Instead** of describing architecture in CLAUDE.md:
 ```markdown
-ПЛОХО:
-[50 строк описания JWT flow, Gateway filter, API contract]
+BAD:
+[50 lines describing JWT flow, Gateway filter, API contract]
 
-ХОРОШО:
-Архитектура и API контракт: смотри docs/architecture.md
+GOOD:
+Architecture and API contract: see docs/architecture.md
 ```
 
-### 3.3. `@file` ссылки на embed
-`@file` в CLAUDE.md embed'ит файл КАЖДУЮ сессию, раздувая контекст.
+### 3.3. `@file` embed references
+`@file` in CLAUDE.md embeds the file EVERY session, bloating context.
 
 ```markdown
-ПЛОХО:
+BAD:
 @docs/api-spec.md
 
-ХОРОШО:
-При работе с API — смотри docs/api-spec.md
+GOOD:
+When working with the API — see docs/api-spec.md
 ```
 
-### 3.4. Дублирование с агентами, skills, hooks
-- Если правило уже есть в агенте (например, java-dev знает про Records) — НЕ дублируй в CLAUDE.md
-- В CLAUDE.md — только КРОСС-агентные правила
-- Если действие должно выполняться на 100% (форматирование, тесты) — это hook, не CLAUDE.md
+### 3.4. Duplication with agents, skills, hooks
+- If a rule already exists in an agent (e.g. java-dev knows about Records) — DO NOT duplicate in CLAUDE.md
+- CLAUDE.md — only CROSS-agent rules
+- If an action must execute 100% of the time (formatting, tests) — that's a hook, not CLAUDE.md
 
-### 3.5. Команды, реализованные через skills
-Если для действия есть skill (например, коммит) — НЕ описывай его логику в CLAUDE.md.
+### 3.5. Commands implemented via skills
+If an action has a skill (e.g. commit) — DO NOT describe its logic in CLAUDE.md.
 
 ---
 
-## 4. Иерархия файлов
+## 4. File hierarchy
 
-| Файл | Что туда | В git? |
+| File | What goes there | In git? |
 |---|---|---|
-| `~/.claude/CLAUDE.md` | Глобальные правила для ВСЕХ проектов (язык, формат коммитов) | Нет |
-| `./CLAUDE.md` | Проектные правила (стек, build, style) — основной файл | Да |
-| `./.claude/CLAUDE.md` | Личные настройки проекта (не для команды) | .gitignore |
-| `./subdir/CLAUDE.md` | Правила для подпапки (on-demand, Claude читает при работе в этой папке) | Да |
+| `~/.claude/CLAUDE.md` | Global rules for ALL projects (language, commit format) | No |
+| `./CLAUDE.md` | Project rules (stack, build, style) — main file | Yes |
+| `./.claude/CLAUDE.md` | Personal project settings (not for the team) | .gitignore |
+| `./subdir/CLAUDE.md` | Rules for a subfolder (on-demand, Claude reads when working in that folder) | Yes |
 
-Правила НАСЛЕДУЮТСЯ сверху вниз. НЕ повторяй в проектном файле то, что есть в глобальном.
+Rules INHERIT top-down. DO NOT repeat in the project file what is already in the global one.
 
 ---
 
-## 5. Предупреждения о документации
+## 5. Documentation warnings
 
-Если docs/ проекта содержат устаревшие или некорректные примеры — ОБЯЗАТЕЛЬНО предупреди:
+If the project's docs/ contain outdated or incorrect examples — MANDATORY warn about it:
 
 ```markdown
-ХОРОШО:
-- auth/docs/ — спеки Auth. ВНИМАНИЕ: описывают ПЛАНИРУЕМЫЕ фичи (Redis, Kafka) — НЕ текущий код
-- budget/docs/api/ — ВНИМАНИЕ: примеры используют @Data — это НАРУШАЕТ конвенции
+GOOD:
+- auth/docs/ — Auth specs. WARNING: describe PLANNED features (Redis, Kafka) — NOT current code
+- budget/docs/api/ — WARNING: examples use @Data — this VIOLATES conventions
 
-ПЛОХО:
+BAD:
 - auth/docs/ — Auth service specs
 ```
 
 ---
 
-## 6. Алгоритм работы skill'а
+## 6. Skill algorithm
 
-### При добавлении нового правила:
-1. Проверь текущий размер файла (строки + примерный токен-каунт)
-2. Если файл ≥120 строк — сначала найди что УДАЛИТЬ или СОКРАТИТЬ
-3. Проверь: нет ли этого правила уже в агентах или skills?
-4. Проверь: может ли Claude получить эту информацию из кода?
-5. Сформулируй конкретно: условие + действие + альтернатива
-6. Добавь в правильную секцию (Style / Mistakes / Build)
-7. Валидация: файл остаётся ≤150 строк
+### When adding a new rule:
+1. Check current file size (lines + approximate token count)
+2. If file ≥120 lines — first find something to DELETE or SHORTEN
+3. Check: is this rule already in agents or skills?
+4. Check: can Claude derive this information from code?
+5. Formulate concretely: condition + action + alternative
+6. Add to the correct section (Style / Mistakes / Build)
+7. Validate: file stays ≤150 lines
 
-### При добавлении Common Mistake:
-1. Сформулируй: "НЕ делай X — делай Y. Причина: Z"
-2. Проверь: нет ли уже похожего правила в Code Style? Если есть — усиль его вместо создания дубликата
-3. Если ошибка повторяется 3+ раза — повысь из Common Mistakes в Code Style
+### When adding a Common Mistake:
+1. Formulate: "DO NOT do X — do Y instead. Reason: Z"
+2. Check: is there already a similar rule in Code Style? If so — strengthen it instead of creating a duplicate
+3. If a mistake recurs 3+ times — promote from Common Mistakes to Code Style
 
-### При аудите (периодическая чистка):
-1. Для каждого правила спроси: "Claude ошибётся без этого?"
-2. Удали правила, которые Claude соблюдает по умолчанию
-3. Удали дублирование с агентами и skills
-4. Объедини похожие правила
-5. Проверь что итоговый размер ≤120 строк
+### When auditing (periodic cleanup):
+1. For each rule ask: "Will Claude make a mistake without this?"
+2. Remove rules Claude follows by default
+3. Remove duplication with agents and skills
+4. Merge similar rules
+5. Check that the final size is ≤120 lines
 
 ---
 
-## 7. Формат записи правил — шпаргалка
+## 7. Rule writing cheatsheet
 
 ```markdown
-# Сильные сигналы (для жёстких ограничений):
-НИКОГДА, ВСЕГДА, ТОЛЬКО, ЗАПРЕЩЕНО, ОБЯЗАТЕЛЬНО
+# Strong signals (for hard constraints):
+NEVER, ALWAYS, ONLY, FORBIDDEN, MANDATORY
 
-# Средние сигналы (для предпочтений):
-Предпочитай X вместо Y
-Используй X, не Y
+# Medium signals (for preferences):
+Prefer X over Y
+Use X, not Y
 
-# Со ссылкой на причину (повышает compliance):
-НИКОГДА @Data — нарушает equals/hashCode в JPA entities
-Используй Records для DTO — immutable, меньше boilerplate
+# With reason (increases compliance):
+NEVER @Data — breaks equals/hashCode in JPA entities
+Use Records for DTOs — immutable, less boilerplate
 
-# С альтернативой (ОБЯЗАТЕЛЬНО при запрете):
-ПЛОХО: "Никогда не используй --foo-bar"
-ХОРОШО: "Никогда --foo-bar — используй --baz вместо него"
+# With alternative (MANDATORY when prohibiting):
+BAD: "Never use --foo-bar"
+GOOD: "Never --foo-bar — use --baz instead"
 ```

@@ -1,20 +1,20 @@
-# Docker Reference — шаблоны Dockerfile
+# Docker Reference — Dockerfile templates
 
 ## Spring Boot + Gradle (multi-stage)
 
-Основной шаблон для Spring Boot проектов с Gradle.
+Main template for Spring Boot projects with Gradle.
 
 ```dockerfile
 # --- Stage 1: Build ---
 FROM eclipse-temurin:21-jdk AS builder
 WORKDIR /app
 
-# Кешируем зависимости (отдельный слой)
+# Cache dependencies (separate layer)
 COPY gradle/ gradle/
 COPY gradlew build.gradle.kts settings.gradle.kts ./
 RUN ./gradlew dependencies --no-daemon || true
 
-# Копируем исходники и собираем
+# Copy sources and build
 COPY src/ src/
 RUN ./gradlew bootJar --no-daemon -x test
 
@@ -22,7 +22,7 @@ RUN ./gradlew bootJar --no-daemon -x test
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-# Не запускай от root
+# Do not run as root
 RUN groupadd -r app && useradd -r -g app app
 USER app
 
@@ -36,9 +36,9 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
 ENTRYPOINT ["java", "-jar", "app.jar"]
 ```
 
-### Адаптация шаблона
+### Template adaptation
 
-**Версия Java**: замени `21` на нужную (17, 21, 23). Проверь в `build.gradle.kts`:
+**Java version**: replace `21` with the required version (17, 21, 23). Check `build.gradle.kts`:
 ```kotlin
 java {
     toolchain {
@@ -47,7 +47,7 @@ java {
 }
 ```
 
-**Multi-module проект**: если проект мульти-модульный, адаптируй COPY:
+**Multi-module project**: if the project is multi-module, adapt COPY:
 ```dockerfile
 COPY gradle/ gradle/
 COPY gradlew build.gradle.kts settings.gradle.kts ./
@@ -60,7 +60,7 @@ COPY module-b/src/ module-b/src/
 RUN ./gradlew :module-b:bootJar --no-daemon -x test
 ```
 
-**Maven**: замени Gradle команды:
+**Maven**: replace Gradle commands:
 ```dockerfile
 COPY pom.xml ./
 RUN mvn dependency:go-offline
@@ -68,11 +68,11 @@ RUN mvn dependency:go-offline
 COPY src/ src/
 RUN mvn package -DskipTests
 
-# В runtime stage:
+# In runtime stage:
 COPY --from=builder /app/target/*.jar app.jar
 ```
 
-**JVM-тюнинг для контейнеров**:
+**JVM tuning for containers**:
 ```dockerfile
 ENTRYPOINT ["java", \
   "-XX:+UseContainerSupport", \
@@ -83,7 +83,7 @@ ENTRYPOINT ["java", \
 
 ## .dockerignore
 
-Всегда создавай рядом с Dockerfile:
+Always create next to the Dockerfile:
 
 ```
 .git
@@ -98,9 +98,9 @@ docker-compose*.yml
 README.md
 ```
 
-## Spring Boot Actuator (для healthcheck)
+## Spring Boot Actuator (for healthcheck)
 
-Если в проекте нет actuator — добавь зависимость:
+If actuator is not in the project — add the dependency:
 
 ```kotlin
 // build.gradle.kts
@@ -121,17 +121,17 @@ management:
       show-details: never
 ```
 
-Если actuator не подходит — используй liveness probe через TCP:
+If actuator is not suitable — use a TCP liveness probe:
 ```dockerfile
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
   CMD nc -z localhost 8080 || exit 1
 ```
 
-## Оптимизация слоёв
+## Layer optimization
 
-Порядок COPY от редко меняющегося к часто:
-1. `gradlew`, `gradle/` — почти никогда не меняются
-2. `build.gradle.kts`, `settings.gradle.kts` — редко
-3. `src/` — часто
+Order COPY from least-changed to most-changed:
+1. `gradlew`, `gradle/` — almost never change
+2. `build.gradle.kts`, `settings.gradle.kts` — rarely
+3. `src/` — frequently
 
-Это максимизирует cache hit при пересборке.
+This maximizes cache hits on rebuild.

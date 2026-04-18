@@ -57,16 +57,16 @@ Goal: produce `docs/concept.md` that captures WHAT is being built and WHY, at a 
 
 Ask questions one at a time, in Russian. Keep each question short. Cover these topics in order, but adapt based on answers:
 
-1. **Что за продукт/система.** "Что это — одно предложение?"
-2. **Пользователи.** "Кто будет этим пользоваться? Один тип пользователей или несколько?"
-3. **Ключевая ценность.** "Какую главную задачу пользователя это решает? Чего сейчас не хватает?"
-4. **Ключевые сценарии.** "Назови 2–3 основных сценария использования — что пользователь делает чаще всего."
-5. **Ограничения.** "Есть ли жёсткие ограничения — масштаб, платформы, регуляторика, бюджет, сроки?"
-6. **Что точно НЕ входит в продукт.** "Что сознательно остаётся за скобками — чтобы не раздувать scope?"
+1. **What the product/system is.** "Что это — одно предложение?"
+2. **Users.** "Кто будет этим пользоваться? Один тип пользователей или несколько?"
+3. **Key value.** "Какую главную задачу пользователя это решает? Чего сейчас не хватает?"
+4. **Key scenarios.** "Назови 2–3 основных сценария использования — что пользователь делает чаще всего."
+5. **Constraints.** "Есть ли жёсткие ограничения — масштаб, платформы, регуляторика, бюджет, сроки?"
+6. **What is explicitly out of scope.** "Что сознательно остаётся за скобками — чтобы не раздувать scope?"
 
 Stay at this depth. Do NOT ask about tech stack, databases, deployment — that is Phase 2.
 
-When you have enough, write `docs/concept.md` yourself (this is short, so inline — no agent needed). **Все заголовки и содержимое — только на русском**, никаких `## What it is` / `## Who it's for` и т.п. Структура строго такая:
+When you have enough, write `docs/concept.md` yourself (this is short, so inline — no agent needed). **All headings and content in Russian only** — no `## What it is` / `## Who it's for` etc. Structure strictly:
 
 ```markdown
 # Концепт — <название продукта>

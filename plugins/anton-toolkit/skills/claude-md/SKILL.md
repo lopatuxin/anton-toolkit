@@ -12,59 +12,59 @@ description: >
   or any request to create or modify a CLAUDE.md file.
 ---
 
-# CLAUDE.md — создание и поддержка
+# CLAUDE.md — creation and maintenance
 
-Создай или приведи в порядок файл CLAUDE.md, следуя строгим правилам из `references/rules.md`.
+Create or clean up a CLAUDE.md file following the strict rules from `references/rules.md`.
 
-## Процесс
+## Process
 
-### Создание нового CLAUDE.md
+### Creating a new CLAUDE.md
 
-1. **Изучи проект:**
-   - Прочитай build-файлы (`build.gradle.kts`, `pom.xml`, `package.json`)
-   - Прочитай существующие конфиги (`application.yml`, `docker-compose.yml`, `.env`)
-   - Посмотри структуру папок
-   - Найди агентов и скиллы в плагинах — не дублируй их правила
-   - **Проверь установленные плагины** (skills и agents). Если java-dev, frontend-dev или другие code-writing агенты есть — НЕ создавай секцию `# Code Style`. Правила стиля живут в агентах
-   - **Проверь скиллы** (commit, devops и т.д.). Если действие уже реализовано скиллом — НЕ описывай его в CLAUDE.md
+1. **Study the project:**
+   - Read build files (`build.gradle.kts`, `pom.xml`, `package.json`)
+   - Read existing configs (`application.yml`, `docker-compose.yml`, `.env`)
+   - Look at the folder structure
+   - Find agents and skills in plugins — do not duplicate their rules
+   - **Check installed plugins** (skills and agents). If java-dev, frontend-dev, or other code-writing agents are present — do NOT create a `# Code Style` section. Style rules live in agents.
+   - **Check skills** (commit, devops, etc.). If an action is already implemented by a skill — do NOT describe its logic in CLAUDE.md.
 
-2. **Определи что НЕ очевидно из кода** — только это попадёт в CLAUDE.md:
-   - Нестандартные команды сборки/запуска
-   - Архитектурные решения, которые нельзя вывести из файлов
-   - Ошибки, которые Claude уже допускал
+2. **Determine what is NOT obvious from the code** — only that goes into CLAUDE.md:
+   - Non-standard build/run commands
+   - Architectural decisions that cannot be derived from files
+   - Mistakes Claude has already made
 
-3. **Напиши файл по структуре** из `references/rules.md`:
-   - `# Project` — 1-3 строки
-   - `# Stack & Build` — только нестандартные команды
-   - `# Code Style` — ТОЛЬКО если в проекте НЕТ code-writing агентов (java-dev, frontend-dev). Если агенты есть — секцию НЕ создавай, даже если в проекте есть конвенции. Кросс-агентные контракты (API формат) выноси в docs/ и давай ссылку
-   - `# Common Mistakes` — заглушка `[Пока пусто]` если ошибок ещё не было
+3. **Write the file using the structure** from `references/rules.md`:
+   - `# Project` — 1–3 lines
+   - `# Stack & Build` — only non-standard commands
+   - `# Code Style` — ONLY if the project has NO code-writing agents (java-dev, frontend-dev). If agents are present — do NOT create the section, even if the project has conventions. Cross-agent contracts (API format) go into docs/ with a reference link.
+   - `# Common Mistakes` — placeholder `[Пока пусто]` if no mistakes have occurred yet
 
-4. **Проверь лимиты:** 80-120 строк, ≤2500 токенов. Жёсткий потолок — 150 строк.
+4. **Check limits:** 80–120 lines, ≤2500 tokens. Hard cap — 150 lines.
 
-### Аудит существующего CLAUDE.md
+### Auditing an existing CLAUDE.md
 
-1. **Прочитай текущий файл**
-2. **Для каждого правила спроси:** "Claude ошибётся без этого?"
-3. **Удали:**
-   - Информацию, которую Claude получит из кода (порты, entities, endpoints)
-   - Дублирование с агентами и скиллами плагина
-   - Размытые правила ("пиши чистый код")
-   - `@file` embed-ссылки — замени на "смотри docs/..."
-4. **Усиль:** слабые формулировки → НИКОГДА/ВСЕГДА + альтернатива
-5. **Проверь лимиты** после правок
+1. **Read the current file**
+2. **For each rule ask:** "Will Claude make a mistake WITHOUT this line?"
+3. **Remove:**
+   - Information Claude can derive from code (ports, entities, endpoints)
+   - Duplication with plugin agents and skills
+   - Vague rules ("write clean code")
+   - `@file` embed references — replace with "see docs/..."
+4. **Strengthen:** weak formulations → NEVER/ALWAYS + alternative
+5. **Check limits** after edits
 
-### Добавление правила
+### Adding a rule
 
-1. Проверь текущий размер — если ≥120 строк, сначала сократи
-2. Проверь нет ли правила в агентах/скиллах
-3. Проверь можно ли получить информацию из кода
-4. Сформулируй: условие + действие + альтернатива
-5. Добавь в правильную секцию
+1. Check current file size — if ≥120 lines, first find something to DELETE or SHORTEN
+2. Check whether the rule already exists in agents/skills
+3. Check whether Claude can derive the information from the code
+4. Formulate: condition + action + alternative
+5. Add to the correct section
 
-## Правила
+## Rules
 
-- ВСЕГДА читай `references/rules.md` перед любым изменением CLAUDE.md
-- ВСЕГДА показывай итоговый файл пользователю перед сохранением
-- НЕ дублируй информацию из кода, агентов, скиллов
-- НЕ превышай 150 строк / 3000 токенов
-- При запрете — ВСЕГДА давай альтернативу
+- ALWAYS read `references/rules.md` before any CLAUDE.md change
+- ALWAYS show the final file to the user before saving
+- DO NOT duplicate information from code, agents, or skills
+- DO NOT exceed 150 lines / 3000 tokens
+- When prohibiting something — ALWAYS provide an alternative

@@ -14,75 +14,75 @@ description: >
   related to Docker, deployment, infrastructure setup, or service orchestration.
 ---
 
-# DevOps — контейнеризация, деплой и инфраструктура
+# DevOps — containerization, deployment, and infrastructure
 
-Помоги пользователю развернуть проект, настроить контейнеры, оркестрацию и инфраструктуру.
+Help the user deploy a project, configure containers, orchestration, and infrastructure.
 
-## Общий подход
+## General approach
 
-1. **Изучи проект.** Прежде чем создавать конфиги, прочитай:
-   - Build-файл (`build.gradle.kts`, `pom.xml`, `package.json`)
-   - Существующие `Dockerfile`, `docker-compose.yml`, `.dockerignore`
-   - Конфиги приложения (`application.yml`, `.env`)
-   - Структуру модулей (моно-репо или мульти-модуль)
+1. **Study the project.** Before creating configs, read:
+   - Build file (`build.gradle.kts`, `pom.xml`, `package.json`)
+   - Existing `Dockerfile`, `docker-compose.yml`, `.dockerignore`
+   - Application configs (`application.yml`, `.env`)
+   - Module structure (mono-repo or multi-module)
 
-2. **Спроси чего не хватает.** Не угадывай — спроси пользователя:
-   - Какие сервисы нужны (БД, кэш, брокер, прокси)
-   - Какие порты использовать
-   - Нужны ли volumes для данных
-   - Окружение: dev, staging или prod
+2. **Ask for what is missing.** Don't guess — ask the user:
+   - Which services are needed (DB, cache, broker, proxy)
+   - Which ports to use
+   - Whether volumes for data are needed
+   - Environment: dev, staging, or prod
 
-3. **Создай конфигурацию.** Используй шаблоны из `references/`:
+3. **Create the configuration.** Use templates from `references/`:
    - Dockerfile → `references/docker.md`
    - docker-compose.yml → `references/compose.md`
    - CI/CD → `references/cicd.md`
 
-4. **Проверь работоспособность.** После создания конфигов:
-   - Проверь что Docker запущен: `docker info`
-   - Собери образ: `docker compose build`
-   - Запусти: `docker compose up -d`
-   - Проверь статус: `docker compose ps`
-   - Покажи логи при ошибках: `docker compose logs <service>`
+4. **Verify it works.** After creating the configs:
+   - Check Docker is running: `docker info`
+   - Build the image: `docker compose build`
+   - Start: `docker compose up -d`
+   - Check status: `docker compose ps`
+   - Show logs on errors: `docker compose logs <service>`
 
-## Возможности
+## Capabilities
 
-### Контейнеризация
-- Создание Dockerfile (multi-stage build для Java/Spring Boot)
-- Создание .dockerignore
-- Оптимизация размера образа и времени сборки
-- Layer caching для Gradle/Maven зависимостей
+### Containerization
+- Creating Dockerfiles (multi-stage build for Java/Spring Boot)
+- Creating .dockerignore
+- Optimizing image size and build time
+- Layer caching for Gradle/Maven dependencies
 
-### Оркестрация (Docker Compose)
-- Сборка docker-compose.yml с нужными сервисами
-- Настройка сетей, volumes, healthchecks
-- Профили для разных окружений (dev/prod)
-- Зависимости между сервисами (depends_on + healthcheck)
+### Orchestration (Docker Compose)
+- Building docker-compose.yml with required services
+- Configuring networks, volumes, healthchecks
+- Profiles for different environments (dev/prod)
+- Service dependencies (depends_on + healthcheck)
 
-### Управление контейнерами
-- Запуск/остановка/перезапуск: `docker compose up -d`, `down`, `restart`
-- Логи: `docker compose logs -f <service>`
-- Статус: `docker compose ps`
-- Вход в контейнер: `docker compose exec <service> bash`
-- Очистка: `docker system prune`, `docker volume prune`
+### Container management
+- Start/stop/restart: `docker compose up -d`, `down`, `restart`
+- Logs: `docker compose logs -f <service>`
+- Status: `docker compose ps`
+- Enter container: `docker compose exec <service> bash`
+- Cleanup: `docker system prune`, `docker volume prune`
 
-### CI/CD (когда потребуется)
+### CI/CD (when needed)
 - GitHub Actions workflows
-- Сборка и push образов
-- Автодеплой по тегам/веткам
+- Building and pushing images
+- Auto-deploy on tags/branches
 
-### Мониторинг и отладка
-- Health check эндпоинты (Spring Boot Actuator)
-- Проверка портов и сетей
-- Анализ ресурсов: `docker stats`
-- Диагностика проблем запуска
+### Monitoring and debugging
+- Health check endpoints (Spring Boot Actuator)
+- Port and network checks
+- Resource analysis: `docker stats`
+- Diagnosing startup problems
 
-## Правила
+## Rules
 
-- ВСЕГДА читай проект перед генерацией конфигов — не шаблонируй вслепую
-- Не перезаписывай существующие Dockerfile/compose без подтверждения
-- Используй multi-stage builds для продакшен-образов
-- Не хардкодь пароли и секреты — используй `.env` файлы и переменные окружения
-- Добавляй healthcheck для каждого сервиса в compose
-- Для volumes с данными (БД) используй named volumes, не bind mounts
-- Порты: не маппь на 80/443 по умолчанию — спроси пользователя
-- При ошибках сборки — покажи логи и диагностируй, не повторяй слепо
+- ALWAYS read the project before generating configs — do not template blindly
+- Do not overwrite existing Dockerfile/compose without confirmation
+- Use multi-stage builds for production images
+- Do not hardcode passwords and secrets — use `.env` files and environment variables
+- Add a healthcheck for each service in compose
+- For data volumes (DBs) use named volumes, not bind mounts
+- Ports: do not map to 80/443 by default — ask the user
+- On build errors — show logs and diagnose, do not retry blindly

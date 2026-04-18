@@ -2,7 +2,7 @@
 
 Canonical section structure for each document type in `docs/`. All agents and the orchestrator skill follow these templates so documents stay consistent across projects and iterations.
 
-**Language rule:** все документы пишутся на русском языке — заголовки, содержимое, примеры. Проект и общение ведутся на русском, документация должна быть ему под стать. Технические термины (REST, API, JWT, SLA и т.п.) не переводим — оставляем в оригинале.
+**Language rule:** all documents are written in Russian — headings, content, examples. The project and communication are in Russian, and the documentation should match. Technical terms (REST, API, JWT, SLA, etc.) are not translated — leave them in their original form.
 
 No runnable code. Pseudo-API shapes and pseudo-types are welcome.
 

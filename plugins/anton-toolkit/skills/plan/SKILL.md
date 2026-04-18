@@ -14,148 +14,148 @@ description: >
   existing frontend code, or verbal description from user.
 ---
 
-# Plan — пошаговый план реализации для агента
+# Plan — step-by-step implementation plan for an agent
 
-Создай детальный пошаговый план реализации, который сможет выполнить Claude-агент без дополнительных уточнений.
+Create a detailed step-by-step implementation plan that a Claude agent can execute without further clarification.
 
-## Источники информации
+## Information sources
 
-### 1. Документация из Confluence (PDF)
+### 1. Confluence documentation (PDF)
 
-Пользователь кладёт PDF в папку `docs/` корня проекта.
+The user places a PDF in the `docs/` folder at the project root.
 
-Процесс:
-- Прочитай PDF через Read tool: `docs/<filename>.pdf`
-- Извлеки ключевое: функциональные требования, бизнес-логику, ограничения
-- Если PDF большой — читай по страницам (`pages: "1-10"`, потом `"11-20"`)
-- Спроси пользователя если что-то непонятно в доке
+Process:
+- Read the PDF via the Read tool: `docs/<filename>.pdf`
+- Extract the key content: functional requirements, business logic, constraints
+- If the PDF is large — read page by page (`pages: "1-10"`, then `"11-20"`)
+- Ask the user if anything in the doc is unclear
 
-### 2. Существующий фронтенд (код)
+### 2. Existing frontend (code)
 
-Пользователь указывает на фронтенд-код, по которому нужно реализовать бэкенд или другую часть.
+The user points to frontend code from which a backend or another part needs to be implemented.
 
-Процесс:
-- Найди фронтенд-файлы: компоненты, страницы, API-вызовы
-- Извлеки: какие эндпоинты вызываются, какие данные ожидаются, какие формы/действия есть
-- Определи контракт между фронтом и бэком (запросы, ответы, DTO)
+Process:
+- Find frontend files: components, pages, API calls
+- Extract: which endpoints are called, what data is expected, what forms/actions exist
+- Determine the frontend–backend contract (requests, responses, DTOs)
 
-### 3. Устное описание
+### 3. Verbal description
 
-Пользователь описывает задачу словами. Задай уточняющие вопросы.
+The user describes the task in words. Ask clarifying questions.
 
-## Процесс создания плана
+## Plan creation process
 
-### Шаг 1. Собери контекст
+### Step 1. Gather context
 
-- Прочитай источник (PDF, код, описание)
-- Изучи текущую структуру проекта (модули, пакеты, существующие паттерны)
-- Найди аналогичные реализации в проекте — план должен следовать тем же паттернам
-- **Обязательный чек границы слоёв**: просканируй фронтовый код, затрагиваемый задачей, на наличие бизнес-вычислений (агрегации, проценты, нормы, rate/ratio-метрики, клампы, формулы типа `(a - b) / a * 100`). Если нашёл — см. раздел [Где должны жить вычисления](#где-должны-жить-вычисления), план обязан включать перенос этой логики в backend.
+- Read the source (PDF, code, description)
+- Study the current project structure (modules, packages, existing patterns)
+- Find similar implementations in the project — the plan must follow the same patterns
+- **Mandatory layer boundary check**: scan the frontend code affected by the task for business calculations (aggregations, percentages, norms, rate/ratio metrics, clamps, formulas like `(a - b) / a * 100`). If found — see [Where calculations should live](#where-calculations-should-live); the plan MUST include moving that logic to the backend.
 
-### Шаг 2. Предложи подходы
+### Step 2. Propose approaches
 
-Если есть несколько вариантов реализации — кратко опиши каждый:
-- Подход А: описание + плюсы + минусы
-- Подход Б: описание + плюсы + минусы
+If there are multiple implementation options — briefly describe each:
+- Approach A: description + pros + cons
+- Approach B: description + pros + cons
 
-Спроси пользователя какой подход выбрать. Если подход очевиден — предложи один и спроси подтверждение.
+Ask the user which approach to take. If the approach is obvious — propose one and ask for confirmation.
 
-### Шаг 3. Напиши план
+### Step 3. Write the plan
 
-Перед написанием шагов ещё раз сверься с разделом [Где должны жить вычисления](#где-должны-жить-вычисления) — если задача трогает фронт, где уже есть агрегации/формулы/проценты, план ОБЯЗАН содержать шаги переноса этой логики в backend и шаг удаления локального вычисления на фронте.
+Before writing the steps, re-check the [Where calculations should live](#where-calculations-should-live) section — if the task touches frontend code that already contains aggregations/formulas/percentages, the plan MUST include steps to move that logic to the backend and a step to remove the local calculation from the frontend.
 
-План должен быть **исполняемым агентом**. Каждый шаг содержит:
+The plan must be **executable by an agent**. Each step contains:
 
 ```
-## Шаг N: <краткое название>
+## Шаг N: <short name>
 
-**Что делать**: конкретное действие (создать файл, добавить метод, изменить конфиг)
-**Где**: точный путь к файлу или пакету
+**Что делать**: specific action (create a file, add a method, change a config)
+**Где**: exact file path or package
 **Детали**:
-- Какие классы/интерфейсы создать
-- Какие методы с какой сигнатурой
-- Какие зависимости добавить
-- Какие паттерны использовать (ссылка на аналог в проекте)
+- Which classes/interfaces to create
+- Which methods with which signatures
+- Which dependencies to add
+- Which patterns to use (reference to a project analogue)
 
-**Проверка**: как убедиться что шаг выполнен — ТОЛЬКО автоматика: компиляция проходит, юнит/интеграционный тест зелёный, линтер/тайпчек чистый. НЕ писать сюда ручные действия (curl, docker exec, psql, открыть браузер, посмотреть логи).
+**Проверка**: how to confirm the step is done — ONLY automated: compilation passes, unit/integration test is green, linter/typecheck is clean. Do NOT include manual actions here (curl, docker exec, psql, open a browser, check logs).
 ```
 
-### Шаг 4. Сохрани план
+### Step 4. Save the plan
 
-Сохрани план в файл `docs/PLAN-<краткое-имя>.md` в **корне проекта** (workspace root, не внутри отдельного сервиса). Если пользователь указал другое место — используй его.
-Это позволит агенту прочитать план и выполнять его пошагово.
+Save the plan to `docs/PLAN-<short-name>.md` in the **project root** (workspace root, not inside an individual service). If the user specified another location — use it.
+This allows the agent to read the plan and execute it step by step.
 
-### Шаг 5. Объяви исполнителей
+### Step 5. Announce the executors
 
-После сохранения плана явно скажи пользователю, какими агентами выполнять каждый шаг:
+After saving the plan, explicitly tell the user which agents should execute each step:
 
-- **Java/Spring Boot шаги** → `java-dev` агент (`anton-toolkit:java-dev`)
-- **React/TypeScript шаги** → `frontend-dev` агент (`anton-toolkit:frontend-dev`)
-- После завершения `java-dev` → автоматически запустить `test-writer` и `code-reviewer`
-- После завершения `frontend-dev` → автоматически запустить `code-reviewer`
+- **Java/Spring Boot steps** → `java-dev` agent (`anton-toolkit:java-dev`)
+- **React/TypeScript steps** → `frontend-dev` agent (`anton-toolkit:frontend-dev`)
+- After `java-dev` finishes → automatically launch `test-writer` and `code-reviewer`
+- After `frontend-dev` finishes → automatically launch `code-reviewer`
 
-Пример итоговой фразы после сохранения плана:
+Example final phrase after saving:
 > Шаги 1–5 (Java) → `java-dev` агент  
 > Шаг 6 (React/TypeScript) → `frontend-dev` агент
 
-## Где должны жить вычисления
+## Where calculations should live
 
-Если в проекте есть backend-сервис, отвечающий за данные задачи — **все бизнес-вычисления (суммы, средние, агрегаты, проценты, нормы, rate/ratio-метрики, клампы, формулы) живут в backend**. Фронт только отображает готовые поля из API.
+If the project has a backend service responsible for the task's data — **all business calculations (sums, averages, aggregates, percentages, norms, rate/ratio metrics, clamps, formulas) live in the backend**. The frontend only displays ready-made fields from the API.
 
-Правило работает в обе стороны:
+The rule works both ways:
 
-**(a) Не добавляй новые вычисления на фронт.** Если в плане появляется расчёт производной метрики — его место в Service/DTO, а не в React-компоненте.
+**(a) Do not add new calculations to the frontend.** If a plan introduces a derived metric calculation — its place is in the Service/DTO, not a React component.
 
-**(b) Если существующий фронт уже содержит такое вычисление — план обязан включать его перенос в backend.** Это частый промах: фронт открывается, в нём находится готовая формула, и план молча оставляет её на месте. Недопустимо. План должен содержать:
-1. Добавить поле в соответствующий response DTO.
-2. Реализовать расчёт в Service (по аналогу существующих методов).
-3. Покрыть тестом.
-4. На фронте — удалить локальное вычисление и использовать поле из API.
+**(b) If existing frontend already contains such a calculation — the plan MUST include moving it to the backend.** This is a common mistake: the frontend is opened, a ready formula is found, and the plan silently leaves it there. That is not acceptable. The plan must contain:
+1. Add the field to the relevant response DTO.
+2. Implement the calculation in the Service (following existing methods as a pattern).
+3. Cover with a test.
+4. In the frontend — remove the local calculation and use the field from the API.
 
-### Пример: `savingsRate = (income - expenses) / income * 100`
+### Example: `savingsRate = (income - expenses) / income * 100`
 
-**Плохо** — план оставляет расчёт в `Index.tsx`:
-> Backend не трогаем — `savingsRate` уже считается на фронте из `summary`.
+**Bad** — plan leaves the calculation in `Index.tsx`:
+> Backend is not touched — `savingsRate` is already computed on the frontend from `summary`.
 
-**Хорошо** — план содержит:
-- Шаг 1: добавить поле `savingsRate: BigDecimal` в `OverviewSummaryResponseDto`.
-- Шаг 2: в `OverviewSummaryService` рассчитать `savingsRate` (с обработкой `income = 0`) и положить в DTO.
-- Шаг 3: тест на расчёт (включая edge-case деления на ноль).
-- Шаг 4: в `Index.tsx` удалить локальное вычисление, использовать `summary.savingsRate` из API.
+**Good** — plan contains:
+- Step 1: add field `savingsRate: BigDecimal` to `OverviewSummaryResponseDto`.
+- Step 2: in `OverviewSummaryService` calculate `savingsRate` (handle `income = 0`) and put it in the DTO.
+- Step 3: test for the calculation (including the divide-by-zero edge case).
+- Step 4: in `Index.tsx` remove the local calculation, use `summary.savingsRate` from the API.
 
-Тот же шаблон применяй к любым rate/percent/ratio-метрикам, агрегациям и формулам, которые сейчас живут на фронте.
+Apply the same pattern to any rate/percent/ratio metrics, aggregations, and formulas currently living on the frontend.
 
-## Требования к плану
+## Plan requirements
 
-### Конкретность
-- НЕ пиши "реализуй бизнес-логику" — пиши "создай метод `calculateDiscount(Order): BigDecimal` в `OrderService`"
-- НЕ пиши "добавь эндпоинт" — пиши "создай `POST /api/v1/orders` в `OrderController`, принимает `CreateOrderRequest`, возвращает `OrderResponse`"
-- Каждый шаг должен быть выполним без дополнительных вопросов
+### Specificity
+- DO NOT write "implement business logic" — write "create method `calculateDiscount(Order): BigDecimal` in `OrderService`"
+- DO NOT write "add an endpoint" — write "create `POST /api/v1/orders` in `OrderController`, accepts `CreateOrderRequest`, returns `OrderResponse`"
+- Every step must be executable without additional questions
 
-### Последовательность
-- Шаги идут в порядке реализации (сначала модели, потом репозитории, потом сервисы, потом контроллеры)
-- Каждый шаг может зависеть только от предыдущих
-- Если шаги независимы — пометь что их можно выполнять параллельно
+### Sequence
+- Steps go in implementation order (first models, then repositories, then services, then controllers)
+- Each step may only depend on previous ones
+- If steps are independent — mark that they can be executed in parallel
 
-### Следование паттернам проекта
-- Найди аналогичный код в проекте и укажи его как образец
-- Например: "по аналогии с `UserService` (src/main/java/.../UserService.java)"
-- Используй те же подходы: именование, структуру пакетов, обработку ошибок
+### Following project patterns
+- Find similar code in the project and cite it as a reference
+- For example: "following the pattern of `UserService` (src/main/java/.../UserService.java)"
+- Use the same approaches: naming, package structure, error handling
 
-### Проверяемость
-- Каждый шаг имеет критерий завершения (компиляция проходит, тест зелёный)
-- В конце плана — итоговая проверка ТОЛЬКО автоматика: сборка проекта (`gradle build` / `npm run build`) и прогон тестов (`gradle test` / `npm test`). Если тестов для этой области в проекте нет — только сборка. Никаких ручных runtime-действий.
+### Verifiability
+- Each step has a completion criterion (compilation passes, test is green)
+- At the end of the plan — a final check using ONLY automated tools: project build (`gradle build` / `npm run build`) and test run (`gradle test` / `npm test`). If there are no tests for this area in the project — build only. No manual runtime actions.
 
-## Формат вывода плана
+## Plan output format
 
 ```markdown
-# План реализации: <название задачи>
+# План реализации: <task name>
 
 ## Контекст
-<откуда взяты требования, ключевые решения>
+<where the requirements come from, key decisions>
 
 ## Подход
-<выбранный подход и почему>
+<chosen approach and why>
 
 ## Шаги
 
@@ -164,28 +164,28 @@ description: >
 ...
 
 ## Итоговая проверка
-<как убедиться что всё работает>
+<how to verify everything works>
 ```
 
-## Что НЕ включать в план (negative rule)
+## What NOT to include in the plan (negative rule)
 
-Следующие виды проверок — это ручной/QA этап, а не содержимое плана реализации. Они выполняются разработчиком вручную или агентом `qa-engineer` ПОСЛЕ исполнения плана. В сам документ плана (ни в «Проверка» шагов, ни в «Итоговая проверка») их класть НЕЛЬЗЯ:
+The following types of checks are manual/QA steps, not plan content. They are performed by the developer manually or by the `qa-engineer` agent AFTER the plan is executed. They must NOT appear in the plan document (neither in a step's "Проверка" nor in "Итоговая проверка"):
 
-- Команды `docker`, `docker-compose`, `docker exec`, `docker stats`, `docker logs` для проверки состояния сервиса
-- `jcmd`, thread dump, heap dump, профилирование JVM
-- `curl`, `httpie`, `wget`, ручные HTTP-запросы к локально запущенному серверу для верификации ответа
-- `psql`, `redis-cli`, `mongo`, ручные запросы к БД/кешу для проверки данных или схемы
-- Проверки через Chrome DevTools (Network / Console / Performance / Memory)
-- Визуальные и ручные проверки UI («открой страницу и посмотри»)
-- Нагрузочные прогоны, замеры idle CPU, наблюдение за логами в реальном времени
+- `docker`, `docker-compose`, `docker exec`, `docker stats`, `docker logs` commands to check service state
+- `jcmd`, thread dump, heap dump, JVM profiling
+- `curl`, `httpie`, `wget`, manual HTTP requests to a locally running server to verify the response
+- `psql`, `redis-cli`, `mongo`, manual DB/cache queries to check data or schema
+- Checks via Chrome DevTools (Network / Console / Performance / Memory)
+- Visual and manual UI checks ("open the page and look")
+- Load runs, idle CPU measurements, watching logs in real time
 
-Критерий: если проверка требует запущенного приложения/контейнера/браузера — она НЕ для плана. План верифицируется компилятором, тестами и линтером — и всё.
+Criterion: if a check requires a running application/container/browser — it does NOT belong in the plan. The plan is verified by the compiler, tests, and linter — and nothing else.
 
-## Правила
+## Rules
 
-- ВСЕГДА изучи проект перед написанием плана — не пиши план в вакууме
-- Спроси пользователя если есть неясности — лучше уточнить чем угадать
-- Не включай код в план — только описание что делать и где
-- План на русском языке
-- Если задача слишком большая — разбей на подзадачи и предложи приоритеты
-- Вычисления, агрегации и формулы — см. отдельный раздел [Где должны жить вычисления](#где-должны-жить-вычисления) выше.
+- ALWAYS study the project before writing the plan — do not write a plan in a vacuum
+- Ask the user if anything is unclear — better to clarify than to guess
+- Do not include code in the plan — only descriptions of what to do and where
+- Plan is written in Russian
+- If the task is too large — break it into subtasks and suggest priorities
+- Calculations, aggregations, and formulas — see the separate [Where calculations should live](#where-calculations-should-live) section above.

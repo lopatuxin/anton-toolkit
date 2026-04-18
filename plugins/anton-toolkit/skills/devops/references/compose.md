@@ -1,6 +1,6 @@
-# Docker Compose Reference — паттерны сервисов
+# Docker Compose Reference — service patterns
 
-## Базовая структура
+## Base structure
 
 ```yaml
 services:
@@ -17,7 +17,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-# === Ниже: блоки сервисов для копирования по необходимости ===
+# === Below: service blocks to copy as needed ===
 ```
 
 ## PostgreSQL
@@ -76,7 +76,7 @@ spring:
       port: ${REDIS_PORT:6379}
 ```
 
-## Kafka (с Kraft, без Zookeeper)
+## Kafka (with Kraft, without Zookeeper)
 
 ```yaml
   kafka:
@@ -144,7 +144,7 @@ spring:
     restart: unless-stopped
 ```
 
-Минимальный nginx.conf:
+Minimal nginx.conf:
 ```nginx
 events { worker_connections 1024; }
 
@@ -214,7 +214,7 @@ http {
     restart: unless-stopped
 ```
 
-## Volumes (в конце файла)
+## Volumes (at the end of the file)
 
 ```yaml
 volumes:
@@ -226,9 +226,9 @@ volumes:
   es_data:
 ```
 
-## .env шаблон
+## .env template
 
-Всегда создавай `.env` рядом с `docker-compose.yml`:
+Always create `.env` next to `docker-compose.yml`:
 
 ```env
 # App
@@ -245,7 +245,7 @@ POSTGRES_PASSWORD=secret
 REDIS_PORT=6379
 ```
 
-И `.env` в `.gitignore`:
+And add `.env` to `.gitignore`:
 ```
 .env
 ```

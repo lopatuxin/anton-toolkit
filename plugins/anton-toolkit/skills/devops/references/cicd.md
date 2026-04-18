@@ -103,7 +103,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 ```
 
-## Deploy по SSH
+## Deploy via SSH
 
 ```yaml
 # .github/workflows/deploy.yml
@@ -134,17 +134,17 @@ jobs:
             docker compose ps
 ```
 
-## Secrets (настройка)
+## Secrets (setup)
 
-Необходимые секреты в Settings → Secrets → Actions:
-- `DEPLOY_HOST` — IP или домен сервера
-- `DEPLOY_USER` — SSH пользователь
-- `DEPLOY_SSH_KEY` — приватный SSH ключ
+Required secrets in Settings → Secrets → Actions:
+- `DEPLOY_HOST` — server IP or domain
+- `DEPLOY_USER` — SSH user
+- `DEPLOY_SSH_KEY` — private SSH key
 
-## Адаптация
+## Adaptation
 
-**Maven**: замени `./gradlew build` на `mvn verify` и `gradle/actions/setup-gradle` на простой `mvn`.
+**Maven**: replace `./gradlew build` with `mvn verify` and `gradle/actions/setup-gradle` with a plain `mvn` step.
 
-**Без PostgreSQL в тестах**: убери блок `services` и переменные окружения БД.
+**Without PostgreSQL in tests**: remove the `services` block and the DB env variables.
 
-**Несколько модулей**: укажи конкретный модуль `./gradlew :module:build`.
+**Multiple modules**: specify the concrete module `./gradlew :module:build`.

@@ -13,206 +13,205 @@ description: >
   or any report of incorrect behavior, errors, or performance issues.
 ---
 
-# Debug — систематический поиск первопричины
+# Debug — systematic root cause analysis
 
-Найди ИСТИННУЮ причину проблемы, а не предположительную. Никогда не предлагай решение пока не доказал причину.
+Find the TRUE cause of the problem, not a hypothetical one. Never propose a solution until the cause is proven.
 
-## Главное правило
+## Core rule
 
-**ДОКАЗАТЕЛЬСТВО > ПРЕДПОЛОЖЕНИЕ.** Не говори "скорее всего проблема в X". Вместо этого — докажи что проблема именно в X через логи, трейсы, воспроизведение, или исключение альтернатив.
+**PROOF > ASSUMPTION.** Do not say "the problem is probably in X". Instead — prove it is X through logs, traces, reproduction, or elimination of alternatives.
 
-## Процесс — Эскалация методов
+## Process — Method escalation
 
-Иди от простого к сложному. Если метод N не дал ответ — переходи к N+1.
+Go from simple to complex. If method N gives no answer — move to N+1.
 
-### Уровень 1: Воспроизведение и логи
+### Level 1: Reproduction and logs
 
-**Цель: увидеть ошибку своими глазами.**
+**Goal: see the error with your own eyes.**
 
-1. **Уточни симптом.** Спроси пользователя:
-   - Что конкретно происходит? (точная ошибка, код ответа, поведение)
-   - Когда? (всегда, иногда, после определённого действия)
-   - Где? (какой эндпоинт, какая страница, какой сервис)
+1. **Clarify the symptom.** Ask the user:
+   - What exactly happens? (exact error, response code, behavior)
+   - When? (always, sometimes, after a specific action)
+   - Where? (which endpoint, which page, which service)
 
-2. **Воспроизведи ошибку:**
+2. **Reproduce the error:**
    ```bash
-   # API — отправь тот же запрос
+   # API — send the same request
    curl -v -X POST http://localhost:8080/api/... -H "Content-Type: application/json" -d '{...}'
    
-   # Браузер — открой ту же страницу через Playwright/Chrome DevTools
+   # Browser — open the same page via Playwright/Chrome DevTools
    ```
 
-3. **Прочитай логи:**
+3. **Read the logs:**
    ```bash
-   # Docker контейнеры
+   # Docker containers
    docker compose logs --tail=100 <service>
    docker compose logs --tail=100 <service> | grep -i "error\|exception\|warn"
    
-   # Файловые логи
+   # File logs
    tail -100 logs/app.log | grep -i "error\|exception"
    
-   # Фронтенд — console errors через Playwright
+   # Frontend — console errors via Playwright
    ```
 
-4. **Найди стектрейс.** Если есть exception — прочитай его ЦЕЛИКОМ. Найди строку в ТВОЁМ коде (не в фреймворке), с которой началась ошибка.
+4. **Find the stack trace.** If there is an exception — read it IN FULL. Find the line in YOUR code (not in the framework) where the error originated.
 
-**Если нашёл точную строку и причину → СТОП. Сообщи причину.**
+**If you found the exact line and cause → STOP. Report the cause.**
 
-### Уровень 2: Анализ кода и данных
+### Level 2: Code and data analysis
 
-**Цель: понять логику, которая привела к ошибке.**
+**Goal: understand the logic that led to the error.**
 
-1. **Прочитай код** вокруг точки ошибки. Не только строку, а весь метод и вызывающий код.
+1. **Read the code** around the error point. Not just the line, but the full method and calling code.
 
-2. **Трассировка вызовов.** Отследи путь данных от входа до ошибки:
+2. **Trace the call chain.** Track the data path from input to error:
    ```
    Controller → Service → Repository → DB
    ```
-   Для каждого шага: что приходит на вход? что возвращается? где данные искажаются?
+   For each step: what comes in? what is returned? where does the data get corrupted?
 
-3. **Проверь данные:**
+3. **Check the data:**
    ```bash
-   # SQL — что реально в базе?
+   # SQL — what is actually in the database?
    docker compose exec postgres psql -U app -d appdb -c "SELECT * FROM orders WHERE id = ..."
    
-   # Redis — что в кеше?
+   # Redis — what is in the cache?
    docker compose exec redis redis-cli GET "key"
    ```
 
-4. **Проверь конфигурацию:**
+4. **Check the configuration:**
    ```bash
-   # Env-переменные внутри контейнера
+   # Env variables inside the container
    docker compose exec <service> env | grep -i "spring\|db\|redis"
    
    # Application config
    cat src/main/resources/application.yml
    ```
 
-**Если нашёл причину → СТОП. Сообщи.**
+**If you found the cause → STOP. Report it.**
 
-### Уровень 3: Динамический анализ
+### Level 3: Dynamic analysis
 
-**Цель: наблюдать за приложением в реальном времени.**
+**Goal: observe the application in real time.**
 
-1. **Добавь временное логирование** в подозрительный код:
+1. **Add temporary logging** to suspicious code:
    ```java
    log.debug(">>> Input: {}, State: {}", input, state);
    ```
-   Потом воспроизведи ошибку и прочитай логи. ОБЯЗАТЕЛЬНО удали временные логи после дебага.
+   Then reproduce the error and read the logs. MANDATORY remove temporary logs after debugging.
 
 2. **Spring Boot Actuator:**
    ```bash
    # Health check
    curl http://localhost:8080/actuator/health
    
-   # Бины — загружен ли нужный компонент?
+   # Beans — is the needed component loaded?
    curl http://localhost:8080/actuator/beans | jq '.contexts[].beans | keys[]' | grep -i "order"
    
-   # HTTP-трейсы (если включены)
+   # HTTP traces (if enabled)
    curl http://localhost:8080/actuator/httpexchanges
    ```
 
-3. **Сетевой анализ:**
+3. **Network analysis:**
    ```bash
-   # Проверь что порт слушается
+   # Check that the port is listening
    curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health
    
-   # DNS/connection проблемы между контейнерами
+   # DNS/connection issues between containers
    docker compose exec <service> curl -v http://other-service:8080/health
    ```
 
-**Если нашёл причину → СТОП. Сообщи.**
+**If you found the cause → STOP. Report it.**
 
-### Уровень 4: Профилирование (медленная работа)
+### Level 4: Profiling (slow performance)
 
-**Цель: найти конкретный bottleneck.**
+**Goal: find the specific bottleneck.**
 
-1. **Замерь время ответа:**
+1. **Measure response time:**
    ```bash
-   # Общее время запроса
    curl -w "\n  DNS: %{time_namelookup}s\n  Connect: %{time_connect}s\n  TTFB: %{time_starttransfer}s\n  Total: %{time_total}s\n" \
      http://localhost:8080/api/...
    ```
 
-2. **SQL-запросы — включи логирование:**
+2. **SQL queries — enable logging:**
    ```yaml
-   # application.yml — временно!
+   # application.yml — temporary!
    logging.level.org.hibernate.SQL: DEBUG
    logging.level.org.hibernate.type.descriptor.sql: TRACE
    ```
-   Воспроизведи медленный запрос → посмотри какие SQL выполняются (N+1?).
+   Reproduce the slow request → see which SQL queries execute (N+1?).
 
-3. **JVM профилирование:**
+3. **JVM profiling:**
    ```bash
-   # Thread dump — что делают потоки прямо сейчас?
+   # Thread dump — what are threads doing right now?
    docker compose exec <service> jcmd 1 Thread.print
    
-   # GC статистика
+   # GC statistics
    docker compose exec <service> jcmd 1 GC.heap_info
    
-   # Если доступен async-profiler
+   # If async-profiler is available
    docker compose exec <service> jcmd 1 jfr.start duration=30s filename=/tmp/profile.jfr
    ```
 
-4. **Фронтенд-перформанс:**
-   - Chrome DevTools → Performance tab (через MCP)
+4. **Frontend performance:**
+   - Chrome DevTools → Performance tab (via MCP)
    - Lighthouse audit
-   - Network waterfall — какой запрос тормозит?
+   - Network waterfall — which request is slow?
 
-**Если нашёл bottleneck → СТОП. Сообщи.**
+**If you found the bottleneck → STOP. Report it.**
 
-### Уровень 5: Бисекция и изоляция
+### Level 5: Bisection and isolation
 
-**Цель: сузить область до минимума, когда всё остальное не помогло.**
+**Goal: narrow the area down to the minimum when everything else has failed.**
 
-1. **Git bisect** — если "раньше работало":
+1. **Git bisect** — if "it worked before":
    ```bash
-   git log --oneline -20  # найди примерный коммит
+   git log --oneline -20  # find the approximate commit
    git bisect start
    git bisect bad
    git bisect good <commit-hash>
-   # Тестируй каждый коммит
+   # Test each commit
    ```
 
-2. **Минимальный воспроизводимый пример:**
-   - Убери из запроса все необязательные поля — ошибка сохраняется?
-   - Подставь другие данные — ошибка от данных?
-   - Вызови сервис напрямую (без контроллера) — ошибка в сервисе или в контроллере?
+2. **Minimal reproducible example:**
+   - Remove all optional fields from the request — does the error persist?
+   - Substitute different data — is the error data-dependent?
+   - Call the service directly (without the controller) — is the error in the service or the controller?
 
-3. **Сравнение** — если работает в одном окружении, не работает в другом:
+3. **Comparison** — if it works in one environment but not another:
    ```bash
-   # Сравни конфиги
+   # Compare configs
    diff <(docker compose exec service1 env | sort) <(docker compose exec service2 env | sort)
    
-   # Сравни версии зависимостей
+   # Compare dependency versions
    ./gradlew dependencies | diff - expected-deps.txt
    ```
 
-## Формат отчёта
+## Report format
 
-Когда причина найдена, сообщи:
+When the cause is found, report:
 
 ```
-## Причина
-<что конкретно вызывает проблему>
+## Root cause
+<what specifically causes the problem>
 
-## Доказательство
-<как ты это доказал — лог, трейс, запрос, данные>
+## Proof
+<how you proved it — log, trace, request, data>
 
-## Где в коде
-<файл:строка — конкретное место>
+## Location in code
+<file:line — exact location>
 
-## Рекомендация
-<что нужно исправить — передай java-dev, test-writer или frontend-dev>
+## Recommendation
+<what needs to be fixed — hand off to java-dev, test-writer, or frontend-dev>
 ```
 
-## Правила
+## Rules
 
-- НИКОГДА не предлагай решение без доказанной причины
-- НИКОГДА не говори "скорее всего" или "возможно причина в" — докажи или скажи "пока не нашёл, перехожу к уровню N"
-- Если уровень не дал результата — явно скажи что и переходи к следующему
-- Удаляй временное логирование после дебага
-- Не исправляй код сам — твоя задача найти причину. Исправление — зона java-dev/test-writer/frontend-dev
-- Если проблема в тестах или тестовых конфигах (application-test.yml и т.п.) — передай test-writer, не java-dev
-- Если проблема в данных (не в коде) — скажи об этом прямо
-- Если проблема в инфраструктуре (сеть, DNS, Docker) — скажи об этом прямо
+- NEVER propose a solution without a proven cause
+- NEVER say "probably" or "the cause might be" — prove it or say "haven't found it yet, moving to level N"
+- If a level gives no result — explicitly say so and move to the next
+- Remove temporary logging after debugging
+- Do not fix code yourself — your job is to find the cause. Fixing is the responsibility of java-dev/test-writer/frontend-dev
+- If the problem is in tests or test configs (application-test.yml etc.) — hand off to test-writer, not java-dev
+- If the problem is in data (not in code) — say so explicitly
+- If the problem is in infrastructure (network, DNS, Docker) — say so explicitly

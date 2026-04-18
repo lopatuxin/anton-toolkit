@@ -6,29 +6,29 @@ description: >
   "/commit", or any request to create a git commit.
 ---
 
-# Commit — русскоязычные коммиты
+# Commit — Russian-language commits
 
-Создай коммит с сообщением на русском языке, описывающим все изменения в коде.
+Create a commit with a Russian-language message describing all code changes.
 
-## Процесс
+## Process
 
-1. **Проверь состояние репозитория.** Выполни `git status` и `git diff --staged`. Если нет застейдженных изменений, выполни `git diff` для анализа незастейдженных.
+1. **Check repository state.** Run `git status` and `git diff --staged`. If there are no staged changes, run `git diff` to analyze unstaged ones.
 
-2. **Проанализируй изменения.** Прочитай diff целиком. Определи:
-   - Какие файлы изменены, добавлены, удалены
-   - Суть каждого изменения (новая фича, исправление бага, рефакторинг, и т.д.)
+2. **Analyze the changes.** Read the full diff. Determine:
+   - Which files were changed, added, deleted
+   - The nature of each change (new feature, bug fix, refactoring, etc.)
 
-3. **Застейджь файлы.** Если файлы не застейджены — добавь ВСЕ изменённые файлы по имени через `git add`. НЕ используй `git add -A` или `git add .` — перечисляй файлы явно, чтобы не включить секреты (.env, credentials). По умолчанию коммить всё. НЕ разделяй изменения на несколько коммитов, если пользователь явно не попросил.
+3. **Stage the files.** If files are not staged — add ALL changed files by name via `git add`. Do NOT use `git add -A` or `git add .` — list files explicitly to avoid including secrets (.env, credentials). By default commit everything. Do NOT split changes into multiple commits unless the user explicitly asks.
 
-4. **Составь сообщение коммита** на русском языке:
-   - Первая строка — краткое описание (до 72 символов), начинается с глагола в прошедшем времени
-   - Пустая строка
-   - Подробное описание всех изменений, если их много
-   - НЕ добавляй строку Co-Authored-By или любые другие подписи
+4. **Compose the commit message** in Russian:
+   - First line — short description (up to 72 characters), starts with a past-tense verb
+   - Blank line
+   - Detailed description of all changes if there are many
+   - Do NOT add Co-Authored-By or any other signatures
 
-5. **Посмотри на историю коммитов** (`git log --oneline -10`), чтобы адаптировать стиль сообщения к существующей истории.
+5. **Check commit history** (`git log --oneline -10`) to adapt the message style to the existing history.
 
-6. **Выполни коммит** через `git commit`, передавая сообщение через HEREDOC:
+6. **Execute the commit** via `git commit`, passing the message through a HEREDOC:
    ```
    git commit -m "$(cat <<'EOF'
    Сообщение коммита
@@ -36,9 +36,9 @@ description: >
    )"
    ```
 
-7. **Подтверди результат.** Выполни `git status` после коммита и покажи пользователю результат.
+7. **Confirm the result.** Run `git status` after the commit and show the user the result.
 
-## Примеры сообщений
+## Message examples
 
 - `Добавил авторизацию через JWT токены`
 - `Исправил ошибку парсинга дат в модуле отчётов`
@@ -46,10 +46,10 @@ description: >
 - `Удалил неиспользуемые компоненты из UI`
 - `Реализовал пагинацию для списка пользователей`
 
-## Правила
+## Rules
 
-- НИКОГДА не пушь автоматически — только коммит
-- Не используй `--no-verify` и `--no-gpg-sign` без явной просьбы пользователя
-- Не коммить файлы с секретами (.env, ключи API, пароли). Предупреди пользователя, если такие обнаружены.
-- Если pre-commit хук упал — исправь проблему и создай НОВЫЙ коммит (не --amend)
-- Если нет изменений для коммита — сообщи об этом, не создавай пустой коммит
+- NEVER push automatically — commit only
+- Do not use `--no-verify` or `--no-gpg-sign` without explicit user request
+- Do not commit files with secrets (.env, API keys, passwords). Warn the user if any are found.
+- If a pre-commit hook fails — fix the issue and create a NEW commit (not --amend)
+- If there are no changes to commit — say so, do not create an empty commit
