@@ -135,8 +135,8 @@ description: >
   </commentary>
   </example>
 
-  POST-COMPLETION RULE: After this agent completes, ALWAYS automatically
-  launch code-reviewer agent to review the changes — do not wait for user to ask.
+  POST-COMPLETION RULE: After this agent completes, do NOT automatically launch
+  code-reviewer — wait for explicit user request.
 
 model: sonnet
 color: green
