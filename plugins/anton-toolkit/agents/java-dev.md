@@ -1,18 +1,10 @@
 ---
 name: java-dev
 description: >
-  MANDATORY: Use this agent for ANY write/edit/delete task touching a Java module
-  — regardless of file extension. The only exception is tests (→ test-writer).
-
-  RULE 1 — .java files: any task that creates or edits a .java file (except tests)
-  MUST go through this agent. No exceptions — even "just add an annotation" or
-  "fix a typo in the method".
-
-  RULE 2 — non-Java files inside Java modules: if a file is NOT .java but has a
-  `pom.xml` or `build.gradle` anywhere up the directory tree — STILL use this agent.
-  Covers: SQL scripts, Spring XML configs, Velocity templates (.vm), tool-registration
-  XML, HTML/JS/CSS/properties inside `src/main/`, Maven/Gradle build files.
-  Short form: **pom.xml exists up the tree → java-dev, regardless of extension.**
+  ANY write/edit/delete inside a Java module goes through this agent — regardless
+  of file extension. Trigger is the MODULE (pom.xml in the tree), not the extension.
+  Covers: .java, SQL, Spring XML, Velocity (.vm), HTML/CSS/JS in src/main/, build files.
+  The only exception is tests (→ test-writer).
 
   <example>
   Context: WRONG reasoning
@@ -20,18 +12,6 @@ description: >
   assistant (WRONG): "Это SQL, не Java — правлю сам."
   assistant (CORRECT): "Запускаю java-dev — файл внутри Java-модуля (есть pom.xml)."
   <commentary>Trigger is the Java MODULE, not the file extension.</commentary>
-  </example>
-
-  <example>
-  Context: New feature
-  user: "Создай CRUD для сущности Product"
-  assistant: "Запускаю java-dev агента для создания CRUD Product."
-  </example>
-
-  <example>
-  Context: Bug fix
-  user: "Исправь NPE в OrderService"
-  assistant: "Запускаю java-dev агента для исправления NPE."
   </example>
 
   POST-COMPLETION RULE: After this agent completes, do NOT automatically launch
