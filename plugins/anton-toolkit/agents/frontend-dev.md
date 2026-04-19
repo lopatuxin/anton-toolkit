@@ -1,56 +1,18 @@
 ---
 name: frontend-dev
 description: >
-  STOP. READ THIS FIRST. ABSOLUTE RULE WITH NO EXCEPTIONS: Any change that
-  touches a frontend file (*.tsx, *.ts, *.jsx, *.js, *.css, *.scss, *.html,
-  public/*, package.json в frontend-репо) MUST be delegated to this agent.
-  Not "should" — MUST. If you are about to call Edit/Write/Bash on a frontend
-  file yourself, you are violating this rule. Stop and launch frontend-dev instead.
-
-  "Too simple for an agent" is NOT a valid reason. "Just one line" is NOT
-  a valid reason. There are zero exceptions based on task size.
-
-  Tasks that LOOK trivial but STILL go through frontend-dev (non-exhaustive):
-  - Copy an image/asset into public/ and update its src or import path
-  - Update a logo, favicon, or static asset reference
-  - Change a className, a style value, a color, a padding
-  - Fix a typo in JSX text or a string literal
-  - Rename/update an import path
-  - Swap an icon
-  - Toggle a boolean prop or flag
-  - Add/remove a single line
-  - Any "quick fix" in a .tsx/.ts/.css file
-
-  The only exception is tests — those go to test-writer. Nothing else.
-
-  This includes: new components, pages, hooks, bug fixes, styling, API integration,
-  state management, refactoring, form handling, routing, asset updates, and any
-  other frontend code changes.
+  ANY change to a frontend file (*.tsx, *.ts, *.jsx, *.js, *.css, *.scss,
+  *.html, public/*, package.json in frontend repo) MUST go through this agent —
+  no exceptions by task size. One line, one class, one typo — still this agent.
+  The only exception is tests (→ test-writer).
 
   <example>
-  Context: User needs a new page
-  user: "Создай страницу списка заказов"
-  assistant: "Запускаю frontend-dev агента для создания страницы заказов."
+  Context: User asks to update a static asset (logo, image, icon)
+  user: "Обнови логотип — вот PNG в docs/, положи в public и поменяй src в Sidebar"
+  assistant: "Запускаю frontend-dev агента — копирование ассета и правка src в .tsx идут через агента."
   <commentary>
-  New frontend page — delegate to frontend-dev.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User needs to connect frontend to API
-  user: "Подключи форму к API создания заказов"
-  assistant: "Запускаю frontend-dev агента для интеграции формы с API."
-  <commentary>
-  API integration in frontend — delegate to frontend-dev.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User found a UI bug
-  user: "Кнопка не работает на странице профиля"
-  assistant: "Запускаю frontend-dev агента для исправления."
-  <commentary>
-  Bug fix in frontend code — delegate to frontend-dev.
+  Looks like "just copy a file and change one line" — but it's a frontend file edit,
+  so frontend-dev is mandatory. Do NOT use Edit/Write directly, even for 1–3 lines.
   </commentary>
   </example>
 
@@ -61,26 +23,6 @@ description: >
   assistant: "Запускаю frontend-dev агента для реализации сайдбара."
   <commentary>
   First discuss in conversation, then delegate implementation to frontend-dev.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User requests a small, targeted UI change
-  user: "На странице обзор показывай только 4 категории"
-  assistant: "Запускаю frontend-dev агента для внесения изменения."
-  <commentary>
-  Even a one-line targeted fix in React/TSX — delegate to frontend-dev. Do NOT use Edit/Write tools directly.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User asks to update a static asset (logo, image, icon)
-  user: "Обнови логотип — вот PNG в docs/, положи в public и поменяй src в Sidebar"
-  assistant: "Запускаю frontend-dev агента — копирование ассета и правка src в .tsx идут через агента."
-  <commentary>
-  Выглядит как «просто скопировать файл и поменять одну строку» — но это правка frontend-файла, значит ОБЯЗАТЕЛЬНО через frontend-dev. НЕ использовать Edit/Write
-  напрямую, даже если изменение буквально 1–3 строки. Это реальный инцидент, который
-  и породил это правило.
   </commentary>
   </example>
 
