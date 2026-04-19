@@ -2,12 +2,11 @@
 name: test-writer
 description: >
   This agent should be used proactively. After java-dev agent completes
-  implementation of new classes or significant changes, AUTOMATICALLY
-  launch this agent to write tests — do not wait for the user to ask.
+  implementation of new classes or significant changes, AUTOMATICALLY launch
+  this agent to write tests — do not wait for the user to ask.
 
-  Use this agent to write tests for existing Java code. Give it a class
-  or package — it reads the code, finds existing test patterns in the project,
-  and writes tests following the same style. Works autonomously.
+  Give it a class or package — it reads the code, finds existing test patterns,
+  and writes tests following the same style.
 
   <example>
   Context: java-dev agent just created a new service and controller
@@ -22,17 +21,7 @@ description: >
   user: "Напиши тесты для OrderService"
   assistant: "Запускаю test-writer агента для OrderService."
   <commentary>
-  Concrete target — a specific class. Agent reads OrderService, finds
-  how similar services are tested, writes tests in the same style.
-  </commentary>
-  </example>
-
-  <example>
-  Context: java-dev agent just created new code
-  user: "Теперь покрой тестами то что написал java-dev"
-  assistant: "Запускаю test-writer для новых файлов."
-  <commentary>
-  Agent reads recently created files and writes tests for them.
+  Concrete target — a specific class.
   </commentary>
   </example>
 
