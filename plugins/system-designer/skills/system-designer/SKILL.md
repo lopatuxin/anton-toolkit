@@ -9,7 +9,8 @@ description: >
   Trigger phrases (Russian, real user input):
   "спроектируй систему", "давай спроектируем", "задизайним модуль", "новый проект, вот репо",
   "хочу продумать архитектуру", "опиши модуль X", "давай добавим <фичу> в дизайн",
-  "я тут подумал, давай добавим", "обнови документацию под это", "продолжим проектировать".
+  "я тут подумал, давай добавим", "обнови документацию под это", "продолжим проектировать",
+  "разбей на фазы", "сделай roadmap", "построй план фаз", "разнеси архитектуру по фазам".
 
   Use this skill when the user is describing a SYSTEM/PRODUCT to design (not writing code yet). If the user asks to
   implement/code something concrete, do NOT use this skill — it is documentation-only, no code is produced.
@@ -152,6 +153,31 @@ Steps:
 3. Read the agent's report, echo it to the user in Russian as a diff-summary:
    `Обновил: <file1> — <что изменилось>; <file2> — <что>. Создал новый модуль: <name>. Ок?`
 4. On approval, commit: `git commit -m "обновил документацию: <краткое описание изменения>"`.
+
+## Phase 5 — Roadmap (delegate to agent, on demand)
+
+Goal: produce `docs/roadmap.md` — короткий план фаз реализации, где каждая фаза это минимальный законченный функционал, который можно потрогать, и каждая следующая фаза опирается на предыдущие.
+
+**Триггер:** отдельный вызов по фразам пользователя — "разбей на фазы", "сделай roadmap", "построй план фаз", "разнеси архитектуру по фазам". НЕ запускается автоматически после модулей.
+
+**Предусловие:** должен существовать `docs/architecture.md`. Если его нет — ответь пользователю: `Нет docs/architecture.md, roadmap не из чего строить. Сначала пройдём фазы 1–2.` и предложи начать с концепта/архитектуры.
+
+Шаги:
+1. Убедись, что `docs/architecture.md` существует.
+2. Короткий диалог (1–2 вопроса максимум, на русском) — есть ли у пользователя предпочтения по первому осязаемому срезу: `Что хочешь увидеть в первой фазе как минимально работающее? Если нет мнения — выберу самый тонкий end-to-end срез сам.`
+3. Dispatch агента **roadmap-planner**:
+   ```
+   Agent(subagent_type="roadmap-planner", prompt="
+   Read docs/architecture.md and docs/modules/*.md (if present) and write docs/roadmap.md.
+   User's preference for the first phase from dialog: <paste verbatim or 'нет предпочтений'>.
+   Follow the structure in references/document-templates.md section 'roadmap.md'.
+   Each phase = minimal testable end-to-end slice. Each phase depends on previous ones.
+   Short descriptions only — no acceptance criteria, no risks, no estimates (отдельный инструмент детализирует фазы потом).
+   ")
+   ```
+4. После возврата агента прочитай `docs/roadmap.md`, перескажи пользователю на русском списком: `Фазы: 1) <название>; 2) <название>; ... Посмотри — порядок и срезы окей?`.
+5. Итерируй (пользователь может попросить переразбить, объединить, переставить — повторно dispatch агента с правкой в prompt).
+6. На подтверждении коммить: `git commit -m "добавил roadmap фаз реализации"`.
 
 ## General rules
 
