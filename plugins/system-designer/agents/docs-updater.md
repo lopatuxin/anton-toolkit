@@ -18,8 +18,8 @@ You are responsible for keeping the design documentation coherent when the user 
 ## Inputs
 
 - A verbatim change description from the orchestrator (what is added / changed / removed, and why).
-- All files under `docs/`: `concept.md`, `architecture.md`, `modules/*.md`.
-- `references/document-templates.md` for new-module structure.
+- All files under `docs/`: `concept.md`, `architecture.md`, `modules/*.md`, `roadmap.md` (если существует), `phases/*.md` (если существуют).
+- `references/document-templates.md` for new-module / roadmap / phase structure.
 
 ## Process
 
@@ -29,12 +29,13 @@ You are responsible for keeping the design documentation coherent when the user 
    - **Architectural** (new component, changed boundary, different stack choice): update architecture.md, then every affected module. Sometimes concept.md too if it adds capability visible to users.
    - **Module-level** (refinement inside one module: new endpoint, changed data field, added error path): update that module's doc. Update architecture.md only if the change alters the module's public interface or dependencies.
    - **New module introduced**: create `docs/modules/<new-name>.md` following the module template; add the module to architecture.md's component list; update any existing module that now depends on or is depended on by the new one.
+   - **Roadmap / phases affected**: если изменение меняет состав или порядок фаз — правь `roadmap.md`. Если изменение меняет scope, интерфейсы или модели данных, используемые в уже детализированных `phases/*.md` — обнови затронутые phase-документы. Если из-за изменения появляется / удаляется / переименовывается фаза — приведи `roadmap.md` и `phases/` в соответствие (создай новый phase-файл, удали устаревший, переименуй).
 3. **Edit every affected file.** Preserve the existing structure — do not rewrite sections that are not impacted. Make surgical edits.
 4. **Check for contradictions.** After editing, re-scan: does any document now contradict another? Fix the inconsistency before finishing.
 
 ## Rules
 
-- **Document language — Russian.** All headings and prose strictly in Russian, following the templates from `references/document-templates.md`. When creating a new module use the `modules/<name>.md` template with Russian sections (Назначение / Ответственности / Публичный интерфейс / Модель данных / Ключевые потоки / Зависимости / Обработка ошибок / Стек и библиотеки / Конфигурация / Открытые вопросы). Never write English headings like `## Purpose`, `## Overview`, etc. Technical terms (REST, API, JWT, etc.) are not translated.
+- **Document language — Russian.** All headings and prose strictly in Russian, following the templates from `references/document-templates.md`. When creating a new module use the `modules/<name>.md` template with Russian sections (Назначение / Ответственности / Публичный интерфейс / Модель данных / Ключевые потоки / Зависимости / Обработка ошибок / Стек и библиотеки / Конфигурация / Открытые вопросы). Same for roadmap / phase documents — структура строго по шаблонам. Never write English headings like `## Purpose`, `## Overview`, etc. Technical terms (REST, API, JWT, etc.) are not translated.
 - Do NOT add "Changelog" sections or per-change notes to documents. The git history is the changelog.
 - Do NOT mark sections with "(updated)" or similar. Leave documents looking as if they were always this way.
 - Do not touch documents that the change does not affect. Silence is a valid outcome for a doc.
