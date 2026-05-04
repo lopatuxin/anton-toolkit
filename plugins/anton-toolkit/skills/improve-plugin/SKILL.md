@@ -6,12 +6,12 @@ description: >
   NOT invoked when it should have been, the user corrected the behavior in
   conversation, and the correction should be persisted in the plugin source.
 
-  Triggers (explicit): "улучши плагин", "обнови скилл", "запомни это в плагине",
-  "исправь скилл", "так не должно быть", "убери <X>", "не добавляй <X>",
-  "запомни", "улучши стратега", "исправь интервьюера", "улучши плагин
-  personal-strategist", "/improve".
+  Triggers (explicit): "/improve", "/improve-plugin", "улучши плагин",
+  "обнови скилл", "запомни это в плагине", "исправь скилл", "так не должно
+  быть", "убери <X>", "не добавляй <X>", "запомни", "улучши стратега",
+  "исправь интервьюера", "улучши плагин personal-strategist".
 
-  Triggers (reprimand / missed-invocation — PROACTIVELY suggest this agent in
+  Triggers (reprimand / missed-invocation — PROACTIVELY suggest this skill in
   the SAME reply where you acknowledge the mistake, do NOT wait for the user
   to ask): "какого хрена", "опять не", "снова не", "ты не использовал
   <агента>", "почему не вызван", "почему не вызвался", "опять не сработало",
@@ -29,7 +29,7 @@ description: >
   так быть", "плохо", "лажа", "глючит". ANY statement that describes a
   skill/agent output as wrong, broken, or inappropriate — WITHOUT an
   imperative verb like "fix" or "improve" — is still a trigger for this
-  agent. The user's evaluative comment IS the correction signal.
+  skill. The user's evaluative comment IS the correction signal.
 
   MANDATORY PROACTIVE RULE: If the user corrects the behavior of a plugin
   component (agent or skill) AND the correction is about behavior that should
@@ -79,17 +79,16 @@ description: >
   plugin-level behavior (agent description, skill triggers, routing,
   delegation rules), proactively suggest `improve-plugin`.
 
-  Runs autonomously. Engages in at most one round of user interaction — the
-  target-plugin confirmation in Step 1 of the process. No interview, no
-  multi-turn dialog beyond that.
-model: opus
+  This skill runs DIRECTLY in conversation. Engages in at most one round of
+  user interaction — the target-plugin confirmation in Step 1. No interview,
+  no multi-turn dialog beyond that.
 ---
 
-# Improve Plugin — reactive plugin fix (Opus)
+# Improve Plugin — reactive plugin fix
 
 Read the current session history, identify the plugin that malfunctioned, apply the minimal fix to persist the user's correction, and ship via git.
 
-**Before starting, read** `references/plugin-authoring.md` for the validation checklist and language rules.
+**Before starting, read** `references/plugin-authoring.md` (next to this SKILL.md) for the validation checklist and language rules.
 
 ## Step 1 — Detect target plugin, confirm in one message
 
@@ -104,7 +103,7 @@ Formulate one hypothesis. Your first message to the user (in Russian) contains b
 Если плагин другой — скажи какой.
 ```
 
-If the session has no clear incident (user invoked the agent "clean"), ask explicitly in Russian:
+If the session has no clear incident (user invoked the skill "clean"), ask explicitly in Russian:
 ```
 В каком плагине правим и что именно?
 ```
@@ -117,15 +116,18 @@ The repo may live in different places on different machines. Try, in order:
 
 ```bash
 ls -d /c/projects/anton-toolkit ~/projects/anton-toolkit ~/anton-toolkit 2>/dev/null
+ls -d "$HOME/.claude/plugins/marketplaces/anton-toolkit-marketplace" 2>/dev/null
 find ~ /c/projects -maxdepth 3 -name "plugin.json" -path "*/anton-toolkit/*" 2>/dev/null | head -5
 ```
 
-If not found, clone:
+If the only working copy is the marketplace path under `~/.claude/plugins/marketplaces/anton-toolkit-marketplace` AND it is a real git remote of `lopatuxin/anton-toolkit` (verify with `git remote -v`), it is safe to edit there directly — that is the user's primary working copy on this machine.
+
+Otherwise, never edit `~/.claude/plugins/cache/` — that is a read-only cache, changes are overwritten. If no working copy is found, clone:
 ```bash
 git clone git@github.com:lopatuxin/anton-toolkit.git /tmp/anton-toolkit
 ```
 
-Never edit `~/.claude/plugins/cache/` or `~/.claude/plugins/marketplaces/` — that's the cache, changes are overwritten. Set `PLUGIN_REPO` to the working-copy path.
+Set `PLUGIN_REPO` to the working-copy path.
 
 ## Step 3 — Read the current state of the target file(s)
 
@@ -144,6 +146,13 @@ Edit rules (strict):
 - Do NOT add "improvements" beyond what the user asked.
 - Do NOT change style or formatting of untouched parts.
 - When adding a new rule, state it concretely with an example of correct and incorrect behavior — vague rules do not change model behavior.
+
+Language rule (strict — applies to every edit this skill makes):
+- **All model-facing text MUST be written in English**: SKILL.md body, agent body, references, YAML `description` fields, inline rules, examples explaining correct/incorrect behavior. Even when the user phrases the correction in Russian, the rule you persist into the plugin source is English prose.
+- **Russian is allowed only in two specific places**: (a) trigger phrases inside `description` that match real Russian user input (e.g. `"улучши плагин"`, `"это косяк"`), and (b) literal user-facing dialogue templates the component will speak back to the user (questions, confirmations, error messages, post-operation summaries).
+- If the user says in Russian "добавь правило, что X не должно быть" — translate the rule itself to English when writing it into the file. Do NOT paste Russian prose into the SKILL.md/agent body. Trigger phrases and user-facing dialogue stay Russian; everything else is English.
+- Correct: `Do NOT include emojis in commit messages unless the user explicitly requests them.`
+- Incorrect: `Не добавляй эмодзи в коммит-сообщения, если пользователь явно не попросил.` (this is a rule, not user-facing dialogue — must be English)
 
 ## Step 5 — Bump PATCH version
 
@@ -196,4 +205,4 @@ Report: `Откатил коммит <hash>, файл вернул в преды
 
 ## Bootstrap note
 
-If the incident was with a skill/agent inside `plugin-builder` itself — target-plugin detection will correctly identify `plugin-builder`, and the agent edits itself. That is supported. Be extra careful with the minimality rule in that case: a botched self-fix is harder to recover from than a botched fix of any other plugin.
+If the incident was with this skill itself (`improve-plugin` inside `anton-toolkit`) — target-plugin detection will correctly identify `anton-toolkit`, and the skill edits itself. That is supported. Be extra careful with the minimality rule in that case: a botched self-fix is harder to recover from than a botched fix of any other plugin/component.
