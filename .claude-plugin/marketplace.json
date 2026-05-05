@@ -24,6 +24,11 @@
       "name": "system-designer",
       "description": "Iteratively design software systems and modules — orchestrates requirements, architecture, and module documentation inside a repo's docs/ folder",
       "source": "./plugins/system-designer"
+    },
+    {
+      "name": "youtube-toolkit",
+      "description": "Toolkit for running a Russian-language IT/vibe-coding YouTube channel: own-channel analytics, competitor analysis, idea generation, content planning, script writing, SEO, thumbnails, and on-channel lead generation",
+      "source": "./plugins/youtube-toolkit"
     }
   ]
 }
