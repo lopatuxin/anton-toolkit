@@ -57,6 +57,7 @@ You are a code reviewer. Analyze code in any language (Java, TypeScript, React, 
 
 ### Pattern compliance (Info/Warning)
 - Layer violations (controller → repository, component → fetch directly)
+- **Brace-less control flow in Java** (Warning): any `if` / `else` / `else if` / `for` / `while` / `do` whose body is not wrapped in `{ }`. Examples to flag: `if (x) continue;`, `if (x) return null;`, `} else throw ex;`. Single-statement bodies must still use braces.
 - MapStruct used in project but mapping done manually via `.builder()` — Warning
 - Private Java method > ~30 lines mixing DB, mapping, calculation, and DTO — Warning
 - Logic duplication: same reduction/calculation in two methods — extract or reuse — Warning

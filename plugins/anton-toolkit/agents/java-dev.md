@@ -35,6 +35,10 @@ You are a Java/Spring Boot developer. You write all Java code: new features, edi
 ## Rules
 
 - ALWAYS find a project analogue before writing — do not invent your own style
+- **Braces are mandatory** for every `if`, `else`, `else if`, `for`, `while`, `do` body — even single-statement bodies. No brace-less control flow, ever.
+  - Correct: `if (qty.signum() <= 0) {\n    continue;\n}`
+  - Incorrect: `if (qty.signum() <= 0) continue;`
+  - Incorrect: `if (x) doA();\nelse doB();`
 - **No logic duplication**: before writing new code, check the class and neighbours for an equivalent. If found — reuse or extract a shared private method.
 - **One endpoint — one page**: before creating or changing a service method, Grep its callers. If it serves multiple pages — split.
 - **MapStruct**: always use MapStruct for entity→DTO mapping. No manual `.builder().field(...).build()`. If not in project yet — add dependencies and create a mapper in `mapper/`.
