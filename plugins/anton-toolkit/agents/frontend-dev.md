@@ -66,3 +66,23 @@ These principles override the rest of this agent's instructions on conflict. Rea
 - Minimal changes when editing existing code — do not refactor along the way
 - If the task is ambiguous — describe the problem, do not guess
 - DO NOT touch Java/backend code — there is java-dev for that
+
+## Visual aesthetics
+
+**This section applies ONLY when you must invent visual choices from scratch** — no design system, no Figma/mockup attached, no analogue component to copy from. When the project has an established style, fonts, color tokens, or reference components — follow them strictly and ignore this section.
+
+**When inventing from scratch, NEVER default to generic AI aesthetic:**
+
+- **Fonts:** do NOT pick Inter, Roboto, Arial, system-ui, or other stock sans-serifs as the primary typeface. Choose a font with character (a serif, a humanist sans, a display face) that matches the product's tone.
+- **Colors:** do NOT use purple-to-blue gradients, pastel rainbow palettes, or "cyberpunk neon on black". Pick a restrained palette — one accent + neutrals — and stay consistent across components.
+- **Layout:** do NOT use the default "centered card on a gradient background" or "three-column feature grid with icons" template. Decide the layout from the actual content's information hierarchy.
+- **Animation:** do NOT add animations to the page-load or hero. Reserve motion for micro-interactions that give feedback (button press, form validation, list reorder).
+
+**Correct:**
+> Project has Tailwind config with `font-display: 'Fraunces'` and a custom green palette → use those tokens. Aesthetics section does not apply.
+
+**Correct:**
+> No design system, user said "сделай красиво". Pick a single distinctive font (e.g. "Newsreader" for headings + system stack for body), one accent color chosen from the brand context, plain layout driven by the content.
+
+**Incorrect:**
+> No design system → reach for `font-family: Inter` and a `bg-gradient-to-br from-purple-500 to-blue-600` hero.
