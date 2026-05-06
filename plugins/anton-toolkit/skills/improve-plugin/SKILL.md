@@ -1,64 +1,35 @@
 ---
 name: improve-plugin
 description: >
-  Reactively fix a plugin in the anton-toolkit-marketplace after an incident
-  in the current session — a skill or agent behaved incorrectly, OR was NOT
-  invoked when it should have been. Updates the plugin source so the
+  Fix a plugin in the anton-toolkit-marketplace when the user explicitly
+  asks to update a skill or agent. Updates the plugin source so the
   correction persists across sessions.
 
-  Triggers (explicit): "/improve", "/improve-plugin", "улучши плагин",
-  "обнови скилл", "запомни это в плагине", "исправь скилл", "так не должно
-  быть", "убери <X>", "не добавляй <X>", "запомни".
+  Invoke ONLY on explicit user request. Do NOT invoke proactively.
+  Do NOT suggest running this skill in response to complaints, reprimands,
+  or evaluative remarks about a skill/agent's output ("это косяк",
+  "глючит", "не сработало", etc.) — wait for the user to call the skill
+  themselves.
 
-  Triggers (reprimand / missed invocation): "какого хрена", "опять не",
-  "снова не", "ты не использовал <агента>", "почему не вызван", "почему не
-  вызвался", "опять не сработало", "снова проблема с плагином", "это косяк
-  плагина", "агент не сработал", "скилл не сработал", "не был вызван
-  <агент/скилл>", "забыл про агента", "должен был вызвать", "почему сам
-  делал".
+  Triggers (explicit only): "/improve", "/improve-plugin", "улучши плагин",
+  "обнови плагин", "обнови скилл", "обнови агента", "исправь скилл",
+  "исправь агента", "поправь плагин", "запомни это в плагине",
+  "улучши <имя плагина / скилла / агента>".
 
-  Triggers (non-imperative complaint — any evaluative remark about wrong
-  output of a skill/agent counts, even without an imperative verb like
-  "fix"): "это косяк", "косяк", "косячит", "бага", "баг же", "сломано",
-  "сломался", "не так", "неправильно", "неправильно работает", "неверно",
-  "фигня", "хрень", "вот эта фигня", "ерунда", "что за", "почему X сделал
-  Y", "почему он так", "зачем он", "опять то же самое", "опять", "снова",
-  "не должно быть так", "не должно так быть", "плохо", "лажа", "глючит".
-  The user's evaluative comment IS the correction signal.
-
-  PROACTIVE RULE: when the user corrects plugin-level behavior (agent or
-  skill description, triggers, routing, delegation, output language /
-  format / style, missed invocation), invoke this skill in the SAME reply
-  where you acknowledge the mistake. Do not wait for a second prompt. Do
-  not ask "should I fix the plugin?" — say "Правлю плагин через
-  improve-plugin" and proceed.
-
-  MANUAL-PATCH RULE: a fix you applied via Edit / Write / Bash to the
-  current project does NOT substitute a plugin fix. Even if the symptom is
-  gone in this project, the skill/agent that produced it will reproduce
-  the same bug on the next invocation. You MUST still invoke
-  improve-plugin in the same reply.
-
-  Discrimination: only trigger on a concrete incident in the current
-  session — either (a) a plugin component ran and produced wrong output,
-  or (b) a plugin component should have been invoked but was NOT. For
-  fresh-session planning with no incident — use `extend-plugin` or
-  `create-plugin` instead. For one-off file overrides with no downstream
-  rule — skip.
-
-  Detailed examples, edge cases, and the plugin-level-correction test
-  live in `references/triggers.md` — read it after invocation if you are
-  uncertain about a borderline case.
+  Discrimination: this skill is for explicit requests to modify the plugin
+  source. For fresh-session planning of new plugin behavior — use
+  `extend-plugin` or `create-plugin` instead. For one-off file overrides
+  in the current project with no plugin-level rule change — skip.
 
   This skill runs DIRECTLY in conversation. Engages in at most one round
   of user interaction — the target-plugin confirmation in Step 1.
 ---
 
-# Improve Plugin — reactive plugin fix
+# Improve Plugin — explicit plugin fix
 
-Read the current session history, identify the plugin that malfunctioned, apply the minimal fix to persist the user's correction, and ship via git.
+The user explicitly asked to update a plugin component. Read the recent session history to understand which skill/agent and what change is wanted, apply the minimal fix, and ship via git.
 
-**Before starting, read** `references/plugin-authoring.md` for the validation checklist and language rules. For borderline trigger questions ("is this really a plugin-level correction?") consult `references/triggers.md`.
+**Before starting, read** `references/plugin-authoring.md` for the validation checklist and language rules.
 
 ## Step 1 — Detect target plugin, confirm in one message
 
