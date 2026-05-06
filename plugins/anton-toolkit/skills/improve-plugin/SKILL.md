@@ -2,93 +2,63 @@
 name: improve-plugin
 description: >
   Reactively fix a plugin in the anton-toolkit-marketplace after an incident
-  in the current session — a skill or agent just behaved incorrectly, OR was
-  NOT invoked when it should have been, the user corrected the behavior in
-  conversation, and the correction should be persisted in the plugin source.
+  in the current session — a skill or agent behaved incorrectly, OR was NOT
+  invoked when it should have been. Updates the plugin source so the
+  correction persists across sessions.
 
   Triggers (explicit): "/improve", "/improve-plugin", "улучши плагин",
   "обнови скилл", "запомни это в плагине", "исправь скилл", "так не должно
-  быть", "убери <X>", "не добавляй <X>", "запомни", "улучши стратега",
-  "исправь интервьюера", "улучши плагин personal-strategist".
+  быть", "убери <X>", "не добавляй <X>", "запомни".
 
-  Triggers (reprimand / missed-invocation — PROACTIVELY suggest this skill in
-  the SAME reply where you acknowledge the mistake, do NOT wait for the user
-  to ask): "какого хрена", "опять не", "снова не", "ты не использовал
-  <агента>", "почему не вызван", "почему не вызвался", "опять не сработало",
-  "снова проблема с плагином", "это косяк плагина", "агент не сработал",
-  "скилл не сработал", "не был вызван <агент/скилл>", "забыл про агента",
-  "должен был вызвать", "почему сам делал".
+  Triggers (reprimand / missed invocation): "какого хрена", "опять не",
+  "снова не", "ты не использовал <агента>", "почему не вызван", "почему не
+  вызвался", "опять не сработало", "снова проблема с плагином", "это косяк
+  плагина", "агент не сработал", "скилл не сработал", "не был вызван
+  <агент/скилл>", "забыл про агента", "должен был вызвать", "почему сам
+  делал".
 
-  Triggers (non-imperative complaint / error statement — ANY evaluative
-  remark about wrong output of a skill/agent counts as a trigger, even
-  without an explicit command to fix): "это косяк", "косяк", "косячит",
-  "бага", "баг же", "сломано", "сломался", "не так", "неправильно",
-  "неправильно работает", "неверно", "фигня", "хрень", "вот эта фигня",
-  "ерунда", "что за", "почему X сделал Y", "почему он так", "зачем он",
-  "опять то же самое", "опять", "снова", "не должно быть так", "не должно
-  так быть", "плохо", "лажа", "глючит". ANY statement that describes a
-  skill/agent output as wrong, broken, or inappropriate — WITHOUT an
-  imperative verb like "fix" or "improve" — is still a trigger for this
-  skill. The user's evaluative comment IS the correction signal.
+  Triggers (non-imperative complaint — any evaluative remark about wrong
+  output of a skill/agent counts, even without an imperative verb like
+  "fix"): "это косяк", "косяк", "косячит", "бага", "баг же", "сломано",
+  "сломался", "не так", "неправильно", "неправильно работает", "неверно",
+  "фигня", "хрень", "вот эта фигня", "ерунда", "что за", "почему X сделал
+  Y", "почему он так", "зачем он", "опять то же самое", "опять", "снова",
+  "не должно быть так", "не должно так быть", "плохо", "лажа", "глючит".
+  The user's evaluative comment IS the correction signal.
 
-  MANDATORY PROACTIVE RULE: If the user corrects the behavior of a plugin
-  component (agent or skill) AND the correction is about behavior that should
-  persist across sessions (wrong description, missing trigger phrase, wrong
-  routing, wrong delegation, missed invocation of an agent/skill, skill
-  produced artifact in wrong language / wrong format / wrong style) —
-  **PROACTIVELY offer to run `improve-plugin` in the SAME reply where you
-  acknowledge the mistake**. Do not wait for a second prompt. Do not ask
-  "should I fix the plugin?" — just say "Правлю плагин через improve-plugin"
-  and proceed.
+  PROACTIVE RULE: when the user corrects plugin-level behavior (agent or
+  skill description, triggers, routing, delegation, output language /
+  format / style, missed invocation), invoke this skill in the SAME reply
+  where you acknowledge the mistake. Do not wait for a second prompt. Do
+  not ask "should I fix the plugin?" — say "Правлю плагин через
+  improve-plugin" and proceed.
 
-  CRITICAL — manual patch does NOT substitute plugin fix: if you already
-  fixed the symptom manually in the project (via Edit / Write / Bash) after
-  the user complained about a plugin component's output, you MUST STILL
-  invoke `improve-plugin` in the same reply. Fixing the artifact in the
-  current project does NOT fix the skill/agent that produced it — on the
-  next invocation the same bug will return. Project-level patch ≠
-  plugin-level patch. The user's complaint about plugin output stays open
-  until the plugin source is updated and committed.
+  MANUAL-PATCH RULE: a fix you applied via Edit / Write / Bash to the
+  current project does NOT substitute a plugin fix. Even if the symptom is
+  gone in this project, the skill/agent that produced it will reproduce
+  the same bug on the next invocation. You MUST still invoke
+  improve-plugin in the same reply.
 
-  Correct example of detection: the user says "концепт на русском, а
-  заголовки на английском — это косяк". You translated the headings via
-  Edit. Regardless, the `system-designer` skill just produced English
-  headings in a Russian-language project — that is a plugin-level bug in
-  the skill's language rules. You MUST run improve-plugin on
-  `system-designer` in the same reply. Do not treat "I already fixed the
-  file" as closure.
+  Discrimination: only trigger on a concrete incident in the current
+  session — either (a) a plugin component ran and produced wrong output,
+  or (b) a plugin component should have been invoked but was NOT. For
+  fresh-session planning with no incident — use `extend-plugin` or
+  `create-plugin` instead. For one-off file overrides with no downstream
+  rule — skip.
 
-  Incorrect example: "in this specific file use 'foo' instead of 'bar'" —
-  one-off factual override with no generalization to the skill's behavior.
-  Skip improve-plugin.
+  Detailed examples, edge cases, and the plugin-level-correction test
+  live in `references/triggers.md` — read it after invocation if you are
+  uncertain about a borderline case.
 
-  Test for "is this a plugin-level correction?": if you can phrase the fix
-  as "in the agent/skill description/body, add/change <rule, trigger, or
-  language/format constraint>" — it IS plugin-level. Proactively run
-  improve-plugin. If the fix is only "in this file, change value X with no
-  downstream rule" — it is NOT plugin-level, skip.
-
-  Discrimination: only trigger when there was a concrete incident with a
-  plugin skill/agent earlier in the current session. An "incident" includes
-  BOTH: (a) plugin component ran and produced wrong output, AND (b) plugin
-  component should have been invoked but was NOT — this second case is just
-  as much an incident as the first. If there was no incident at all (fresh
-  session, user is just planning) — delegate to `extend-plugin` (proactive
-  modification) or `create-plugin` (new plugin). Even if the user hasn't
-  explicitly asked to fix the plugin — if the correction is clearly about
-  plugin-level behavior (agent description, skill triggers, routing,
-  delegation rules), proactively suggest `improve-plugin`.
-
-  This skill runs DIRECTLY in conversation. Engages in at most one round of
-  user interaction — the target-plugin confirmation in Step 1. No interview,
-  no multi-turn dialog beyond that.
+  This skill runs DIRECTLY in conversation. Engages in at most one round
+  of user interaction — the target-plugin confirmation in Step 1.
 ---
 
 # Improve Plugin — reactive plugin fix
 
 Read the current session history, identify the plugin that malfunctioned, apply the minimal fix to persist the user's correction, and ship via git.
 
-**Before starting, read** `references/plugin-authoring.md` (next to this SKILL.md) for the validation checklist and language rules.
+**Before starting, read** `references/plugin-authoring.md` for the validation checklist and language rules. For borderline trigger questions ("is this really a plugin-level correction?") consult `references/triggers.md`.
 
 ## Step 1 — Detect target plugin, confirm in one message
 
