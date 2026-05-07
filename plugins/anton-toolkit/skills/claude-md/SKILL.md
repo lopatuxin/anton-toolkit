@@ -8,8 +8,10 @@ description: >
 
   Trigger phrases: "claude.md", "CLAUDE.md", "создай claude.md",
   "обнови claude.md", "почисти claude.md", "аудит claude.md",
-  "приведи в порядок claude.md", "оформи claude.md", "/claude-md",
-  or any request to create or modify a CLAUDE.md file.
+  "приведи в порядок claude.md", "оформи claude.md",
+  "синхронизируй claude.md", "проект изменился обнови claude.md",
+  "освежи claude.md под проект", "/claude-md",
+  or any request to create, refresh, or modify a CLAUDE.md file.
 ---
 
 # CLAUDE.md — creation and maintenance
@@ -52,6 +54,23 @@ Create or clean up a CLAUDE.md file following the strict rules from `references/
    - `@file` embed references — replace with "see docs/..."
 4. **Strengthen:** weak formulations → NEVER/ALWAYS + alternative
 5. **Check limits** after edits
+
+### Refreshing CLAUDE.md after major project changes
+
+Use this mode when the user says the project has changed significantly and CLAUDE.md is out of sync — new agents/skills added, build commands changed, services renamed, old features removed. Differs from `Auditing`: audit only enforces the `references/rules.md` style guide; refresh re-checks the file against the CURRENT project state and can both remove stale info and add what is now missing. Differs from creating from scratch: refresh PRESERVES user-added rules and existing `# Common Mistakes` entries that are still valid.
+
+1. **Read the current CLAUDE.md** — note every project line, rule, and `# Common Mistakes` entry that is already there
+2. **Re-scan the project as if creating from scratch:**
+   - Build files, configs, folder structure
+   - Installed plugins/agents/skills (java-dev, frontend-dev, commit, devops, etc.)
+   - `docs/` for reference materials and warnings
+3. **Diff current file vs reality and decide per item:**
+   - Stale rules (refer to removed code, dropped stack, gone services) → REMOVE
+   - New non-obvious commands or architectural decisions found in code → ADD
+   - New agents/skills now installed → REMOVE anything CLAUDE.md duplicates from them
+   - User-added rules and existing `# Common Mistakes` entries that are still relevant → KEEP VERBATIM
+4. **Show the user a clear diff** (what is removed, what is added, what is kept) BEFORE writing the file
+5. **Check limits** after edits — target 80–120 lines, hard cap 150
 
 ### Adding a rule
 
