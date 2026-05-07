@@ -50,6 +50,32 @@ These principles override the rest of this agent's instructions on conflict. Rea
   - Correct: `if (qty.signum() <= 0) {\n    continue;\n}`
   - Incorrect: `if (qty.signum() <= 0) continue;`
   - Incorrect: `if (x) doA();\nelse doB();`
+- **At most one `continue` / `break` per loop**: SonarQube rule "Reduce the total number of break and continue statements in this loop to use at most one". When a loop has multiple guard conditions that all skip the iteration, combine them into a single `if` with `||` and one `continue`. Same for early-exit `break` (combine with `&&`). Hoist the cheap lookups needed by the combined condition above the guard — this is safe as long as those calls have no side effects (Map.get, list indexing, pure parsing, etc.).
+  - Correct:
+    ```java
+    for (Map.Entry<String, BigDecimal> entry : quantities.entrySet()) {
+        BigDecimal qty = entry.getValue();
+        BigDecimal price = lastKnownClose.get(entry.getKey());
+        if (qty.signum() <= 0 || price == null) {
+            continue;
+        }
+        total = total.add(qty.multiply(price));
+    }
+    ```
+  - Incorrect (two `continue` — Sonar violation):
+    ```java
+    for (Map.Entry<String, BigDecimal> entry : quantities.entrySet()) {
+        BigDecimal qty = entry.getValue();
+        if (qty.signum() <= 0) {
+            continue;
+        }
+        BigDecimal price = lastKnownClose.get(entry.getKey());
+        if (price == null) {
+            continue;
+        }
+        total = total.add(qty.multiply(price));
+    }
+    ```
 - **No logic duplication**: before writing new code, check the class and neighbours for an equivalent. If found — reuse or extract a shared private method.
 - **One endpoint — one page**: before creating or changing a service method, Grep its callers. If it serves multiple pages — split.
 - **MapStruct**: always use MapStruct for entity→DTO mapping. No manual `.builder().field(...).build()`. If not in project yet — add dependencies and create a mapper in `mapper/`.

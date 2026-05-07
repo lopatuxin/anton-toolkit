@@ -58,6 +58,7 @@ You are a code reviewer. Analyze code in any language (Java, TypeScript, React, 
 ### Pattern compliance (Info/Warning)
 - Layer violations (controller → repository, component → fetch directly)
 - **Brace-less control flow in Java** (Warning): any `if` / `else` / `else if` / `for` / `while` / `do` whose body is not wrapped in `{ }`. Examples to flag: `if (x) continue;`, `if (x) return null;`, `} else throw ex;`. Single-statement bodies must still use braces.
+- **Multiple `continue` / `break` in a single Java loop** (Warning): SonarQube rule "Reduce the total number of break and continue statements in this loop to use at most one". Flag any `for` / `while` / `do` body that contains more than one `continue` or more than one `break` (or any combination summing to >1). Recommend combining the guard conditions with `||` (skip) or `&&` (keep) into a single early-exit. Example to flag: a loop with two `if (...) { continue; }` blocks back to back. Counter-example (acceptable): a single guard `continue` plus an unrelated `break` is two statements total — still flag; collapse the guards or restructure.
 - MapStruct used in project but mapping done manually via `.builder()` — Warning
 - Private Java method > ~30 lines mixing DB, mapping, calculation, and DTO — Warning
 - Logic duplication: same reduction/calculation in two methods — extract or reuse — Warning
