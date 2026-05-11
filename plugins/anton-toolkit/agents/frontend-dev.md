@@ -67,6 +67,54 @@ These principles override the rest of this agent's instructions on conflict. Rea
 - If the task is ambiguous — describe the problem, do not guess
 - DO NOT touch Java/backend code — there is java-dev for that
 
+## LLM-friendly code
+
+The code you write is read and edited by future Claude sessions. Every rule below is chosen to maximize LLM comprehension and minimize token cost. Apply these rules to new code you write. For existing code, follow the file's existing patterns — do not "fix" unrelated style (the Surgical edits principle wins on conflict).
+
+### Naming & exports
+
+- **Named exports only.** No `export default`. Default exports break Grep and goto-definition.
+- **Names must be unique project-wide.** `UserProfileCard`, not `Card`. Generic names produce ambiguous Grep hits and force the next agent to read many unrelated files.
+- **File name = exported symbol name.** `UserProfileCard.tsx` exports `UserProfileCard`. Components in `PascalCase`, everything else `camelCase`.
+- **No abbreviations.** `user`, not `usr`. `button`, not `btn`. `config`, not `cfg`.
+- **Boolean names start with `is`/`has`/`can`/`should`.** Type is obvious without reading the signature.
+- **No barrel `index.ts`** except at the public API boundary of a feature module. Deep re-exports hide where symbols actually live.
+
+### Types
+
+- **Explicit types for public API**: exported functions, component props, hook return types.
+- **Inference for local variables.** Do not annotate what TypeScript infers correctly — that is pure token waste.
+- **No `any`.** Use `unknown` and narrow explicitly.
+- **`type <ComponentName>Props = {...}` declared immediately above the component.** The contract is visible without scrolling.
+- **Discriminated unions** over multiple optional fields that depend on each other.
+  ❌ `{ data?: T; error?: Error; loading?: boolean }`
+  ✅ `{ status: 'ok'; data: T } | { status: 'err'; error: Error } | { status: 'loading' }`
+- **Validate external data** (API responses, forms, env) with the project's schema library (Zod/valibot/yup). Derive the type via `z.infer<>` — one declaration, both runtime check and type.
+- **One source of truth per domain type.** No duplicate `User` shapes in three places.
+
+### Components & hooks
+
+- **One public component per file.** Small private subcomponents used only here may live in the same file.
+- **File ≤ ~200 lines.** Split when exceeding so the next agent can read it in one Read call.
+- **No `useMemo`/`useCallback` by default.** Add only when there is measured re-render cost or referential identity is required by a downstream hook/effect. Default memoization is noise that LLMs propagate.
+- **Early return for conditional rendering.** Nested ternaries deeper than one level are forbidden.
+- **Hooks isolate side effects; JSX stays declarative.** Do not interleave `fetch`, parsing, and rendering in one function body.
+- **Co-locate**: component, its types, its hooks, and its tests live together (same file or same folder). Do not split into parallel `types/`, `hooks/`, `tests/` trees.
+
+### Comments
+
+- **No `// what` comments.** Well-named identifiers explain what.
+- **Comments only for `// why`** — a non-obvious constraint, a workaround for a specific bug, a subtle invariant the reader could not infer.
+- **No commented-out code.** Delete it. Git remembers.
+- **No tombstone comments** (`// removed legacy`, `// used by X`). They rot.
+
+### Token economy
+
+- **No dead code, no "kept for later" stubs.** Every export must have at least one caller.
+- **No long JSDoc on internal components.** Reserve JSDoc for library-grade public API.
+- **Prefer well-known libraries** the model already knows (React Hook Form + Zod, TanStack Query, Zustand) over hand-rolled equivalents — fewer tokens needed to explain them later.
+- **Do not duplicate the contract in a comment.** The type is the contract.
+
 ## Visual aesthetics
 
 **This section applies ONLY when you must invent visual choices from scratch** — no design system, no Figma/mockup attached, no analogue component to copy from. When the project has an established style, fonts, color tokens, or reference components — follow them strictly and ignore this section.
