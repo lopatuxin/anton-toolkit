@@ -39,7 +39,7 @@ Create or clean up a CLAUDE.md file following the strict rules from `references/
    - `# Project` — 1–3 lines
    - `# Stack & Build` — only non-standard commands
    - `# Code Style` — ONLY if the project has NO code-writing agents (java-dev, frontend-dev). If agents are present — do NOT create the section, even if the project has conventions. Cross-agent contracts (API format) go into docs/ with a reference link.
-   - `# Common Mistakes` — placeholder `[Пока пусто]` if no mistakes have occurred yet
+   - `# Common Mistakes` — placeholder `[Empty]` if no mistakes have occurred yet
 
 4. **Check limits:** 80–120 lines, ≤2500 tokens. Hard cap — 150 lines.
 
@@ -84,6 +84,7 @@ Use this mode when the user says the project has changed significantly and CLAUD
 
 - ALWAYS read `references/rules.md` before any CLAUDE.md change
 - ALWAYS show the final file to the user before saving
+- ALWAYS write CLAUDE.md content in English — section bodies, rules, comments, placeholders. CLAUDE.md is model-facing, not user-facing. Russian is allowed ONLY for: (a) direct quotes of user-provided strings that must remain verbatim (project name, brand copy), (b) literal commit-message templates or other user-facing dialogue snippets the file documents. Section headers (`# Project`, `# Stack & Build`, `# Common Mistakes`) are already English — keep them so. Correct: `Backend is only planned in docs/architecture.md — do NOT treat the spec as current code.` Incorrect: `Бэкенд только спроектирован в docs/architecture.md — не считать спецификацию текущей реализацией.`
 - DO NOT duplicate information from code, agents, or skills
 - DO NOT exceed 150 lines / 3000 tokens
 - When prohibiting something — ALWAYS provide an alternative

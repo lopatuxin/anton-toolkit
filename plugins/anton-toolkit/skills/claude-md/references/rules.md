@@ -65,7 +65,8 @@ BAD (vague, ~35% compliance):
 - Mistakes Claude has ALREADY made in this project
 - Format: "DO NOT do X — do Y instead. Reason: Z"
 - This section grows organically through the feedback loop
-- If the section is empty — leave a placeholder: `[Пока пусто]`
+- If the section is empty — leave a placeholder: `[Empty]`
+- CLAUDE.md content MUST be written in English (all sections, rules, placeholders). Russian is allowed only inside literal quoted strings the file documents (e.g. user-facing dialogue templates). This rule applies regardless of the language the user speaks in.
 
 ---
 
