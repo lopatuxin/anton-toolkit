@@ -102,6 +102,40 @@ Produce a full Russian-language script: hook (first 15 sec) → acts → CTA →
 - Files / repos / screenshots needed: <list>
 ```
 
+## Save to vault
+
+After producing the script in chat, persist it to the Obsidian vault following `${CLAUDE_PLUGIN_ROOT}/references/vault.md`.
+
+- Target folder: `C:\projects\Claude\youtube\40-scripts\`.
+- Filename: `<video-slug>.md`. The slug is derived from the working title — transliterate Russian to Latin, lowercase, kebab-case, ≤ 60 chars. Reuse this exact slug across `40-scripts/`, `50-seo/`, `60-thumbnails/` so the three files form a video bundle. If a script with this slug already exists, append `-v2`, `-v3`…
+- Frontmatter:
+
+  ```yaml
+  ---
+  type: script
+  date: <YYYY-MM-DD>
+  video: "<working title in Russian>"
+  video_slug: <slug>
+  video_type: tutorial | case | flagship | review | lead-gen
+  series: logos | crm | standalone
+  length_min: <N>
+  hook_formula: "<name from references/hook-formulas.md>"
+  cta_placement: opening-soft | mid-roll | end-roll
+  tags:
+    - youtube/script
+    - youtube/series/<series>
+  related:
+    - "[[20-ideas/<ideas-file>]]"   # the idea this script came from, if any
+    - "[[50-seo/<slug>]]"           # forward link — SEO file for the same video
+    - "[[60-thumbnails/<slug>]]"    # forward link — thumbnail file for the same video
+  ---
+  ```
+
+  The forward links to `50-seo/` and `60-thumbnails/` are intentional even if those files don't exist yet — Obsidian renders them as creatable links.
+
+- Body: the full script in the format above (Hook, Acts, CTAs, Production notes) — same content as the chat output.
+- After writing, tell the user in Russian where the file landed.
+
 ## Boundaries
 
 - Do not write the title, description, tags, or thumbnail concept here — those are `yt-seo` and `yt-thumbnail`.

@@ -131,6 +131,37 @@ Design and refine the on-channel lead-gen system: pinned comments, end-screens, 
 <2–3 changes that take more time>
 ```
 
+## Save to vault
+
+After producing the artefact in chat, persist it to the Obsidian vault following `${CLAUDE_PLUGIN_ROOT}/references/vault.md`.
+
+- Target folder: `C:\projects\Claude\youtube\70-promo\`.
+- Filename depends on the request type:
+  - Audit → `YYYY-MM-DD-audit.md`
+  - Pinned comment → `pinned-<video-slug>.md` (reuse the same slug as the video's script in `40-scripts/`)
+  - End-screen plan → `endscreen-<video-slug>.md`
+  - Funnel design → `YYYY-MM-DD-funnel.md`
+  - If a file with the chosen name exists, append `-v2`, `-v3`…
+- Frontmatter (set `type` based on request type — one of: `promo-audit`, `pinned-comment`, `end-screen`, `funnel`):
+
+  ```yaml
+  ---
+  type: <promo-audit | pinned-comment | end-screen | funnel>
+  date: <YYYY-MM-DD>
+  video: "<working title>"           # only for pinned-comment / end-screen
+  video_slug: <slug>                 # only for pinned-comment / end-screen
+  cta_mode: pre-site | post-site
+  tags:
+    - youtube/promo
+    - youtube/promo/<audit|pinned|endscreen|funnel>
+  related:
+    - "[[40-scripts/<slug>]]"        # only for per-video artefacts
+  ---
+  ```
+
+- Body: the full artefact in the format above — same content as the chat output, not a summary.
+- After writing, tell the user in Russian where the file landed.
+
 ## Boundaries
 
 - Do NOT design cross-promo posts for Telegram, Habr, dev.to, X, LinkedIn, etc. The user excluded that. If the user explicitly asks for cross-promo, say: "Кросс-промо постов на других платформах в плагине нет — могу разобрать только on-channel часть."

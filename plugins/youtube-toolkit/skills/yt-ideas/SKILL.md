@@ -86,6 +86,34 @@ If at least one is present, proceed.
 3 ideas to film first, with one-sentence rationale per idea.
 ```
 
+## Save to vault
+
+After producing the ideas in chat, persist them to the Obsidian vault following `${CLAUDE_PLUGIN_ROOT}/references/vault.md`.
+
+- Target folder: `C:\projects\Claude\youtube\20-ideas\`.
+- Filename: `YYYY-MM-DD-ideas-batch.md` (current session date). If a batch for today already exists, append `-v2`, `-v3`…
+- Frontmatter:
+
+  ```yaml
+  ---
+  type: idea-batch
+  date: <YYYY-MM-DD>
+  idea_count: <N>
+  sources:
+    - yt-my-channel | yt-competitors | both
+  tags:
+    - youtube/idea-batch
+  related:
+    - "[[00-channel/<channel-file>]]"     # if a yt-my-channel report was used
+    - "[[10-competitors/<competitor-file>]]" # if a yt-competitors report was used
+  ---
+  ```
+
+  Populate `related` only with files that actually exist in the vault. If the inputs were pasted inline in the conversation rather than read from vault files, leave `related: []` and note the inline source in the body's "Inputs used" section.
+
+- Body: the full ideas batch (Inputs used, Ideas in schema, Priority shortlist) — same content as the chat output.
+- After writing, tell the user in Russian where the file landed.
+
 ## Boundaries
 
 - Do not make up data. If an idea has no evidence from the inputs, drop it.

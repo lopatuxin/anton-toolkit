@@ -85,6 +85,38 @@ Variant <N> — <one-sentence rationale>.
 - Series breadcrumb included: <yes/no>
 ```
 
+## Save to vault
+
+After producing the SEO block in chat, persist it to the Obsidian vault following `${CLAUDE_PLUGIN_ROOT}/references/vault.md`.
+
+- Target folder: `C:\projects\Claude\youtube\50-seo\`.
+- Filename: `<video-slug>.md`. Reuse the same slug as the script for this video (lives in `40-scripts/<slug>.md`). If a SEO file with this slug exists, append `-v2`, `-v3`…
+- Frontmatter:
+
+  ```yaml
+  ---
+  type: seo
+  date: <YYYY-MM-DD>
+  video: "<working title in Russian>"
+  video_slug: <slug>
+  video_type: tutorial | case | flagship | review | lead-gen
+  series: logos | crm | standalone
+  recommended_title_variant: <1..5>
+  timestamps_mode: real | placeholder
+  cta_mode: site-url | soft-fallback
+  tag_count: <N>
+  tags:
+    - youtube/seo
+    - youtube/series/<series>
+  related:
+    - "[[40-scripts/<slug>]]"
+    - "[[60-thumbnails/<slug>]]"
+  ---
+  ```
+
+- Body: the full SEO output (5 title variants, recommended pick, description, tags, notes) — same content as the chat output.
+- After writing, tell the user in Russian where the file landed.
+
 ## Boundaries
 
 - Do NOT generate a thumbnail concept — that is `yt-thumbnail`.

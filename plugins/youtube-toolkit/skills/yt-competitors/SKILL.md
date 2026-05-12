@@ -77,6 +77,39 @@ Apply the framework in `references/analysis-framework.md`:
 - **Input — BATCH:** the user's own channel handle (used to build the niche query). Optionally, a custom subscriber threshold (default 10 000).
 - **Output:** Markdown report. Numbers exact, hypotheses labelled.
 
+## Save to vault
+
+After producing the report in chat, persist it to the Obsidian vault following `${CLAUDE_PLUGIN_ROOT}/references/vault.md`.
+
+- Target folder: `C:\projects\Claude\youtube\10-competitors\`.
+- Filename:
+  - SINGLE mode → `YYYY-MM-DD-channel-<handle-slug>-deep-dive.md` (slugify the competitor handle, ASCII, kebab-case).
+  - BATCH mode → `YYYY-MM-DD-niche-batch-scan.md`.
+  - Use the current session date. If the file exists, append `-v2`, `-v3`…
+- Frontmatter:
+
+  ```yaml
+  ---
+  type: competitor-analysis
+  mode: single | batch
+  date: <YYYY-MM-DD>
+  competitor_handle: "<@handle>"        # SINGLE only
+  competitor_subs: <number>             # SINGLE only
+  niche_queries:                        # BATCH only
+    - "<query 1>"
+    - "<query 2>"
+  channels_scanned: <N>                 # BATCH only
+  min_subs_threshold: <N>               # BATCH only
+  tags:
+    - youtube/competitor-analysis
+    - youtube/mode/<single|batch>
+  related: []                           # add wiki-links to any yt-my-channel report used as context
+  ---
+  ```
+
+- Body: the full report — same content as the chat output, not a summary.
+- After writing, tell the user in Russian where the file landed.
+
 ## Boundaries
 
 - Do not generate ideas here — that is `yt-ideas`. The competitor report is the *input* to ideas.

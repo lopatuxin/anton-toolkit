@@ -74,6 +74,34 @@ Variant <N> — <one-sentence rationale matching the title and series>.
 - Face zone: faces should occupy 30–50% of vertical height when used.
 ```
 
+## Save to vault
+
+After producing the concept brief in chat, persist it to the Obsidian vault following `${CLAUDE_PLUGIN_ROOT}/references/vault.md`.
+
+- Target folder: `C:\projects\Claude\youtube\60-thumbnails\`.
+- Filename: `<video-slug>.md`. Reuse the same slug as the script for this video (lives in `40-scripts/<slug>.md`). If a thumbnail file with this slug exists, append `-v2`, `-v3`…
+- Frontmatter:
+
+  ```yaml
+  ---
+  type: thumbnail
+  date: <YYYY-MM-DD>
+  video: "<working title in Russian>"
+  video_slug: <slug>
+  variants: <N>                          # number of concept variants in the body
+  recommended_variant: <1..N>
+  emotion: curiosity | triumph | frustration | surprise | <other>
+  tags:
+    - youtube/thumbnail
+  related:
+    - "[[40-scripts/<slug>]]"
+    - "[[50-seo/<slug>]]"
+  ---
+  ```
+
+- Body: the full thumbnail concept brief (2–3 variants, recommended pick, production notes) — same content as the chat output.
+- After writing, tell the user in Russian where the file landed.
+
 ## Boundaries
 
 - Do not generate the actual image. The output is a brief.

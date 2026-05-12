@@ -44,6 +44,27 @@ Produce a structured analytical report on the user's own YouTube channel using p
 
 5. **Save the report inline in chat** so downstream skills (`yt-ideas`, `yt-content-plan`) can consume it from conversation context.
 
+6. **Persist the report to the Obsidian vault.** Follow `${CLAUDE_PLUGIN_ROOT}/references/vault.md`. Target folder: `C:\projects\Claude\youtube\00-channel\`. Filename: `YYYY-MM-DD-channel-snapshot.md` (use the current session date; if a snapshot for today already exists, append `-v2`, `-v3`…). Frontmatter:
+
+   ```yaml
+   ---
+   type: channel-analysis
+   date: <YYYY-MM-DD>
+   channel_handle: "<@handle or channel ID>"
+   subscribers: <number>
+   total_views: <number>
+   video_count: <number>
+   studio_data_included: <true|false>
+   tags:
+     - youtube/channel-analysis
+   related: []
+   ---
+   ```
+
+   Body: the full report (Snapshot, Top performers, Underperformers, Patterns, Hypotheses, Recommendations) — same content as the chat output, not a summary.
+
+   After writing, tell the user in Russian where the file landed.
+
 ## Interpretation rules
 
 Apply the rules in `references/metrics.md`:

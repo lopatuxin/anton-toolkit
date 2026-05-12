@@ -41,6 +41,33 @@ Build a calendar that schedules concrete videos against weeks. Balance flagship-
 - **Input:** period (weeks), idea pool, start date.
 - **Output:** calendar table + week-by-week notes (production status, dependencies).
 
+## Save to vault
+
+After producing the calendar in chat, persist it to the Obsidian vault following `${CLAUDE_PLUGIN_ROOT}/references/vault.md`.
+
+- Target folder: `C:\projects\Claude\youtube\30-plans\`.
+- Filename: `YYYY-MM-DD-content-plan-<N>w.md` where `<N>` is the period in weeks (e.g., `2026-05-12-content-plan-8w.md`). Use the current session date. If the file exists, append `-v2`, `-v3`…
+- Frontmatter:
+
+  ```yaml
+  ---
+  type: content-plan
+  date: <YYYY-MM-DD>
+  period_weeks: <N>
+  start_date: <YYYY-MM-DD>      # first scheduled video
+  end_date: <YYYY-MM-DD>        # last scheduled video
+  videos_planned: <N>
+  reservations: <N>             # gaps marked as "need more ideas"
+  tags:
+    - youtube/content-plan
+  related:
+    - "[[20-ideas/<ideas-file>]]"   # the idea batch the plan draws from
+  ---
+  ```
+
+- Body: the full calendar table + week-by-week notes — same content as the chat output.
+- After writing, tell the user in Russian where the file landed.
+
 ## Boundaries
 
 - Do not generate ideas — request them from the user / direct to `yt-ideas`.
