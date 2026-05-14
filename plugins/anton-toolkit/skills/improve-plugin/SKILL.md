@@ -89,7 +89,8 @@ Edit rules (strict):
 - When adding a new rule, state it concretely with an example of correct and incorrect behavior — vague rules do not change model behavior.
 
 Language rule (strict — applies to every edit this skill makes):
-- **All model-facing text MUST be written in English**: SKILL.md body, agent body, references, YAML `description` fields, inline rules, examples explaining correct/incorrect behavior. Even when the user phrases the correction in Russian, the rule you persist into the plugin source is English prose.
+- **Scope: EVERY skill or agent file you edit while running this skill** — this includes personal `~/.claude/skills/` and project-level `.claude/skills/` files, not only plugin-repo source. If the incident traces to a non-plugin skill/agent file, the language rule still applies to whatever you write into it.
+- **All model-facing text MUST be written in English**: SKILL.md body, agent body, references, YAML `description` fields, inline rules, examples explaining correct/incorrect behavior. Even when the user phrases the correction in Russian, the rule you persist into the file is English prose. This holds even if the surrounding file is currently written in Russian.
 - **Russian is allowed only in two specific places**: (a) trigger phrases inside `description` that match real Russian user input (e.g. `"улучши плагин"`, `"это косяк"`), and (b) literal user-facing dialogue templates the component will speak back to the user (questions, confirmations, error messages, post-operation summaries).
 - If the user says in Russian "добавь правило, что X не должно быть" — translate the rule itself to English when writing it into the file. Do NOT paste Russian prose into the SKILL.md/agent body. Trigger phrases and user-facing dialogue stay Russian; everything else is English.
 - Correct: `Do NOT include emojis in commit messages unless the user explicitly requests them.`
