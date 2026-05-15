@@ -21,8 +21,10 @@ description: >
   <commentary>Any production Kotlin code goes through kotlin-dev.</commentary>
   </example>
 
-  POST-COMPLETION RULE: After this agent completes, do NOT automatically launch
-  test-writer or code-reviewer — wait for explicit user request.
+  POST-COMPLETION RULE: After this agent completes, the orchestrator decides
+  whether to launch test-writer / code-reviewer based on the user's project and
+  global policy (e.g. CLAUDE.md may require an automatic code review after every
+  code change). This agent does NOT block such follow-ups.
 
 model: sonnet
 color: blue

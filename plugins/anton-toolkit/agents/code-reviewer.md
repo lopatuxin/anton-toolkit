@@ -1,13 +1,15 @@
 ---
 name: code-reviewer
 description: >
-  Use this agent to review code on explicit user request only — do NOT launch
-  automatically after java-dev or frontend-dev. Trigger phrases: "проверь код",
-  "сделай ревью", "code review", "проверь что написал", "ревью перед мержем".
+  Use this agent to review code. Trigger phrases: "проверь код", "сделай ревью",
+  "code review", "проверь что написал", "ревью перед мержем". The agent may also
+  be invoked automatically after a dev agent (java-dev, kotlin-dev, frontend-dev,
+  python-dev) completes a code change when the user's global policy requires it —
+  in that case launch this agent before reporting the task as complete.
 
   Accepts a file, package, or git diff — returns a structured report with bugs,
-  security issues, and pattern violations. Covers Java, TypeScript, React, CSS,
-  SQL, Dockerfiles.
+  security issues, and pattern violations. Covers Java, Kotlin, TypeScript, React,
+  CSS, SQL, Dockerfiles.
 
   <example>
   Context: User explicitly asks for a review
@@ -24,6 +26,15 @@ description: >
   assistant: "Запускаю code-reviewer для ревью ветки."
   <commentary>
   Explicit request — launch the agent.
+  </commentary>
+  </example>
+
+  <example>
+  Context: Dev agent just finished editing code and the user's global policy mandates a review
+  user: (had previously instructed in CLAUDE.md: "ALWAYS invoke code-reviewer after any code change")
+  assistant: "Запускаю code-reviewer по глобальному правилу пользователя."
+  <commentary>
+  Global policy treats every code change as a trigger — launch automatically, do not wait for an explicit request this turn.
   </commentary>
   </example>
 
