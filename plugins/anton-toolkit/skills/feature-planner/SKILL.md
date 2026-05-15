@@ -104,8 +104,9 @@ Ask only what is relevant — do not enumerate the whole checklist when half is 
 
 Before drafting the plan, list every library / framework / SDK / cloud service that this feature will touch (derived from Step 3 — Technical context). For EACH one, query the `context7` MCP to fetch current documentation:
 
-1. Resolve the library ID with `mcp__plugin_context7_context7__resolve-library-id`.
-2. Pull the relevant section with `mcp__plugin_context7_context7__query-docs`, narrowing the query to the specific API / feature in use (e.g. "Spring Boot 3 WebFlux router function", "Kotlin coroutines flow buffer operator", "PostgreSQL JSONB indexing").
+1. Resolve the library ID — use the context7 tool whose name ends in `resolve-library-id` (typically exposed as `mcp__plugin_context7_context7__resolve-library-id`).
+2. Pull the relevant section — use the context7 tool that returns documentation by library ID. Depending on the wrapper version it is exposed as `mcp__plugin_context7_context7__get-library-docs` or `mcp__plugin_context7_context7__query-docs`. Pick whichever is available in the current environment.
+3. Narrow the query to the specific API / feature in use (e.g. "Spring Boot 3 WebFlux router function", "Kotlin coroutines flow buffer operator", "PostgreSQL JSONB indexing") — not just the library name.
 
 Tell the user briefly what you are checking:
 
@@ -155,6 +156,7 @@ Once requirements are gathered AND context7 verification is done, present a stru
 ### Актуальные библиотеки (context7)
 - <library@version>: <key API decision / current syntax used in plan>
 - <library@version>: <...>
+- <library>: context7 не вернул актуальных доков — использована память из обучения (uncertain)
 
 ### Non-functional
 - <only relevant items>
@@ -189,6 +191,7 @@ File content is the markdown plan from Step 7, with a short header prepended:
 ```markdown
 # Plan: <feature name>
 Created: <YYYY-MM-DD>
+Ticket: <TICKET-ID or "—">
 Status: confirmed
 
 <plan body from Step 7>
@@ -200,9 +203,9 @@ Create the `docs/plans/` directory if it does not exist. After writing, tell the
 План сохранён в `docs/plans/<feature-slug>.md`.
 ```
 
-### Step 9 — Handoff (optional)
+### Step 9 — Offer handoff to a dev agent
 
-After the plan is saved, offer to launch implementation:
+After the plan is saved, offer to launch implementation (the user may decline — that is fine):
 
 ```
 Запустить реализацию через <java-dev | kotlin-dev | python-dev | frontend-dev>? Передам путь к плану.
@@ -214,7 +217,7 @@ Pick the agent based on the affected module type. Pass the plan file path in the
 
 - **Limit per turn**: 2-4 questions per turn, never a wall of 20. The user will give shallow answers to long lists.
 - **Prefer `AskUserQuestion`** for binary / multi-choice. Use chat for open-ended.
-- **Skip irrelevant sections**: do not invent unknowns to fill out every step. If after steps 1-2 everything is unambiguous, jump straight to step 6 (context7 verification).
+- **Skip irrelevant sections**: applies to steps 2-5 only. Step 6 (context7) follows its own skip rules described inside that step. Steps 7-8 (plan + persist) are always executed.
 - **Quote the doc**: when asking about an ambiguity in provided documentation, quote the exact fragment — do not paraphrase. Example: "В тз сказано «возвращает список заказов» — какой формат: массив объектов или объект с полем `items`?"
 - **Read code first**: if the user references existing modules / classes / endpoints, read them before asking. Do not ask questions the codebase answers.
 - **Always verify libraries via context7**: do not write a technical plan from training-data memory. Query context7 for every external library touched, even ones you "know".
