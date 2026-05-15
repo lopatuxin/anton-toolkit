@@ -100,9 +100,35 @@ Ask only what is relevant — do not enumerate the whole checklist when half is 
 - **Test data**: any specific fixtures or edge values the user wants verified?
 - **Manual verification**: is there a manual smoke check after deployment?
 
-### Step 6 — Confirm the plan
+### Step 6 — Verify current library docs via context7 (mandatory)
 
-Once all critical unknowns are resolved, present a structured plan in this exact format (in Russian, since it is user-facing output):
+Before drafting the plan, list every library / framework / SDK / cloud service that this feature will touch (derived from Step 3 — Technical context). For EACH one, query the `context7` MCP to fetch current documentation:
+
+1. Resolve the library ID with `mcp__plugin_context7_context7__resolve-library-id`.
+2. Pull the relevant section with `mcp__plugin_context7_context7__query-docs`, narrowing the query to the specific API / feature in use (e.g. "Spring Boot 3 WebFlux router function", "Kotlin coroutines flow buffer operator", "PostgreSQL JSONB indexing").
+
+Tell the user briefly what you are checking:
+
+```
+Сверяюсь с актуальной документацией через context7: <библиотека 1>, <библиотека 2>, ...
+```
+
+Use the freshly fetched docs to:
+- Validate the technical approach against current best practices (not training-data assumptions).
+- Catch deprecated methods, renamed APIs, signature changes, new required arguments.
+- Cite specific version-correct syntax / configuration in the plan.
+
+Skip context7 ONLY when:
+- The feature is pure business logic with no external library calls.
+- The library is internal to the user's monorepo (context7 will not have it) — say so explicitly.
+
+In all other cases — ALWAYS run context7. Training data lags behind real library versions, and outdated assumptions silently corrupt the plan.
+
+If context7 returns nothing useful for a given library — say so in the plan ("context7: no current docs for X, used training-data assumption") so the dev agent knows the source is uncertain.
+
+### Step 7 — Present and confirm the plan
+
+Once requirements are gathered AND context7 verification is done, present a structured plan in this exact format (in Russian — user-facing output):
 
 ```markdown
 ## Фича: <название>
@@ -126,6 +152,10 @@ Once all critical unknowns are resolved, present a structured plan in this exact
 - API: <method, path, request, response>
 - UI: <pages/components affected>
 
+### Актуальные библиотеки (context7)
+- <library@version>: <key API decision / current syntax used in plan>
+- <library@version>: <...>
+
 ### Non-functional
 - <only relevant items>
 
@@ -138,7 +168,7 @@ Once all critical unknowns are resolved, present a structured plan in this exact
 - <scenario>
 ```
 
-Then ask the user:
+Then ask:
 
 ```
 Подтверди план или скажи, что поправить.
@@ -146,34 +176,50 @@ Then ask the user:
 
 Iterate on feedback until the user confirms.
 
-### Step 7 — Persist the plan (optional)
+### Step 8 — Persist the plan to `docs/plans/` (mandatory)
 
-If the user confirms AND the plan is non-trivial (more than ~3 implementation steps), offer to save it:
+ALWAYS write the confirmed plan to `docs/plans/<feature-slug>.md`. This is not optional — chat context gets compressed by the harness, but a file on disk does not, and dev agents read the file directly.
+
+Slug rules:
+- If a ticket ID is mentioned (e.g. `TRADEX-69`) — prefix the slug with it lowercase: `tradex-69-<short-name>.md`.
+- Otherwise — kebab-case of the feature name: `user-export-csv.md`.
+
+File content is the markdown plan from Step 7, with a short header prepended:
+
+```markdown
+# Plan: <feature name>
+Created: <YYYY-MM-DD>
+Status: confirmed
+
+<plan body from Step 7>
+```
+
+Create the `docs/plans/` directory if it does not exist. After writing, tell the user:
 
 ```
-Сохранить план в `docs/plans/<feature-slug>.md` чтобы передать dev-агенту?
+План сохранён в `docs/plans/<feature-slug>.md`.
 ```
 
-On yes — write the file. On no — keep the plan in chat context for direct handoff.
+### Step 9 — Handoff (optional)
 
-### Step 8 — Handoff (optional)
-
-After confirmation, offer to launch implementation:
+After the plan is saved, offer to launch implementation:
 
 ```
-Запустить реализацию через <java-dev | kotlin-dev | python-dev | frontend-dev>?
+Запустить реализацию через <java-dev | kotlin-dev | python-dev | frontend-dev>? Передам путь к плану.
 ```
 
-Pick the agent based on the affected module type. If work spans multiple stacks, list the agents that will run sequentially.
+Pick the agent based on the affected module type. Pass the plan file path in the agent's prompt — do NOT inline the plan body. If work spans multiple stacks, list the agents that will run sequentially.
 
 ## Interview rules
 
 - **Limit per turn**: 2-4 questions per turn, never a wall of 20. The user will give shallow answers to long lists.
 - **Prefer `AskUserQuestion`** for binary / multi-choice. Use chat for open-ended.
-- **Skip irrelevant sections**: do not invent unknowns to fill out every step. If after steps 1-2 everything is unambiguous, jump to step 6.
+- **Skip irrelevant sections**: do not invent unknowns to fill out every step. If after steps 1-2 everything is unambiguous, jump straight to step 6 (context7 verification).
 - **Quote the doc**: when asking about an ambiguity in provided documentation, quote the exact fragment — do not paraphrase. Example: "В тз сказано «возвращает список заказов» — какой формат: массив объектов или объект с полем `items`?"
 - **Read code first**: if the user references existing modules / classes / endpoints, read them before asking. Do not ask questions the codebase answers.
-- **Do not start implementation during the interview**. No file edits, no agent launches, until the user confirms the plan at step 6.
+- **Always verify libraries via context7**: do not write a technical plan from training-data memory. Query context7 for every external library touched, even ones you "know".
+- **Always persist the plan to a file**: never keep the confirmed plan only in chat — context compaction will lose it.
+- **Do not start implementation during the interview**. No file edits, no agent launches, until the user confirms the plan at step 7 AND the plan is saved at step 8.
 - **Stop when clear**: the goal is a confident plan, not maximum question count.
 
 ## Anti-patterns to avoid
@@ -184,3 +230,6 @@ Pick the agent based on the affected module type. If work spans multiple stacks,
 - Skipping the interview because the task "seems clear" — it almost never is.
 - Re-asking what the documentation already states clearly.
 - Starting to write code mid-interview because an answer felt sufficient.
+- Skipping context7 because you "know" the library — training data lags behind real versions; verify.
+- Keeping the plan only in chat — always write `docs/plans/<feature-slug>.md`, no exceptions.
+- Inlining the entire plan body into a dev agent prompt — pass the file path instead.
