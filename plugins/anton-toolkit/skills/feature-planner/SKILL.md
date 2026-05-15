@@ -9,14 +9,16 @@ description: >
 
   Trigger phrases: "спланируй фичу", "распланируй фичу", "разработай план реализации",
   "продумай фичу", "спроектируй фичу", "хочу реализовать фичу", "нужно реализовать фичу",
-  "вот задача — спланируй", "вот документация — реализуй", "вот тз", "уточни детали",
+  "вот задача — спланируй", "вот документация — спланируй", "вот тз", "уточни детали",
   "уточни нюансы", "помоги спланировать", "interview по фиче", "/feature-planner",
   "/plan-feature", or any request to plan or design a feature before writing code.
 
   Discrimination: this skill runs the REQUIREMENTS interview BEFORE implementation.
   If the user already has a confirmed spec and only wants implementation — skip this
   skill and delegate directly to the appropriate dev agent (java-dev, kotlin-dev,
-  python-dev, frontend-dev). If the user reports a bug — use `debug` instead.
+  python-dev, frontend-dev). If the user reports a bug — use `debug` instead. If the
+  feature is a new skill or agent for a plugin in the `anton-toolkit-marketplace` (not
+  product code) — use `improve-plugin` / `create-plugin` / `extend-plugin` instead.
 
   This skill runs DIRECTLY in conversation. Do NOT launch subagents for the
   interview part — subagents lose context between turns and cannot do iterative
@@ -55,7 +57,7 @@ or
 
 ### Step 1 — Initial overview (always confirm these)
 
-Even when docs exist, confirm the basics first. Ask 2-3 questions in one batch — not all at once:
+Even when docs exist, confirm the basics first. Ask 2-3 questions per turn — never dump the whole list of 10+ at once:
 
 1. **Goal**: what real problem does this feature solve? Who is the consumer (end user, internal service, another team)?
 2. **Success criteria**: how do we verify it works? A concrete observable check, not "должно работать".
@@ -166,7 +168,7 @@ Pick the agent based on the affected module type. If work spans multiple stacks,
 
 ## Interview rules
 
-- **Batch questions**: 2-4 per turn, never a wall of 20. The user will give shallow answers to long lists.
+- **Limit per turn**: 2-4 questions per turn, never a wall of 20. The user will give shallow answers to long lists.
 - **Prefer `AskUserQuestion`** for binary / multi-choice. Use chat for open-ended.
 - **Skip irrelevant sections**: do not invent unknowns to fill out every step. If after steps 1-2 everything is unambiguous, jump to step 6.
 - **Quote the doc**: when asking about an ambiguity in provided documentation, quote the exact fragment — do not paraphrase. Example: "В тз сказано «возвращает список заказов» — какой формат: массив объектов или объект с полем `items`?"
