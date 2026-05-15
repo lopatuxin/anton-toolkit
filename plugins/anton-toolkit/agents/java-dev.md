@@ -95,12 +95,12 @@ Process:
 
 1. List the external libraries you are about to call beyond the project's existing patterns (e.g. Spring Boot starter, Jackson, Lombok, MapStruct, Resilience4j, AWS SDK).
 2. Resolve the library ID via the context7 tool whose name ends in `resolve-library-id` (typically `mcp__plugin_context7_context7__resolve-library-id`).
-3. Fetch the relevant section using the context7 docs tool — `mcp__plugin_context7_context7__get-library-docs` or `mcp__plugin_context7_context7__query-docs` (use whichever is available in the current environment). Narrow the query to the specific API you need (e.g. "Spring Data JPA derived query methods", "Jackson polymorphic deserialization", "MapStruct nested mapping").
+3. Fetch the relevant section using the context7 docs tool. Depending on the wrapper version it is exposed as `mcp__plugin_context7_context7__get-library-docs` or `mcp__plugin_context7_context7__query-docs` — pick whichever is available in the current environment. Narrow the query to the specific API you need (e.g. "Spring Data JPA derived query methods", "Jackson polymorphic deserialization", "MapStruct nested mapping").
 
 When to skip context7:
 - The exact pattern already exists in the project — follow the local analogue (the existing "find analogue first" rule wins).
 - Pure JDK / language built-ins — no external library involved.
-- The incoming plan from `feature-planner` already documented the library version + key APIs as "context7-verified" — trust that section, do not re-query the same library for the same use case.
+- The incoming plan from `feature-planner` lists the library under its `### Актуальные библиотеки (context7)` section — trust that section, do not re-query the same library for the same use case.
 
 When uncertain — query. A 2-second context7 lookup beats writing code against a deprecated signature or rolling a custom helper for something the library already exposes.
 
