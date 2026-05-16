@@ -5,17 +5,19 @@
 
 ## 1. Niche query
 - Source channel: @user-handle
-- Queries used (4–8): <list>
-- Subscriber threshold: <N> (default 10 000)
+- User-supplied competitor seeds (included unconditionally): <list of handles | "none supplied">
+- Queries used (8–15): <list>
+- Subscriber threshold: <N> (default 10 000, does NOT apply to seeds)
 - Channels found: <N candidates → N after threshold → N analysed>
+- Full deduped candidate pool (including below-threshold, for the user to spot omissions): <list of `@handle (subs)`, one per line>
 
 ## 2. Top channels in the niche (by recent total views)
-| # | Channel | Subs | Total views | Posts/week | Avg engagement |
-|---|---------|------|-------------|------------|----------------|
-| 1 | @… | … | … | … | …% |
+| # | Channel | Subs | Total views | Posts/week | Avg engagement | Source |
+|---|---------|------|-------------|------------|----------------|--------|
+| 1 | @… | … | … | … | …% | seed / search / related |
 …
 
-(Show top 10–15.)
+(Show top 15–25. The `Source` column marks whether the channel came from the user-supplied seed list, keyword search, or the related-videos expansion.)
 
 ## 3. Top videos across the niche (last 12 months)
 | # | Title | Channel | Views | Length | Published |

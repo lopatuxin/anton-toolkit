@@ -90,8 +90,8 @@ If at least one is present, proceed.
 
 After producing the ideas in chat, persist them to the Obsidian vault following `${CLAUDE_PLUGIN_ROOT}/references/vault.md`.
 
-- Target folder: `C:\projects\Claude\youtube\20-ideas\`.
-- Filename: `YYYY-MM-DD-ideas-batch.md` (current session date). If a batch for today already exists, append `-v2`, `-v3`…
+- Target folder: `C:\projects\Claude\youtube\идеи\`.
+- Filename: `YYYY-MM-DD-идеи.md` (Russian, Cyrillic, kebab-case; current session date). If a batch for today already exists, append `-v2`, `-v3`…
 - Frontmatter:
 
   ```yaml
@@ -104,8 +104,8 @@ After producing the ideas in chat, persist them to the Obsidian vault following 
   tags:
     - youtube/idea-batch
   related:
-    - "[[00-channel/<channel-file>]]"     # if a yt-my-channel report was used
-    - "[[10-competitors/<competitor-file>]]" # if a yt-competitors report was used
+    - "[[канал/<channel-file>]]"          # if a yt-my-channel report was used
+    - "[[конкуренты/<competitor-file>]]"  # if a yt-competitors report was used
   ---
   ```
 

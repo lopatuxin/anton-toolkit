@@ -22,21 +22,23 @@ If no `yt-my-channel` report is in the conversation, pull this minimal data firs
 
 ## Query construction
 
-Produce 4–8 queries. Aim for variety across:
+Produce **8–15 queries** (the previous 4–8 range systematically under-covered the niche and missed obvious competitors). Required coverage:
 
-- Tool-anchored (e.g., "vibe coding cursor", "claude code разработка")
-- Outcome-anchored (e.g., "сделал приложение за день с ai", "ai разработка стартап")
-- Series-anchored (e.g., "ai ассистент jarvis на python", "логос ассистент")
-- Process-anchored (e.g., "как кодить с ии", "vibe coding workflow")
+- ≥ 2 tool-anchored (e.g., "vibe coding cursor", "claude code разработка", "cline ai", "windsurf ide", "v0 vercel")
+- ≥ 2 outcome-anchored (e.g., "сделал приложение за день с ai", "ai разработка стартап", "запустил mvp за неделю")
+- ≥ 2 process-anchored (e.g., "как кодить с ии", "vibe coding workflow", "ai-ассистент для кода")
+- ≥ 1 series/brand-anchored — specific to the user's channel (e.g., "логос ассистент", "ai ассистент jarvis на python")
+- ≥ 1 generic Russian IT-YouTube ("программирование канал", "айти блогер", "разработчик ютуб")
 
-Mix Russian and the occasional English term — the IT/AI niche on Russian YouTube uses both.
+Mix Russian and English terms — the IT/AI niche on Russian YouTube uses both.
 
 ## Quality rules
 
-- 4–8 queries, no fewer (too narrow) and no more (quota waste).
+- 8–15 queries. Fewer than 8 is a configuration error — re-derive until at least 8.
 - At least one query must be brand/series-specific to the user's channel.
 - Each query should plausibly return ≥ 5 videos from channels not run by the user.
-- If two queries differ by only a stop-word, merge them.
+- If two queries differ by only a stop-word, merge them — but count the merge against the 8-minimum and add a replacement query.
+- After running the queries (in BATCH-mode step 4), if the deduped candidate pool is smaller than 25 distinct channels, the query set is too narrow — add 2–4 adjacent-angle queries and re-run before reporting.
 
 ## Logging
 

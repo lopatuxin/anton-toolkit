@@ -78,8 +78,8 @@ Variant <N> — <one-sentence rationale matching the title and series>.
 
 After producing the concept brief in chat, persist it to the Obsidian vault following `${CLAUDE_PLUGIN_ROOT}/references/vault.md`.
 
-- Target folder: `C:\projects\Claude\youtube\60-thumbnails\`.
-- Filename: `<video-slug>.md`. Reuse the same slug as the script for this video (lives in `40-scripts/<slug>.md`). If a thumbnail file with this slug exists, append `-v2`, `-v3`…
+- Target folder: `C:\projects\Claude\youtube\превью\`.
+- Filename: `<video-slug>.md`. The slug is Russian (Cyrillic) kebab-case, no transliteration. Reuse the same slug as the script for this video (lives in `сценарии/<slug>.md`). If a thumbnail file with this slug exists, append `-v2`, `-v3`…
 - Frontmatter:
 
   ```yaml
@@ -87,15 +87,15 @@ After producing the concept brief in chat, persist it to the Obsidian vault foll
   type: thumbnail
   date: <YYYY-MM-DD>
   video: "<working title in Russian>"
-  video_slug: <slug>
+  video_slug: <slug>                     # Cyrillic kebab-case
   variants: <N>                          # number of concept variants in the body
   recommended_variant: <1..N>
   emotion: curiosity | triumph | frustration | surprise | <other>
   tags:
     - youtube/thumbnail
   related:
-    - "[[40-scripts/<slug>]]"
-    - "[[50-seo/<slug>]]"
+    - "[[сценарии/<slug>]]"
+    - "[[seo/<slug>]]"
   ---
   ```
 

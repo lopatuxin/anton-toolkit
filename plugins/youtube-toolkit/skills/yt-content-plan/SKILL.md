@@ -45,8 +45,8 @@ Build a calendar that schedules concrete videos against weeks. Balance flagship-
 
 After producing the calendar in chat, persist it to the Obsidian vault following `${CLAUDE_PLUGIN_ROOT}/references/vault.md`.
 
-- Target folder: `C:\projects\Claude\youtube\30-plans\`.
-- Filename: `YYYY-MM-DD-content-plan-<N>w.md` where `<N>` is the period in weeks (e.g., `2026-05-12-content-plan-8w.md`). Use the current session date. If the file exists, append `-v2`, `-v3`…
+- Target folder: `C:\projects\Claude\youtube\контент-план\`.
+- Filename: `YYYY-MM-DD-контент-план-<N>нед.md` where `<N>` is the period in weeks (e.g., `2026-05-12-контент-план-8нед.md`). Russian, Cyrillic, kebab-case. Use the current session date. If the file exists, append `-v2`, `-v3`…
 - Frontmatter:
 
   ```yaml
@@ -61,7 +61,7 @@ After producing the calendar in chat, persist it to the Obsidian vault following
   tags:
     - youtube/content-plan
   related:
-    - "[[20-ideas/<ideas-file>]]"   # the idea batch the plan draws from
+    - "[[идеи/<ideas-file>]]"   # the idea batch the plan draws from
   ---
   ```
 

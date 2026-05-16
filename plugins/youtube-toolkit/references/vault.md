@@ -14,31 +14,44 @@ Fixed path. Do NOT ask the user where to save. Do NOT use any other path. If the
 
 ```
 C:\projects\Claude\youtube\
-├── 00-channel\        # yt-my-channel reports
-├── 10-competitors\    # yt-competitors reports (SINGLE and BATCH)
-├── 20-ideas\          # yt-ideas batches
-├── 30-plans\          # yt-content-plan calendars
-├── 40-scripts\        # yt-script — one file per video
-├── 50-seo\            # yt-seo — one file per video
-├── 60-thumbnails\     # yt-thumbnail — one file per video
-└── 70-promo\          # yt-promo — audits, funnel, pinned, end-screens
+├── канал\           # yt-my-channel reports
+├── конкуренты\      # yt-competitors reports (SINGLE and BATCH)
+├── идеи\            # yt-ideas batches
+├── контент-план\    # yt-content-plan calendars
+├── сценарии\        # yt-script — one file per video
+├── seo\             # yt-seo — one file per video
+├── превью\          # yt-thumbnail — one file per video
+└── продвижение\     # yt-promo — audits, funnel, pinned, end-screens
 ```
+
+Folder-name rules (strict):
+- Folder names are Russian (Cyrillic), lowercase. No numeric prefixes like `10-`, `20-`, no English aliases (`competitors`, `ideas`). The only exception is `seo` because it is a universally recognised acronym.
+- Use exactly the eight names above. Do NOT invent variants (`конкуренти`, `канал-обзор`, `idea`, `10-конкуренты`).
+- Correct: `C:\projects\Claude\youtube\конкуренты\2026-05-13-разбор-ниши.md`
+- Incorrect: `C:\projects\Claude\youtube\10-competitors\2026-05-13-niche-batch-scan.md`
 
 Each skill writes to exactly one folder. The per-skill SKILL.md names which folder.
 
 ## Filename convention
 
-Use kebab-case, ASCII only, no spaces, `.md` extension. Two patterns by content type:
+Use Russian (Cyrillic), lowercase, kebab-case, no spaces, `.md` extension. Two patterns by content type:
 
 - **Dated reports** (channel snapshots, competitor scans, idea batches, content plans, audits):
-  `YYYY-MM-DD-<slug>.md`
-  Example: `2026-05-12-channel-snapshot.md`, `2026-05-12-niche-batch-scan.md`
+  `YYYY-MM-DD-<russian-slug>.md`
+  Example: `2026-05-12-обзор-канала.md`, `2026-05-13-разбор-ниши.md`, `2026-05-12-идеи.md`, `2026-05-12-контент-план-8нед.md`
 
 - **Per-video artefacts** (scripts, SEO, thumbnails, pinned comments, end-screens):
   `<video-slug>.md`
-  Example: `cursor-vykinul-proekt.md`
+  Example: `курсор-выкинул-проект.md`
 
-The video slug is derived from the video's working title: transliterate Russian to Latin (e.g., `Курсор выкинул проект` → `kursor-vykinul-proekt`), lowercase, kebab-case, ≤ 60 chars. The SAME slug is reused across skills so that `40-scripts/<slug>.md`, `50-seo/<slug>.md`, `60-thumbnails/<slug>.md` form a video bundle the user can find by slug in Obsidian.
+The video slug is derived from the video's working title: keep it in Russian (Cyrillic), do NOT transliterate to Latin. Lowercase, kebab-case (spaces → `-`), strip punctuation, ≤ 60 chars. Example: `Курсор выкинул проект` → `курсор-выкинул-проект`. The SAME slug is reused across skills so that `сценарии/<slug>.md`, `seo/<slug>.md`, `превью/<slug>.md` form a video bundle the user can find by slug in Obsidian.
+
+Filename rules (strict):
+- Russian (Cyrillic), lowercase, kebab-case. Do NOT transliterate to Latin (`kursor-vykinul-proekt.md` is WRONG).
+- Do NOT use English words for content type (`niche-batch-scan`, `channel-snapshot`, `ideas-batch`). Use Russian equivalents (`разбор-ниши`, `обзор-канала`, `идеи`).
+- The only ASCII tokens allowed inside a slug are: the ISO date prefix `YYYY-MM-DD`, the `seo` acronym, and proper-noun tool names where the brand itself is Latin (`Cursor`, `Claude`, `Jarvis`) — but Russian wording around them stays Cyrillic.
+- Correct: `2026-05-13-разбор-ниши.md`, `курсор-выкинул-проект.md`, `seo/курсор-выкинул-проект.md`
+- Incorrect: `2026-05-13-niche-batch-scan.md`, `kursor-vykinul-proekt.md`, `10-competitors/scan.md`
 
 If a file with the chosen name already exists, append a `-v2`, `-v3`… suffix. Do not overwrite without asking.
 
@@ -51,7 +64,7 @@ Every file starts with YAML frontmatter. Obsidian indexes these fields for tags,
 type: script | seo | thumbnail | idea-batch | content-plan | channel-analysis | competitor-analysis | promo-audit | pinned-comment | end-screen | funnel
 date: 2026-05-12
 video: "Курсор выкинул проект"        # if applicable
-video_slug: kursor-vykinul-proekt     # if applicable
+video_slug: курсор-выкинул-проект     # if applicable, Cyrillic kebab-case
 series: logos | crm | standalone      # if applicable
 length_min: 12                        # for scripts
 tags:
@@ -73,11 +86,11 @@ Rules:
 
 Cross-reference using Obsidian's `[[wiki-link]]` syntax in both frontmatter `related:` and inline body text. Examples:
 
-- A script body links to the idea it came from: `> Based on idea: [[20-ideas/2026-05-12-ideas-batch#Idea-3]]`
-- An SEO file links to the script: `Script: [[40-scripts/kursor-vykinul-proekt]]`
-- A thumbnail file links to script and SEO: `Pair with [[40-scripts/kursor-vykinul-proekt]] and [[50-seo/kursor-vykinul-proekt]]`
+- A script body links to the idea it came from: `> Based on idea: [[идеи/2026-05-12-идеи#Idea-3]]`
+- An SEO file links to the script: `Script: [[сценарии/курсор-выкинул-проект]]`
+- A thumbnail file links to script and SEO: `Pair with [[сценарии/курсор-выкинул-проект]] and [[seo/курсор-выкинул-проект]]`
 
-Keep wiki-link paths vault-root-relative (e.g., `20-ideas/2026-05-12-ideas-batch`, not absolute).
+Keep wiki-link paths vault-root-relative (e.g., `идеи/2026-05-12-идеи`, not absolute).
 
 ## Body content
 

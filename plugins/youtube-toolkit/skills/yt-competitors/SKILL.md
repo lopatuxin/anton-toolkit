@@ -45,22 +45,39 @@ If unclear, ask once: "Один канал глубоко или сводный 
 
 ## BATCH — niche scan
 
-In batch mode, do NOT ask the user for a keyword list. Build the niche query from the user's own channel context (this is the explicit user requirement).
+In batch mode, build the niche query from the user's own channel context (this is the explicit user requirement). Do NOT ask the user for a keyword list — but DO ask them for known-competitor seeds, because the user almost always knows channels the auto-extraction would miss.
 
-1. **Get user's own channel context.** Either reuse a recent `yt-my-channel` report from the conversation, or pull minimal data on the user's channel:
+1. **Ask the user for known-competitor seeds.** One short message in Russian, before any API call:
+   > Подкинь 3–7 каналов, которых ты сам считаешь конкурентами (handle, ссылка или просто название) — включу их в анализ без фильтра и расширю поиск через их похожие видео. Если не назовёшь — соберу нишу только автоматически по твоему каналу, но скорее всего часть очевидных конкурентов пропущу.
+
+   Wait for the answer. Treat the seed list as **included unconditionally** in the final analysis — they bypass the subscriber threshold and ranking cut-off. If the user replies "никого не назову" or similar — proceed without seeds and warn in the report's section 1 that the result may miss obvious competitors.
+
+2. **Get user's own channel context.** Either reuse a recent `yt-my-channel` report from the conversation, or pull minimal data on the user's channel:
    - `getChannelStatistics` for the user's channel (ask handle if unknown).
-   - `getChannelTopVideos` (top 5).
+   - `getChannelTopVideos` (top 5–10).
    - Read each top video's title, tags, and description.
-2. **Construct niche queries** using the procedure in `references/niche-query.md`:
-   - Extract recurring nouns/phrases from titles (n-grams).
-   - Add tags that appear ≥ 2 times across the top set.
-   - Mine description for named tools/series ("Cursor", "Claude Code", "Логос", "vibe coding", etc.).
-   - Produce 4–8 search queries that together cover the niche.
-3. **Find candidate channels.** For each query, `searchVideos` (max ~20 results), collect channel IDs.
-4. **Filter by subscriber threshold.** Default minimum **10 000 subscribers**. Use `getChannelStatistics` per candidate. Drop the user's own channel.
-5. **Deduplicate and rank.** Dedupe by channel ID. Rank by total channel views in the last year (proxy: top videos publish date × view counts).
-6. **Pull data on top 10–15 channels.** For each: stats, top 10 videos, engagement ratios.
-7. **Build the niche report** using `references/batch-mode.md`.
+
+3. **Construct niche queries** using the procedure in `references/niche-query.md`. Produce **8–15 queries** (was 4–8 — widened because the previous range systematically under-covered the niche). Coverage requirements:
+   - At least 2 tool-anchored queries (Cursor, Claude Code, Cline, Windsurf, v0, …).
+   - At least 2 outcome-anchored queries ("сделал приложение за", "запустил стартап за", "сэкономил время с ai").
+   - At least 2 process/workflow queries ("vibe coding", "ai-разработка", "ai-ассистент для кода").
+   - At least 1 brand/series query specific to the user's channel.
+   - At least 1 "Russian IT YouTube" generic query ("программирование канал", "айти блогер", "разработчик ютуб").
+   - Mix Russian and English terms — the IT/AI niche on Russian YouTube uses both.
+
+4. **Find candidate channels.** For each query, `searchVideos` with `maxResults` **at least 25** (was ~20) — collect channel IDs from every result, not just the top few.
+
+5. **Expand from seeds and top candidates via related videos.** For each seed channel and each top-3 candidate from step 4, take 2–3 of their highest-view videos and call `getRelatedVideos` on each. Collect the channel IDs of the related videos. This is the step that surfaces competitors the keyword search misses — adjacent channels YouTube itself associates with the seeds.
+
+6. **Filter by subscriber threshold.** Default minimum **10 000 subscribers**, applied only to non-seed channels. Use `getChannelStatistics` per candidate. Drop the user's own channel. Seed channels from step 1 bypass this filter unconditionally.
+
+7. **Deduplicate, log, and rank.** Dedupe by channel ID. Log the full deduped candidate list (channel + subs) in the report's section 1 — even ones below the threshold — so the user can spot omissions. Rank survivors by total channel views in the last year (proxy: top videos publish date × view counts). Seeds always appear in the final ranked list regardless of view rank.
+
+8. **Pull data on top 15–25 channels** (was 10–15 — widened). For each: stats, top 10 videos, engagement ratios. Always include all seeds in this set.
+
+9. **Sanity check coverage before writing the report.** If the deduped candidate pool from steps 4–5 contains fewer than 25 distinct channels, the scan is too narrow — add 2–4 more queries from neighbouring angles and re-run search before producing the report.
+
+10. **Build the niche report** using `references/batch-mode.md`.
 
 ## Analysis framework
 
@@ -81,10 +98,10 @@ Apply the framework in `references/analysis-framework.md`:
 
 After producing the report in chat, persist it to the Obsidian vault following `${CLAUDE_PLUGIN_ROOT}/references/vault.md`.
 
-- Target folder: `C:\projects\Claude\youtube\10-competitors\`.
-- Filename:
-  - SINGLE mode → `YYYY-MM-DD-channel-<handle-slug>-deep-dive.md` (slugify the competitor handle, ASCII, kebab-case).
-  - BATCH mode → `YYYY-MM-DD-niche-batch-scan.md`.
+- Target folder: `C:\projects\Claude\youtube\конкуренты\`.
+- Filename (Russian, Cyrillic, kebab-case — see `${CLAUDE_PLUGIN_ROOT}/references/vault.md` for the rules):
+  - SINGLE mode → `YYYY-MM-DD-канал-<handle>.md`. The `<handle>` token is the competitor's `@handle` without the `@` — leave it as-is (Latin handles stay Latin, Cyrillic handles stay Cyrillic); do not transliterate. Example: `2026-05-13-канал-yandexedu.md`, `2026-05-13-канал-логос.md`.
+  - BATCH mode → `YYYY-MM-DD-разбор-ниши.md`.
   - Use the current session date. If the file exists, append `-v2`, `-v3`…
 - Frontmatter:
 

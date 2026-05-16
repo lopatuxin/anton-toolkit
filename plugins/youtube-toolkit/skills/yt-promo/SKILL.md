@@ -135,12 +135,12 @@ Design and refine the on-channel lead-gen system: pinned comments, end-screens, 
 
 After producing the artefact in chat, persist it to the Obsidian vault following `${CLAUDE_PLUGIN_ROOT}/references/vault.md`.
 
-- Target folder: `C:\projects\Claude\youtube\70-promo\`.
-- Filename depends on the request type:
-  - Audit → `YYYY-MM-DD-audit.md`
-  - Pinned comment → `pinned-<video-slug>.md` (reuse the same slug as the video's script in `40-scripts/`)
-  - End-screen plan → `endscreen-<video-slug>.md`
-  - Funnel design → `YYYY-MM-DD-funnel.md`
+- Target folder: `C:\projects\Claude\youtube\продвижение\`.
+- Filename depends on the request type (Russian, Cyrillic, kebab-case):
+  - Audit → `YYYY-MM-DD-аудит.md`
+  - Pinned comment → `закреп-<video-slug>.md` (reuse the same Cyrillic slug as the video's script in `сценарии/`)
+  - End-screen plan → `концовка-<video-slug>.md`
+  - Funnel design → `YYYY-MM-DD-воронка.md`
   - If a file with the chosen name exists, append `-v2`, `-v3`…
 - Frontmatter (set `type` based on request type — one of: `promo-audit`, `pinned-comment`, `end-screen`, `funnel`):
 
@@ -149,13 +149,13 @@ After producing the artefact in chat, persist it to the Obsidian vault following
   type: <promo-audit | pinned-comment | end-screen | funnel>
   date: <YYYY-MM-DD>
   video: "<working title>"           # only for pinned-comment / end-screen
-  video_slug: <slug>                 # only for pinned-comment / end-screen
+  video_slug: <slug>                 # only for pinned-comment / end-screen, Cyrillic kebab-case
   cta_mode: pre-site | post-site
   tags:
     - youtube/promo
     - youtube/promo/<audit|pinned|endscreen|funnel>
   related:
-    - "[[40-scripts/<slug>]]"        # only for per-video artefacts
+    - "[[сценарии/<slug>]]"          # only for per-video artefacts
   ---
   ```
 
