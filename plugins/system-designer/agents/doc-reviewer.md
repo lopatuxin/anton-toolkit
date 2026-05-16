@@ -7,9 +7,9 @@ description: >
   rest of docs/, and flags violations of YAGNI / KISS / LLM-friendliness. Runs one-shot, returns a structured
   text report. Does NOT modify any file. Documentation-only context.
 
-  Invoked by the system-designer orchestrator after EVERY document-writing step in Phases 2–6 (architecture,
-  modules, change management, roadmap, phase detailing). Not triggered by user phrases directly — the
-  orchestrator decides.
+  Invoked by the system-designer orchestrator after EVERY document-writing step in Phases 1–6 (concept,
+  architecture, modules, change management, roadmap, phase detailing), including re-dispatches after user
+  feedback. Not triggered by user phrases directly — the orchestrator decides.
 model: opus
 ---
 
