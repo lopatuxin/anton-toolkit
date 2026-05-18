@@ -56,14 +56,14 @@ Per phase, exactly these fields, no more:
 - **Document language — Russian.** All headings and prose. Технические термины (REST, JWT, API и т.п.) не переводи.
 - Имена модулей в `Затронутые модули` — строго из `architecture.md`. Не выдумывай.
 - Если `architecture.md` не существует — останови работу и верни оркестратору сообщение: «нет docs/architecture.md, roadmap построить не из чего».
-- Если оркестратор не передал slug или output path — останови работу и верни оркестратору сообщение: «не передан slug roadmap-а, не могу выбрать целевую папку».
+- If the orchestrator did not pass a slug or an output path — stop work and return to the orchestrator the message: "no roadmap slug provided, cannot pick target folder".
 - Если архитектура противоречива или каких-то модулей не хватает для разумной первой фазы — отметь это в кратком репорте оркестратору, но roadmap всё равно построй на best-effort основе.
 - Не пиши код, не описывай реализацию. Roadmap — это план фаз, не план задач.
 
 ## Output
 
 Write the file to the exact path provided by the orchestrator (`docs/roadmaps/<slug>/roadmap.md`). Create the parent folder if it does not exist. Then return a brief report to the orchestrator:
-- slug roadmap-а и полный путь файла,
-- количество фаз,
-- одна строка на фазу (название + ключевые модули),
-- любые предупреждения (например: «модуль X не задействован ни в одной фазе — возможно стоит проверить архитектуру»).
+- roadmap slug and the full file path,
+- number of phases,
+- one line per phase (name + key modules),
+- any warnings (e.g. "module X is not used in any phase — the architecture may need a check").

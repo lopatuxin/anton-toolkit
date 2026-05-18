@@ -158,20 +158,20 @@ Steps:
 
 ## Phase 5 — Roadmap (delegate to agent, on demand)
 
-Goal: produce `docs/roadmaps/<slug>/roadmap.md` — короткий план фаз реализации для конкретного среза системы (например, отдельного модуля или фичи), где каждая фаза это минимальный законченный функционал, который можно потрогать, и каждая следующая фаза опирается на предыдущие.
+Goal: produce `docs/roadmaps/<slug>/roadmap.md` — a short execution roadmap for one slice of the system (a module, a feature, or the whole product). Each phase is a minimal end-to-end slice of user-touchable functionality; each subsequent phase builds on prior ones.
 
-**Триггер:** отдельный вызов по фразам пользователя — "разбей на фазы", "сделай roadmap", "построй план фаз", "разнеси архитектуру по фазам". НЕ запускается автоматически после модулей.
+**Trigger:** explicit user invocation via phrases "разбей на фазы", "сделай roadmap", "построй план фаз", "разнеси архитектуру по фазам". Does NOT run automatically after modules.
 
-**Предусловие:** должен существовать `docs/architecture.md`. Если его нет — ответь пользователю: `Нет docs/architecture.md, roadmap не из чего строить. Сначала пройдём фазы 1–2.` и предложи начать с концепта/архитектуры.
+**Precondition:** `docs/architecture.md` must exist. If it does not, reply to the user (in Russian): `Нет docs/architecture.md, roadmap не из чего строить. Сначала пройдём фазы 1–2.` and offer to start with concept / architecture.
 
-**Folder layout — strict.** Roadmaps NEVER go directly into `docs/`. Each roadmap lives in its own subfolder under `docs/roadmaps/<slug>/` together with its phase documents. This keeps multiple roadmaps (per module / per feature / per release) cleanly separated. The slug is kebab-case, derived from the scope of the roadmap (e.g. `auth`, `public`, `mvp`, `payments`). If the project has a single overall roadmap and no scope distinction is needed, default to slug `main`.
+**Folder layout — strict.** Roadmaps NEVER go directly into `docs/`. Each roadmap lives in its own subfolder under `docs/roadmaps/<slug>/` together with its phase documents. This keeps multiple roadmaps (per module / per feature / per release) cleanly separated. The slug is kebab-case ASCII, derived from the scope of the roadmap (e.g. `auth`, `public`, `mvp`, `payments`). If the project has a single overall roadmap and no scope distinction is needed, default to slug `main`.
 
-Шаги:
-1. Убедись, что `docs/architecture.md` существует.
-2. **Определи slug roadmap-а.** Если пользователь сам назвал срез ("сделай roadmap для auth-модуля", "разбей public-часть на фазы") — slug получается из этого (`auth`, `public`). Если scope не назван — спроси на русском одним вопросом: `На какой срез строим roadmap (например auth, public, mvp)? Если roadmap один общий — скажи "main".` Slug сохраняй как kebab-case ASCII.
-3. Короткий диалог (1–2 вопроса максимум, на русском) — есть ли у пользователя предпочтения по первому осязаемому срезу: `Что хочешь увидеть в первой фазе как минимально работающее? Если нет мнения — выберу самый тонкий end-to-end срез сам.`
-4. Создай папку roadmap-а: `mkdir -p docs/roadmaps/<slug>`.
-5. Dispatch агента **roadmap-planner**:
+Steps:
+1. Verify `docs/architecture.md` exists.
+2. **Determine the roadmap slug.** If the user named the slice in their request ("сделай roadmap для auth-модуля", "разбей public-часть на фазы") — derive the slug from that (`auth`, `public`). If the scope is not named, ask in Russian with one question: `На какой срез строим roadmap (например auth, public, mvp)? Если roadmap один общий — скажи "main".`. Persist the slug as kebab-case ASCII.
+3. Short dialog (1–2 questions max, in Russian) — ask if the user has a preference for the first tangible slice: `Что хочешь увидеть в первой фазе как минимально работающее? Если нет мнения — выберу самый тонкий end-to-end срез сам.`
+4. Create the roadmap folder: `mkdir -p docs/roadmaps/<slug>`.
+5. Dispatch the **roadmap-planner** agent:
    ```
    Agent(subagent_type="roadmap-planner", prompt="
    Roadmap slug: <slug>.
@@ -181,48 +181,48 @@ Goal: produce `docs/roadmaps/<slug>/roadmap.md` — короткий план ф
    User's preference for the first phase from dialog: <paste verbatim or 'нет предпочтений'>.
    Follow the structure in references/document-templates.md section 'roadmaps/<slug>/roadmap.md'.
    Each phase = minimal testable end-to-end slice. Each phase depends on previous ones.
-   Short descriptions only — no acceptance criteria, no risks, no estimates (отдельный инструмент детализирует фазы потом).
+   Short descriptions only — no acceptance criteria, no risks, no estimates (a separate tool details phases later).
    ")
    ```
-6. После возврата агента запусти агента **doc-reviewer** на `docs/roadmaps/<slug>/roadmap.md` (см. секцию "Mandatory review step" ниже). Прочитай файл и отчёт ревьюера, перескажи пользователю на русском списком фаз ПЛЮС замечания ревью: `Roadmap <slug>, фазы: 1) <название>; 2) <название>; ... Ревью: <blockers/warnings или "чисто">. Посмотри — порядок и срезы окей?`.
-7. Итерируй (пользователь может попросить переразбить, объединить, переставить — повторно dispatch агента с правкой в prompt, сохраняя тот же slug и output path).
-8. На подтверждении коммить: `git commit -m "добавил roadmap <slug>"`.
+6. After the agent returns, run the **doc-reviewer** agent on `docs/roadmaps/<slug>/roadmap.md` (see "Mandatory review step" below). Read the file and the reviewer's report, then summarize to the user in Russian as a phase list plus review notes: `Roadmap <slug>, фазы: 1) <название>; 2) <название>; ... Ревью: <blockers/warnings или "чисто">. Посмотри — порядок и срезы окей?`.
+7. Iterate (the user may ask to re-split, merge, or reorder phases — re-dispatch the agent with the corrections in the prompt, preserving the same slug and output path).
+8. On approval, commit: `git commit -m "добавил roadmap <slug>"`.
 
-**Миграция со старого layout.** Если в репозитории встречаются файлы вида `docs/roadmap.md` или `docs/roadmap-<slug>.md` (старая плоская раскладка) — это устаревший формат. Предложи пользователю на русском перенести: `Вижу старый формат — <file>. Перенесу в docs/roadmaps/<slug>/roadmap.md и подтяну за ним phase-документы. Ок?`. На подтверждении сделай `git mv` файлов и соответствующих `docs/phases/phase-NN-*.md` в новую структуру.
+**Migration from legacy flat layout.** If the repository contains files like `docs/roadmap.md`, `docs/roadmap-<slug>.md`, or `docs/phases/phase-NN-*.md` — that is the deprecated flat layout. Offer migration to the user in Russian: `Вижу старый формат — <file>. Перенесу в docs/roadmaps/<slug>/roadmap.md и подтяну за ним phase-документы. Ок?`. On confirmation, `git mv` the files into the new structure (`docs/roadmaps/<slug>/roadmap.md` and `docs/roadmaps/<slug>/phases/phase-NN-*.md`).
 
 ## Phase 6 — Phase detailing (delegate to agent, on demand)
 
-Goal: для каждой фазы из `docs/roadmaps/<slug>/roadmap.md` произвести детальный документ `docs/roadmaps/<slug>/phases/phase-NN-<phase-slug>.md`, достаточный для реализации агентом `python-dev` без уточняющих вопросов.
+Goal: for each phase listed in `docs/roadmaps/<slug>/roadmap.md`, produce a detailed document `docs/roadmaps/<slug>/phases/phase-NN-<phase-slug>.md` concrete enough for the `python-dev` agent to implement the phase without follow-up questions.
 
-**Триггер:** отдельный вызов по фразам пользователя — "детализируй фазу N", "разверни фазу N", "распиши фазу <название>", "детализируй все фазы". НЕ запускается автоматически после roadmap.
+**Trigger:** explicit user invocation via phrases "детализируй фазу N", "разверни фазу N", "распиши фазу <название>", "детализируй все фазы". Does NOT run automatically after roadmap.
 
 **Folder layout — strict.** Phase documents NEVER go into a top-level `docs/phases/` folder. They live next to their roadmap, in `docs/roadmaps/<slug>/phases/`. Each roadmap owns its own `phases/` subdirectory — this keeps phases of different scopes (auth vs public vs payments) from mixing.
 
-**Предусловия:**
-- Существует хотя бы один `docs/roadmaps/<slug>/roadmap.md` и `docs/architecture.md`. Если чего-то нет — скажи пользователю в чём проблема и предложи построить недостающее сначала.
-- Желательно наличие `docs/modules/*.md` (иначе срезы модулей в фазе будут слабо детализированы — предупреди пользователя, но детализировать можно).
+**Preconditions:**
+- At least one `docs/roadmaps/<slug>/roadmap.md` and `docs/architecture.md` must exist. If something is missing, tell the user (in Russian) what is missing and offer to build it first.
+- `docs/modules/*.md` is desirable (otherwise per-phase module slices will be thinly detailed — warn the user, but detailing can still proceed).
 
-Шаги:
-1. **Определи целевой roadmap (slug).** Если в `docs/roadmaps/` ровно один подкаталог — используй его. Если несколько — а пользователь не назвал slug явно ("детализируй фазу 2 auth-роадмапа") — спроси на русском одним вопросом: `Roadmap-ов несколько: <list>. Какой детализируем?`.
-2. Прочитай `docs/roadmaps/<slug>/roadmap.md` — определи номер(а) и название(я) фаз(ы), которые пользователь просит детализировать. Если пользователь сказал «детализируй все» — все фазы из этого roadmap.
-3. Создай директорию `docs/roadmaps/<slug>/phases/`, если её нет: `mkdir -p docs/roadmaps/<slug>/phases`.
-4. Dispatch агента **phase-detailer**:
+Steps:
+1. **Determine the target roadmap (slug).** If `docs/roadmaps/` contains exactly one subdirectory — use it. If there are several and the user did not name the slug explicitly ("детализируй фазу 2 auth-роадмапа") — ask in Russian with one question: `Roadmap-ов несколько: <list>. Какой детализируем?`.
+2. Read `docs/roadmaps/<slug>/roadmap.md` — determine the number(s) and name(s) of the phase(s) the user is asking to detail. If the user said "детализируй все" — all phases in this roadmap.
+3. Create the directory `docs/roadmaps/<slug>/phases/` if it does not exist: `mkdir -p docs/roadmaps/<slug>/phases`.
+4. Dispatch the **phase-detailer** agent:
    ```
    Agent(subagent_type="phase-detailer", prompt="
    Roadmap slug: <slug>.
    Roadmap file: docs/roadmaps/<slug>/roadmap.md
    Output directory: docs/roadmaps/<slug>/phases/
-   Detail phase(s): <номер или список номеров, или 'all'>.
+   Detail phase(s): <number or list of numbers, or 'all'>.
    Read docs/roadmaps/<slug>/roadmap.md, docs/architecture.md, docs/modules/*.md, docs/concept.md.
    For each requested phase, write docs/roadmaps/<slug>/phases/phase-NN-<phase-slug>.md following references/document-templates.md section 'roadmaps/<slug>/phases/phase-NN-<phase-slug>.md'.
-   Target reader: python-dev agent — документ должен быть достаточно конкретным для реализации без уточняющих вопросов.
+   Target reader: python-dev agent — the document must be concrete enough to implement without follow-up questions.
    ")
    ```
-5. После возврата агента запусти **doc-reviewer** на КАЖДОМ созданном файле `docs/roadmaps/<slug>/phases/phase-NN-<phase-slug>.md` (см. секцию "Mandatory review step" ниже). Echo на русском: `Детализировал в roadmaps/<slug>/phases: phase-01-<phase-slug>.md, phase-02-<phase-slug>.md, ... Открытые вопросы: <если есть>. Ревью: <blockers/warnings по файлам или "чисто">. Посмотри — ок?`
-6. Итерируй (пользователь может попросить переразвернуть конкретную фазу — повторный dispatch с указанием номера и того же slug).
-7. На подтверждении коммить: `git commit -m "детализировал фазы roadmap <slug>: <номера>"` (либо «все фазы»).
+5. After the agent returns, run **doc-reviewer** on EACH created `docs/roadmaps/<slug>/phases/phase-NN-<phase-slug>.md` file (see "Mandatory review step" below). Echo to the user in Russian: `Детализировал в roadmaps/<slug>/phases: phase-01-<phase-slug>.md, phase-02-<phase-slug>.md, ... Открытые вопросы: <если есть>. Ревью: <blockers/warnings по файлам или "чисто">. Посмотри — ок?`
+6. Iterate (the user may ask to re-detail a specific phase — re-dispatch with that phase number and the same slug).
+7. On approval, commit: `git commit -m "детализировал фазы roadmap <slug>: <numbers>"` (or "все фазы").
 
-Если пользователь позже правит roadmap (через Phase 4 / change management), `docs-updater` агент синхронизирует уже существующие `docs/roadmaps/<slug>/phases/*.md` автоматически.
+If the user later edits the roadmap (via Phase 4 / change management), the `docs-updater` agent synchronizes the existing `docs/roadmaps/<slug>/phases/*.md` automatically.
 
 ## Mandatory review step (used by Phases 1–6)
 
