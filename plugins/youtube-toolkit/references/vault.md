@@ -14,19 +14,26 @@ Fixed path. Do NOT ask the user where to save. Do NOT use any other path. If the
 
 ```
 C:\projects\Claude\youtube\
-├── канал\           # yt-my-channel reports
+├── канал\           # yt-my-channel reports (dated channel snapshots)
 ├── конкуренты\      # yt-competitors reports (SINGLE and BATCH)
 ├── идеи\            # yt-ideas batches
 ├── контент-план\    # yt-content-plan calendars
 ├── сценарии\        # yt-script — one file per video
 ├── seo\             # yt-seo — one file per video
 ├── превью\          # yt-thumbnail — one file per video
-└── продвижение\     # yt-promo — audits, funnel, pinned, end-screens
+├── продвижение\     # yt-promo — audits, funnel, pinned, end-screens
+└── база\            # yt-knowledge-base — persistent dataset
+    ├── канал.md            # latest channel-level stats (overwritten each run)
+    ├── индекс.md           # one-row-per-video index (overwritten each run)
+    └── видео\              # one file per video: metadata + transcript + classification
+        └── <video-slug>.md
 ```
+
+Note: `канал\` (dated reports from `yt-my-channel`) and `база\канал.md` (latest snapshot from `yt-knowledge-base`) are different artefacts — do NOT conflate them. The former is a series of analytical reports over time; the latter is the current state of channel-wide stats, always overwritten.
 
 Folder-name rules (strict):
 - Folder names are Russian (Cyrillic), lowercase. No numeric prefixes like `10-`, `20-`, no English aliases (`competitors`, `ideas`). The only exception is `seo` because it is a universally recognised acronym.
-- Use exactly the eight names above. Do NOT invent variants (`конкуренти`, `канал-обзор`, `idea`, `10-конкуренты`).
+- Use exactly the nine names above. Do NOT invent variants (`конкуренти`, `канал-обзор`, `idea`, `10-конкуренты`, `knowledge-base`).
 - Correct: `C:\projects\Claude\youtube\конкуренты\2026-05-13-разбор-ниши.md`
 - Incorrect: `C:\projects\Claude\youtube\10-competitors\2026-05-13-niche-batch-scan.md`
 
