@@ -18,6 +18,12 @@ description: >
 
 Build a calendar that schedules concrete videos against weeks. Balance flagship-series episodes, tutorials/case studies, and lead-gen anchors. Honour the 1-video/week cap.
 
+## Step 0 — Load channel knowledge base (if present)
+
+Follow `${CLAUDE_PLUGIN_ROOT}/references/knowledge-base-context.md`. For `yt-content-plan` specifically, when `kb_available: true` read: the full `индекс.md` (every row — titles and `published` dates of all videos on the channel).
+
+Use the index to space topics on the new calendar: do NOT schedule a topic that was published in the last 8 weeks; reduce repetition with topics published in the last 6 months unless the new angle is clearly different. When dropping or warning about a duplicate, cite the existing slug, e.g. "пересекается с [[база/видео/курсор-выкинул-проект]] от 2026-03-10 — рекомендую сменить угол". If the KB is absent, plan without the duplicate-detection check.
+
 ## Procedure
 
 1. **Get the period.** Default — next **8 weeks**. Accept "месяц" → 4 weeks, "квартал" → 12 weeks. Confirm if ambiguous.

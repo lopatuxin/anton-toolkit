@@ -17,6 +17,12 @@ description: >
 
 Produce a full Russian-language script: hook (first 15 sec) → acts → CTA → outro. Length capped at 20 min equivalent (~2400 spoken words).
 
+## Step 0 — Load channel knowledge base (if present)
+
+Follow `${CLAUDE_PLUGIN_ROOT}/references/knowledge-base-context.md`. For `yt-script` specifically, when `kb_available: true` read: `индекс.md` and the top 3 `top`-classified video cards in FULL (including transcript bodies).
+
+Use the transcripts to match the user's actual speaking voice: sentence rhythm, recurring transitions, callback phrases, how they open and close videos, how they signpost sections. The script should sound like the same person who recorded the `top` videos — not a generic IT-channel script. Do NOT copy phrases verbatim; calibrate cadence and vocabulary. If the KB is absent, fall back to neutral conversational Russian.
+
 ## Procedure
 
 1. **Get inputs.** Required:

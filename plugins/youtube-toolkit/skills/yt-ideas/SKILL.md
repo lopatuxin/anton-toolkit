@@ -20,16 +20,23 @@ description: >
 
 Produce 10–20 video ideas tailored to the user's IT/vibe-coding channel. Every idea must trace back to a specific finding from a yt-my-channel or yt-competitors report. No analytics → no ideas.
 
+## Step 0 — Load channel knowledge base (if present)
+
+Follow `${CLAUDE_PLUGIN_ROOT}/references/knowledge-base-context.md`. For `yt-ideas` specifically, when `kb_available: true` read: `индекс.md`, the top 5 `top`-classified video cards (full content including transcript), and the top 3 `fail`-classified cards (frontmatter only — title and `classification_reason`).
+
+The knowledge base counts as analytical input for the hard precondition below — a present KB satisfies the requirement just like a `yt-my-channel` report would.
+
 ## Hard precondition
 
-Before generating anything, scan the conversation for:
+Before generating anything, scan for at least one of:
 
-- A `yt-my-channel` report (sections: Snapshot, Top performers, Patterns, Hypotheses, Recommendations).
-- A `yt-competitors` report (sections: top videos / clusters / gaps / hypotheses).
+- A `yt-my-channel` report in the conversation (sections: Snapshot, Top performers, Patterns, Hypotheses, Recommendations).
+- A `yt-competitors` report in the conversation (sections: top videos / clusters / gaps / hypotheses).
+- A loaded knowledge base from Step 0 (`kb_available: true`).
 
-If **neither** is present, respond:
+If **none** is present, respond:
 
-> "Чтобы идеи были на основе данных, нужен отчёт от yt-my-channel или yt-competitors. Запусти один из них и вернись — я подключусь к их выводам."
+> "Чтобы идеи были на основе данных, нужен отчёт от yt-my-channel, yt-competitors, или собранная база знаний канала. Запусти один из них и вернись — я подключусь к их выводам."
 
 Stop. Do not generate ideas. Do not improvise.
 
@@ -40,6 +47,7 @@ If at least one is present, proceed.
 1. **Read the analytical input.** Pull out:
    - From `yt-my-channel`: top-performer hypotheses, underperformer causes, recommended next moves, hypotheses about what works.
    - From `yt-competitors`: niche gaps, top-performing hooks/formats, hypotheses for our channel (section 10).
+   - From the knowledge base: titles + transcripts of top cards (signal for what hooks/topics worked), titles + `classification_reason` of fail cards (signal for what to avoid). When citing in the "Why this idea" field, reference the specific video by slug, e.g. `"KB: [[база/видео/курсор-выкинул-проект]] — top, vpd 2.4x median"`.
 
 2. **Apply generation rules** from `references/generation-rules.md`:
    - Gap-fill (take niche gaps directly)

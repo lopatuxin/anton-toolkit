@@ -19,6 +19,12 @@ description: >
 
 Produce a thumbnail concept: 3–5 word text overlay, composition layout, colour scheme, dominant emotion. Output is a brief the user takes to Figma / Photoshop / Canva.
 
+## Step 0 — Load channel knowledge base (if present)
+
+Follow `${CLAUDE_PLUGIN_ROOT}/references/knowledge-base-context.md`. For `yt-thumbnail` specifically, when `kb_available: true` read: `индекс.md` and the top 10 `top`-classified cards (frontmatter only — title field).
+
+Use the loaded titles to keep the new thumbnail text coherent with what the channel already trained the audience on: tone, register, vocabulary, length conventions. The thumbnail text should compose with the channel's existing visual identity, not break from it. If the KB is absent, fall back to the generic composition rules unchanged.
+
 ## Procedure
 
 1. **Get inputs.**

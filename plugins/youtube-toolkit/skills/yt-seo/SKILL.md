@@ -18,6 +18,12 @@ description: >
 
 Produce: 5 title variants (A/B-style), one full description with timestamps and CTAs, and 15–30 tags. Russian-language channel.
 
+## Step 0 — Load channel knowledge base (if present)
+
+Follow `${CLAUDE_PLUGIN_ROOT}/references/knowledge-base-context.md`. For `yt-seo` specifically, when `kb_available: true` read: `индекс.md` and the top 10 `top`-classified cards (frontmatter + description sections — skip the transcript body to keep context light).
+
+Use the loaded cards to mine the channel's working SEO patterns: which title formulas recur in the `top` set, which tag categories appear repeatedly, how descriptions are structured. Prefer formulas that the channel already validated over generic best practice. If the KB is absent, fall back to the generic title formulas in `references/title-formulas.md` unchanged.
+
 ## Procedure
 
 1. **Get inputs.** Required:

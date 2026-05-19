@@ -20,11 +20,17 @@ description: >
 
 Produce a structured analytical report on the user's own YouTube channel using public metrics from the bundled MCP server, plus optional pasted YouTube Studio data for CTR and audience retention.
 
+## Step 0 — Load channel knowledge base (if present)
+
+Follow `${CLAUDE_PLUGIN_ROOT}/references/knowledge-base-context.md`. For `yt-my-channel` specifically, when `kb_available: true` read: `канал.md` and the full `индекс.md`. Then sample full cards for the top 5 `top`-classified videos and top 3 `fail`-classified videos for the Top performers / Underperformers sections.
+
+If the KB is fresh (`last_updated` within 14 days), SKIP the MCP calls in Step 2 entirely and build the Snapshot from `канал.md` directly. If the KB is stale (>14 days) or absent, do the MCP calls as before.
+
 ## Procedure
 
-1. **Get the channel handle.** If not already in the conversation, ask once: "Какой handle или ID вашего канала?" Accept `@handle`, channel URL, or channel ID.
+1. **Get the channel handle.** If not already in the conversation, ask once: "Какой handle или ID вашего канала?" Accept `@handle`, channel URL, or channel ID. If the KB is loaded and contains a `channel_handle`, use it without asking.
 
-2. **Pull public metrics via MCP.** Call in this order:
+2. **Pull public metrics via MCP** (skip if KB Step 0 already filled this in). Call in this order:
    - `getChannelStatistics` — subscribers, total views, video count, creation date.
    - `getChannelTopVideos` — top videos by views (request 10–20).
    - For each top video, `getVideoDetails` — duration, publish date, tags, description.
