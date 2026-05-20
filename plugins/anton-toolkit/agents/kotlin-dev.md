@@ -26,7 +26,7 @@ description: >
   global policy (e.g. CLAUDE.md may require an automatic code review after every
   code change). This agent does NOT block such follow-ups.
 
-model: sonnet
+model: opus
 color: blue
 tools: ["Read", "Write", "Edit", "Glob", "Grep", "Bash", "mcp__plugin_context7_context7__resolve-library-id", "mcp__plugin_context7_context7__get-library-docs", "mcp__plugin_context7_context7__query-docs"]
 ---
