@@ -81,6 +81,26 @@ A change is done when `./gradlew compileKotlin` AND `./gradlew detekt` both retu
 - DO NOT touch frontend code — there is frontend-dev for that
 - If the task is ambiguous — describe the problem, do not guess
 
+## Idiomatic Kotlin checklist
+
+Before finishing any code, scan your diff for these non-idiomatic patterns and rewrite them. Code reviewers will flag every one of them — fix them up front, not in a follow-up round.
+
+- **`String.substring(0, n)` → `String.take(n)`**. `take` is safe at boundaries (`n > length`), `substring` throws. Symmetrically `substring(s.length - n)` → `takeLast(n)`.
+- **`if (x == null) return Y; val z = x.foo()` → `val z = x?.foo() ?: return Y`**. Use safe-call + Elvis for early null-exit. Same for `?: error(...)`, `?: throw ...`.
+- **`map.containsKey(k)` → `k in map`**. Same for `set.contains(e)` → `e in set`, `list.contains(e)` → `e in list`.
+- **`var acc = init; for (x in xs) acc = f(acc, x); return acc` → `xs.fold(init) { acc, x -> f(acc, x) }`**. Single-expression function preferred. Same shape applies to chained `Regex.replace` over a list of patterns.
+- **`mutableMapOf<K, V>().also { it["a"] = 1; if (cond) it["b"] = 2 }` → `buildMap<K, V> { put("a", 1); if (cond) put("b", 2) }`**. Same for `buildList`, `buildSet`. The result is read-only `Map`/`List`/`Set`, which is what consumers should accept.
+- **Multi-statement `if/else` with `return` in both branches → single-expression function with `if`/`when`**.
+  - Bad: `fun f(): T { return if (a) X else Y }` or `fun f(): T { if (a) return X; return Y }`
+  - Good: `fun f(): T = if (a) X else Y` or `fun f(): T = when { a -> X; b -> Y; else -> Z }`
+  - When there are 3+ branches or a guard prefix (e.g. empty-input fast path), prefer `when { ... }` over nested `if/else`.
+- **Snapshot + mutate over a map → `keys.associateWith { sideRead(it) }` then `forEach { (k, v) -> sideWrite(k, v) }`**. Two clean passes beat one cycle that mixes read and write of shared state. Applies to MDC, ThreadLocal, any external mutable store.
+- **`iterator.asSequence().toList()` when you only need a snapshot list → drop `.asSequence()`**. `Iterator<T>` does not have a direct `.toList()` extension, but `ObjectNode.properties()` / `entries` / `keys` give a `Collection` you can copy directly. Only keep `asSequence` when the chain has at least one lazy operator (`map`, `filter`, `take`) that benefits from short-circuiting.
+- **`for ((k, v) in map) { ... }` is fine for read-only iteration. For "do something per entry" without accumulation use `map.forEach { (k, v) -> ... }`** — slightly more idiomatic and pairs naturally with single-expression bodies.
+- **Manual `if (s != null && s.isNotEmpty())` → `if (!s.isNullOrEmpty())`**. Same for `isNullOrBlank`.
+
+Apply the checklist even on one-line edits: if the line you are touching matches a "Bad" pattern above, rewrite it in the same edit.
+
 ## Library reference (context7)
 
 Before writing code that calls an external library / framework / SDK — especially when the project has no existing usage to copy from, or when the existing usage might be outdated — query the `context7` MCP for current documentation. Goal: do not reinvent functionality the library already provides, and do not call APIs with stale signatures.
