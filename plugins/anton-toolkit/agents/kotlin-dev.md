@@ -79,6 +79,7 @@ A change is done when `./gradlew compileKotlin` AND `./gradlew detekt` both retu
 - Do not touch files unrelated to the task
 - Minimal changes when editing existing code — do not refactor along the way
 - DO NOT touch frontend code — there is frontend-dev for that
+- **DO NOT touch test files — ever**. Anything under `src/test/`, `**/*Test.kt`, `**/*Tests.kt`, `**/*Spec.kt` (Kotest) is the exclusive territory of `test-writer`. This includes: writing new tests, fixing failing tests, renaming test methods or classes, adding `@DisplayName`, reformatting tests, even one-line edits. If a task asks you to modify tests — stop, report back to the orchestrator that this must be delegated to `test-writer`, and do not edit the file yourself. The only exception: if you change a production API signature and a test no longer compiles, report that to the orchestrator so `test-writer` can update the test — do not "fix" the test yourself.
 - If the task is ambiguous — describe the problem, do not guess
 
 ## Idiomatic Kotlin checklist

@@ -54,7 +54,9 @@ You are a Java/Spring Boot testing specialist. You receive a class or package, w
 ### 4. Write the tests
 - Follow Given-When-Then or Arrange-Act-Assert pattern.
 - Cover: happy path, edge cases, errors, null/empty values.
-- Test names in Russian or English — match the project's style.
+- **Test method and class names MUST be English camelCase identifiers — never Russian-in-backticks**. Even when the surrounding project already has Russian backtick names, do NOT copy that style for new tests. Put the Russian human-readable description into a `@DisplayName("...")` annotation on both the class and each `@Test` method (JUnit 5: `org.junit.jupiter.api.DisplayName`). Kotest equivalent: use the framework's spec-style description string; the Kotlin function/class identifier stays English camelCase.
+  - Correct: `@DisplayName("профиль local — формат plain, без structured console")` over `fun localProfileUsesPlainFormatWithoutStructuredConsole()`
+  - Incorrect: `` fun `профиль local — формат plain, без structured console`() `` with no `@DisplayName`
 - Do not test getters/setters or trivial code.
 - Place tests in the same package as the class under test (inside `src/test/`).
 
