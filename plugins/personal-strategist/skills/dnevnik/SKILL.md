@@ -2,9 +2,9 @@
 name: dnevnik
 description: >
   Record a personal diary / journal entry by dictation into the Obsidian vault, formatting
-  raw thoughts into a clean Markdown note named by today's date. Triggers on: "дневник",
-  "запиши в дневник", "запиши мои мысли", "/dnevnik". Capture and format only — for advice
-  or strategy from the content use `strategist` instead.
+  raw thoughts into a clean Markdown note named by today's date. Invoked explicitly via the
+  /dnevnik command only — no auto-trigger. Capture and format only; for advice or strategy
+  use `strategist` instead.
 ---
 
 # Dnevnik — diary capture for Obsidian
