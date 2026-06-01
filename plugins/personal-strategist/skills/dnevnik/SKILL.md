@@ -1,20 +1,10 @@
 ---
 name: dnevnik
 description: >
-  Use when the user wants to record a personal diary / journal entry by dictation —
-  the user speaks or types raw thoughts and this skill formats them into a clean,
-  Obsidian-friendly Markdown note named by today's date, saved inside the
-  "Личная/Дневник" folder of the Obsidian vault.
-  Triggers on: "дневник", "запиши в дневник", "сделай запись в дневник",
-  "дневниковая запись", "хочу записать в дневник", "запиши мои мысли", "/dnevnik".
-
-  This skill runs DIRECTLY in conversation. Do NOT launch agents. It is a simple
-  format-and-write operation: take the user's dictated text, clean it up, and save
-  it as a well-structured Obsidian note.
-
-  Discrimination: this skill ONLY captures and formats — it does NOT analyse,
-  advise, interpret, or build strategy from the content. If the user asks for advice
-  or a plan based on what they wrote, use the `strategist` skill instead.
+  Record a personal diary / journal entry by dictation into the Obsidian vault, formatting
+  raw thoughts into a clean Markdown note named by today's date. Triggers on: "дневник",
+  "запиши в дневник", "запиши мои мысли", "/dnevnik". Capture and format only — for advice
+  or strategy from the content use `strategist` instead.
 ---
 
 # Dnevnik — diary capture for Obsidian
