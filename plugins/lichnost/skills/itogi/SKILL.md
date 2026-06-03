@@ -5,8 +5,7 @@ description: >
   the vault. Three levels — week, month, year — built as a cascade: the weekly итог analyses
   the daily diary entries, the monthly итог analyses the weekly итоги (NOT the daily entries),
   the yearly итог analyses the monthly итоги. Invoked explicitly via the /itogi command only —
-  no auto-trigger. Analysis, not a flat summary; for raw capture use `dnevnik`, for strategy
-  use `strategist`.
+  no auto-trigger. Analysis, not a flat summary; for raw capture use `dnevnik`.
 ---
 
 # Itogi — analytical period review for the Obsidian diary
@@ -196,7 +195,7 @@ Read the gathered sources, then write **analysis**, not a retelling. Strict rule
    (week level → `[[2026-06-01]]`; month level → `[[2026-W22]]`; year level → `[[2026-05]]`).
    Do NOT invent events, feelings, or progress the sources do not support.
 3. **Keep the user's language (Russian)** and their own framing of events. Do not moralize or
-   give unsolicited advice — that is `strategist`'s job. A forward-looking "фокус на следующий
+   give unsolicited advice. A forward-looking "фокус на следующий
    период" is allowed as a neutral observation of what is unresolved, not as coaching.
 4. **Scale the lens to the level:**
    - **Week** (from daily entries): main events / what got done, progress on projects and
@@ -309,6 +308,6 @@ Reply in one or two lines naming the file and what was analysed, e.g.:
 - **Never invent content** the sources do not support; ground claims in linked entries.
 - **Russian stays Russian** — write the итог in the user's language; never translate.
 - **Never overwrite silently** — an existing итог is regenerated only after the user confirms.
-- **No advice/coaching** — that is `strategist`. This skill describes the period, it does not
+- **No advice/coaching** — this skill describes the period, it does not
   prescribe what to do about it.
 - **Single-shot** — gather and write directly in the conversation; no subagents.

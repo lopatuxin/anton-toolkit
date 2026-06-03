@@ -11,9 +11,9 @@
       "source": "./plugins/anton-toolkit"
     },
     {
-      "name": "personal-strategist",
-      "description": "Strategic advisor that collects personal information and helps develop strategies",
-      "source": "./plugins/personal-strategist"
+      "name": "lichnost",
+      "description": "Personal life logging in the Obsidian vault: diary capture, film curation, and analytical period reviews",
+      "source": "./plugins/lichnost"
     },
     {
       "name": "plugin-builder",

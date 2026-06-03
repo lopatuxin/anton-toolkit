@@ -1,0 +1,8 @@
+{
+  "name": "lichnost",
+  "version": "0.6.1",
+  "description": "Personal life logging in the Obsidian vault: diary capture (dnevnik), film curation (film), and analytical period reviews (itogi)",
+  "author": {
+    "name": "Anton"
+  }
+}

@@ -7,7 +7,7 @@ description: >
   blurb). Invoked explicitly via the /film command only — no auto-trigger. Three flows, inferred
   from the command argument: recommend what to watch next, log a freshly watched film with a
   detailed review, or (on first run) migrate the legacy `films.md` note into the structured vault
-  folder. For diary capture use `dnevnik`; for life/career strategy use `strategist`.
+  folder. For diary capture use `dnevnik`.
 ---
 
 # Film — personal film curator for the Obsidian vault
