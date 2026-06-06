@@ -1,7 +1,7 @@
 {
   "name": "lichnost",
-  "version": "0.7.0",
-  "description": "Personal life logging in the Obsidian vault: diary capture (dnevnik), idea capture and development (idea), film curation (film), and analytical period reviews (itogi)",
+  "version": "0.8.0",
+  "description": "Personal life logging in the Obsidian vault: diary capture (dnevnik), idea capture and development (idea), film curation (film), analytical period reviews (itogi), and an evolving psychological self-profile from personal data and interviews (profil)",
   "author": {
     "name": "Anton"
   }
