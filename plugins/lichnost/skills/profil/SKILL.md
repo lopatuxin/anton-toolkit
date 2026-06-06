@@ -41,6 +41,7 @@ All under `<vault>/Личная/Портрет/`:
 |------|------|
 | `Профиль.md` | THE living psychological profile — the main artefact. Dimensions of the person, every claim grounded in linked evidence and marked with confidence, plus an «Открытые вопросы» section that the interview reads to know where to dig. |
 | `Интервью/<date>.md` | Raw interview sessions, one note per date (like `dnevnik` keeps raw entries). The analysis mode interprets these; the interview mode only captures them. |
+| `Состояние.md` | Service note — the **processed-sources registry**: a list of every evidence file already folded into the profile, keyed by content hash. The analysis mode reads it to know what is new or changed, and rewrites it after each update. Not for human editing. |
 | `Портрет.md` | Folder-note hub with a Dataview index of interview sessions (the vault uses `folder-notes`, so opening the folder opens this note). |
 
 The **only** evidence sources are inside `Личная/`: `Дневник/`, `Итоги/`, `Идеи/`, and the
@@ -67,7 +68,7 @@ If `$VAULT` is empty, tell the user in Russian: «Не нашёл хранили
 
 Paths used by this skill:
 - Profile folder: `$VAULT/Личная/Портрет`
-- Notes: `Профиль.md`, interview sessions `Интервью/<date>.md`, folder note `Портрет.md`
+- Notes: `Профиль.md`, interview sessions `Интервью/<date>.md`, registry `Состояние.md`, folder note `Портрет.md`
 - Evidence sources: `$VAULT/Личная/Дневник`, `$VAULT/Личная/Итоги`, `$VAULT/Личная/Идеи`
 
 ## 1. Idempotent setup (run these checks EVERY time)
@@ -182,47 +183,71 @@ develop threads that are already half-known. **One theme per session.**
 
 ## 4. ОБНОВИ / АНАЛИЗ mode — (re)build the living profile
 
-This is the "weekly analyst": read the evidence and produce the profile. Two sub-modes, auto-detected.
+This is the "weekly analyst": read the evidence and produce the profile. It tracks what it has
+already folded in with a **content-hash registry** (`Состояние.md`), so it reads exactly the files
+that are new or changed — never re-reading an unchanged one, never missing an edited one. A date
+cutoff is deliberately NOT used: it leaks (same-day edits, итоги written days after their period,
+and refined ideas all slip past a date). The registry is the single source of truth for "already
+processed".
 
-```bash
-P="$VAULT/Личная/Портрет/Профиль.md"
-if [ -s "$P" ]; then echo "REFRESH"; else echo "INIT"; fi
-```
+### 4a. Enumerate sources and diff against the registry (ALWAYS do this first)
 
-### 4a. INIT — full first build
+1. **List every evidence file** (skip folder notes and the skill's own output notes — `Профиль.md`,
+   `Состояние.md`, `Портрет.md`):
 
-`Профиль.md` is missing or empty. Read **all** available evidence in `Личная/` and build the profile
-from scratch:
-- Every diary entry: `Личная/Дневник/*.md` (skip the folder note `Дневник.md`).
-- Every итог: `Личная/Итоги/**/*.md` (skip the folder note).
-- Every idea: `Личная/Идеи/*.md` (skip the folder note).
-- Every interview session: `Личная/Портрет/Интервью/*.md`.
+   ```bash
+   { ls "$VAULT/Личная/Дневник/"*.md 2>/dev/null | grep -v '/Дневник\.md$'
+     find "$VAULT/Личная/Итоги" -name '*.md' 2>/dev/null | grep -v '/Итоги\.md$'
+     ls "$VAULT/Личная/Идеи/"*.md 2>/dev/null | grep -v '/Идеи\.md$'
+     ls "$VAULT/Личная/Портрет/Интервью/"*.md 2>/dev/null
+   } | sort -u
+   ```
 
-List what exists, then Read each. If there is essentially nothing to work with (no diary, no
-итоги, no interviews), tell the user in Russian: «Пока мало данных для профиля. Поведи дневник (`/dnevnik`) или давай проведём интервью (`/профиль интервью`).» and stop.
+2. **Hash each file by content** (stable, independent of mtime and of obsidian-git syncs). The vault
+   is a git repo, so use `git hash-object` (it hashes the working-tree content and works on
+   untracked files too); fall back to `sha1sum` if not inside a git repo:
 
-Then write the profile per §6.
+   ```bash
+   git hash-object "<file>"   # or: sha1sum "<file>" | cut -d' ' -f1
+   ```
 
-### 4b. REFRESH — incremental update
+3. **Read the current registry** from `$VAULT/Личная/Портрет/Состояние.md` (a `путь → хеш` map). If
+   the note does not exist yet (first build), treat the registry as empty.
 
-`Профиль.md` already exists. Read its frontmatter `охвачено_по:` (the date through which evidence
-was last folded in) and read the existing profile in full. Gather only NEW material:
-- Diary entries dated **after** `охвачено_по`.
-- Interview sessions dated **after** `охвачено_по` (or any not yet reflected).
-- Any итог or idea created/changed since (when in doubt, re-read the latest итог and any idea not
-  yet referenced in the profile).
+4. **Classify each enumerated file:**
+   - **NEW** — its path is not in the registry → read it.
+   - **CHANGED** — its path is in the registry but the hash differs (edited diary entry, refined
+     idea, freshly written итог) → read it and refresh the claims that lean on it.
+   - **UNCHANGED** — the hash matches the registry → skip; it is already reflected in the profile.
 
-**MERGE into the existing profile — never wipe it.** This is the core discipline:
+### 4b. INIT — full first build
+
+`Профиль.md` is missing or empty → there is no profile yet, so every enumerated file is NEW. Read
+them all and build the profile from scratch per §6. If there is essentially nothing to work with
+(no diary, no итоги, no interviews), tell the user in Russian: «Пока мало данных для профиля. Поведи дневник (`/dnevnik`) или давай проведём интервью (`/профиль интервью`).» and stop.
+
+### 4c. REFRESH — incremental update
+
+`Профиль.md` exists. Read it in full, then read only the **NEW + CHANGED** files from §4a and
+**MERGE** into the existing profile — never wipe it:
 - Strengthen an existing claim when new evidence supports it (add the new wikilink, and you MAY
   raise its confidence from «(гипотеза)» to «(подтверждено)»).
 - Add genuinely new observations as new grounded lines.
+- For a CHANGED file already cited in the profile, refresh the observations that lean on it.
 - If new evidence **contradicts** an existing claim, do not silently delete the old one — revise it
   and note the shift (e.g. «Раньше избегал публичности, в последних записях — наоборот тянется к ней
   [[2026-06-05]]»). A changing person is signal, not noise.
 - Re-tighten the «Открытые вопросы» section: drop questions the new material answered, add new ones
   the new material opened.
 
-Then write the updated profile per §6, bumping `updated:` and `охвачено_по:` to today.
+If **nothing** is NEW or CHANGED, tell the user in Russian that the profile is already up to date and
+stop WITHOUT rewriting either note.
+
+### 4d. Rewrite the registry (both INIT and REFRESH, after writing the profile)
+
+Rewrite `$VAULT/Личная/Портрет/Состояние.md` so its registry lists **every** enumerated source with
+its CURRENT hash — the full set, not just the delta. This is what makes the next run's diff correct.
+Use the template in §6. Then the profile's `updated:` is set to today.
 
 ## 5. ПОКАЗАТЬ mode — read back the current profile
 
@@ -284,7 +309,6 @@ File layout — `$VAULT/Личная/Портрет/Профиль.md`:
 ---
 type: профиль
 updated: <YYYY-MM-DD>
-охвачено_по: <YYYY-MM-DD>     # latest evidence date folded in; REFRESH resumes after this
 tags:
   - портрет
   - профиль
@@ -300,12 +324,41 @@ tags:
 <what is still unknown — the interview's backlog>
 ```
 
+The processed-sources registry — `$VAULT/Личная/Портрет/Состояние.md`. Rewrite it whole on every
+build per §4d; the `text` block holds one `<hash> <path>` line per enumerated source (path relative
+to the vault root). Never hand-maintain it:
+
+````markdown
+---
+type: состояние
+updated: <YYYY-MM-DD>
+tags:
+  - портрет
+  - служебное
+---
+
+# ⚙️ Состояние профиля
+
+[[Портрет]]
+
+Служебная заметка: реестр исходников, уже свёрнутых в [[Профиль]]. Ведётся скиллом `/профиль` —
+**не редактируй вручную**. Каждая строка — `<хеш содержимого> <путь от корня хранилища>`.
+
+```text
+<hash>  Личная/Дневник/2026-06-04.md
+<hash>  Личная/Идеи/Logos — автономный ИИ-ассистент.md
+<hash>  Личная/Итоги/Недели/2026-W22.md
+<hash>  Личная/Портрет/Интервью/2026-06-06.md
+```
+````
+
 ## 7. Confirm to the user (Russian)
 
 Reply in one or two lines naming what changed, e.g.:
 - Interview: «Провёл интервью по теме «что драйвит» — записал в `Личная/Портрет/Интервью/2026-06-06.md`.»
 - INIT: «Собрал профиль из твоих данных (дневник: 7, итоги: 2, интервью: 1): `Личная/Портрет/Профиль.md`. Открытых вопросов — 5.»
-- REFRESH: «Обновил профиль `Личная/Портрет/Профиль.md` — добавил 3 наблюдения, одну гипотезу подтвердил, открытых вопросов теперь 4.»
+- REFRESH: «Обновил профиль `Личная/Портрет/Профиль.md` — новых файлов 2, изменённых 1; добавил 3 наблюдения, одну гипотезу подтвердил, открытых вопросов теперь 4.»
+- REFRESH (nothing new): «Профиль уже актуален — новых или изменённых записей нет.»
 - Show: a tight digest + the path.
 
 `obsidian-git` auto-syncs the vault, so no manual git commit is needed here. The Dataview index in
@@ -323,6 +376,10 @@ Reply in one or two lines naming what changed, e.g.:
 - **No clinical diagnosis, no coaching.** Describe the person; do not label or prescribe.
 - **REFRESH merges, never clobbers.** Strengthen, add, or revise-with-note; never wipe prior
   substance. A changing person is recorded as change.
+- **Track processed sources by content hash, not by date.** What has been folded in lives in
+  `Состояние.md` as `<hash> <path>` per file. REFRESH reads only files that are NEW (path absent) or
+  CHANGED (hash differs), then rewrites the full registry. Never rely on a date cutoff — it misses
+  same-day edits, late-written итоги, and refined ideas.
 - **Source is only `Личная/`.** Diary, итоги, ideas, interviews. Nothing else.
 - **Russian stays Russian** — all note content and chat replies in Russian; never translate.
 - **Single-shot, no agents** — read, converse, and write directly in the conversation.
