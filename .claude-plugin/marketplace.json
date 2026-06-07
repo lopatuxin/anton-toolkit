@@ -16,6 +16,11 @@
       "source": "./plugins/lichnost"
     },
     {
+      "name": "logos",
+      "description": "Toolkit for designing the Logos autonomous AI assistant: a domain-specific architect council (orchestration, memory, models, autonomy, resources) and a searchable decision journal with importance weights, all in the Logos/ folder of the Obsidian vault",
+      "source": "./plugins/logos"
+    },
+    {
       "name": "plugin-builder",
       "description": "Creates, extends, and fixes plugins in the anton-toolkit-marketplace",
       "source": "./plugins/plugin-builder"

@@ -1,0 +1,8 @@
+{
+  "name": "logos",
+  "version": "0.1.0",
+  "description": "Toolkit for designing the Logos autonomous AI assistant: a domain-specific architect council (orchestration, memory, models, autonomy, resources) that designs the system by consensus, and a searchable decision journal where every decision and experiment is recorded with an importance weight and reviewed by the user. All artifacts live in the Logos/ folder of the Obsidian vault.",
+  "author": {
+    "name": "Anton"
+  }
+}
