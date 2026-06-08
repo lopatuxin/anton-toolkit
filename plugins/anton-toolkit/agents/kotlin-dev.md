@@ -54,7 +54,7 @@ The manifest is the default standard. **A concrete project always wins on confli
 
 1. **Understand the task** — read end to end. If it's a bug fix — reproduce and understand the cause. If editing existing code — read the whole file for context.
 2. **Study the project** — check `build.gradle.kts`, `gradle/libs.versions.toml`, `settings.gradle.kts`. Find analogues (existing Controller, Service, Entity, Converter) and follow their patterns. Read `application.yml` if configuration is involved.
-3. **Write the code** — follow project naming, structure, error handling. Use existing libraries from the Version Catalog, no unnecessary dependencies, no comments on obvious code, no future abstractions. Decompose complex logic: private functions must not exceed ~30 lines (detekt `LongMethod` threshold); DB access, calculations, and DTO assembly must be separate functions.
+3. **Write the code** — follow project naming, structure, error handling. Use existing libraries from the Version Catalog, no unnecessary dependencies, no comments in code (see the "No comments" rule below), no future abstractions. Decompose complex logic: private functions must not exceed ~30 lines (detekt `LongMethod` threshold); DB access, calculations, and DTO assembly must be separate functions.
 4. **Verify compilation** — run `./gradlew compileKotlin`. Fix errors, retry.
 5. **Verify static analysis** — run `./gradlew detekt`. Fix violations, retry.
 6. **Report** — which files changed, whether compilation and detekt passed, key decisions made.
@@ -66,6 +66,10 @@ A change is done when `./gradlew compileKotlin` AND `./gradlew detekt` both retu
 ## Rules
 
 - ALWAYS find a project analogue before writing — do not invent your own style
+- **NO comments in code — ever.** Do not write any comments in the Kotlin you produce: no KDoc (`/** ... */`), no block comments (`/* ... */`), no single-line comments (`// ...`). This applies to new code AND edits — when you touch existing code, do not add new comments (and do not bother preserving the comment style of neighbours; just do not introduce comments yourself). Code must be self-documenting through clear naming and small functions: when tempted to explain WHAT or WHY with a comment, rename the symbol or extract a well-named private function / `val` instead. The ONLY allowed exceptions are non-prose, machine-read directives that tooling requires — e.g. IntelliJ language-injection hints (`// language=SQL`), lint/static-analysis suppressions (`// ktlint-disable`, `@Suppress` is an annotation and is always fine), and a license/copyright header the project already mandates. Everything that is human prose explaining the code is forbidden.
+  - Incorrect: `// calculate total price` above `val total = items.sumOf { it.price }`
+  - Incorrect: `/** Returns the user by id, or null if absent. */` above a function
+  - Correct: `val total = items.sumOf { it.price }` with a descriptive name and no comment
 - **Braces are mandatory** for every `if`, `else`, `else if`, `for`, `while`, `do` body — even single-statement bodies. No brace-less control flow, ever. Exception: a single-expression `if`/`when` used as an expression and assigned/returned (`val x = if (a) b else c`) — that is idiomatic Kotlin and stays.
   - Correct: `if (qty.signum() <= 0) {\n    continue\n}`
   - Incorrect: `if (qty.signum() <= 0) continue`
