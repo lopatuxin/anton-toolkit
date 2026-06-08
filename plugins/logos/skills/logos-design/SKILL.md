@@ -33,6 +33,28 @@ architecture-writing step.
 **Critical rule:** documentation only. No implementation code. Documents may describe algorithms,
 interfaces, and data shapes in prose — but no runnable code files.
 
+## Interview style (applies to EVERY dialog phase: concept, architectural constraints, change management)
+
+The user wants the documentation worked out in depth. Your job in every dialog phase is to interview
+the user thoroughly until the target picture is genuinely clear — not to fill a couple of gaps and
+move on. The design is built from the user's own words.
+
+Hard rules for every question you ask the user:
+- Ask OPEN-ENDED, free-text questions. NEVER use the AskUserQuestion tool and NEVER present pre-baked
+  multiple-choice answer options (no "вариант А / Б / В" lists). The user answers in their own words.
+- Ask ONE question at a time. Wait for the answer before asking the next. Do NOT batch several
+  questions into a single message.
+- Go deep: follow up on each answer, probe for the "why", surface hidden assumptions, and where the
+  right path is unclear, discuss the trade-offs WITH the user in prose to converge on the target
+  picture together. It is expected and encouraged that reaching clarity takes many turns.
+- Only stop interviewing a topic once the user's intent on it is concretely pinned down — then write
+  it into the document and move to the next topic.
+
+Correct: «С какого первого сценария хочешь стартовать и почему именно с него?» (open, single
+question, invites the user's own framing).
+Incorrect: calling AskUserQuestion, presenting a list of pre-written options for the user to pick
+from, or asking three questions in one message.
+
 ## Locate the vault and resolve paths (once per session)
 
 Find the Obsidian vault root (the directory that contains `.obsidian/`). Walk up from the current
@@ -85,9 +107,13 @@ the orchestrator hierarchy, evolving memory with strength weights, autonomy, the
 swarm, and the resource constraint. Use it as the backbone of the concept, so you do NOT re-ask what
 is already written there.
 
-Then ask, in Russian, ONE question at a time, only to fill genuine gaps the idea note leaves open
-(e.g. the single sharpest use case to aim at first, what is explicitly out of scope at the start).
-Keep questions short. Do NOT ask about tech stack — that is Phase 2.
+Then interview the user in Russian following the **Interview style** rules above — open-ended
+free-text questions, one at a time, going deep. The idea note is only the backbone; your job is to
+draw out everything it leaves open or under-specified and probe each answer further until the concept
+is genuinely clear. Topics to cover (one open question each, follow up as the answers demand): the
+sharpest first use case and why it, who the system is for, how the user interacts with it, what
+"success" looks like, and what is explicitly out of scope at the start. Do NOT reduce this to a
+couple of quick gap-fillers, and do NOT ask about tech stack — that is Phase 2.
 
 When you have enough, write `Концепт.md` yourself (it is short — inline, no agent) following the
 `Концепт` template in `references/design-templates.md`, all Russian headings. Then summarize to the
@@ -104,7 +130,8 @@ rejected alternatives — the council machinery is internal.
 
 ### Step 2.1 — Collect architectural constraints (short dialog, Russian)
 
-Ask only what the concept/idea note does not pin down. Suggested questions (adapt, 2–4 max):
+Following the **Interview style** rules above (open-ended, one question at a time, probing deeper),
+ask only what the concept/idea note does not pin down. Topics to cover (one open question each):
 - «Старт на готовых моделях через OpenRouter — какие именно в приоритете, или решаем в совете?»
 - «Какой реальный бюджет железа на старте — VRAM, число GPU?»
 - «Язык/стек оркестратора есть предпочтение, или это решаем здесь?»
