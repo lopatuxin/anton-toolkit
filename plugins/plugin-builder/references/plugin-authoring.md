@@ -70,6 +70,27 @@ model: <opus|sonnet|haiku>  # optional; omit for session default
 - Use session default for most other tasks.
 - Agents are autonomous one-shot workers. No multi-turn dialog inside an agent.
 
+## Component types — what a plugin can contain
+
+A plugin is a bundle of one or more of these. Pick per the task — most plugins need only one or two. Do NOT default to "skill" reflexively.
+
+| Component | Use when | Location | Invocation |
+|---|---|---|---|
+| **skill** | Multi-step or dialog-driven behavior the model performs in conversation (interview, guided workflow). | `skills/<name>/SKILL.md` | Auto-triggered by `description`, or `/<name>`. |
+| **agent** | Autonomous one-shot work with no dialog (review, generate, analyze) that runs in its own context. | `agents/<name>.md` | Dispatched via the Agent tool. |
+| **command** | A fixed, explicit action the user triggers by name with optional args (`/deploy`, `/commit`). No reasoning/dialog needed. | `commands/<name>.md` | `/<name> [args]` only — never auto-triggers. |
+| **hook** | Automatic behavior on a harness event (PreToolUse, PostToolUse, Stop, SessionStart, …). The harness runs it, not the model. | `hooks/hooks.json` + scripts | Fires on the event, no user action. |
+| **MCP server** | The plugin must expose external tools/data (an API, a DB, a service). | `.mcp.json` | Tools appear as `mcp__<server>__*`. |
+
+Decision shortcuts:
+- "The user describes it and I converse to refine it" → **skill**.
+- "Run it and come back with a result, no back-and-forth" → **agent**.
+- "User types a slash command to do exactly X" → **command** (a **skill** instead if X needs reasoning or dialog).
+- "Whenever event Y happens, automatically do Z" → **hook** (the model cannot self-trigger on events — only a hook can).
+- "Needs to talk to an external system" → **MCP server**.
+
+For the exact file format and frontmatter of commands, hooks, and MCP config, consult the official `plugin-dev` skills when installed: `plugin-dev:command-development`, `plugin-dev:hook-development`, `plugin-dev:mcp-integration`, `plugin-dev:plugin-structure`. Apply this marketplace's language rule regardless of what those skills show.
+
 ## Trigger phrases — good vs bad examples
 
 **Good** (specific, literal, matches real user input):
@@ -88,9 +109,10 @@ Run before every commit that touches plugin files:
 
 1. All modified/created `*.json` parse as valid JSON.
 2. `.claude-plugin/marketplace.json` has no duplicate plugin names.
-3. All created/modified `SKILL.md` and `agents/*.md` files are non-empty (> 100 bytes).
+3. All created/modified `SKILL.md`, `agents/*.md`, and `commands/*.md` files are non-empty (> 100 bytes).
 4. Each SKILL.md `description` contains at least 3 explicit trigger phrases.
 5. If any plugin file was modified, the corresponding `plugin.json` `version` is incremented.
+6. If a `hooks/hooks.json` or `.mcp.json` was created, it parses as valid JSON (covered by check 1).
 
 If any check fails: do not commit. Report the specific failure to the user in Russian. Files stay on disk for the next pass.
 
@@ -109,6 +131,13 @@ git push
 
 After successful push, report to user in Russian with the commit hash so rollback is possible: `git revert <hash> && git push` on the user saying "отмени" / "откати".
 
+## Activation — registering is not enough
+
+Adding a plugin to `.claude-plugin/marketplace.json` makes it *discoverable*, not *active*. A plugin runs only when it is enabled in the user's `~/.claude/settings.json` under `enabledPlugins` (e.g. `"<name>@anton-toolkit-marketplace": true`). Skipping this is the single most common reason a freshly created plugin "does nothing" after a restart.
+
+- **New plugin (`create-plugin`):** after the files are committed, the plugin is registered but NOT yet active. Tell the user to enable it: run `/plugin`, find `<name>` under the `anton-toolkit-marketplace`, and enable it — this installs it into the local cache and flips `enabledPlugins`. A plain restart is NOT enough for a brand-new plugin.
+- **Existing enabled plugin (`extend-plugin`, `improve-plugin`):** the plugin is already in `enabledPlugins`, so a version bump is enough. With `autoUpdate` on for this marketplace, a restart pulls the new version; otherwise the user runs `/plugin` to update.
+
 ## File layout conventions
 
 ```
@@ -120,10 +149,16 @@ plugins/<plugin-name>/
 │       └── SKILL.md
 ├── agents/
 │   └── <agent-name>.md
+├── commands/
+│   └── <command-name>.md
+├── hooks/
+│   └── hooks.json
+├── .mcp.json
 └── references/
     └── <topic>.md
 ```
 
+- Create only the directories the plugin actually uses — a skill-only plugin has just `skills/`.
 - One SKILL.md per skill, each in its own subdirectory.
-- Agents live as flat `*.md` files directly under `agents/`.
+- Agents and commands live as flat `*.md` files directly under `agents/` and `commands/`.
 - References are flat under `references/`, named by topic (not by the component that reads them).

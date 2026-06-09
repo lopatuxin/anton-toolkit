@@ -1,6 +1,6 @@
 {
   "name": "plugin-builder",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Creates and extends plugins in the anton-toolkit-marketplace via task-centric interviews. Reactive fixes for in-session incidents are handled by the `improve-plugin` skill in the `anton-toolkit` plugin.",
   "author": {
     "name": "Anton"

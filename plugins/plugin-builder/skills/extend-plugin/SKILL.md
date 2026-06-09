@@ -40,7 +40,7 @@ Read the full contents of `plugins/<target>/` — `plugin.json`, all SKILL.md, a
 
 Required fields for an extension:
 
-1. **Что добавляем** (what to add) — a new skill? new agent? new reference? rework of an existing component?
+1. **Что добавляем** (what to add) — a new skill, agent, command, hook, MCP server, or reference? Or a rework of an existing component? (See the **Component types** table in `references/plugin-authoring.md`.)
 2. **Зачем** (why) — task the new thing solves / gap in the current plugin.
 3. **Когда запускать** (trigger context, if a new skill/agent) — situations that invoke it.
 4. **Как работает** (how it works) — step-by-step behavior.
@@ -63,7 +63,8 @@ Wait for confirmation. On corrections go back to Phase 3.
 Two modes:
 
 **Mode A — new component:**
-- Create new `SKILL.md` / agent file / reference under the target plugin, following `references/plugin-authoring.md`.
+- The new component can be a skill, agent, command, hook, MCP server, or reference — pick per the **Component types** table in `references/plugin-authoring.md`, not reflexively a skill.
+- Create the new file(s) under the target plugin, following `references/plugin-authoring.md`.
 - Do NOT modify existing files in the target plugin unless the user explicitly asked.
 
 **Mode B — rework existing component:**

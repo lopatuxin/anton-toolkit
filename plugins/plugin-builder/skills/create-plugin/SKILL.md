@@ -70,14 +70,15 @@ If the user corrects something, go back to Phase 3 with the specific delta, not 
 
 ## Phase 5 — Generate files
 
-Decide component layout from the interview:
+Decide the component layout from the interview using the **Component types** table in `references/plugin-authoring.md` — a plugin can be a skill, agent, command, hook, MCP server, or a small combination. Do NOT default to "skill" reflexively:
 
 - **Dialog-driven behavior** (multi-turn) → **skill**.
-- **Autonomous one-shot behavior** (no dialog needed) → **agent**.
-- **Behavior requiring high precision** (editing text, strict formats) → agent with `model: opus`.
-- Routine automation → default model.
+- **Autonomous one-shot work** (no dialog) → **agent** (use `model: opus` for high-precision text editing).
+- **Explicit user-triggered action with args** (`/<name> ...`, no reasoning) → **command**.
+- **Automatic behavior on a harness event** → **hook** (the model cannot self-trigger on events).
+- **External tool/data access** → **MCP server**.
 
-Minimal plugin: `plugin.json` + one `SKILL.md` (or `agent.md`). Add more components only if the interview clearly requires them.
+Minimal plugin: `plugin.json` + one component. Add more only if the interview clearly requires them.
 
 Generate, following `references/plugin-authoring.md`:
 
@@ -85,6 +86,7 @@ Generate, following `references/plugin-authoring.md`:
 2. `plugins/<name>/skills/<skill-name>/SKILL.md` — English body, English frontmatter, Russian trigger phrases inside `description`.
 3. `plugins/<name>/agents/<agent-name>.md` if the design needs an agent — include `model: opus` when warranted.
 4. `plugins/<name>/references/<topic>.md` only if the interview revealed a clear need for a shared reference.
+5. `plugins/<name>/commands/<command-name>.md`, `plugins/<name>/hooks/hooks.json`, or `plugins/<name>/.mcp.json` if the chosen layout includes a command, hook, or MCP server. For their exact format, consult the `plugin-dev` skills named in `references/plugin-authoring.md`.
 
 User-facing prompts inside the generated skill (e.g. "Что нужно закоммитить?") stay in Russian — include them in the SKILL.md body as literal Russian strings wrapped in code fences or blockquotes, so the model knows to speak them verbatim.
 
@@ -107,10 +109,11 @@ User-facing prompts inside the generated skill (e.g. "Что нужно зако
    git commit -m "<Russian message: created plugin <name> with N skills / M agents>"
    git push
    ```
-5. Report to user in Russian:
+5. A brand-new plugin is registered in `marketplace.json` but NOT yet active — it must be enabled (see the **Activation** section in `references/plugin-authoring.md`). A plain restart is not enough. Report this explicitly to the user in Russian:
    ```
    Создал плагин `<name>`. Состав: <список компонентов>. Коммит <hash>.
-   Перезагрузи Claude Code, чтобы плагин стал активен. Если что-то не так — скажи "отмени".
+   Плагин зарегистрирован, но ещё не активен. Чтобы включить: запусти `/plugin`, найди `<name>` в маркетплейсе `anton-toolkit-marketplace` и включи его — простой перезагрузки для нового плагина недостаточно.
+   Если что-то не так — скажи "отмени".
    ```
 
 ## Rollback
