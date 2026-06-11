@@ -48,10 +48,11 @@ Target 12–20 min.
 
 ## Pacing rules
 
-- **Payoff every ~2 min.** A payoff = a visible outcome, a working step, a moment of "ah, that's the trick". If two minutes pass without one, cut or restructure.
-- **No more than 30 sec of pure exposition** before something happens. Use B-roll, code, screen capture to break it up.
-- **B-roll suggestion every 30–60 sec.** In script, mark as `[B-ROLL: <suggestion>]`. The script writer suggests; the user records.
+- **Payoff every ~2 min.** A payoff = a concrete outcome, a working step, a moment of "ah, that's the trick" delivered in the spoken text. If two minutes pass without one, cut or restructure.
+- **No more than 30 sec of pure exposition** before something happens — vary the talk track so it does not flatten into a lecture.
 - **Words per minute target:** 130–145. So 12 min ≈ 1600–1750 words; 20 min ≈ 2600–2900 words.
+
+(Visual pacing — B-roll, screen capture, what to show on screen — is NOT planned here. That is `yt-montage`'s job, applied to the finished script.)
 
 ## Section length anchors (for ~12 min video)
 

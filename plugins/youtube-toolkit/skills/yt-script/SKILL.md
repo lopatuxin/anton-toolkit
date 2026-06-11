@@ -49,7 +49,6 @@ Use the transcripts to match the user's actual speaking voice: sentence rhythm, 
 
 5. **Apply pacing rules** from `references/structure.md`:
    - One concrete payoff every 2 minutes. No "filler" stretches.
-   - B-roll suggestion every 30–60 seconds in `[B-ROLL: …]` brackets.
    - Cut a section if it does not pay off.
 
 6. **Write the script.** Use the output format below.
@@ -71,13 +70,9 @@ Use the transcripts to match the user's actual speaking voice: sentence rhythm, 
 
 <Russian text, 30–50 spoken words. The actual opening line.>
 
-[B-ROLL: <suggestion>]
-
 ## Act 1 — <name> (0:15–N:NN)
 
 <text>
-
-[B-ROLL: <suggestion>]
 
 ## Act 2 — <name> (N:NN–N:NN)
 
@@ -104,8 +99,8 @@ Use the transcripts to match the user's actual speaking voice: sentence rhythm, 
 ## Production notes
 
 - Estimated record time: <N min>
-- Open questions for the recording: <list anything the script left under-specified, e.g., "show the prompt template on screen at 4:30">
-- Files / repos / screenshots needed: <list>
+- Open questions for the recording: <list anything the script left under-specified about the spoken content, e.g., "confirm the exact tool version mentioned at 4:30">
+- Files / repos needed for the talk track: <list>
 ```
 
 ## Save to vault
@@ -145,6 +140,7 @@ After producing the script in chat, persist it to the Obsidian vault following `
 ## Boundaries
 
 - Do not write the title, description, tags, or thumbnail concept here — those are `yt-seo` and `yt-thumbnail`.
+- Do NOT include any editing/visual directions in the script: no B-roll suggestions, no `[B-ROLL: …]` markers, no "show X on screen", no shot/cut/overlay instructions, no descriptions of what the viewer sees. The script is the spoken talk track ONLY (hook, acts, CTAs, outro). All on-screen/visual planning belongs to `yt-montage`, which consumes the finished script. Correct: a script line is something the host says aloud. Incorrect: "[B-ROLL: terminal with error]" or "show the prompt template on screen at 4:30".
 - Do not improvise the idea — if the user did not give one and there is no `yt-ideas` output, ask.
 - Do not exceed 20 min length cap.
 - Russian language for all spoken text. English allowed in code blocks, tool names, and tags.
