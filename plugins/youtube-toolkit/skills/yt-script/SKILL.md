@@ -23,6 +23,18 @@ Follow `${CLAUDE_PLUGIN_ROOT}/references/knowledge-base-context.md`. For `yt-scr
 
 Use the transcripts to match the user's actual speaking voice: sentence rhythm, recurring transitions, callback phrases, how they open and close videos, how they signpost sections. The script should sound like the same person who recorded the `top` videos — not a generic IT-channel script. Do NOT copy phrases verbatim; calibrate cadence and vocabulary. If the KB is absent, fall back to neutral conversational Russian.
 
+## Step 0b — Calibrate style from existing written scripts (MANDATORY when any exist)
+
+Before writing, read the already-written scripts in the vault folder `C:\projects\Claude\youtube\сценарии\`. These are the user's PREFERRED, hand-approved style — the gold standard for how a script should read. The user has stated that scripts written without this calibration come out stylistically wrong and have to be rewritten almost entirely. Treat this step as required, not optional.
+
+Procedure:
+1. List the `.md` files in `сценарии/`. If the folder is empty or absent, skip this step.
+2. Select 1–3 reference scripts, prioritising those **closest in meaning/topic** to the script you are about to write (same series, same `video_type`, overlapping subject). A script from the same flagship series is the strongest reference. If nothing is topically close, pick the 2 most recent scripts as a general style anchor.
+3. Read the selected reference scripts IN FULL and extract the concrete style fingerprint: sentence length and rhythm, paragraph density, level of directness and informality, how the hook is phrased, how arguments are built ("первое… второе…"), recurring connective phrases, how the host addresses the viewer (ты/вы), how sections open and close, the balance of plain talk vs. jargon.
+4. Write the new script so a reader could not tell it apart, by style, from the reference scripts — same voice, same rhythm, same vibe. Match the style; do NOT copy sentences, structure-for-structure, or content verbatim.
+
+This style calibration takes precedence over any generic "good script" instinct. When in doubt about phrasing, mirror how the reference scripts do it.
+
 ## Procedure
 
 1. **Get inputs.** Required:
@@ -51,7 +63,7 @@ Use the transcripts to match the user's actual speaking voice: sentence rhythm, 
    - One concrete payoff every 2 minutes. No "filler" stretches.
    - Cut a section if it does not pay off.
 
-6. **Write the script.** Use the output format below.
+6. **Write the script** in the style calibrated in Step 0b (reference scripts from `сценарии/`). Use the output format below.
 
 ## Output format
 
