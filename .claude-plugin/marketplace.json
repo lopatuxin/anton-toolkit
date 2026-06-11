@@ -31,6 +31,11 @@
       "source": "./plugins/system-designer"
     },
     {
+      "name": "vibe-coding-course",
+      "description": "Helps the teacher run a vibe-coding course: an interview-driven roadmap builder and a beginner-friendly per-lesson writer that save Russian Markdown files into the Obsidian vault's Курс/ folder",
+      "source": "./plugins/vibe-coding-course"
+    },
+    {
       "name": "youtube-toolkit",
       "description": "Toolkit for running a Russian-language IT/vibe-coding YouTube channel: own-channel analytics, competitor analysis, idea generation, content planning, script writing, SEO, thumbnails, and on-channel lead generation",
       "source": "./plugins/youtube-toolkit"

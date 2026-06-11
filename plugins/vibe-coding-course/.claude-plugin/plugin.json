@@ -1,0 +1,6 @@
+{
+  "name": "vibe-coding-course",
+  "version": "0.1.0",
+  "description": "Helps the teacher run a vibe-coding course: an interview-driven roadmap builder and a beginner-friendly per-lesson writer that save Russian Markdown files into the Obsidian vault's Курс/ folder",
+  "author": { "name": "Anton" }
+}
