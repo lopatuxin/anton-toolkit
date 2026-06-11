@@ -34,7 +34,7 @@ echo "VAULT=$VAULT"
 
 If `$VAULT` is empty, tell the user in Russian: «Не нашёл хранилище Obsidian (папку `.obsidian`). Запусти скилл из папки хранилища.» — then stop.
 
-The course folder is `$VAULT/Курс`. The roadmap file is `$VAULT/Курс/Roadmap.md`.
+The course folder is `$VAULT/Курс`. The roadmap file is `$VAULT/Курс/Дорожная карта.md`.
 
 ## 1. First-run setup (idempotent — check EVERY time)
 
@@ -42,7 +42,7 @@ The course folder is `$VAULT/Курс`. The roadmap file is `$VAULT/Курс/Roa
 mkdir -p "$VAULT/Курс"
 ```
 
-If `$VAULT/Курс/Roadmap.md` already exists and is non-empty, this is a re-run. Read it,
+If `$VAULT/Курс/Дорожная карта.md` already exists and is non-empty, this is a re-run. Read it,
 tell the user in Russian that a roadmap already exists, and ask whether to **update it**
 (continue the interview from gaps) or **start over**. Never silently overwrite.
 
@@ -88,7 +88,7 @@ something, adjust — do not re-run the whole interview, only the delta.
 
 ## 4. Write the roadmap
 
-Write `$VAULT/Курс/Roadmap.md` with the Write tool. Everything in **Russian** — headings,
+Write `$VAULT/Курс/Дорожная карта.md` with the Write tool. Everything in **Russian** — headings,
 module names, lesson titles. Structure it as an ordered program the teacher can show the
 student. Template:
 
@@ -99,7 +99,7 @@ tags:
   - roadmap
 ---
 
-# Roadmap курса: <название курса>
+# Дорожная карта курса: <название курса>
 
 > Для кого: <одно предложение про ученика и его цель.>
 > Итог курса: <что ученик умеет в финале.>
@@ -135,7 +135,7 @@ Rules for the content:
 ## 5. Confirm to the user (Russian)
 
 Reply in one or two lines, e.g.:
-«Готово. Программа курса: `Курс/Roadmap.md` — N блоков, M уроков. Дальше зови скилл `lesson`,
+«Готово. Программа курса: `Курс/Дорожная карта.md` — N блоков, M уроков. Дальше зови скилл `lesson`,
 чтобы расписать конкретный урок.»
 
 `obsidian-git` auto-syncs the vault, so no manual git commit is needed.

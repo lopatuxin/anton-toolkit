@@ -31,11 +31,11 @@ echo "VAULT=$VAULT"
 
 If `$VAULT` is empty, tell the user in Russian: «Не нашёл хранилище Obsidian (папку `.obsidian`). Запусти скилл из папки хранилища.» — then stop.
 
-The course folder is `$VAULT/Курс`. The roadmap is `$VAULT/Курс/Roadmap.md`.
+The course folder is `$VAULT/Курс`. The roadmap is `$VAULT/Курс/Дорожная карта.md`.
 
 ## 1. Read the roadmap
 
-Read `$VAULT/Курс/Roadmap.md`. If it does not exist or is empty, tell the user in Russian:
+Read `$VAULT/Курс/Дорожная карта.md`. If it does not exist or is empty, tell the user in Russian:
 «Сначала нужна программа курса — запусти скилл `roadmap`.» — then stop.
 
 ## 2. Pick the lesson
