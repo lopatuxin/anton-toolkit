@@ -1,9 +1,9 @@
 # Logos design document templates
 
-Canonical structure for the Logos design documents. The council members (each writing a
-candidate), the synthesizer (writing the final), and the `logos-design` orchestrator (writing
-the concept inline) all follow these templates. Documents live under `$VAULT/Logos/Дизайн/`
-with Russian file names and Russian headings.
+Canonical structure for the Logos design documents. The council members (shaping the shared
+draft), the synthesizer (writing the final), and the `logos-design` orchestrator (writing the
+concept inline) all follow these templates. Documents live under `$VAULT/Logos/Дизайн/` with
+Russian file names and Russian headings.
 
 All design documents are **Russian** in headings and prose. Technical terms (LLM, VRAM, RAG,
 GPU, OpenRouter, gRPC, API, etc.) keep their original form. No runnable code in any document —
@@ -42,10 +42,11 @@ tags:
 
 ## Архитектура
 
-Path of the final: `$VAULT/Logos/Дизайн/Архитектура.md`. Each council candidate uses this
-SAME structure so the synthesizer can compare them section by section. The sections map onto
-the council's areas of expertise — that is deliberate: every member fills the whole document,
-but leans hard into the section matching their role.
+Path of the final: `$VAULT/Logos/Дизайн/Архитектура.md`. The council's shared working draft
+(`_черновики/Черновик-архитектуры.md`) uses this SAME structure: the lead writes the skeleton over
+all sections, then each member deepens the one section matching their role and reviews the rest. The
+sections map onto the council's areas of expertise — that is deliberate, so each member owns exactly
+one section and addresses questions to whoever owns the section they object to.
 
 Sections, strictly in this order, with exactly these Russian names:
 
@@ -60,15 +61,15 @@ Sections, strictly in this order, with exactly these Russian names:
 9. **Стек и инфраструктура** — concrete technology choices per layer with one-line justifications, fitted to the resource constraints.
 10. **Риски и открытые вопросы** — what could not be resolved, and the biggest risks (technical, resource, safety).
 
-### Candidate-only header
+### Scratch-draft-only header
 
-A council CANDIDATE draft (not the final) adds one line at the very top, before **Обзор**, so
-the synthesizer can attribute it:
+The council's shared working draft (not the final) carries one line at the very top, before
+**Обзор**, written by the lead in skeleton mode, to mark it as scratch:
 
-`> Кандидат-оптика: <role / dominant lens of this member, in Russian>`
+`> Черновик совета — общий рабочий документ`
 
-The FINAL `Архитектура.md` does NOT carry this line and never mentions "candidates" or
-"council" — that machinery is invisible to the document's reader.
+The FINAL `Архитектура.md` does NOT carry this line and never mentions "draft", "council", or
+"discussion log" — that machinery is invisible to the document's reader.
 
 ---
 
