@@ -1,6 +1,6 @@
 {
   "name": "plugin-builder",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Creates, extends, and fixes plugins in the anton-toolkit-marketplace via task-centric interviews. `create-plugin` scaffolds a new plugin, `extend-plugin` adds to an existing one, and `improve-plugin` applies reactive point fixes after an in-session incident.",
   "author": {
     "name": "Anton"

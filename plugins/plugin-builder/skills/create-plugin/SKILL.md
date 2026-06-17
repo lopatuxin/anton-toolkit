@@ -103,9 +103,10 @@ User-facing prompts inside the generated skill (e.g. "Что нужно зако
    - Each skill `description` has 3+ trigger phrases.
 3. If any check fails — abort, report in Russian which file failed which check, do not commit. Leave files on disk for the next pass.
 4. If all pass:
+   - Update the root `README.md` per the **README sync** section in `references/plugin-authoring.md`: add the new plugin's section, a map-diagram box, a plugins-table row (with its version), a TOC entry, a cheatsheet row, and bump the badge counts.
    ```bash
    git pull origin main
-   git add .claude-plugin/marketplace.json plugins/<name>/
+   git add README.md .claude-plugin/marketplace.json plugins/<name>/
    git commit -m "<Russian message: created plugin <name> with N skills / M agents>"
    git push
    ```

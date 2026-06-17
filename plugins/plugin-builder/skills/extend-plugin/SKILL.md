@@ -83,9 +83,10 @@ In both modes, bump `plugins/<target>/.claude-plugin/plugin.json` version:
    - `version` in target `plugin.json` is incremented.
 2. On failure — abort, report in Russian, do not commit.
 3. On success:
+   - Update the root `README.md` per the **README sync** section in `references/plugin-authoring.md`: for a new skill/agent add its entry to the target plugin's section (and the cheatsheet/workflows if relevant), update the plugins-table counts and version cell, and the badge counts.
    ```bash
    git pull origin main
-   git add plugins/<target>/<explicit paths>
+   git add README.md plugins/<target>/<explicit paths>
    git commit -m "<Russian: описание что добавил/изменил и зачем>"
    git push
    ```

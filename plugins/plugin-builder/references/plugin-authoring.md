@@ -113,6 +113,7 @@ Run before every commit that touches plugin files:
 4. Each SKILL.md `description` contains at least 3 explicit trigger phrases.
 5. If any plugin file was modified, the corresponding `plugin.json` `version` is incremented.
 6. If a `hooks/hooks.json` or `.mcp.json` was created, it parses as valid JSON (covered by check 1).
+7. The root `README.md` reflects the change per the **README sync** section (counts, table version cell, and any added/removed/reworked tool), and `README.md` is staged in the same commit.
 
 If any check fails: do not commit. Report the specific failure to the user in Russian. Files stay on disk for the next pass.
 
@@ -130,6 +131,26 @@ git push
 ```
 
 After successful push, report to user in Russian with the commit hash so rollback is possible: `git revert <hash> && git push` on the user saying "отмени" / "откати".
+
+## README sync (root marketplace README)
+
+The repo-root `README.md` is the navigation map of the whole marketplace. It WILL drift out of sync unless every tool change updates it in the SAME commit. After modifying any plugin and before committing, update `README.md` to match the new state, then `git add README.md` alongside the plugin files. This is mandatory for all three skills (`create-plugin`, `extend-plugin`, `improve-plugin`).
+
+What the root README tracks and where to touch it:
+
+- **Header badges** — `plugins-N`, `skills-N`, `agents-N`. Recount across all `plugins/*/` and update the numbers.
+- **Intro sentence** — the "N плагинов, ~M инструментов" line.
+- **Map diagram** — add or remove a plugin box.
+- **Plugins table** — the row for the changed plugin. This table is the SINGLE place a version is shown — update the version cell here and nowhere else. Update the skill/agent counts. Add or remove a whole row for a new or deleted plugin.
+- **Per-plugin section** — the `<details>` block for a new/removed/reworked skill, or the agents-table row for an agent. Update the description/triggers shown there only if they changed.
+- **Cheatsheet ("по задаче")** — add or remove the row for the tool.
+- **Typical workflows** — only if the tool slots into an existing flow.
+
+Version is shown ONLY in the plugins table. Section headings (`## 🛠 anton-toolkit`) and TOC anchors carry NO version, so a PATCH bump touches exactly one README cell and never breaks a TOC link. Do NOT reintroduce versions into headings or anchors.
+
+Scope rule — edit only what the change actually affects (same minimality discipline as for plugin files; never reflow untouched sections):
+- New / removed / renamed tool, or changed triggers/description → update the relevant sections above. This is the common case for `create-plugin` and `extend-plugin`.
+- Pure internal behavior fix that does NOT change the tool's name, triggers, count, or one-line description (the common `improve-plugin` case) → update only the version cell in the plugins table; the prose sections need no change.
 
 ## Activation — registering is not enough
 
