@@ -147,4 +147,4 @@ Report: `Откатил коммит <hash>, файл вернул в преды
 
 ## Bootstrap note
 
-If the incident was with this skill itself (`improve-plugin` inside `anton-toolkit`) — target-plugin detection will correctly identify `anton-toolkit`, and the skill edits itself. That is supported. Be extra careful with the minimality rule in that case: a botched self-fix is harder to recover from than a botched fix of any other plugin/component.
+If the incident was with this skill itself (`improve-plugin` inside `plugin-builder`) — target-plugin detection will correctly identify `plugin-builder`, and the skill edits itself. That is supported. Be extra careful with the minimality rule in that case: a botched self-fix is harder to recover from than a botched fix of any other plugin/component.
