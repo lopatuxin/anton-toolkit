@@ -4,6 +4,12 @@ Canonical section structure for each document type under the documentation root 
 
 **Language rule:** all documents are written in Russian — headings, content, examples. Folder and file names are also Russian (`Концепт.md`, `Архитектура.md`, `Модули/`, `Дорожные карты/`, `Фазы/`). The project and communication are in Russian, and the documentation should match. Technical terms (REST, API, JWT, SLA, etc.) are not translated — leave them in their original form.
 
+**Writing style — describe the finished system, not the design process.** The reader has no idea this document was produced by a consortium, by debate, or through iterations — they read it cold to understand how the system works. Every sentence must describe WHAT the system is and HOW it behaves, never HOW the team arrived at it.
+- Cut design-process traces. Forbidden: "выбрано потому что…", "вариант X отклонён…", "отвергнутая альтернатива…", "мы решили…", "ради единообразия…", "новая таблица" / "общая таблица" (new/common relative to a past version the reader never saw). State the decision as a fact, optionally with a one-line *why it works* (not *why we picked it over Y*). Incorrect: `Первичный ключ — составной (выбрано потому, что surrogate id отклонён как лишняя колонка).` Correct: `Первичный ключ — составной (token_id, organization_id): пара уникальна и неизменяема.`
+- No duplicate summaries. State each fact in exactly ONE home section; elsewhere reference it ("см. поток N", "см. «Зависимости»") instead of restating. Do NOT add a "сводка правил/решений" block that repeats what tables or flows already say.
+- Plain language over jargon. If a term like STI / class-table-inheritance / CHECK-инвариант is used, either gloss it in one plain phrase on first use or drop it. Prefer "БД сама не даст создать строку без email" over "декларативный CHECK-инвариант гарантирует NOT NULL".
+- Lead with meaning, mechanism second. A flow/step opens with what happens in user/system terms; DB mechanics (atomic conditional UPDATE, affected-row counts, column names) come after as a clause, not as the headline.
+
 **Cross-references:** link to sibling documents with Obsidian wiki-links — `[[Концепт]]`, `[[Архитектура]]`, `[[Модули/Аутентификация]]` — so the documents navigate like an Obsidian vault. Do NOT use relative markdown paths (`../Архитектура.md`).
 
 No runnable code. Pseudo-API shapes and pseudo-types are welcome.
