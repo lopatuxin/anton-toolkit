@@ -71,11 +71,17 @@ Evaluate the document along ALL of the dimensions below. Each finding goes into 
 
 10. **Scope discipline.** The document stays within its layer: concept does not specify databases; architecture does not specify SQL column types; module documents do not redefine global stack decisions. Cross-layer leakage is a finding.
 
+11. **Plain-language readability (hard gate).** A non-specialist must understand the prose on the first read. This is the single most common defect in this skill's output — be strict. Scan the whole document and flag each of these as a **blocker** (not a warning), because an unreadable document forces the user to rewrite it by hand:
+    - **Unexplained jargon / acronyms.** Terms of art used without a plain gloss on first use: `fail-closed`, `fail-soft`, `anti-enumeration`, `opaque session`, `idle/absolute timeout`, `SLO`, `p99`, `RTO`, `CSRF`, `HttpOnly`, `Secure`, `SameSite`, `HSTS`, `backoff`, `session fixation`, `round-trip`, `latency budget`, `STI`, and similar. Either a plain phrase or a one-clause gloss is required.
+    - **Raw code identifiers / key names / wire-level names in prose.** Symbols like `T_floor`, `PRINCIPAL_NAME_INDEX_NAME`, `HINCRBY`, `PEXPIRE`, `maxmemory-policy noeviction`, `auth:otp:{id}`, `NotificationPort.sendOtp`, `spring:session:sessions:{id}`, Lua-script in architecture-level prose. The text must describe behavior in words, not name the command/key that implements it. (Developer-level module documents may carry a few, but architecture prose must not.)
+    - **Parenthetical justification clutter.** Trailing asides that re-argue or cross-point: `(закрыто HA-топологией — см. ниже)`, `(экономия round-trip)`, `(в отличие от fail-closed для Redis)`, `(YAGNI)`, `(anti-fixation)`. Each is noise — flag for removal.
+    For every hit, quote the exact phrase and give the plain-language rewrite as the suggestion.
+
 ## Severity levels
 
 Classify every finding as one of:
 
-- **blocker** — the document is internally broken, contradicts another committed document, contains forbidden content (runnable code, English headings), or describes a design that does not solve a scenario from `concept.md`. The orchestrator should not commit until fixed.
+- **blocker** — the document is internally broken, contradicts another committed document, contains forbidden content (runnable code, English headings), describes a design that does not solve a scenario from `concept.md`, or fails the plain-language readability gate (dimension 11: unexplained jargon, raw code identifiers in prose, or justification-clutter parentheticals). The orchestrator should not commit until fixed.
 - **warning** — YAGNI / KISS violation, weak rationale, LLM-friendliness gap, ambiguous prose. The document is usable but the design will degrade if not addressed. Worth raising to the user.
 - **nitpick** — stylistic inconsistency, minor naming, a missing one-line rationale. Optional to fix.
 
@@ -119,6 +125,7 @@ Return plain text in this exact structure (in English, since this is for the orc
 - LLM-friendliness: <OK | ...>
 - Open questions placement: <OK | ...>
 - Scope discipline: <OK | ...>
+- Plain-language readability: <OK | ...>
 
 ## Top 3 things to fix first
 1. <highest-impact action>
