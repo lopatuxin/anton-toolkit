@@ -112,12 +112,16 @@ Run the checklist from `references/plugin-authoring.md`:
 
 On any failure — abort, report to user in Russian what failed, leave files on disk. Do not commit.
 
-## Step 7 — Git
+## Step 7 — Sync the root README
+
+Update the repo-root `README.md` per the **README sync** section in `references/plugin-authoring.md`, in the same commit. For a pure internal behavior fix that does not change the tool's name, triggers, count, or one-line description, this is just the version cell in the plugins table. If the fix changed a trigger, name, or the documented behavior shown in the README, update that tool's section too.
+
+## Step 8 — Git
 
 ```bash
 cd $PLUGIN_REPO
 git pull origin main
-git add plugins/<target>/<explicit paths>
+git add README.md plugins/<target>/<explicit paths>
 git commit -m "<Russian message: what was fixed and why, 1–2 sentences>"
 git push
 ```
@@ -127,7 +131,7 @@ If cloned to `/tmp/`, remove after push:
 rm -rf /tmp/anton-toolkit
 ```
 
-## Step 8 — Report in Russian
+## Step 9 — Report in Russian
 
 ```
 Поправил скилл `<name>` в плагине `<target>`: <что именно изменил в одном предложении>.
@@ -147,4 +151,4 @@ Report: `Откатил коммит <hash>, файл вернул в преды
 
 ## Bootstrap note
 
-If the incident was with this skill itself (`improve-plugin` inside `anton-toolkit`) — target-plugin detection will correctly identify `anton-toolkit`, and the skill edits itself. That is supported. Be extra careful with the minimality rule in that case: a botched self-fix is harder to recover from than a botched fix of any other plugin/component.
+If the incident was with this skill itself (`improve-plugin` inside `plugin-builder`) — target-plugin detection will correctly identify `plugin-builder`, and the skill edits itself. That is supported. Be extra careful with the minimality rule in that case: a botched self-fix is harder to recover from than a botched fix of any other plugin/component.
