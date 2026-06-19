@@ -4,7 +4,7 @@
 
 [![Plugins](https://img.shields.io/badge/plugins-7-blue)]()
 [![Skills](https://img.shields.io/badge/skills-28-green)]()
-[![Agents](https://img.shields.io/badge/agents-21-orange)]()
+[![Agents](https://img.shields.io/badge/agents-22-orange)]()
 [![Language](https://img.shields.io/badge/lang-ru-red)]()
 
 ---
@@ -47,7 +47,7 @@
 
 | 🏷 | Плагин | Версия | О чём | Skills | Agents |
 |---|--------|--------|-------|--------|--------|
-| 🛠 | **anton-toolkit** | 0.19.0 | Коммиты, ревью, дебаг, devops, dev-агенты | 5 | 7 |
+| 🛠 | **anton-toolkit** | 0.20.0 | Коммиты, ревью, дебаг, devops, dev-агенты | 5 | 8 |
 | 📓 | **lichnost** | 0.8.1 | Дневник, идеи, фильмы, итоги, психологический профиль | 5 | 0 |
 | 🧠 | **logos** | 0.2.0 | Проектирование автономного ИИ-ассистента Logos (совет архитекторов + журнал решений) | 2 | 6 |
 | 🏗 | **plugin-builder** | 0.4.1 | Создание, расширение и точечная правка плагинов в этом маркетплейсе | 3 | 0 |
@@ -216,6 +216,7 @@ plugins/<plugin-name>/
 | 🐍 **python-dev** | Файл внутри Python-модуля (`pyproject.toml`/`setup.py`/`requirements.txt`) | Реализует по step-by-step плану: `.py`, Alembic, Jinja, Dockerfile, конфиги. |
 | 🌐 **frontend-dev** | `*.tsx`, `*.ts`, `*.jsx`, `*.js`, `*.css`, `*.scss`, `*.html`, ассеты в `public/` | Любая фронтовая правка — даже одна строчка идёт через агента. |
 | 👀 **code-reviewer** | `"проверь код"`, `"сделай ревью"`. Автоматически после dev-агентов (по правилу в `CLAUDE.md`) | Структурированный отчёт: баги, безопасность, нарушения паттернов. Java, Kotlin, TS, React, CSS, SQL, Dockerfile. |
+| 📝 **mr-spec-reviewer** | Только командой `/mr-review` — без триггер-фраз | Сверяет всю ветку (MR) с твоей документацией из `project/documentation/` и выдаёт готовые тексты замечаний для MR: `файл:строка` + короткое сообщение без жаргона. Ищет и баги/безопасность, и нарушения контрактов из доки; дока же отсеивает ложные срабатывания. |
 | 🧪 **test-writer** | Проактивно после dev-агентов; явно — `"напиши тесты для X"` | Читает класс, находит существующие паттерны тестов, пишет в том же стиле. |
 | 🕵 **qa-engineer** | `"протестируй фичу"`, `"smoke-тест"`, `"протестируй перед мержем"` | End-to-end тест: API через `curl`, UI через Chrome DevTools, выдаёт bug-report с маршрутизацией (backend bug → backend dev). |
 
@@ -543,6 +544,7 @@ Hook, акты, CTA, темп. Максимум 20 минут.
 | Починить глючащий скилл/агент | `improve-plugin` |
 | Обновить `CLAUDE.md` | `claude-md` |
 | Сделать ревью кода | агент `code-reviewer` |
+| Ревью ветки (MR) по документации с готовыми замечаниями | `/mr-review` |
 | Написать тесты | агент `test-writer` |
 | Протестировать фичу end-to-end | агент `qa-engineer` |
 | Записать запись в дневник | `/dnevnik` |
