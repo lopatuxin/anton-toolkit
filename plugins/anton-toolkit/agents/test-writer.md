@@ -25,7 +25,7 @@ description: >
   </commentary>
   </example>
 
-model: sonnet
+model: opus
 color: cyan
 tools: ["Read", "Write", "Edit", "Glob", "Grep", "Bash"]
 ---
