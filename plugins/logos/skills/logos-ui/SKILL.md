@@ -121,9 +121,10 @@ Cover at least these, anchored to what Logos does (from the architecture). Skip 
 ## 4. Write the spec
 
 When a topic is pinned down, write/extend `$VAULT/Logos/Дизайн/Веб-интерфейс.md` following the
-structure in `references/web-ui-spec-template.md` (read it and follow it). Russian headings, all
-details captured, **no colours or visual styling**. Be exhaustive at the element level — every button
-and field named, its purpose, behaviour, and states. Reference `[[Архитектура]]` and `[[Концепт]]`.
+structure in `references/web-ui-spec-template.md` (read it and follow it) — including its YAML
+frontmatter (`tags: [logos, дизайн, интерфейс]`) and the `[[Концепт]] · [[Архитектура]]` link line.
+Russian headings, all details captured, **no colours or visual styling**. Be exhaustive at the
+element level — every button and field named, its purpose, behaviour, and states.
 
 The vault auto-syncs via `obsidian-git` — no manual git commit for vault files.
 
@@ -147,8 +148,10 @@ propagated across the whole design.** After writing or changing the spec:
    it to `Архитектура.md` → «Риски и открытые вопросы».
 3. **Record significant changes in the journal.** For each non-trivial sync edit to the architecture,
    write a journal entry per `references/diary-format.md` — one note under `$VAULT/Logos/Журнал/`,
-   `тип: решение` (or `тип: наблюдение` for a noted gap), the matching `область`, `статус: предложено`,
-   `ревью: false`, `вес: 5` (default until the user weighs in). Trivial wording fixes need no entry.
+   `тип: решение` (or `тип: наблюдение` for a noted gap), `область: общее` (the interface is
+   cross-cutting and the journal's `область` taxonomy has no UI value — never write `область: интерфейс`),
+   `статус: предложено`, `ревью: false`, `вес: 5` (default until the user weighs in). Trivial wording
+   fixes need no entry.
 4. **Report the sync to the user** in Russian: a short list of what changed in `Архитектура.md` (and
    why) so they can review it. When the user reviews, fold their verdict into the journal entries
    (`статус`, `ревью: true`, `вес`, verbatim feedback in `## Ревью`) exactly as `logos-log` does.
