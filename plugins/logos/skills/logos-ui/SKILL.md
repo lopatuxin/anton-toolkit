@@ -46,6 +46,12 @@ behaves — you do NOT pick the visual style.
   of the Logos design (see Step 5). A web-interface decision that silently contradicts the
   architecture is a bug.
 
+**Project context:** this spec is what the `logos-build` skill implements as the actual Logos web
+frontend (in the code repo `git@github.com:lopatuxin/Logos.git`, the vault's sibling `Logos/`
+folder). The full project picture — code repo vs vault docs, the polyglot stack, and the
+"documentation is the source of truth" sync rule — is in `references/logos-project.md`. Read it so
+the interface spec stays build-ready and consistent with the code.
+
 ## 0. Locate the vault and resolve paths (once per session)
 
 Find the Obsidian vault root (the directory that contains `.obsidian/`). Walk up from the current

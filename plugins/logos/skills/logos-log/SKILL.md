@@ -26,6 +26,11 @@ separate, searchable note. The storage format, file locations, frontmatter field
 self-updating Dataview index are defined in `references/diary-format.md` — **read it and follow it
 verbatim**. This skill is the user-facing interface over that format: record, review, search, outcome.
 
+**Project context:** the journal records both DESIGN decisions and BUILD decisions. Where the Logos
+code lives, where the docs live, and how they stay in sync is described in
+`references/logos-project.md` — read it so build-related entries use the right `область` and link to
+the right artifacts.
+
 ## 0. Setup (every run)
 
 Locate the vault and ensure the journal folder + folder note exist exactly as described in

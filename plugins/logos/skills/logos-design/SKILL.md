@@ -34,6 +34,12 @@ architecture-writing step.
 **Critical rule:** documentation only. No implementation code. Documents may describe algorithms,
 interfaces, and data shapes in prose — but no runnable code files.
 
+**Project context:** the whole Logos project (where the code repo and the docs live, the polyglot
+stack, and the "documentation is the source of truth" sync rule) is described in
+`references/logos-project.md` — read it for the shared picture. The actual code is built by the
+separate `logos-build` skill into the code repo `git@github.com:lopatuxin/Logos.git`; this design
+skill only produces the documentation those builders implement.
+
 ## Interview style (applies to EVERY dialog phase: concept, architectural constraints, change management)
 
 The user wants the documentation worked out in depth. Your job in every dialog phase is to interview

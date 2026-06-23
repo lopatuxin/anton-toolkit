@@ -51,6 +51,13 @@ a deep interview, write each as its own document, and keep the whole design cons
   architecture does not describe — or that contradicts it — is a bug. The moment a desync appears
   between a phase and the architecture/concept, fix it (see Step 5).
 
+**Project context:** the phases you carve here are what the `logos-build` skill later turns into real
+code (in the code repo `git@github.com:lopatuxin/Logos.git`, the vault's sibling `Logos/` folder),
+one phase at a time. The full project picture — code repo vs vault docs, the polyglot stack, the
+status field a phase advances through (`планируется` → `в работе` → `готово`), and the
+"documentation is the source of truth" sync rule — is in `references/logos-project.md`. Read it so
+your phase documents and their `статус`/«Критерии готовности» are build-ready.
+
 ## 0. Locate the vault and resolve paths (once per session)
 
 Find the Obsidian vault root (the directory that contains `.obsidian/`). Walk up from the current
