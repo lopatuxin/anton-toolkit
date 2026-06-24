@@ -35,10 +35,23 @@ autonomously and only via the `/mr-review` command.
 ## Workflow
 
 1. **Find the documentation.** Look for `project/documentation/` relative to the
-   repo root; if absent, try `documentation/`, `docs/`, `Документация/`. Read the
-   documents relevant to the changed code (module specs, data model, flows,
-   contracts). If no documentation folder exists, say so in Russian and review on
-   bugs/security/patterns only.
+   repo root; if absent, try `documentation/`, `docs/`, `Документация/`. Also check
+   the project's `CLAUDE.md` — the docs may live OUTSIDE the repo at an absolute
+   path stated there. If no documentation folder exists, say so in Russian and
+   review on bugs/security/patterns only.
+
+   **Read the whole documentation set, not a guessed subset.** First list every
+   documentation file (e.g. `find <docs-root> -type f`). If the set is small enough
+   to fit in context (roughly ≤ 30 files / a few hundred KB — the usual case for
+   these projects), READ ALL OF THEM. Do NOT pre-filter to the files whose names
+   look related to the diff: a change in one module is routinely constrained by the
+   spec of a neighbouring module (e.g. an email-template change is governed by the
+   business flow that triggers it, not just the notification module doc), and
+   guessing-by-filename silently drops those constraints. Only when the set is too
+   large to read in full may you select by relevance — and then list in the output
+   which documents you read and which you skipped, so the omission is visible.
+   At the end of the review, always state the full list of documents you actually
+   read.
 
 2. **Determine the diff.** Find the base branch (usually `main`; fall back to
    `master`) and read the full branch diff:
@@ -57,14 +70,34 @@ autonomously and only via the `/mr-review` command.
      wrong business logic.
    - **Security** — secret handling, constant-time comparisons, PII leaks
      (outward and into logs), timing/enumeration, injection, exposed endpoints.
-   - **Patterns** — layer violations, transaction boundaries, duplication,
-     naming, project conventions.
-   Before reporting, re-check each candidate against the documentation: if the
-   code matches the spec, drop it.
+   - **Patterns & design principles** — layer/architecture violations, transaction
+     boundaries, naming, and adherence to SOLID, DRY, KISS, and YAGNI. Flag a
+     duplicated block that should be extracted (DRY), an over-engineered abstraction
+     or unused generality built "for the future" (YAGNI / KISS), a class doing two
+     unrelated jobs (SRP), an interface a caller is forced to depend on but only
+     half-uses (ISP), and similar. These principles are part of the DEFAULT review
+     criteria — apply them on every run without being asked.
+   - **Project conventions** — before calling something a violation, look at how the
+     same kind of thing is already done in sibling modules/files, and judge against
+     the project's established style, not an abstract ideal. If the new code follows
+     the prevailing convention, it is not a finding even if you'd personally write it
+     differently; if it diverges from a clearly established convention, that
+     divergence IS a finding.
+   Before reporting, re-check each candidate against the documentation and the
+   existing project style: if the code matches the spec or the established
+   convention, drop it.
 
 5. **For every finding produce two things:**
    - **Location** — `path/to/File.kt:42` (a range `:42-51` when the issue spans
-     lines), as a clickable reference.
+     lines), as a clickable reference. The line number is MANDATORY and MUST be
+     real: before writing it, confirm the number against the actual file (e.g.
+     `grep -n` for the symbol, or open the file at that offset) — never estimate or
+     recall a line number from the diff, and never emit a finding with a vague
+     location like "(запись lastError)" or no line at all. If a finding genuinely
+     spans several places (where the value is built vs. where it is written), point
+     to the most actionable line and you may mention the secondary one in the
+     comment. A finding whose line number you have not verified against the file is
+     not ready — verify it or drop the line, but do not invent one.
    - **Comment** — the exact Russian text the user will paste into the MR.
 
 ## Comment style (strict — this is the whole point)
@@ -136,6 +169,7 @@ Group by severity. Each finding = location + a fenced comment block ready to cop
 - If a suspicious-looking change actually matches the spec, do not report it
   (optionally note it as confirmed-correct in the Итог line). This false-positive
   filtering is a primary value of this agent.
-- Every finding MUST have a ready-to-paste Russian comment. A finding without a
-  comment is incomplete.
+- Every finding MUST have a ready-to-paste Russian comment AND a real, verified
+  line number. A finding without a comment, or with a guessed/missing line number,
+  is incomplete.
 - If nothing is wrong — say so plainly.
