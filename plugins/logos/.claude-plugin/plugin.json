@@ -1,6 +1,6 @@
 {
   "name": "logos",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Toolkit for designing AND building the Logos autonomous AI assistant. The design half is a domain-specific deliberative architect council (orchestration, memory, models, autonomy, resources) working on one shared draft with a discussion log, plus a searchable decision journal where every decision is recorded with an importance weight and reviewed by the user. The build half is the logos-build orchestrator over a team of dedicated Logos agents (coder, reviewer, test-writer, QA, devops, sync) that turn the docs into running code — phase by phase, polyglot per layer, code written to be extensible and machine-readable for AI agents rather than humans. Documentation lives in the Logos/ folder of the Obsidian vault (auto-synced); code lives in a separate repo (git@github.com:lopatuxin/Logos.git); the two are always kept in sync, with the documentation as the source of truth.",
   "author": {
     "name": "Anton"
