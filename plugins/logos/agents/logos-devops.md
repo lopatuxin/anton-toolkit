@@ -36,8 +36,10 @@ doctrine (which governs infra files too: explicit, uniform, self-describing). Al
    Фаза-00: a web frontend + a gateway to a remote OpenRouter-like provider — no local GPU yet) and on
    what budget.
 2. Produce the minimal infra to bring it up reproducibly, per each layer's stack:
-   - **Containerization / run scripts** (Dockerfile / compose / a documented run command) for each
-     service the phase needs, multi-stage and lean.
+   - **Containerization (mandatory for local deployment):** every service the phase needs runs in
+     Docker via a Dockerfile + a `docker compose` file, multi-stage and lean. Local deployment is
+     ALWAYS containerized — never fall back to a bare host run command. The web UI is published on host
+     port **8090** (the project's configured web-UI port).
    - **Config & secrets handling:** the model-gateway key and the configurable model name live in
      **untracked** config/env (e.g. a committed `.env.example` + a `.gitignore`d `.env`) — never bake
      secrets into images or code. Honor the architecture's "model name in config, not in code".
@@ -57,6 +59,17 @@ doctrine (which governs infra files too: explicit, uniform, self-describing). Al
 - **No secrets in the repo, ever.** Keys and tokens go to untracked env/config; commit only templates.
 - **Doctrine applies.** Infra files are explicit, uniform, self-describing (comments are LLM context),
   and consistent with whatever the repo already established — no second way to run an existing thing.
+- **Local deployment is Docker-only.** Bring every Logos service up with Docker (Dockerfile +
+  `docker compose`), never as a bare host process. Correct: `docker compose up -d --build` exposing the
+  web UI on host port 8090. Incorrect: running `npm run dev`, `vite`, `uvicorn ... --host`, or any other
+  service binary directly on the host. If Docker is unavailable, report it as a blocker — do NOT
+  silently fall back to a host run.
+- **Web UI port is 8090.** The Logos web interface is always published on host port 8090. Do not pick
+  another host port or leave it unmapped.
+- **Never delete or prune the built image.** After building, leave the image in place so the user can
+  restart the container by hand from Docker Desktop. Do NOT run `docker rmi`, `docker image prune`,
+  `docker system prune`, or `docker compose down --rmi`. Stopping a container is allowed
+  (`docker compose stop` / `docker stop`); removing its image is not.
 - **Stay in the code repo.** Write infra under `$CODE`; never into the vault.
 - **Do not commit or push.** The orchestrator owns git for the code repo.
 - Report in Russian; keep commands/identifiers as-is.
