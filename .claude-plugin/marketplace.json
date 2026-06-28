@@ -17,7 +17,7 @@
     },
     {
       "name": "logos",
-      "description": "Toolkit for designing the Logos autonomous AI assistant: a domain-specific architect council (orchestration, memory, models, autonomy, resources) and a searchable decision journal with importance weights, all in the Logos/ folder of the Obsidian vault",
+      "description": "Toolkit for designing the Logos autonomous AI assistant: a domain-specific architect council (orchestration, memory, models, autonomy, frontend, resources) that designs the architecture and details each system element into its own module document, plus a searchable decision journal with importance weights, all in the Logos/ folder of the Obsidian vault",
       "source": "./plugins/logos"
     },
     {

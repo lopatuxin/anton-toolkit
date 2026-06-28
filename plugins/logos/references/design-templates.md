@@ -56,10 +56,17 @@ Sections, strictly in this order, with exactly these Russian names:
 4. **Подсистема памяти** — how memory is stored and evolves: importance/strength weights, the nightly consolidation pass (generalize, tag, re-weight), how strength rises on success and falls on failure, retrieval. (This is the heart of Logos — detail it.)
 5. **Модельный слой** — the swarm of small specialized models vs one large LLM; the path from ready-made models (Chinese via OpenRouter) to local models on owned hardware; routing a task to the right model; fine-tuning approach.
 6. **Автономность и самомодификация** — how the system writes its own tools/skills, how new capabilities are registered, and the SAFETY boundaries on self-modification (what it may not touch, rollback, human gate).
-7. **Ресурсный бюджет** — hardware assumptions (e.g. ~72 GB VRAM target), what runs where, what is feasible without datacenter-scale compute, and where cost/compute forces a simpler path.
-8. **Потоки данных** — 2–4 of the most important end-to-end flows in prose or numbered lists (e.g. "user asks to fix code → central brain → programming orchestrator → agents → memory updated"). No diagrams-as-code.
-9. **Стек и инфраструктура** — concrete technology choices per layer with one-line justifications, fitted to the resource constraints.
-10. **Риски и открытые вопросы** — what could not be resolved, and the biggest risks (technical, resource, safety).
+7. **Слой взаимодействия и веб-интерфейс** — how the user-facing web frontend integrates into the system as a first-class layer: the client↔brain contract (how user input enters the orchestration hierarchy, how results and live telemetry/diagnostics stream back), the real-time channel, the session/state boundary, and which surfaces exist at the architecture level (e.g. chat, metrics/diagnostics). This section owns the *integration contract* that wires the frontend into orchestration, memory, and models — NOT the detailed page/element/UX spec, which lives in `[[Веб-интерфейс]]` (owned by the `logos-ui` skill). Keep the two consistent: this section says how the frontend plugs into the system; `[[Веб-интерфейс]]` says what each screen contains.
+8. **Ресурсный бюджет** — hardware assumptions (e.g. ~72 GB VRAM target), what runs where, what is feasible without datacenter-scale compute, and where cost/compute forces a simpler path.
+9. **Потоки данных** — 2–4 of the most important end-to-end flows in prose or numbered lists (e.g. "user asks to fix code → central brain → programming orchestrator → agents → memory updated"). No diagrams-as-code.
+10. **Стек и инфраструктура** — concrete technology choices per layer with one-line justifications, fitted to the resource constraints.
+11. **Риски и открытые вопросы** — what could not be resolved, and the biggest risks (technical, resource, safety).
+
+The eleven sections map onto the council's areas of expertise: six are **owned** by one member each
+(`Иерархия оркестрации`→orchestration, `Подсистема памяти`→memory, `Модельный слой`→models,
+`Автономность и самомодификация`→autonomy, `Слой взаимодействия и веб-интерфейс`→frontend,
+`Ресурсный бюджет`→resources). The cross-cutting sections (`Обзор`, `Ключевые архитектурные решения`,
+`Потоки данных`, `Стек и инфраструктура`, `Риски и открытые вопросы`) are shaped by everyone.
 
 ### Scratch-draft-only header
 
@@ -99,3 +106,49 @@ tags:
 ## Обработка ошибок и крайние случаи
 ## Открытые вопросы
 ```
+
+---
+
+## Детализация модуля (module-detailing protocol)
+
+The architecture document is the SYSTEM-wide picture: deliberately broad, with gaps left in each
+element. A module document closes those gaps for ONE element — it is the deep, build-ready
+specification of that single element. The `logos-design` skill produces it the SAME deliberative way
+it produces the architecture: through the council, on a shared draft, with a discussion log — never as
+one agent's monologue. This protocol defines that module-detailing round; the council agents and the
+synthesizer follow it when the orchestrator dispatches them with **mode `module-detailing`**.
+
+**Target element.** The orchestrator names ONE system element to detail (e.g. `Память`, `Оркестрация`,
+`Модельный слой`, `Веб-интерфейс`) and resolves all paths:
+- module draft: `$VAULT/Logos/Дизайн/_черновики/Черновик-модуля-<имя>.md`
+- module discussion log: `$VAULT/Logos/Дизайн/_черновики/Журнал-обсуждения-модуля-<имя>.md`
+- final module document: `$VAULT/Logos/Дизайн/Модули/<имя>.md` (the `Модуль` template above).
+
+**The draft uses the `Модуль` template, NOT the eleven-section architecture structure.** In a module
+round there is no per-member "owned section"; instead every member contributes the parts of THIS
+element that fall under their lens, wherever those land in the `Модуль` template:
+- orchestration → how the element is commanded/called, its place in the control hierarchy, its contracts.
+- memory → what the element reads from / writes to memory, weights, consolidation touchpoints.
+- models → which models the element uses, routing, on-device vs OpenRouter for this element.
+- autonomy → how the element may be self-modified/extended, registration, safety boundaries for it.
+- frontend → how the element surfaces to or is driven by the web frontend, the client↔element contract.
+- resources → the element's footprint (VRAM, storage, latency) against the budget; where it must be cut.
+
+A member whose lens does NOT touch the element contributes nothing to the draft and raises no
+questions — silence is correct. The orchestrator only dispatches the members whose lens is relevant
+to the named element.
+
+**Round shape (same machinery as the architecture phase, scoped to one element):**
+1. **Skeleton** — the orchestration architect creates the module draft from the `Модуль` template,
+   filling each section at a high level from the architecture, and parking the deep per-lens
+   decisions in `Открытые вопросы` for the specialists.
+2. **Contribute** — each relevant member, SEQUENTIALLY, deepens the parts of the `Модуль` document
+   under its lens and opens cross-lens questions in the module discussion log (same numbered-entry
+   format as the architecture log).
+3. **Resolve** — each member with open questions addressed to it answers them (fix or defend), one
+   bounded round.
+4. **Synthesize** — the synthesizer consolidates the converged module draft into the final
+   `Модули/<имя>.md`, references the architecture as `[[Архитектура]]`, and folds anything still open
+   into `Открытые вопросы`.
+
+All language, no-code, and decisiveness rules from the architecture phase carry over unchanged.
