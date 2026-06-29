@@ -124,7 +124,8 @@ phase, orchestrated by `logos-build`:
 
 1. **Read the spec** — the phase file + the architecture sections it touches. The phase's «Критерии
    готовности» are the acceptance tests; «Что НЕ входит» are hard scope boundaries.
-2. **Implement** — `logos-coder` writes the code per the doctrine, routing each layer to its stack.
+2. **Implement** — `logos-coder` writes the code per the doctrine, routing each layer to its stack;
+   it also bumps the product version per §9 (`MINOR` = phase number for a phase build).
 3. **Review** — `logos-reviewer` checks the diff against the architecture docs AND the doctrine.
 4. **Test** — `logos-test-writer` writes machine-checkable tests covering the «Критерии готовности».
 5. **QA** — `logos-qa` exercises the phase end-to-end against its «Критерии готовности».
@@ -156,3 +157,27 @@ recorded did not happen.
   identifiers and code in their natural (usually English) technical form, commit messages in Russian.
 - **All vault content** (journal entries, doc edits) — Russian, technical terms keep their form.
 - **All chat with the user** — Russian.
+
+## 9. Product version — one semver, the build maintains it
+
+Logos carries ONE product-wide semver `MAJOR.MINOR.PATCH`, and maintaining it is a MANDATORY,
+non-skippable part of every change the build tools ship — never an afterthought. This is exactly what
+the user means by «версионирование проекта»: the build must never leave the version stale.
+
+- **Single source of truth.** The literal lives in EXACTLY one place — `$CODE/gateway/app/version.py`
+  (`PRODUCT_VERSION`). Everything else reads it (the frontend via `GET /api/version`); never hard-code
+  or duplicate the number anywhere else, and never introduce per-layer versions.
+- **MINOR = phase number.** Building Фаза-NN sets the version to `0.NN.0` (Фаза-01 → `0.1.0`,
+  Фаза-03 → `0.3.0`, …). A phase is NOT `готово` until `PRODUCT_VERSION` reflects its number.
+- **PATCH = an in-phase fix.** Any shipped change AFTER a phase was built — a bugfix, a conformance
+  fix, a touch-up that is NOT a new phase — bumps the PATCH: `0.3.0` → `0.3.1` → `0.3.2` … . This holds
+  even for a change made by a direct `logos-coder` dispatch outside a full phase build: **if you ship
+  code to the repo, you bump the version.**
+- **MAJOR = 0.** The product is pre-release; the move to `1.0.0` is a separate, deliberate future
+  decision, never mechanical.
+- **Who bumps it.** The bump is a one-line edit to `version.py`, made by `logos-coder` as part of the
+  change (the orchestrator never writes production code). `logos-build` VERIFIES the version reflects
+  the build before it commits and before it marks a phase `готово`; if the bump was missed, it sends
+  `logos-coder` back to do only the bump.
+- **Must NOT.** Never duplicate the literal, never auto-derive it from git tags / CI, never add
+  per-layer versions. It stays one manual literal in `version.py`.

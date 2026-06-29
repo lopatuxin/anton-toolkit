@@ -112,7 +112,8 @@ finish before the next; feed each agent the prior agent's report.
    Build plan / layer→stack routing: <paste the plan from step 3>.
    Hard scope boundaries (do NOT build ahead): <paste «Что НЕ входит»>.
    Implement only this phase. Self-describing, explicit, machine-readable, extensible by registration.
-   Return: what you created/changed (files + one-line each), and any drift you had to introduce vs the docs.
+   Also bump PRODUCT_VERSION in gateway/app/version.py to 0.<phase-number>.0 (MINOR = phase number) per references/logos-project.md §9 — a phase is not built until the version reflects it.
+   Return: what you created/changed (files + one-line each), the new PRODUCT_VERSION, and any drift you had to introduce vs the docs.
    ")
    ```
 2. **logos-reviewer** — review the diff against the architecture docs AND the doctrine. If it returns
@@ -143,14 +144,21 @@ For each reported drift, resolve it (do NOT leave docs and code disagreeing):
   the design skills for a structural change) and record the change as a journal entry.
 Re-run `logos-sync` until it reports no unresolved drift.
 
-## 6. Commit the code and record the phase
+## 6. Bump the version, commit the code, and record the phase
 
-1. **Commit the code** (manual git for the code repo — reference §3). Stage explicit paths, never
+1. **Verify the product version (mandatory — reference §9).** `PRODUCT_VERSION` in
+   `$CODE/gateway/app/version.py` (the single source of truth) MUST reflect this build: a phase build →
+   `MINOR` = phase number (Фаза-NN → `0.NN.0`); an in-phase fix → `PATCH`+1 (`0.3.0` → `0.3.1`). The
+   bump is a one-line edit made by `logos-coder` in step 4 (you never write production code) — if it
+   was missed, send `logos-coder` back to do ONLY the version bump, then continue. A phase is NOT
+   `готово` until the version reflects it. The frontend reads it via `GET /api/version`; nothing else
+   changes.
+2. **Commit the code** (manual git for the code repo — reference §3). Stage explicit paths, never
    `-A`; Russian commit message describing the phase delivered. Push to `origin` only after the user
    confirms (ask once: «Запушить в репозиторий Logos?»). Never commit secrets.
-2. **Advance the phase status.** Set the phase document `статус` to `готово` (or `заблокирована` with
+3. **Advance the phase status.** Set the phase document `статус` to `готово` (or `заблокирована` with
    a reason if QA/criteria did not pass). The vault auto-syncs — no manual git for docs.
-3. **Record in the journal** per `references/diary-format.md`: a `тип: наблюдение` entry «Фаза NN
+4. **Record in the journal** per `references/diary-format.md`: a `тип: наблюдение` entry «Фаза NN
    собрана», plus `тип: решение` entries for any significant stack/structure decisions made, each with
    the matching `область`, `статус: принято`, `вес: 5`. The journal is the assistant's own memory —
    no review gate; do not ask the user to review or sign off these entries.
