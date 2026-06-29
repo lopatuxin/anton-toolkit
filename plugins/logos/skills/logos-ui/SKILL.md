@@ -156,11 +156,11 @@ propagated across the whole design.** After writing or changing the spec:
    write a journal entry per `references/diary-format.md` — one note under `$VAULT/Logos/Журнал/`,
    `тип: решение` (or `тип: наблюдение` for a noted gap), `область: общее` (the interface is
    cross-cutting and the journal's `область` taxonomy has no UI value — never write `область: интерфейс`),
-   `статус: предложено`, `ревью: false`, `вес: 5` (default until the user weighs in). Trivial wording
+   `статус: принято`, `вес: 5` (the assistant's importance estimate). Trivial wording
    fixes need no entry.
 4. **Report the sync to the user** in Russian: a short list of what changed in `Архитектура.md` (and
-   why) so they can review it. When the user reviews, fold their verdict into the journal entries
-   (`статус`, `ревью: true`, `вес`, verbatim feedback in `## Ревью`) exactly as `logos-log` does.
+   why). No review gate — do not ask the user to review or sign off the journal entries; if the user
+   asks for changes, keep the entries consistent exactly as `logos-log` does.
 
 The reconciliation is one bounded pass — do not loop it endlessly. If syncing the architecture would
 itself reshape the interface, note it and let the next interview turn resolve it.

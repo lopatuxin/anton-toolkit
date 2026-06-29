@@ -152,8 +152,8 @@ Re-run `logos-sync` until it reports no unresolved drift.
    a reason if QA/criteria did not pass). The vault auto-syncs — no manual git for docs.
 3. **Record in the journal** per `references/diary-format.md`: a `тип: наблюдение` entry «Фаза NN
    собрана», plus `тип: решение` entries for any significant stack/structure decisions made, each with
-   the matching `область`, `статус: предложено`, `ревью: false`, `вес: 5`. Then offer the user a quick
-   review of those entries (this is the user's "every decision reviewed" rule — same as `logos-design`).
+   the matching `область`, `статус: принято`, `вес: 5`. The journal is the assistant's own memory —
+   no review gate; do not ask the user to review or sign off these entries.
 
 ## 7. Report to the user (Russian, brief)
 

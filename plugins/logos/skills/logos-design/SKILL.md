@@ -264,25 +264,26 @@ Do not include runnable code, and do not mention the council/draft/discussion-lo
 After the synthesizer returns, delete the scratch directory so the draft and discussion log never get
 committed: `rm -rf "$VAULT/Logos/Дизайн/_черновики"`. Only `Архитектура.md` survives.
 
-### Step 2.7 — Present, review, and record in the journal
+### Step 2.7 — Present and record in the journal
 
-This step enforces the user's rule: **every key decision is reviewed by the user and recorded**.
+This step records every key decision and shows the user the result. The journal is the assistant's
+own memory of the work — do NOT ask the user to "review", accept/reject, or weigh entries, and do
+NOT leave anything waiting on the user.
 
 1. Read `Архитектура.md` and the synthesizer's report. Summarize to the user in Russian: 3–4 key
-   decisions, the short **debate summary** (straight from the synthesizer's «Ключевые споры и как
-   разрешены»), then ask:
-   «Посмотри архитектуру. По каждому ключевому решению скажи: принимаем или нет, и насколько оно важное (вес 1–10). Что поправить?»
+   decisions and the short **debate summary** (straight from the synthesizer's «Ключевые споры и как
+   разрешены»), then invite corrections openly:
+   «Вот архитектура и ключевые решения. Что поправить?»
 2. **Record each key decision in the journal.** For every key decision from the synthesizer, write a
    journal entry following `references/diary-format.md` — one note per decision under
-   `$VAULT/Logos/Журнал/`, with `тип: решение`, the matching `область`, `статус: предложено`,
-   `ревью: false`, `вес: 5` (default until the user weighs in). Also record each major contested
+   `$VAULT/Logos/Журнал/`, with `тип: решение`, the matching `область`, `статус: принято`,
+   `вес: 5` (the assistant's importance estimate). Also record each major contested
    point from «Ключевые споры и как разрешены» as `тип: наблюдение` (or `тип: тупик` if the council
    rejected an option as unworkable) so the debate and how it was settled are not lost or re-litigated
    later. (Do this right after presenting, so nothing is lost.)
-3. **Fold in the user's review.** When the user responds with accept/reject + weight + feedback,
-   update each affected journal entry: set `статус` to `принято` / `отвергнуто`, `ревью: true`, the
-   `вес` the user gave, and paste their verbatim feedback into the `## Ревью` section. If the user's
-   feedback changes the architecture, apply it (see iteration below) and reflect it in the entry.
+3. **If the user asks for changes,** apply them (see iteration below) and update the affected journal
+   entries to match (adjust the decision, its `вес`, or add an `откат` entry). No review gate, no
+   sign-off — just keep the journal consistent with what was actually decided.
 
 The vault auto-syncs via `obsidian-git` — no manual git commit for the documents or journal.
 
@@ -304,8 +305,8 @@ Triggered by "давай добавим в дизайн", "а что если", 
    document, do NOT write it inline — run **Phase 4 — Module detailing** so the council works it out,
    producing `$VAULT/Logos/Дизайн/Модули/<Русское-имя>.md`.
 3. **Record the change in the journal** per `references/diary-format.md`: a `тип: решение` (or
-   `тип: откат` if it reverses a prior decision) entry, `статус: предложено`, `ревью: false`, then
-   fold in the user's review exactly as in Phase 2.7.
+   `тип: откат` if it reverses a prior decision) entry, `статус: принято`. No review gate; if the
+   user later asks to change it, keep the entry consistent exactly as in Phase 2.7.
 4. Echo a short diff-summary to the user in Russian and iterate.
 
 ## Phase 4 — Module detailing (element deep-dive through the council)
@@ -395,9 +396,10 @@ Do not include runnable code, and do not mention the council/draft/discussion-lo
 
 Delete the module scratch files (`Черновик-модуля-<имя>.md` and `Журнал-обсуждения-модуля-<имя>.md`);
 only `Модули/<имя>.md` survives. Then present and record exactly as in Step 2.7: summarize the key
-decisions to the user in Russian, ask for accept/reject + weight + fixes, and write one journal entry
-per key decision (`тип: решение`, `область` matching the element, `статус: предложено`, `ревью: false`,
-`вес: 5`) plus the contested points as `тип: наблюдение`/`тупик`. Fold in the user's review. For small
+decisions to the user in Russian and invite corrections («Что поправить?»), and write one journal entry
+per key decision (`тип: решение`, `область` matching the element, `статус: принято`,
+`вес: 5`) plus the contested points as `тип: наблюдение`/`тупик`. No review gate — if the user asks for
+changes, keep the entries consistent. For small
 fixes, re-dispatch ONLY the synthesizer (or edit inline) — do NOT re-run the whole module council.
 
 ## General rules

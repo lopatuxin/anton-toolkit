@@ -18,6 +18,12 @@ interface can be assembled from it without guessing the screens, the elements, o
 
 All prose and headings are **Russian**. Technical terms (UI, modal, dropdown, breakpoint, API, tab,
 toast, etc.) keep their original form. No runnable code — prose, numbered flows, and tables only.
+
+**Plain-language requirement (hard rule).** Write in plain, simple Russian the user can read. No
+jargon or anglicism-кальки when an ordinary Russian word exists (рендерить → «отрисовывать»,
+латентность → «задержка», стейт → «состояние», инвариант → «нерушимое правило»). Keep only genuine
+interface/technology terms and code identifiers; explain every screen and behavior in human terms,
+keeping all the concrete detail.
 Cross-reference sibling design docs with Obsidian wiki-links: `[[Концепт]]`, `[[Архитектура]]`.
 
 ---

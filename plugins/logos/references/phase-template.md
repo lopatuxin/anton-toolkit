@@ -9,6 +9,13 @@ All phase documents are **Russian** in headings and prose. Technical terms (LLM,
 GPU, OpenRouter, gRPC, etc.) keep their original form. No runnable code in any document — prose,
 numbered flows, and pseudo-API shapes only.
 
+**Plain-language requirement (hard rule).** Write in plain, simple Russian the user can read. No
+jargon or anglicism-кальки when an ordinary Russian word exists (эмбеддинг → «отпечаток», релевантность
+→ «близость по смыслу», латентность → «задержка», деградация → «как ведёт себя при сбоях», инвариант →
+«нерушимое правило», контракт → «договорённость»). Keep only real technology/product names and code
+identifiers; explain every mechanism in human terms. Keep all numbers and guarantees — change only how
+it is said, not the substance.
+
 Cross-reference sibling documents with Obsidian wiki-links: `[[Концепт]]`, `[[Архитектура]]`,
 `[[Фаза-00-чат-в-вебе]]` — never relative markdown paths.
 

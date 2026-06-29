@@ -10,6 +10,14 @@ run, every dead end hit. It is deliberately the same idea as Logos's own "evolvi
 memory with importance weights" — so it doubles as a working prototype of that mechanism,
 tried out on the project itself before it is built into the system.
 
+The journal is written BY the assistant FOR the assistant — it is the model's own working
+memory of what was decided and why, so a later session can pick the context back up. Entries
+are recorded as the work happens; they do NOT require the user's review or sign-off. There is
+NO review gate: never ask the user to "review", "accept/reject", or weigh journal entries, and
+never leave entries waiting on the user. The assistant sets the fields (including `вес`) itself
+from what it knows. The user may, of course, ask to search or change an entry — but nothing in
+the journal is ever blocked on the user looking at it.
+
 ## 1. Locate the vault and the Logos folder
 
 Find the Obsidian vault root (the directory that contains `.obsidian/`). Walk up from the
@@ -55,15 +63,6 @@ tags:
 
 Долговременная память проекта. Каждое решение, эксперимент и тупик — отдельная заметка.
 Не листай вручную — фильтруй запросами ниже.
-
-## На ревью (ждут твоей оценки)
-
-```dataview
-TABLE WITHOUT ID file.link AS "Запись", область AS "Область", тип AS "Тип", дата AS "Дата"
-FROM "Logos/Журнал"
-WHERE ревью = false AND file.name != this.file.name
-SORT дата DESC
-```
 
 ## По важности (вес ≥ 7)
 
@@ -116,8 +115,7 @@ and values are Russian on purpose (they are vault content the user reads and que
 тип: <решение | эксперимент | тупик | откат | наблюдение>
 область: <оркестрация | память | модели | автономность | ресурсы | общее>
 вес: <1–10>
-статус: <предложено | принято | отвергнуто | проверяется | сработало | провал>
-ревью: <true | false>
+статус: <принято | отвергнуто | проверяется | сработало | провал>
 теги:
   - logos
   - журнал
@@ -127,9 +125,8 @@ and values are Russian on purpose (they are vault content the user reads and que
 Field semantics:
 - **тип** — the kind of record. `решение` (a design decision), `эксперимент` (something tried), `тупик` (a dead end — keep these, they prevent repeating mistakes), `откат` (a previous decision reversed), `наблюдение` (a noted fact without a decision).
 - **область** — which part of Logos this touches. Use the agent/council role taxonomy: `оркестрация`, `память`, `модели`, `автономность`, `ресурсы`, or `общее` for cross-cutting.
-- **вес** — importance / strength, 1–10. This is the journal's analogue of Logos's "сила информации". Start a fresh decision around 5; raise it when it proves itself, lower it when it fails. The user sets or overrides this on review.
-- **статус** — lifecycle. A decision starts `предложено` (proposed, awaiting review) → `принято` / `отвергнуто` after user review. An experiment moves `проверяется` → `сработало` / `провал`. An `откат` entry (which reverses an earlier decision) is itself a decision about the reversal, so it follows the decision lifecycle: `предложено` → `принято` once the user confirms the reversal; the entry it reverses is set to `статус: отвергнуто` and the two are linked with a wiki-link.
-- **ревью** — `false` until the user has reviewed this entry, then `true`. The "На ревью" query surfaces everything still `false`. This enforces the user's rule: every decision gets reviewed, nothing slips through silently.
+- **вес** — importance / strength, 1–10. This is the journal's analogue of Logos's "сила информации". The assistant sets it itself (there is no user review): start a fresh decision around 5, raise it when the decision proves itself, lower it when it fails.
+- **статус** — lifecycle, set by the assistant from what actually happened (no user sign-off). A decision is recorded straight as `принято` (it was decided in the work). An experiment moves `проверяется` → `сработало` / `провал`. An `откат` entry reverses an earlier decision and is itself recorded `принято`; the entry it reverses is set to `статус: отвергнуто` and the two are linked with a wiki-link. `отвергнуто` means "superseded by a later decision", NOT "the user rejected it".
 
 ## 5. Entry body template
 
@@ -154,10 +151,6 @@ Field semantics:
 ## Результат
 <For experiments: what happened — worked / failed and why. For fresh decisions
 awaiting outcome, write «пока не проверено».>
-
-## Ревью
-<Filled when the user reviews. Their verbatim feedback, and the weight they set.
-Until reviewed, write «ждёт ревью».>
 ```
 
 Cross-reference related entries and design documents with Obsidian wiki-links —
@@ -168,6 +161,6 @@ never relative markdown paths.
 
 - **Capture faithfully.** When recording the user's own thoughts, do not invent, embellish, or moralize — clean up mechanics only, like a diary. When recording a design decision the council made, summarize it accurately without adding new claims.
 - **Russian content.** All entry text, headings, and field values are Russian. Technical terms (LLM, VRAM, RAG, OpenRouter, GPU, etc.) keep their original form.
-- **Never overwrite a different entry.** Each decision is a new file. Re-recording the same decision updates its existing file (e.g. to flip `статус` or fill `Результат`/`Ревью`).
+- **Never overwrite a different entry.** Each decision is a new file. Re-recording the same decision updates its existing file (e.g. to flip `статус` or fill `Результат`).
 - **The index updates itself.** Never hand-edit `Журнал.md` per entry — the Dataview queries pick up new notes automatically as long as the frontmatter fields above are set.
 - **No manual git.** `obsidian-git` auto-syncs the vault, so no `git commit` is needed for journal entries.

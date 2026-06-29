@@ -9,6 +9,22 @@ All design documents are **Russian** in headings and prose. Technical terms (LLM
 GPU, OpenRouter, gRPC, API, etc.) keep their original form. No runnable code in any document —
 prose, pseudo-API shapes, and numbered flows only.
 
+**Plain-language requirement (hard rule, not a preference).** These documents are read by the USER,
+so write them in plain, simple Russian a non-specialist can follow. Do NOT use jargon, academic
+phrasing, or anglicism-кальки when an ordinary Russian word exists. Keep only two kinds of non-plain
+tokens: (a) real technology/product names (PostgreSQL, Qdrant, FastAPI, API, VRAM, GPU, OpenRouter)
+and (b) code identifiers in backticks that tie the prose to real code. Everything else is plain
+Russian, and every mechanism is explained in human terms — what happens, in what order, and why; add
+a short «простыми словами: …» clause where a point is subtle. Replace кальки with plain Russian,
+e.g.: эмбеддинг → «числовой отпечаток»; релевантность → «близость по смыслу»; ранжирование →
+«упорядочивание по…»; оверсэмпл → «брать с запасом»; латентность → «задержка»; деградация → «как
+ведёт себя при сбоях»; инвариант → «нерушимое правило»; контракт → «договорённость»; субстрат →
+«хранилище»; консолидация → «ночная переработка». Keep every number, name, and guarantee — change
+only HOW it is said, never dumb down the substance.
+- Incorrect: «Ранжирование кандидатов по релевантности с оверсэмплом снижает латентность деградации.»
+- Correct: «Записи упорядочиваются по близости к запросу; кандидатов берём с запасом. При сбоях
+  память не падает, а отвечает пустым срезом.»
+
 Cross-reference sibling documents with Obsidian wiki-links: `[[Концепт]]`, `[[Архитектура]]`,
 `[[Модули/Память]]` — never relative markdown paths.
 

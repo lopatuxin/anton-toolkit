@@ -171,11 +171,11 @@ After writing or changing any phase:
 3. **Record significant changes in the journal.** For each non-trivial sync edit to the architecture,
    write a journal entry per `references/diary-format.md` — one note under `$VAULT/Logos/Журнал/`,
    `тип: решение` (or `тип: наблюдение` for a noted gap), `область: общее` (phases are cross-cutting;
-   the journal's `область` taxonomy has no phase value — never invent one), `статус: предложено`,
-   `ревью: false`, `вес: 5` (default until the user weighs in). Trivial wording fixes need no entry.
+   the journal's `область` taxonomy has no phase value — never invent one), `статус: принято`,
+   `вес: 5` (the assistant's importance estimate). Trivial wording fixes need no entry.
 4. **Report the sync to the user** in Russian: a short list of what changed in `Архитектура.md` (and
-   why) so they can review it. When the user reviews, fold their verdict into the journal entries
-   (`статус`, `ревью: true`, `вес`, verbatim feedback in `## Ревью`) exactly as `logos-log` does.
+   why). No review gate — do not ask the user to review or sign off the journal entries; if the user
+   asks for changes, keep the entries consistent exactly as `logos-log` does.
 
 The reconciliation is one bounded pass per phase — do not loop it endlessly. If a sync edit reshapes a
 phase, note it and let the next interview turn resolve it.
@@ -185,14 +185,14 @@ phase, note it and let the next interview turn resolve it.
 Because there is no roadmap document, the journal IS the phase overview. After writing each phase,
 record it as its own journal entry per `references/diary-format.md`:
 - One note under `$VAULT/Logos/Журнал/<YYYY-MM-DD>-фаза-NN-<краткое-имя>.md`.
-- Frontmatter: today's `дата`, `тип: решение`, `область: общее`, `вес: 5`, `статус: предложено`,
-  `ревью: false`, the `теги` from the reference.
+- Frontmatter: today's `дата`, `тип: решение`, `область: общее`, `вес: 5`, `статус: принято`,
+  the `теги` from the reference.
 - Body: state which phase it is, its goal, what becomes touchable, and wiki-link the phase document
   (`[[Фаза-NN-<имя>]]`) and the architecture (`[[Архитектура]]`).
 - Confirm in Russian, one line, as `logos-log` does.
 
-Fold in the user's review later exactly as `logos-log` and `logos-ui` do (`статус`, `ревью: true`,
-`вес`, verbatim feedback in `## Ревью`).
+No review gate — do not solicit user review of the entry; if the user later asks for changes, keep it
+consistent exactly as `logos-log` and `logos-ui` do.
 
 ## 7. Iteration
 
