@@ -86,6 +86,17 @@ Paths (Russian names — you own all path construction):
 | Architecture (read + sync target) | `$VAULT/Logos/Дизайн/Архитектура.md` |
 | Decision journal | `$VAULT/Logos/Журнал/` |
 
+**The `Logos` folder name is a LITERAL Latin-script identifier — NEVER transliterate it to Cyrillic.**
+Everything *inside* the folder is Russian (file names, headings, slugs like `Дизайн`, `Фазы`, `Журнал`),
+but the top-level folder is always spelled `Logos` (Latin letters L-o-g-o-s), exactly as written in the
+`$VAULT/Logos/…` paths above. While producing Russian prose you may reflexively type the folder as
+Cyrillic `Логос` — do NOT. Build every path from the `$VAULT/Logos/…` prefix verbatim; never retype the
+folder name from memory. This applies to EVERY write in every step (phase files, architecture/concept
+sync, journal entries).
+- Correct: `$VAULT/Logos/Журнал/2026-07-04-имя.md`
+- Incorrect: `$VAULT/Логос/Журнал/2026-07-04-имя.md` — Cyrillic `Логос` silently creates a second, wrong
+  folder next to the real `Logos` one, scattering the vault.
+
 Create the phases folder if missing: `mkdir -p "$VAULT/Logos/Дизайн/Фазы"`.
 
 Cross-references use Obsidian wiki-links (`[[Концепт]]`, `[[Архитектура]]`, `[[Фаза-00-чат-в-вебе]]`),
