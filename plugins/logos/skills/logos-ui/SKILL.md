@@ -2,10 +2,12 @@
 name: logos-ui
 description: >
   Design the web interface of the Logos system as a complete, build-ready structural specification
-  for Claude Design — WHICH pages/screens exist, WHAT blocks and elements (buttons, fields, lists,
-  tables, modals) each one holds, HOW the user navigates between them, and how every element behaves
-  (states, validations, data shown, edge cases). It does NOT design visuals: no colours, typography,
-  spacing, or styling — Claude Design owns all of that. The skill runs a deep DIALOG-interview with
+  for the Logos frontend coder (the logos-frontend-coder agent) — WHICH pages/screens exist, WHAT
+  blocks and elements (buttons, fields, lists, tables, modals) each one holds, HOW the user navigates
+  between them, and how every element behaves (states, validations, data shown, edge cases). It does
+  NOT design a new visual look: no colours, typography, spacing, or theme — the frontend coder renders
+  the spec in the ALREADY-ESTABLISHED Logos style (reusing existing tokens/components/shell), so the
+  spec defines structure and behaviour, not appearance. The skill runs a deep DIALOG-interview with
   the user (open-ended, one question at a time) to pin down exactly what they want from the interface,
   writes the spec to Logos/Дизайн/Веб-интерфейс.md, and then SYNCHRONIZES it with the rest of the
   Logos design: if the interface requires something not in (or contradicting) Архитектура.md, it
@@ -16,8 +18,8 @@ description: >
   Other phrases ("спроектируй интерфейс logos", "распиши веб-интерфейс logos", "какие страницы у
   logos") are context for the user, not auto-triggers — act only when the user runs /logos-ui.
 
-  Discrimination: this skill designs the Logos web INTERFACE structure (UX/IA spec under Claude
-  Design). For designing the Logos SYSTEM architecture (orchestration, memory, models) use
+  Discrimination: this skill designs the Logos web INTERFACE structure (UX/IA spec that the
+  logos-frontend-coder agent builds from). For designing the Logos SYSTEM architecture (orchestration, memory, models) use
   logos-design; for recording/searching decisions use logos-log; for an arbitrary non-Logos system
   use system-designer. This skill is documentation-only — if the user asks to write actual frontend
   code, stop.
@@ -26,19 +28,21 @@ description: >
   context between turns and cannot hold a dialog.
 ---
 
-# Logos-ui — web interface specification for Claude Design
+# Logos-ui — web interface specification for the Logos frontend coder
 
-You design the **web interface of Logos** as a structural specification precise enough that Claude
-Design can build the UI from it without guessing the layout, the screens, the elements, or their
-behaviour. You work out WHERE the buttons, pages, and blocks go and HOW everything is arranged and
-behaves — you do NOT pick the visual style.
+You design the **web interface of Logos** as a structural specification precise enough that the
+**logos-frontend-coder** agent can build the UI from it without guessing the layout, the screens, the
+elements, or their behaviour. You work out WHERE the buttons, pages, and blocks go and HOW everything
+is arranged and behaves — you do NOT pick a new visual style: the frontend coder renders your spec in
+the already-established Logos look (reusing the existing tokens, components, and layout shell).
 
 **Critical rules:**
 - **Documentation only.** No runnable code, no frontend files. The output is a Markdown spec.
-- **No visual design.** Never specify colours, exact typography, hex values, shadows, pixel spacing,
-  or a visual theme — Claude Design chooses all of that. You define structure, hierarchy, content,
-  grouping, order, behaviour, and states. (Relative emphasis like "primary action" / "secondary
-  action" / "destructive action" is allowed — it is structural intent, not a colour.)
+- **No new visual design.** Never specify colours, exact typography, hex values, shadows, pixel
+  spacing, or a visual theme — the frontend coder inherits all of that from the already-established
+  Logos style (existing tokens/components/shell) and must not invent a new look. You define structure,
+  hierarchy, content, grouping, order, behaviour, and states. (Relative emphasis like "primary action"
+  / "secondary action" / "destructive action" is allowed — it is structural intent, not a colour.)
 - **Command-only.** Act only when the user runs `/logos-ui`.
 - **Russian output.** The spec, headings, and all chat dialogue are Russian. Technical terms (UI,
   modal, dropdown, breakpoint, API, etc.) keep their original form.
@@ -46,11 +50,14 @@ behaves — you do NOT pick the visual style.
   of the Logos design (see Step 5). A web-interface decision that silently contradicts the
   architecture is a bug.
 
-**Project context:** this spec is what the `logos-build` skill implements as the actual Logos web
-frontend (in the code repo `git@github.com:lopatuxin/Logos.git`, the vault's sibling `Logos/`
-folder). The full project picture — code repo vs vault docs, the polyglot stack, and the
-"documentation is the source of truth" sync rule — is in `references/logos-project.md`. Read it so
-the interface spec stays build-ready and consistent with the code.
+**Project context:** this spec is what the `logos-build` skill implements — specifically its
+`logos-frontend-coder` agent — as the actual Logos web frontend (in the code repo
+`git@github.com:lopatuxin/Logos.git`, the vault's sibling `Logos/` folder). That agent reuses the
+established Logos frontend style, so write the spec FOR it: exhaustive structure and behaviour, and,
+where useful, point it at the existing reusable components/shell rather than describing a look. The
+full project picture — code repo vs vault docs, the polyglot stack, and the "documentation is the
+source of truth" sync rule — is in `references/logos-project.md`. Read it so the interface spec stays
+build-ready and consistent with the code.
 
 ## 0. Locate the vault and resolve paths (once per session)
 
@@ -177,4 +184,5 @@ do not rewrite settled sections.
 - User wants to record/search a decision → use logos-log.
 - User wants to design a different (non-Logos) system → use system-designer.
 - User asks to write actual frontend code → stop, this skill is docs-only.
-- User wants the visual look (colours, theme, typography) → that is Claude Design's job, not this spec.
+- User wants a new visual look (colours, theme, typography) → not this spec: the frontend coder reuses
+  the established Logos style; this spec is structural only.

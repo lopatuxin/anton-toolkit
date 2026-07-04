@@ -3,15 +3,17 @@
 Canonical structure for the Logos web-interface spec written by the `logos-ui` skill. The document
 lives at `$VAULT/Logos/Дизайн/Веб-интерфейс.md` with a Russian file name and Russian headings.
 
-This spec is the **build-ready input for Claude Design**. It must be complete enough that the
-interface can be assembled from it without guessing the screens, the elements, or their behaviour.
+This spec is the **build-ready input for the `logos-frontend-coder` agent**. It must be complete
+enough that the interface can be assembled from it without guessing the screens, the elements, or
+their behaviour. The frontend coder renders it in the already-established Logos style (reusing existing
+tokens/components/shell), so this document defines structure and behaviour — not a new look.
 
 **Two hard rules:**
-1. **No visual design.** Never specify colours, hex values, typography, font sizes, shadows, exact
-   pixel spacing, or a visual theme — Claude Design owns all of that. This document defines
-   structure, hierarchy, grouping, order, content, behaviour, and states. Relative emphasis
-   (primary / secondary / destructive action, prominent / muted) is allowed — it is structural
-   intent, not styling.
+1. **No new visual design.** Never specify colours, hex values, typography, font sizes, shadows, exact
+   pixel spacing, or a visual theme — the frontend coder inherits all of that from the
+   already-established Logos style and must not invent a new look. This document defines structure,
+   hierarchy, grouping, order, content, behaviour, and states. Relative emphasis (primary / secondary
+   / destructive action, prominent / muted) is allowed — it is structural intent, not styling.
 2. **Exhaustive at the element level.** Every screen, every block, and every interactive element
    (button, field, list, table, card, modal, menu) is named, with its purpose, behaviour, the data
    it shows, and its states. "All the small details accounted for" is the bar.
@@ -109,7 +111,7 @@ shows in each.>
 **Крайние случаи:** <empty collections, long lists, very long text, concurrent edits, offline, etc.>
 ```
 
-Repeat for every screen in the sitemap. Be exhaustive — this is what Claude Design builds from.
+Repeat for every screen in the sitemap. Be exhaustive — this is what `logos-frontend-coder` builds from.
 
 ### 6. Переиспользуемые компоненты
 Shared UI components used across screens (buttons, cards, modals, tables, forms, dropdowns,
@@ -135,7 +137,7 @@ breakpoints — not exact pixel widths or visual styling.
 ### 10. Доступность и взаимодействие
 Structural a11y/interaction expectations: keyboard navigation and focus order, dialog/modal focus
 trapping and dismissal, semantic grouping/labels, tab order, primary-action-on-Enter conventions.
-No colour-contrast (that is Claude Design's visual concern).
+No colour-contrast (that is inherited from the established Logos style, not specified here).
 
 ### 11. Связь экранов с системой
 For each screen (or grouped), which Logos capability, data source, or API surface it consumes —
