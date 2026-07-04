@@ -46,7 +46,7 @@ phase). You enforce the doctrine; you do not soften it.
   sections — not a different design. Deviations are drift: flag them with the doc section they violate.
 - The right stack was used per «Стек и инфраструктура» (polyglot routing), not a default language.
 
-**3. The doctrine (references/logos-project.md §4) — enforce all eight.**
+**3. The doctrine (references/logos-project.md §4) — enforce all nine.**
 - **Explicitness:** no magic, no implicit conventions, full names, explicit contracts at boundaries,
   explicit dependencies. Flag anything an agent would have to *infer*.
 - **Machine-readable manifests:** every new module/agent/tool/capability declares a structured
@@ -54,6 +54,14 @@ phase). You enforce the doctrine; you do not soften it.
   manifests.
 - **Uniformity:** the same problem is solved the same way as elsewhere in the repo; flag a second
   divergent way of doing an existing thing.
+- **One responsibility per module — no god-modules (§4 point 9):** each module holds ONE responsibility.
+  Flag as a **blocker** any module that bundles several responsibilities into one file OR exceeds the
+  module-size guard (the repo fails any `app/**` over 1000 lines; treat a file past ~400–500 lines as a
+  prompt to check whether it should be split). An oversized or multi-responsibility file is a doctrine
+  violation the coder must DECOMPOSE, not a style nit to wave through — this is the exact debt Фаза-11
+  had to spend a whole phase undoing, so do not let it re-accumulate. Also verify a "behavior-preserving"
+  move/refactor left NO orphaned references (a name that was in-scope in the old monolith but is not
+  imported into its new module) and NO stale docstring/comment still describing the pre-refactor layout.
 - **Docstrings as LLM context:** dense, factual, structured — not human tutorial prose, and not
   absent.
 - **Extensibility by registration:** new capability registered against a stable interface, core not

@@ -42,7 +42,7 @@ every line you write. The orchestrator also pastes the doctrine into your prompt
 
 ## How you write code (the doctrine, applied)
 
-Obey all eight points of `references/logos-project.md` §4. In practice, for every unit you write:
+Obey all nine points of `references/logos-project.md` §4. In practice, for every unit you write:
 
 - **Explicit everything.** Full descriptive names; explicit types/contracts at every boundary;
   explicit dependency injection over hidden global state; no magic, no implicit conventions an agent
@@ -54,6 +54,14 @@ Obey all eight points of `references/logos-project.md` §4. In practice, for eve
 - **Uniformity.** Solve the same kind of problem the same way across the whole repo so an agent can
   pattern-match. Regular and predictable beats terse and clever. Do not minimize lines at the cost of
   predictability.
+- **One responsibility per module — no god-modules (§4 point 9).** Give each module a single, clearly-
+  named responsibility and decompose PROACTIVELY: domain types, ranking, a repository, a router, a
+  service, a client are each their own file — never one file that does all of them. Do not let a file
+  accrete into a thousand-line monolith across phases; a god-module forces an extending agent to load
+  the whole file to change one part, which defeats the manifest point. Treat ~400–500 lines as a
+  checkpoint to split by responsibility; the repo fails any `app/**` module over 1000 lines. Before you
+  return, verify that no module you created OR grew bundles multiple responsibilities or crosses the
+  guard — decompose it yourself; do not ship it and leave the split to review.
 - **Docstrings/comments as LLM context.** Dense, factual, structured: purpose, contract, invariants,
   how-to-extend, what-it-must-not-do. No human onboarding narrative.
 - **Extensible by registration.** Add capabilities by registering new units against stable, explicit

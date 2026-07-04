@@ -110,9 +110,25 @@ on `logos-coder` (how to write) and `logos-reviewer` (what to enforce). Concrete
 8. **It must still run and be correct.** AI-readability is never an excuse for broken, insecure, or
    untested code. The doctrine governs *style and structure*, not correctness — correctness is
    non-negotiable. Tests (section: `logos-test-writer`) are the executable, machine-checkable spec.
+9. **One responsibility per module — no god-modules.** Each file/module holds a SINGLE, clearly-named
+   responsibility (domain types, ranking math, a repository, a router, a service, a client, …), and
+   each responsibility is its own unit. A module that bundles several responsibilities, or that grows
+   so large an agent must ingest the whole file to change one part, DIRECTLY defeats point 2 (understand
+   and extend a unit *without reading all of its code*) and clogs the extending agent's context window —
+   so decomposition is an AI-readability requirement here, not a human-ergonomics nicety. Decompose by
+   responsibility from the FIRST phase and keep it decomposed; never let a file accrete across phases
+   into a thousand-line monolith. Treat a module crossing ~400–500 lines as a decomposition checkpoint
+   (does it hold more than one responsibility? split it), and NEVER ship a module that mixes unrelated
+   responsibilities or exceeds the module-size guard the code repo enforces (a machine test that fails
+   any `app/**` module over 1000 lines — that ceiling is a backstop, aim far below it). Correct: the
+   memory subsystem split into `domain` / `substrate` / `ranking` / `service` / repository / `router`,
+   each one responsibility. Incorrect: a single `memory_service.py` holding domain types + ranking math
+   + the retrieval pipeline + the write path + repository wiring in 1800 lines — one file no agent can
+   safely extend without loading all of it. This is the exact debt Фаза-11 had to spend a whole phase
+   cleaning up; do not let it re-accumulate.
 
 When a human-ergonomics convention (short names, "self-evident" code, minimal comments, idiomatic
-terseness) conflicts with these eight points, the doctrine wins. The reviewer rejects human-oriented
+terseness) conflicts with these nine points, the doctrine wins. The reviewer rejects human-oriented
 "cleanups" that reduce explicitness or machine-readability.
 
 ## 5. Phase-driven workflow (how a phase becomes code)
