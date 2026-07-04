@@ -2,7 +2,8 @@
 name: logos-build
 description: >
   Build the Logos system from its design documentation — the development orchestrator over a team of
-  dedicated Logos agents (coder, reviewer, test-writer, QA, devops, sync). It takes a delivery phase
+  dedicated Logos agents (backend coder, frontend coder, reviewer, test-writer, QA, devops, sync).
+  Backend and web frontend are written by SEPARATE specialists — different crafts. It takes a delivery phase
   from Logos/Дизайн/Фазы/ as the spec (documentation is the source of truth), on first run clones or
   initializes the code repository at the vault's sibling Logos/ folder from
   git@github.com:lopatuxin/Logos.git, then drives the phase through implement → review → test → QA →
@@ -103,7 +104,9 @@ the phase document path, the relevant architecture sections, the phase scope bou
 instruction to obey `references/logos-project.md` (especially the §4 doctrine). Wait for each to
 finish before the next; feed each agent the prior agent's report.
 
-1. **logos-coder** — implement the phase per the doctrine, routing each layer to its stack.
+1. **logos-coder** (backend / server-side layers) — implement the phase's backend per the doctrine,
+   routing each server-side layer to its stack, and own the `PRODUCT_VERSION` bump. The web frontend is
+   built separately by `logos-frontend-coder` (next).
    ```
    Agent(subagent_type="logos-coder", prompt="
    Obey references/logos-project.md (code repo, paths, and the §4 doctrine 'code for AI, not humans').
@@ -111,17 +114,37 @@ finish before the next; feed each agent the prior agent's report.
    Architecture source of truth: <DOCS>/Дизайн/Архитектура.md, sections: <list from «Затрагиваемые части»>.
    Build plan / layer→stack routing: <paste the plan from step 3>.
    Hard scope boundaries (do NOT build ahead): <paste «Что НЕ входит»>.
-   Implement only this phase. Self-describing, explicit, machine-readable, extensible by registration.
+   Implement only this phase's SERVER-SIDE layers — the web frontend is built separately by logos-frontend-coder; do NOT write browser client code. Self-describing, explicit, machine-readable, extensible by registration.
    Also bump PRODUCT_VERSION in gateway/app/version.py to 0.<phase-number>.0 (MINOR = phase number) per references/logos-project.md §9 — a phase is not built until the version reflects it.
-   Return: what you created/changed (files + one-line each), the new PRODUCT_VERSION, and any drift you had to introduce vs the docs.
+   Return: what you created/changed (files + one-line each), the new PRODUCT_VERSION, the backend contracts (endpoints/WS frames) this phase exposes for the frontend, and any drift you had to introduce vs the docs.
    ")
    ```
-2. **logos-reviewer** — review the diff against the architecture docs AND the doctrine. If it returns
-   blocking findings, re-dispatch `logos-coder` with them, then re-review. One fix loop is normal;
-   stop after two and surface unresolved findings to the user.
+   Then, **only if the phase touches the web frontend layer**, dispatch **logos-frontend-coder** (web
+   frontend) — it builds the UI against the just-built backend contracts, reusing the ESTABLISHED Logos
+   frontend style (it must not invent a new look). Feed it the backend coder's reported contracts.
+   ```
+   Agent(subagent_type="logos-frontend-coder", prompt="
+   Obey references/logos-project.md (code repo, paths, and the §4 doctrine 'code for AI, not humans').
+   Code repo: <CODE>. Docs root: <DOCS>. Phase spec: <DOCS>/Дизайн/Фазы/<file> (read it fully).
+   Web-interface spec (structural source of truth): <DOCS>/Дизайн/Веб-интерфейс/ — sections this phase touches.
+   Architecture: <DOCS>/Дизайн/Архитектура.md → «Стек и инфраструктура» (React+TS+Vite) and the thin-client doctrine.
+   Backend contracts to consume: <paste the contracts from logos-coder's report>.
+   Hard scope boundaries (do NOT build ahead): <paste «Что НЕ входит»>.
+   Build only this phase's web UI. REUSE the established Logos frontend style — existing design tokens, components, layout shell, CSS conventions; NEVER invent a new visual language, palette, font, or styling system. Thin client: no source-of-truth state or business logic on the client; read the product version via GET /api/version, do NOT bump it.
+   Return: frontend files created/changed (one-line each), how «Критерии готовности» + the web-interface spec are covered, which existing components/tokens you reused, and any drift vs the docs.
+   ")
+   ```
+   Routing: a **backend-only** phase skips `logos-frontend-coder`; a **frontend-only** phase (e.g. a
+   pure UI tweak) dispatches `logos-frontend-coder` for the UI and still sends `logos-coder` to make the
+   one-line `PRODUCT_VERSION` bump (§9 applies to every phase).
+2. **logos-reviewer** — review the diff against the architecture docs AND the doctrine (backend and
+   frontend). Route blocking findings to the right fixer — backend findings to `logos-coder`, frontend
+   findings to `logos-frontend-coder` — then re-review. One fix loop is normal; stop after two and
+   surface unresolved findings to the user.
 3. **logos-test-writer** — write machine-checkable tests covering the phase's «Критерии готовности».
 4. **logos-qa** — exercise the phase end-to-end against its «Критерии готовности»; route any bug back
-   to `logos-coder` (a code bug) and re-run the affected steps.
+   to the right fixer — a backend bug to `logos-coder`, a frontend bug to `logos-frontend-coder` — and
+   re-run the affected steps.
 5. **logos-devops** — make the phase runnable per its stack (containers / run scripts / infra),
    within the resource budget from the architecture.
 
@@ -139,7 +162,8 @@ Report every drift (code does X, docs say Y) with file:line and which side looks
 ")
 ```
 For each reported drift, resolve it (do NOT leave docs and code disagreeing):
-- Code is wrong → re-dispatch `logos-coder` to fix it.
+- Code is wrong → re-dispatch the right coder to fix it (backend → `logos-coder`, frontend →
+  `logos-frontend-coder`).
 - The docs are now outdated by a deliberate, justified change → update the affected doc inline (or via
   the design skills for a structural change) and record the change as a journal entry.
 Re-run `logos-sync` until it reports no unresolved drift.
