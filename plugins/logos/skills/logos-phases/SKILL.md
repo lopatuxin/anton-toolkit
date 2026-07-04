@@ -97,6 +97,25 @@ sync, journal entries).
 - Incorrect: `$VAULT/Логос/Журнал/2026-07-04-имя.md` — Cyrillic `Логос` silently creates a second, wrong
   folder next to the real `Logos` one, scattering the vault.
 
+**Enforce this mechanically — the passive warning above has been broken before, so do NOT just trust
+yourself to type it right.** Two mandatory guards:
+
+1. **Check at the moment of every write.** Journal and sync file paths are almost entirely Russian
+   (`…/Журнал/2026-…`, `…/Дизайн/…`) — that Russian flow is exactly where the folder gets mistyped as
+   Cyrillic `Логос`. Before you submit ANY Write/Edit whose path is in the vault, verify the segment
+   directly after the vault root reads `Logos` in Latin (L-o-g-o-s). Build the path by copying the
+   `$VAULT/Logos/` prefix; never re-type the folder name from memory mid-Russian-sentence.
+2. **Verify after all writes for the phase are done, before reporting done.** Run this stray-directory
+   check and fix any hit:
+   ```bash
+   ls -d "$VAULT/Логос" 2>/dev/null && echo "STRAY CYRILLIC 'Логос' DIRECTORY — a path was mistyped"
+   ```
+   If it prints anything, at least one file went into the wrong Cyrillic `Логос` folder: re-write each
+   such file to the correct `$VAULT/Logos/…` path, then remove the stray directory with
+   `rm -rf "$VAULT/Логос"`. If tooling denies the delete, do NOT leave it silently — tell the user in
+   Russian exactly which folder to remove by hand: «Удали, пожалуйста, папку `Логос` рядом с `Logos` в
+   хранилище — я записал туда файл по ошибке и не смог удалить сам.»
+
 Create the phases folder if missing: `mkdir -p "$VAULT/Logos/Дизайн/Фазы"`.
 
 Cross-references use Obsidian wiki-links (`[[Концепт]]`, `[[Архитектура]]`, `[[Фаза-00-чат-в-вебе]]`),
