@@ -207,7 +207,7 @@ Read the command argument and choose:
    first). Do NOT touch the import table. Entry shape:
 
    ```markdown
-   ### <emoji> <Название> (<Год>) — <короткий вердикт>
+   ### <emoji> <Название> (<Original Title>, <Год>) — <короткий вердикт>
    <formatted review prose>
    ```
 
@@ -226,6 +226,16 @@ The recommendation note is deliberately SHORT — a wall of films is useless to 
 - **Hard cap: 10 films. Never more.** If a top-up would exceed 10, drop the weakest fit.
 - **Never recommend a watched film.** Cross-check every candidate against `Просмотрено.md`
   (the import table AND the `## Обзоры` headings).
+- **Real, findable titles only — never invent or literally translate a title.** Give each film
+  its actual title so the user can search it and land on the exact film. Prefer the film's real
+  official Russian release title; if you are NOT certain of it, do not translate the English
+  title word-for-word into Russian — verify it (web search) or use the original title instead.
+  ALWAYS put the original-language title and year in parentheses. If a candidate's real title is
+  uncertain, verify before writing it — never guess.
+  - Correct: `Манкимэн (Monkey Man, 2024)`, `Форпост (The Outpost, 2020)`, `Ночь идёт за нами (The Night Comes for Us, 2018)`.
+  - Incorrect: a bare invented Russian name like «Обезьяна» for *Monkey Man* (that name is actually
+    a different 2025 horror film, *The Monkey*), «Человек-война» for *The Outpost*, or «Апостол» for
+    *The Night Comes for Us* — the user searches these and finds the wrong film or nothing.
 - **Every entry has a short, concrete description** — one or two sentences: what the film is
   (director/actor/hook) AND why it fits this user's taste, specific enough to recognize at a
   glance. No bare titles.
@@ -248,7 +258,7 @@ The recommendation note is deliberately SHORT — a wall of films is useless to 
   > Не больше 10 фильмов. Каждый — с коротким описанием: что это и почему зайдёт.
   > Посмотренное убирается отсюда автоматически.
 
-  ### <Название> (<Год>) — <режиссёр / актёр / жанр-якорь>
+  ### <Название> (<Original Title>, <Год>) — <режиссёр / актёр / жанр-якорь>
   <one–two sentence description: what it is + why it fits>
 
   ### ...
@@ -275,6 +285,8 @@ Reply in one or two lines naming what changed, e.g.:
 - **Faithful capture** — format and keep the user's words and verdict; never invent films,
   ratings, or opinions they did not give.
 - **Russian stays Russian** — all note content and chat replies are in Russian; never translate.
+  This is about prose (reviews, blurbs, chat), NOT film titles: never invent or translate a Russian
+  title for a film — use its real official title with the original-language title + year (see §7).
 - **Merge, don't clobber** — append reviews and taste lines; never overwrite the watched log or
   the taste profile wholesale.
 - **Do not delete `films.md`** — migration leaves it on disk for the user to remove.
