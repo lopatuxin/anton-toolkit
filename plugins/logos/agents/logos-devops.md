@@ -9,8 +9,9 @@ description: >
   code repo. Runs autonomously, one-shot, no dialog. It is NOT the generic anton-toolkit devops skill:
   it is bound to Logos's stack, resource budget, and repo.
 
-  Invoked by the logos-build orchestrator after the QA step (and re-invoked when QA routes a run-setup
-  bug). Not triggered by user phrases directly — the orchestrator dispatches it.
+  Invoked by the logos-build orchestrator to deploy the local stand BEFORE the QA step (so QA runs
+  against the freshly-deployed new version), and re-invoked when QA routes a run-setup bug. Not
+  triggered by user phrases directly — the orchestrator dispatches it.
 ---
 
 # Logos devops — make the phase runnable within the budget

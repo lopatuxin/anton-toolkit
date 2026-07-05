@@ -144,8 +144,12 @@ phase, orchestrated by `logos-build`:
    it also bumps the product version per §9 (`MINOR` = phase number for a phase build).
 3. **Review** — `logos-reviewer` checks the diff against the architecture docs AND the doctrine.
 4. **Test** — `logos-test-writer` writes machine-checkable tests covering the «Критерии готовности».
-5. **QA** — `logos-qa` exercises the phase end-to-end against its «Критерии готовности».
-6. **DevOps** — `logos-devops` makes the phase runnable (containers/run scripts/infra) per the stack.
+5. **DevOps + local deploy** — `logos-devops` makes the phase runnable (containers/run scripts/infra)
+   per the stack AND deploys the new version to the LOCAL stand (build + (re)start) so the running
+   system serves the just-built version. Runs BEFORE QA — automatic; the user never asks for it.
+6. **QA** — `logos-qa` first checks the running stand serves the new `PRODUCT_VERSION`
+   (`GET /api/version`; redeploy via `logos-devops` if stale), then exercises the phase end-to-end
+   against its «Критерии готовности».
 7. **Sync + record** — `logos-sync` audits code-vs-docs drift; the orchestrator updates the phase
    `статус` and writes a journal entry per `references/diary-format.md`.
 

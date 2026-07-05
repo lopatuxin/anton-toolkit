@@ -6,8 +6,7 @@ description: >
   Backend and web frontend are written by SEPARATE specialists — different crafts. It takes a delivery phase
   from Logos/Дизайн/Фазы/ as the spec (documentation is the source of truth), on first run clones or
   initializes the code repository at the vault's sibling Logos/ folder from
-  git@github.com:lopatuxin/Logos.git, then drives the phase through implement → review → test → QA →
-  devops → sync, updates the phase status, and records the work in the Logos decision journal. The
+  git@github.com:lopatuxin/Logos.git, then drives the phase through implement → review → test → devops (local deploy) → QA → sync, updates the phase status, and records the work in the Logos decision journal. The
   code is written to be extensible and understandable for AI agents, NOT for humans (the user never
   reads it). Code and documentation are always kept in sync.
 
@@ -97,7 +96,7 @@ silently), and record the choice as a journal `решение` after.
 Produce a short build plan (the tasks, their layer, their stack) and set the phase `статус` to
 `в работе` in its document frontmatter. Keep the plan brief in chat — the agents do the heavy lifting.
 
-## 4. Implement → Review → Test → QA → DevOps (dispatch the Logos agents)
+## 4. Implement → Review → Test → DevOps (deploy locally) → QA (dispatch the Logos agents)
 
 Dispatch the dedicated Logos agents IN ORDER. Each gets the resolved `$CODE`/`$DOCS` paths verbatim,
 the phase document path, the relevant architecture sections, the phase scope boundaries, and an
@@ -142,11 +141,20 @@ finish before the next; feed each agent the prior agent's report.
    findings to `logos-frontend-coder` — then re-review. One fix loop is normal; stop after two and
    surface unresolved findings to the user.
 3. **logos-test-writer** — write machine-checkable tests covering the phase's «Критерии готовности».
-4. **logos-qa** — exercise the phase end-to-end against its «Критерии готовности»; route any bug back
-   to the right fixer — a backend bug to `logos-coder`, a frontend bug to `logos-frontend-coder` — and
-   re-run the affected steps.
-5. **logos-devops** — make the phase runnable per its stack (containers / run scripts / infra),
-   within the resource budget from the architecture.
+4. **logos-devops** — make the phase runnable per its stack (containers / run scripts / infra), within
+   the resource budget from the architecture, AND deploy the new version to the LOCAL stand: build the
+   images and (re)start the local containers so the running system serves the JUST-BUILT
+   `PRODUCT_VERSION`. This runs BEFORE QA so QA exercises the real running NEW code, not a stale image.
+   The local deploy is MANDATORY and automatic — NEVER wait for the user to ask for it. Even for a
+   backend/logic phase with no infra-artifact delta, the local stand is still rebuilt and restarted so
+   the new code is the one actually running. Route a deploy failure back to `logos-devops` itself.
+5. **logos-qa** — FIRST assert the running stand serves the new version: `GET /api/version` MUST equal
+   the just-built `PRODUCT_VERSION`. If it still serves an older version, the local deploy did not take —
+   route back to `logos-devops` to rebuild/restart, then re-check, BEFORE any testing (a PASS against a
+   stale image is invalid). THEN exercise the phase end-to-end against its «Критерии готовности»; route
+   any bug back to the right fixer — a backend bug to `logos-coder`, a frontend bug to
+   `logos-frontend-coder`, a run/deploy bug to `logos-devops` — and re-run the affected steps (including
+   a redeploy so QA always runs against the current code).
 
 If any agent reports it cannot proceed without a user decision, pause and ask the user ONE open
 question in Russian, then continue.
