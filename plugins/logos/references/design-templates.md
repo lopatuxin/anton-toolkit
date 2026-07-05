@@ -28,6 +28,26 @@ only HOW it is said, never dumb down the substance.
 Cross-reference sibling documents with Obsidian wiki-links: `[[Концепт]]`, `[[Архитектура]]`,
 `[[Модули/Память]]` — never relative markdown paths.
 
+**Documentation hygiene (hard rule — the document states the current + target system, never its history).**
+A design document describes how the system works now and the target design it is heading toward — it is
+NOT a changelog. All history lives in the decision journal (`references/diary-format.md`), never in the
+document:
+- **No history narration in the document.** No "we decided / it used to be / resolved on Фаза-NN / this is
+  (not) a drift" prose. State the current fact and, where useful, the target design plainly; put the
+  decision, the rejected alternatives, and the "why" in the journal.
+- **`Открытые вопросы` / `Риски и открытые вопросы` hold ONLY still-open items.** The moment a question is
+  resolved, fold the answer into the document's prose as a plain fact and DELETE the question from this
+  section. A resolved question left sitting here is exactly the clutter this rule forbids.
+- **Never record a code↔documentation drift inside a document** (no "ДРЕЙФ" callouts or `[!note]` boxes that
+  argue "current vs target, this is/isn't a drift"). Bring the document to the truth; record the drift and
+  its resolution in the journal.
+- **Journal-first before deleting.** Before removing a resolved item, make sure its substance already lives
+  in the journal; if not, write the journal entry first, then delete. Move knowledge, never lose it.
+- Correct: an element that used to run on CPU now runs on GPU → the document simply states it runs on GPU
+  (plus the target, if any); the CPU→GPU story is a journal entry.
+- Incorrect: leaving a note «раньше на CPU, это разрешённый дрейф, см. Фазу-06» in the document, or keeping
+  an already-resolved item under `Открытые вопросы`.
+
 ---
 
 ## Концепт
@@ -76,7 +96,7 @@ Sections, strictly in this order, with exactly these Russian names:
 8. **Ресурсный бюджет** — hardware assumptions (e.g. ~72 GB VRAM target), what runs where, what is feasible without datacenter-scale compute, and where cost/compute forces a simpler path.
 9. **Потоки данных** — 2–4 of the most important end-to-end flows in prose or numbered lists (e.g. "user asks to fix code → central brain → programming orchestrator → agents → memory updated"). No diagrams-as-code.
 10. **Стек и инфраструктура** — concrete technology choices per layer with one-line justifications, fitted to the resource constraints.
-11. **Риски и открытые вопросы** — what could not be resolved, and the biggest risks (technical, resource, safety).
+11. **Риски и открытые вопросы** — only what is STILL genuinely unresolved, plus the biggest risks (technical, resource, safety). Remove each item the moment it is resolved (fold the answer into prose, record the reasoning in the journal — see Documentation hygiene above); this section is not an archive of settled decisions.
 
 The eleven sections map onto the council's areas of expertise: six are **owned** by one member each
 (`Иерархия оркестрации`→orchestration, `Подсистема памяти`→memory, `Модельный слой`→models,
@@ -164,7 +184,8 @@ to the named element.
 3. **Resolve** — each member with open questions addressed to it answers them (fix or defend), one
    bounded round.
 4. **Synthesize** — the synthesizer consolidates the converged module draft into the final
-   `Модули/<имя>.md`, references the architecture as `[[Архитектура]]`, and folds anything still open
-   into `Открытые вопросы`.
+   `Модули/<имя>.md`, references the architecture as `[[Архитектура]]`, and folds anything STILL genuinely
+   open into `Открытые вопросы` (resolved items and drift flags are dropped from the document, not
+   archived — see Documentation hygiene).
 
 All language, no-code, and decisiveness rules from the architecture phase carry over unchanged.
