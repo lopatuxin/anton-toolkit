@@ -42,6 +42,21 @@ a deep interview, write each as its own document, and keep the whole design cons
 - **Tangible, testable slices.** Every phase must end in something the user can actually use and check
   by hand — not an internal refactor or a half-feature. If a proposed phase cannot be touched and
   tested on its own, it is too small or too internal — fold it into an adjacent phase or reshape it.
+- **Scope is the OWNER's decision — carve the phase they want, never shrink it.** Your job is to
+  capture the FULL scope the owner asks for, not to make the phase smaller or cheaper. Do NOT propose a
+  "minimal version", do NOT push the owner's requested work into "a later/next phase", do NOT narrow
+  their stated intent, and do NOT invent out-of-scope boundaries the owner did not ask for. If the
+  owner describes a large phase (many fixes at once, or a deep change like "make X work the way it was
+  designed"), carve it large and in full. Interview to CLARIFY and surface hidden work that must be
+  ADDED — never to talk the owner into doing less. "Minimal" applies ONLY to the FIRST phase (the
+  MVP-zero) and to keeping each sync edit minimal (Step 5); it is NOT a target to impose on the scope
+  of a normal phase. When in doubt about size, carve MORE and let the owner cut, not less.
+  - Correct: owner says "fix the brain so it works as designed — decomposition and the task graph" →
+    you carve exactly that, in full, and ask what else it must cover. Owner says "this is a phase of
+    small fixes" and lists eight → you put all eight in, plus anything they add.
+  - Incorrect: owner asks to "fix the brain properly" → you offer a "minimal variant" that leaves
+    decomposition "for a later phase", split their ask into a smaller slice, or add scope boundaries
+    the owner never requested. This is срезание углов and is exactly what the owner has rejected.
 - **Command-only.** Act only when the user runs `/logos-phases`.
 - **No roadmap document.** There is deliberately NO overview/roadmap file — the development journal
   (`Logos/Журнал/`) is the overview. Each phase is one standalone file plus one journal entry.
@@ -154,12 +169,15 @@ Incorrect: calling AskUserQuestion, offering an А/Б/В list, or asking three t
 ## 3. Interview topics — per phase (one open question each, follow up as answers demand)
 
 For each phase, pin down at least these, anchored to what the architecture says Logos does:
-- **The slice and why now.** What minimal, finished capability this phase delivers, and why it is the
-  right next step on top of the previous phases. For the first phase, drive to a true MVP-zero.
+- **The slice and why now.** What finished capability this phase delivers — at the full scope the owner
+  wants, do NOT shrink it — and why it is the right next step on top of the previous phases. For the
+  FIRST phase specifically, drive to a true MVP-zero; later phases are as large as the owner asks.
 - **What becomes touchable.** Exactly what the user can do/see/test by hand once the phase is done.
 - **What is in scope.** The concrete capabilities included — named, not vague.
-- **What is explicitly out of scope.** What is deliberately pushed to later phases, so the phase stays
-  minimal. This boundary is as important as what is included.
+- **What is explicitly out of scope.** ONLY what the owner themselves chose to defer to later phases —
+  never work you trimmed to keep the phase small. If the owner did not ask to defer something, it stays
+  IN scope. This section records the owner's own boundary decisions; it is not a lever for shrinking the
+  phase. Do not populate it to make the phase look leaner.
 - **Architecture surface.** Which parts/subsystems of `Архитектура.md` this phase exercises (and
   therefore which must already exist or be stubbed). Wiki-link them.
 - **Dependencies.** Which prior phases must be done first. Phase 00 has none.
