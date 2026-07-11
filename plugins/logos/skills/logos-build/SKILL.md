@@ -159,6 +159,35 @@ finish before the next; feed each agent the prior agent's report.
 If any agent reports it cannot proceed without a user decision, pause and ask the user ONE open
 question in Russian, then continue.
 
+## 4a. Doctrine guard — mechanical, runs after the coders and BEFORE the reviewer
+
+Two doctrine violations are cheap to catch mechanically and expensive to let through, because both
+grow without bound and every agent of every later phase pays to read the result. Run this guard
+yourself (it is a check, not production code) after step 4.1's coders and before dispatching
+`logos-reviewer` in step 4.2:
+
+```bash
+# 1. History in the code — BANNED under app/** and web/src/** (reference §4 point 10).
+git -C "$CODE" grep -nE 'Фаза-[0-9]|ДРЕЙФ-|superseded|prior standing|RETROSPECTIVE|^\s*history:|^\s*changelog:' \
+  -- 'gateway/app/*' 'web/src/*'
+
+# 2. Module-size guard — no app/** module over 1000 lines (reference §4 point 9).
+find "$CODE/gateway/app" "$CODE/web/src" -type f \( -name '*.py' -o -name '*.ts' -o -name '*.tsx' \) \
+  -exec awk 'END {if (NR > 1000) print FILENAME": "NR" lines"}' {} \;
+```
+
+A hit is a **blocker**, not a nit. Route it back to the right coder (backend → `logos-coder`, frontend
+→ `logos-frontend-coder`) with the instruction to **DELETE** the historical prose (never rewrite or
+"condense" it) or to decompose the oversized module, then re-run the guard. Only when it is clean does
+the phase proceed to review.
+
+The one legal exception is a terse spec pointer — `spec: Фазы/Фаза-23-самость.md`. A phase name used
+as narrative («в Фазе-07 мы заменили…», «prior standing value was 0.22.0», a `history:` section) is a
+violation regardless of how informative it looks.
+
+The bump of `PRODUCT_VERSION` is a ONE-LINE literal change. If a coder "bumped" it by also appending a
+paragraph about what this phase delivered, that is exactly this violation — send it back.
+
 ## 5. Sync — reconcile code and docs (mandatory)
 
 Dispatch **logos-sync** to audit the code repo against the design documents:
@@ -208,6 +237,14 @@ with the next phase.
 - **Code repo = manual git; vault = auto-sync.** Do not confuse the two. Push code only with the
   user's ok; never `git commit` the vault.
 - **Keep docs and code in sync, always.** A phase is not `готово` until `logos-sync` is clean.
+- **`$DOCS/Дизайн/_черновики/` is NOT a source of truth.** It is scratch material from the design
+  sessions. Never read it yourself and never name it in an agent prompt — the agents build against the
+  architecture, the module documents, the web-interface spec, and the phase document only. A drift
+  reported against a draft is a false positive.
+- **Bound what the agents read.** Give every dispatch the specific phase document and the named
+  architecture/module sections — never "read the design folder" or "read the codebase". The docs run to
+  megabytes and the code to millions of tokens; an unbounded read is what makes a phase build expensive
+  and makes the agent worse at its job, not better.
 - **Documentation only changes go to the docs; code only goes to the repo.** Never write design prose
   into the code repo (beyond `CLAUDE.md`) and never write code into the vault.
 - Keep your own chat output short and in Russian; the agents and documents carry the detail.

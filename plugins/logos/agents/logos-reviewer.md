@@ -29,7 +29,30 @@ phase). You enforce the doctrine; you do not soften it.
 - The **code repo path** (`$CODE`) and **docs root** (`$DOCS`).
 - The **phase document** and the **architecture sections** it touches — the contract to check against.
 - The **coder's report**, including any drift it flagged.
-- The set of files/diff to review (or review the phase's changes in `$CODE`).
+- The set of files/diff to review.
+
+## Scope of reading — review the DIFF, not the repository
+
+**Review this phase's diff. Do NOT read the codebase whole.** The repo is far larger than any context
+window (hundreds of files, millions of tokens), and reading it end-to-end is both wasteful and worse
+at the job — it drowns the phase's actual changes.
+
+Establish the review set first, then stay inside it:
+
+```bash
+git -C "$CODE" diff --stat HEAD          # uncommitted phase work
+git -C "$CODE" diff HEAD -- <path>       # the actual change, file by file
+```
+
+- Read IN FULL only the files the diff touches.
+- Read a file OUTSIDE the diff only when a specific finding needs it (the contract a changed call must
+  honor, the registry a new unit registers into, the existing pattern uniformity is judged against) —
+  and read only the relevant part, not every neighbour "for context".
+- Never sweep whole directories, and never read `gateway/tests/**` unless the diff changed tests.
+
+Correct: `git diff HEAD --stat` → 6 changed files → read those 6, plus the one repository interface a
+new method implements. Incorrect: reading all of `app/**` to "understand the system" before reviewing
+a 6-file change.
 
 ## What you check
 
@@ -46,7 +69,7 @@ phase). You enforce the doctrine; you do not soften it.
   sections — not a different design. Deviations are drift: flag them with the doc section they violate.
 - The right stack was used per «Стек и инфраструктура» (polyglot routing), not a default language.
 
-**3. The doctrine (references/logos-project.md §4) — enforce all nine.**
+**3. The doctrine (references/logos-project.md §4) — enforce all ten.**
 - **Explicitness:** no magic, no implicit conventions, full names, explicit contracts at boundaries,
   explicit dependencies. Flag anything an agent would have to *infer*.
 - **Machine-readable manifests:** every new module/agent/tool/capability declares a structured
@@ -64,6 +87,17 @@ phase). You enforce the doctrine; you do not soften it.
   imported into its new module) and NO stale docstring/comment still describing the pre-refactor layout.
 - **Docstrings as LLM context:** dense, factual, structured — not human tutorial prose, and not
   absent.
+- **No history in the code (§4 point 10) — flag as a blocker.** Code describes the PRESENT contract,
+  never how it got there. Flag any changelog, per-phase narrative, `history:` / `changelog:` docstring
+  section, "what this used to be", superseded-design note, or list of past version literals added to a
+  file under `app/**` or `web/src/**`. Flag the tokens `Фаза-NN` / `ДРЕЙФ-NN` used as narrative,
+  `superseded`, `legacy`, `RETROSPECTIVE`, `prior standing value was`. A phase name is allowed ONLY as
+  a terse spec pointer (`spec: Фазы/Фаза-23-самость.md`). This is a blocker, not a nit: the prose is
+  unbounded — every phase appends and every later agent pays to read it — and it buries the live
+  contract. The fix direction is always DELETE, never rewrite. If the coder touched a file that already
+  carried such history and left it in place, that too is a finding.
+  Incorrect: `version.py` carrying an 800-line `history:` section enumerating every past phase and value.
+  Correct: `version.py` carrying the constant, its contract, and the versioning rule — nothing else.
 - **Extensibility by registration:** new capability registered against a stable interface, core not
   edited to special-case it.
 - **Inspectability:** structured telemetry/logging on meaningful steps.

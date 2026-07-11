@@ -126,9 +126,27 @@ on `logos-coder` (how to write) and `logos-reviewer` (what to enforce). Concrete
    + the retrieval pipeline + the write path + repository wiring in 1800 lines — one file no agent can
    safely extend without loading all of it. This is the exact debt Фаза-11 had to spend a whole phase
    cleaning up; do not let it re-accumulate.
+10. **No history in the code — a unit describes its PRESENT contract, never how it got there.** A
+   docstring states what the unit does NOW: purpose, contract, invariants, how to extend it. It NEVER
+   narrates the path that led there. Changelogs, per-phase narratives, "what this used to be",
+   superseded designs, and enumerations of past versions are BANNED from every file under `app/**` and
+   `web/src/**`. History already has two homes an agent can query on demand — `git log` and the decision
+   journal (`$DOCS/Журнал/`) — and duplicating it into docstrings actively HARMS the extending agent:
+   it buries the current contract under dead prose, and it grows without bound (every phase appends a
+   paragraph; every agent of every later phase then pays to read it — the cost compounds quadratically).
+   Concretely banned in code: the tokens `Фаза-NN` / `ДРЕЙФ-NN` used as narrative, `superseded`,
+   `legacy`, `RETROSPECTIVE`, `prior standing value was`, "the phase that introduced this", lists of
+   past version literals, and any `history:` / `changelog:` docstring section.
+   Correct — a manifest that stands alone in the present tense:
+   `contract: PRODUCT_VERSION is a semver string; the ONLY place the literal appears; GET /api/version returns exactly this value.`
+   Incorrect — the same manifest followed by 800 lines retelling what each past phase changed and which
+   value the constant used to hold.
+   Pointing at a phase document as the SPEC a unit implements is allowed ONLY in the terse pointer form
+   `spec: Фазы/Фаза-23-самость.md` — a reference, never a retelling. When you edit a file that already
+   carries such history, DELETE the historical prose rather than appending to it.
 
 When a human-ergonomics convention (short names, "self-evident" code, minimal comments, idiomatic
-terseness) conflicts with these nine points, the doctrine wins. The reviewer rejects human-oriented
+terseness) conflicts with these ten points, the doctrine wins. The reviewer rejects human-oriented
 "cleanups" that reduce explicitness or machine-readability.
 
 ## 5. Phase-driven workflow (how a phase becomes code)
@@ -199,5 +217,12 @@ the user means by «версионирование проекта»: the build m
   change (the orchestrator never writes production code). `logos-build` VERIFIES the version reflects
   the build before it commits and before it marks a phase `готово`; if the bump was missed, it sends
   `logos-coder` back to do only the bump.
+- **`version.py` holds the literal and its rule — NOTHING else.** It is a SHORT file (tens of lines):
+  the constant, its contract, its invariants, and the MINOR=phase / PATCH=fix rule above. It is NOT a
+  changelog. Never append a per-phase narrative, a `history:` section, a "what the previous value was"
+  note, or a summary of what a phase delivered — that is a §4 point-10 violation and it is what let this
+  one-constant file bloat past 800 lines. What each phase delivered belongs to the journal
+  (`$DOCS/Журнал/`) and the commit message; the version's own history is `git log gateway/app/version.py`.
+  When you bump the version, you CHANGE the literal — you do not add to a story.
 - **Must NOT.** Never duplicate the literal, never auto-derive it from git tags / CI, never add
   per-layer versions. It stays one manual literal in `version.py`.

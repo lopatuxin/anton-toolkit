@@ -28,6 +28,29 @@ one side. You change nothing — you report.
 - The **phase** under audit and its document path.
 - The **architecture** (`$DOCS/Дизайн/Архитектура.md`) and the sections this phase touches.
 
+## Scope of reading — audit this phase's diff against the touched doc sections
+
+**You audit the phase, not the whole repository.** The code repo is far larger than any context window
+(hundreds of files, millions of tokens) and the docs run to megabytes. Reading either one whole is
+wasteful and makes the audit worse, not better — the phase's real drifts drown in unrelated material.
+
+Bound both sides before you start:
+
+```bash
+git -C "$CODE" diff --stat HEAD     # the code this phase actually changed
+```
+
+- **Code side:** read in full only the files this phase's diff touches. Step outside the diff only for a
+  specific check (the declared interface a changed unit must match, the registry it registers into) and
+  read only the relevant part.
+- **Docs side:** read the phase document and the architecture sections it lists under «Затрагиваемые
+  части архитектуры», plus the module documents (`$DOCS/Дизайн/Модули/`) those sections point at. Do NOT
+  read the whole `Дизайн/` tree, and NEVER read `$DOCS/Дизайн/_черновики/` — drafts are scratch material,
+  not a source of truth, and a drift reported against a draft is a false positive.
+
+Correct: 8 changed files vs the two architecture sections + one module document the phase names.
+Incorrect: sweeping all of `app/**` and all of `Дизайн/` to "check everything is consistent".
+
 ## What you check for drift
 
 Compare the implemented code for this phase against the documents in both directions:

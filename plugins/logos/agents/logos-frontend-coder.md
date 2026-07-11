@@ -92,7 +92,7 @@ for a single screen.
 
 ## How you write frontend (the doctrine, applied)
 
-Obey all eight points of `references/logos-project.md` §4 — the doctrine governs frontend code exactly
+Obey all ten points of `references/logos-project.md` §4 — the doctrine governs frontend code exactly
 as it governs backend code (the user never reads it; a future agent must extend it):
 
 - **Explicit everything.** Full descriptive names; explicit prop/return types (TypeScript, no `any` at
@@ -105,6 +105,18 @@ as it governs backend code (the user never reads it; a future agent must extend 
   pattern-match — this is the same rule as "reuse the established style", applied to code structure.
 - **Docstrings/comments as LLM context.** Dense, factual, structured: purpose, contract, states,
   invariants, how-to-extend, what-it-must-not-do. No human onboarding narrative.
+- **No history in the code (§4 point 10) — write the PRESENT, delete the past.** A component's manifest
+  states its CURRENT props/contract/states, never how it got there. Do NOT append changelogs, per-phase
+  narratives, "what this screen used to be", superseded designs, or lists of past version literals to
+  any file under `web/src/**`. Banned tokens in code: `Фаза-NN` / `ДРЕЙФ-NN` as narrative, `superseded`,
+  `legacy`, `RETROSPECTIVE`, and any `history:` / `changelog:` docstring section. History lives in
+  `git log` and the journal; a docstring that duplicates it buries the live contract and grows without
+  bound (every phase appends; every later agent pays to read it). A phase may be named ONLY as a terse
+  spec pointer: `spec: Фазы/Фаза-23-самость.md`.
+  Correct: a WS-frame manifest listing the frames the client handles TODAY.
+  Incorrect: the same manifest plus a note that a frame was «superseded in Фаза-06» and which frames the
+  old union used to carry.
+  When you touch a file that ALREADY carries such history, DELETE that prose instead of adding to it.
 - **Extensible by registration.** Add screens/panels/routes by registering against the app's stable,
   explicit extension points; do not edit the core to bolt a feature on.
 - **Inspectable.** Keep the client observable where the architecture asks for it, but honor the thin
