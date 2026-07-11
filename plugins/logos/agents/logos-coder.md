@@ -47,10 +47,19 @@ Obey all ten points of `references/logos-project.md` §4. In practice, for every
 - **Explicit everything.** Full descriptive names; explicit types/contracts at every boundary;
   explicit dependency injection over hidden global state; no magic, no implicit conventions an agent
   would have to infer.
-- **A machine-readable manifest per unit.** Every module/agent/tool/capability declares, in a
-  structured form an LLM can parse, what it is: its inputs/outputs, its contract, its capabilities,
-  its invariants, and how to extend it. A future agent must be able to understand and extend the unit
-  from its manifest + docstring without reading all its code.
+- **A manifest that carries what the CODE CANNOT SAY (§4 point 2).** The agent who extends this file
+  reads Python fluently — signatures, types and names already tell it what the code does. So do NOT
+  restate them in prose. Write a manifest to answer one question: *what would a competent agent get
+  WRONG if it had only the code?* That means: the CONTRACT of a boundary (an ABC/endpoint/repository
+  method — ordering, bounds, idempotency, what `limit<=0` returns), the JUSTIFICATION of every tuned
+  constant (a bare `0.95` reads as arbitrary and the next agent will "improve" it — record what it was
+  measured against and what breaks above/below), invariants the code does not enforce, must-NOT rules
+  and dependency direction, and how to extend the unit. Nothing beyond that.
+  Prefer TYPES over prose — an explicit dataclass/schema is a manifest that cannot fall out of sync.
+  On a unit with nothing non-derivable to declare, a ONE-LINE header naming its single responsibility
+  is the WHOLE obligation — do not pad it into a manifest to satisfy a rule.
+  Correct: `contract: read_recent(limit) -> last `limit` half-turns, oldest->newest; limit<=0 returns []; never reads the whole history.`
+  Incorrect: `purpose: the value types of the facts subsystem: FactState, FactSort, FactSource, …` — the code right below says exactly that.
 - **Uniformity.** Solve the same kind of problem the same way across the whole repo so an agent can
   pattern-match. Regular and predictable beats terse and clever. Do not minimize lines at the cost of
   predictability.

@@ -88,10 +88,34 @@ on `logos-coder` (how to write) and `logos-reviewer` (what to enforce). Concrete
 1. **Explicit over implicit, always.** No magic, no clever implicit conventions, no relying on the
    reader's intuition. Full descriptive names, explicit types/contracts at every boundary, explicit
    wiring. An agent should never have to *infer* what is happening.
-2. **Machine-readable self-description.** Every module, agent, tool, and capability carries a
-   structured manifest (schema / declared inputs-outputs / contract / capabilities / invariants) that
-   an LLM can read to understand and extend the unit *without reading all of its code*. This mirrors
-   Logos's own autonomy layer, where the system registers and reasons about its own tools.
+2. **Machine-readable self-description — carrying what the CODE CANNOT SAY.** A manifest earns its
+   tokens only by holding NON-DERIVABLE information. The extending agent reads Python and TypeScript
+   fluently: signatures, type annotations, names and control flow already tell it *what the code does*.
+   Restating that in prose is not self-description — it is duplication, paid for on every single read,
+   and it buries the part that actually matters. Write a manifest to answer ONE question: *what would a
+   competent agent get WRONG if it had only the code?* Write that, and nothing beyond it.
+   **Mandatory — a missing manifest here is a real defect:**
+   - **The contract of a boundary** — an ABC/interface/protocol, an endpoint, a WS frame, a repository
+     method: the promise EVERY implementation must keep (ordering, bounds, idempotency, what `limit<=0`
+     or an empty input returns). An interface's implementations cannot state this; the interface must.
+   - **The justification of a tuned constant** — a threshold, a timeout, a window. A bare `0.95` reads
+     as arbitrary, and the next agent will "improve" it and silently break the system. Record what it
+     was measured against and what breaks above and below it.
+   - **Invariants and ordering the code does not enforce** — "the text is written synchronously BEFORE
+     the fingerprint", "callable only after X has run".
+   - **must-NOT rules and dependency direction** — "must NOT import from service — this is the base of
+     the package".
+   - **How to extend the unit** — which registry to register a new implementation against.
+   **Not wanted — delete it, it is pure cost:**
+   - a `purpose:` that re-lists the public names declared right below it;
+   - prose restating what a signature, a type annotation, or a well-named function already says;
+   - a manifest written only to satisfy a rule, on a unit that has nothing non-derivable to declare — a
+     ONE-LINE header naming the unit's single responsibility is the entire obligation there.
+   Correct: `contract: read_recent(limit) -> the last `limit` half-turns, oldest->newest; limit<=0 returns []; the hot path NEVER reads the whole history.`
+   Incorrect: `purpose: the value types of the facts subsystem: FactState, FactSort, FactSource, …` — the code directly below the docstring says exactly that.
+   **Prefer types over prose:** an explicit dataclass/schema/type annotation IS the machine-readable
+   manifest, and it cannot fall out of sync with the code the way a paragraph can. Reach for prose only
+   for what a type cannot express — which is precisely the mandatory list above.
 3. **Uniformity over brevity or cleverness.** The same problem is solved the same way everywhere, so
    an agent can pattern-match across the codebase. Regular, repetitive, predictable structure beats a
    terse clever one-off. Never optimize for fewer lines at the cost of predictability.

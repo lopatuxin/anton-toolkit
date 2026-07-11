@@ -72,9 +72,22 @@ a 6-file change.
 **3. The doctrine (references/logos-project.md §4) — enforce all ten.**
 - **Explicitness:** no magic, no implicit conventions, full names, explicit contracts at boundaries,
   explicit dependencies. Flag anything an agent would have to *infer*.
-- **Machine-readable manifests:** every new module/agent/tool/capability declares a structured
-  manifest (inputs/outputs, contract, capabilities, invariants, how-to-extend). Flag missing or thin
-  manifests.
+- **Manifests carry what the code CANNOT say (§4 point 2) — judge by NON-DERIVABILITY, both ways.**
+  A manifest is not measured by length. The coder's agent-reader is fluent in Python/TypeScript, so
+  prose that restates signatures, types, or names is pure cost, and a rule-satisfying manifest on a
+  unit with nothing to declare is padding.
+  Flag as **missing** (a real defect, blocker when it could mislead an extending agent): a boundary
+  (ABC/interface/endpoint/WS frame/repository method) with no stated contract — ordering, bounds,
+  idempotency, empty/`limit<=0` behavior; a **tuned constant with no justification** (a bare threshold/
+  timeout/window that the next agent would "improve" and break — it must say what it was measured
+  against and what breaks above/below); an unenforced invariant or ordering requirement; a missing
+  must-NOT / dependency-direction rule.
+  Flag as **bloat** (delete it — same defect class, opposite sign): a `purpose:` re-listing the public
+  names declared right below it; prose restating a signature or type annotation; a manifest that exists
+  only because a rule demanded one. A one-line header is the correct and complete manifest for a unit
+  with nothing non-derivable to declare.
+  Also flag prose duplicating what a TYPE could express — types cannot fall out of sync with the code;
+  paragraphs can, and stale prose actively misleads.
 - **Uniformity:** the same problem is solved the same way as elsewhere in the repo; flag a second
   divergent way of doing an existing thing.
 - **One responsibility per module — no god-modules (§4 point 9):** each module holds ONE responsibility.

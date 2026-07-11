@@ -97,10 +97,19 @@ as it governs backend code (the user never reads it; a future agent must extend 
 
 - **Explicit everything.** Full descriptive names; explicit prop/return types (TypeScript, no `any` at
   boundaries); explicit data flow; no magic, no implicit conventions an agent would have to infer.
-- **A machine-readable manifest per unit.** Every component/module/hook declares, in a structured form
-  an LLM can parse, what it is: its props/inputs/outputs, its contract, its states, its invariants, and
-  how to extend it. A future agent must understand and extend it from its manifest + docstring without
-  reading all its code.
+- **A manifest that carries what the CODE CANNOT SAY (§4 point 2).** The agent who extends this file
+  reads TypeScript fluently — prop types, names and JSX already tell it what the component renders. Do
+  NOT restate them in prose. Write a manifest to answer one question: *what would a competent agent get
+  WRONG if it had only the code?* That means: the wire CONTRACT it consumes (endpoint/WS-frame shape,
+  ordering, pagination/cursor semantics), the JUSTIFICATION of a tuned constant (a poll interval, a
+  debounce, a page size), invariants the code does not enforce (the thin-client rule, "newest on top",
+  "live push must not duplicate a paged item"), must-NOT rules, and the registration point to extend it.
+  Nothing beyond that.
+  Prefer TYPES over prose — an explicit `Props`/contract type is a manifest that cannot fall out of sync.
+  On a component with nothing non-derivable to declare, a ONE-LINE header naming its single
+  responsibility is the WHOLE obligation — do not pad it into a manifest to satisfy a rule.
+  Correct: `contract: consumes GET /api/logs (cursor-paginated, oldest->newest WITHIN a page); live WS blocks prepend and must not duplicate a paged item.`
+  Incorrect: `purpose: this component renders a list of log blocks and accepts props blocks, loading, onLoadMore` — the Props type right below says exactly that.
 - **Uniformity.** Solve the same kind of UI problem the same way across the whole app so an agent can
   pattern-match — this is the same rule as "reuse the established style", applied to code structure.
 - **Docstrings/comments as LLM context.** Dense, factual, structured: purpose, contract, states,
