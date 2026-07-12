@@ -11,6 +11,7 @@ description: >
 
   Invoked by the logos-build orchestrator after the review step. Not triggered by user phrases directly
   — the orchestrator dispatches it.
+model: sonnet
 ---
 
 # Logos test-writer — tests as the executable spec

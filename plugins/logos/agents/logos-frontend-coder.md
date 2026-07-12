@@ -15,6 +15,7 @@ description: >
   Invoked by the logos-build orchestrator during a phase build (the implement step, for the web frontend
   layer), and re-invoked to fix reviewer/QA findings that are frontend bugs. Not triggered by user
   phrases directly — the orchestrator dispatches it.
+model: sonnet
 ---
 
 # Logos frontend coder — the Logos web interface implementation agent
@@ -97,23 +98,29 @@ as it governs backend code (the user never reads it; a future agent must extend 
 
 - **Explicit everything.** Full descriptive names; explicit prop/return types (TypeScript, no `any` at
   boundaries); explicit data flow; no magic, no implicit conventions an agent would have to infer.
-- **A manifest that carries what the CODE CANNOT SAY (§4 point 2).** The agent who extends this file
-  reads TypeScript fluently — prop types, names and JSX already tell it what the component renders. Do
-  NOT restate them in prose. Write a manifest to answer one question: *what would a competent agent get
-  WRONG if it had only the code?* That means: the wire CONTRACT it consumes (endpoint/WS-frame shape,
-  ordering, pagination/cursor semantics), the JUSTIFICATION of a tuned constant (a poll interval, a
-  debounce, a page size), invariants the code does not enforce (the thin-client rule, "newest on top",
-  "live push must not duplicate a paged item"), must-NOT rules, and the registration point to extend it.
-  Nothing beyond that.
-  Prefer TYPES over prose — an explicit `Props`/contract type is a manifest that cannot fall out of sync.
-  On a component with nothing non-derivable to declare, a ONE-LINE header naming its single
-  responsibility is the WHOLE obligation — do not pad it into a manifest to satisfy a rule.
-  Correct: `contract: consumes GET /api/logs (cursor-paginated, oldest->newest WITHIN a page); live WS blocks prepend and must not duplicate a paged item.`
+- **Comment ONLY what the code cannot say — the default is NO comment (§4 point 2).** Silence is the
+  correct default, not a gap to fill. Prop types, names and JSX already say what the component renders;
+  restating them costs tokens on every read and buries the few lines that matter.
+  **There is NO manifest template.** Do not open a file with a structured header. No `purpose:` /
+  `contract:` / `invariants:` scaffold — a template gets filled because its shape demands it, not because
+  there was anything to say, and THAT is what bloated this repo. A component with nothing non-derivable
+  to say carries **no header comment at all**; that file is finished, not unfinished.
+  Write a comment when, and ONLY when, it carries one of these:
+  – an **edge case or trap** (pointer capture must be taken only past the drag threshold, never on the
+    press — capturing on press retargets the click and selection dies silently);
+  – the **justification of a tuned constant** (a debounce, a backoff curve, a page size, a drag threshold);
+  – an **invariant the code does not enforce** (thin client; "newest on top"; a live push must not
+    duplicate an item already in a loaded page; snapshot scrollTop BEFORE the fetch);
+  – a **must-NOT** (never hard-code the product version — read `GET /api/version`);
+  – a **wire promise the types cannot express** (cursor/ordering semantics; a field whose server-side
+    meaning is not obvious from its name — e.g. which side of a conflict is the STORED fact).
+  Everything else is read from the code. **The types ARE the manifest** — when a type can carry the
+  knowledge, use the type, not a sentence.
+  Correct: `// Live push must not duplicate a paged item — de-dup by id, NOT trace_id (one pass writes two episodes sharing a trace_id).`
   Incorrect: `purpose: this component renders a list of log blocks and accepts props blocks, loading, onLoadMore` — the Props type right below says exactly that.
+  When you touch a file carrying such padding, **DELETE it** — do not rewrite or "condense" it.
 - **Uniformity.** Solve the same kind of UI problem the same way across the whole app so an agent can
   pattern-match — this is the same rule as "reuse the established style", applied to code structure.
-- **Docstrings/comments as LLM context.** Dense, factual, structured: purpose, contract, states,
-  invariants, how-to-extend, what-it-must-not-do. No human onboarding narrative.
 - **No history in the code (§4 point 10) — write the PRESENT, delete the past.** A component's manifest
   states its CURRENT props/contract/states, never how it got there. Do NOT append changelogs, per-phase
   narratives, "what this screen used to be", superseded designs, or lists of past version literals to

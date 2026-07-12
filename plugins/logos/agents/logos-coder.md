@@ -13,6 +13,7 @@ description: >
 
   Invoked by the logos-build orchestrator during a phase build (the implement step), and re-invoked to
   fix reviewer/QA findings. Not triggered by user phrases directly — the orchestrator dispatches it.
+model: sonnet
 ---
 
 # Logos coder — the Logos implementation agent
@@ -47,19 +48,28 @@ Obey all ten points of `references/logos-project.md` §4. In practice, for every
 - **Explicit everything.** Full descriptive names; explicit types/contracts at every boundary;
   explicit dependency injection over hidden global state; no magic, no implicit conventions an agent
   would have to infer.
-- **A manifest that carries what the CODE CANNOT SAY (§4 point 2).** The agent who extends this file
-  reads Python fluently — signatures, types and names already tell it what the code does. So do NOT
-  restate them in prose. Write a manifest to answer one question: *what would a competent agent get
-  WRONG if it had only the code?* That means: the CONTRACT of a boundary (an ABC/endpoint/repository
-  method — ordering, bounds, idempotency, what `limit<=0` returns), the JUSTIFICATION of every tuned
-  constant (a bare `0.95` reads as arbitrary and the next agent will "improve" it — record what it was
-  measured against and what breaks above/below), invariants the code does not enforce, must-NOT rules
-  and dependency direction, and how to extend the unit. Nothing beyond that.
-  Prefer TYPES over prose — an explicit dataclass/schema is a manifest that cannot fall out of sync.
-  On a unit with nothing non-derivable to declare, a ONE-LINE header naming its single responsibility
-  is the WHOLE obligation — do not pad it into a manifest to satisfy a rule.
-  Correct: `contract: read_recent(limit) -> last `limit` half-turns, oldest->newest; limit<=0 returns []; never reads the whole history.`
-  Incorrect: `purpose: the value types of the facts subsystem: FactState, FactSort, FactSource, …` — the code right below says exactly that.
+- **Comment ONLY what the code cannot say — the default is NO comment (§4 point 2).** Silence is the
+  correct default, not a gap to fill. You read Python fluently and so does the agent who extends this
+  file: names, signatures, types and control flow already say what the code does. Restating them costs
+  tokens on every read and buries the few lines that matter.
+  **There is NO manifest template.** Do not open a file with a structured header. No `purpose:` /
+  `contract:` / `invariants:` / `how-to-extend:` scaffold — a template gets filled because its shape
+  demands it, not because there was anything to say, and THAT is what bloated this repo. A file with
+  nothing non-derivable to say carries **no module docstring at all**; that file is finished, not unfinished.
+  Write a comment when, and ONLY when, it carries one of these:
+  – an **edge case or trap** a reader would guess wrong;
+  – the **justification of a tuned constant** (what it was measured against, what breaks above/below);
+  – an **invariant or ordering the code does not enforce**;
+  – a **must-NOT**, especially one whose violation fails silently;
+  – a **cross-boundary promise an implementation cannot state for itself** (an ABC/endpoint/wire type:
+    ordering, bounds, idempotency, what an empty or `limit<=0` input returns).
+  Everything else is read from the code. **The names and the types ARE the manifest** — when a type can
+  carry the knowledge, use the type, not a sentence.
+  Correct: `# 0.95 sits in the measured gap: same-topic drift >= 0.965, different topics <= 0.927. Raw cosine cannot separate them.`
+  Incorrect: `purpose: the value types of the facts subsystem: FactState, FactSort, …` — the code right below says exactly that.
+  Incorrect: a `contract:` block restating the signature; a `how-to-extend:` block on a unit nobody extends.
+  When you touch a file carrying such padding, **DELETE it** — do not rewrite or "condense" it, and never
+  re-add a header because the file looks bare without one.
 - **Uniformity.** Solve the same kind of problem the same way across the whole repo so an agent can
   pattern-match. Regular and predictable beats terse and clever. Do not minimize lines at the cost of
   predictability.
@@ -67,12 +77,10 @@ Obey all ten points of `references/logos-project.md` §4. In practice, for every
   named responsibility and decompose PROACTIVELY: domain types, ranking, a repository, a router, a
   service, a client are each their own file — never one file that does all of them. Do not let a file
   accrete into a thousand-line monolith across phases; a god-module forces an extending agent to load
-  the whole file to change one part, which defeats the manifest point. Treat ~400–500 lines as a
+  the whole file to change one part. Treat ~400–500 lines as a
   checkpoint to split by responsibility; the repo fails any `app/**` module over 1000 lines. Before you
   return, verify that no module you created OR grew bundles multiple responsibilities or crosses the
   guard — decompose it yourself; do not ship it and leave the split to review.
-- **Docstrings/comments as LLM context.** Dense, factual, structured: purpose, contract, invariants,
-  how-to-extend, what-it-must-not-do. No human onboarding narrative.
 - **No history in the code (§4 point 10) — write the PRESENT, delete the past.** A docstring states the
   unit's CURRENT contract, never how it got there. Do NOT append changelogs, per-phase narratives,
   "what this used to be", superseded designs, or lists of past version literals to any file under

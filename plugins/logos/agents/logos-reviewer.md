@@ -72,20 +72,21 @@ a 6-file change.
 **3. The doctrine (references/logos-project.md §4) — enforce all ten.**
 - **Explicitness:** no magic, no implicit conventions, full names, explicit contracts at boundaries,
   explicit dependencies. Flag anything an agent would have to *infer*.
-- **Manifests carry what the code CANNOT say (§4 point 2) — judge by NON-DERIVABILITY, both ways.**
-  A manifest is not measured by length. The coder's agent-reader is fluent in Python/TypeScript, so
-  prose that restates signatures, types, or names is pure cost, and a rule-satisfying manifest on a
-  unit with nothing to declare is padding.
-  Flag as **missing** (a real defect, blocker when it could mislead an extending agent): a boundary
-  (ABC/interface/endpoint/WS frame/repository method) with no stated contract — ordering, bounds,
-  idempotency, empty/`limit<=0` behavior; a **tuned constant with no justification** (a bare threshold/
-  timeout/window that the next agent would "improve" and break — it must say what it was measured
-  against and what breaks above/below); an unenforced invariant or ordering requirement; a missing
-  must-NOT / dependency-direction rule.
-  Flag as **bloat** (delete it — same defect class, opposite sign): a `purpose:` re-listing the public
-  names declared right below it; prose restating a signature or type annotation; a manifest that exists
-  only because a rule demanded one. A one-line header is the correct and complete manifest for a unit
-  with nothing non-derivable to declare.
+- **Comments carry only what the code CANNOT say — the default is NO comment (§4 point 2). Judge both
+  ways.** A comment is not measured by length or by having a nice structure. The reader is fluent in
+  Python/TypeScript, so any prose restating names, signatures or types is pure cost.
+  Flag as **bloat — delete it** (this is the common case and you must be aggressive about it): a
+  structured manifest header on a unit that has nothing non-derivable to say; a `purpose:` re-listing the
+  names declared right below it; a `contract:` block restating the signature; a `how-to-extend:` block on
+  a unit nobody extends; prose describing what a function does or what a module contains. **A file with
+  no module docstring at all is CORRECT and complete — never ask for one back.** Never accept a
+  "condensed" rewrite where a delete was right.
+  Flag as **missing** (a real defect, blocker when it could mislead an extending agent): a **tuned
+  constant with no justification** (a bare threshold/timeout/window the next agent would "improve" and
+  break — it must say what it was measured against and what breaks above/below); an **edge case or trap**
+  a reader would guess wrong; an **invariant or ordering the code does not enforce**; a **must-NOT** whose
+  violation fails silently; a **cross-boundary promise** an implementation cannot state for itself
+  (ordering, bounds, idempotency, empty/`limit<=0` behavior on an ABC/endpoint/wire type).
   Also flag prose duplicating what a TYPE could express — types cannot fall out of sync with the code;
   paragraphs can, and stale prose actively misleads.
 - **Uniformity:** the same problem is solved the same way as elsewhere in the repo; flag a second

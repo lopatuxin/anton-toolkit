@@ -88,41 +88,43 @@ on `logos-coder` (how to write) and `logos-reviewer` (what to enforce). Concrete
 1. **Explicit over implicit, always.** No magic, no clever implicit conventions, no relying on the
    reader's intuition. Full descriptive names, explicit types/contracts at every boundary, explicit
    wiring. An agent should never have to *infer* what is happening.
-2. **Machine-readable self-description — carrying what the CODE CANNOT SAY.** A manifest earns its
-   tokens only by holding NON-DERIVABLE information. The extending agent reads Python and TypeScript
-   fluently: signatures, type annotations, names and control flow already tell it *what the code does*.
-   Restating that in prose is not self-description — it is duplication, paid for on every single read,
-   and it buries the part that actually matters. Write a manifest to answer ONE question: *what would a
-   competent agent get WRONG if it had only the code?* Write that, and nothing beyond it.
-   **Mandatory — a missing manifest here is a real defect:**
-   - **The contract of a boundary** — an ABC/interface/protocol, an endpoint, a WS frame, a repository
-     method: the promise EVERY implementation must keep (ordering, bounds, idempotency, what `limit<=0`
-     or an empty input returns). An interface's implementations cannot state this; the interface must.
-   - **The justification of a tuned constant** — a threshold, a timeout, a window. A bare `0.95` reads
-     as arbitrary, and the next agent will "improve" it and silently break the system. Record what it
-     was measured against and what breaks above and below it.
-   - **Invariants and ordering the code does not enforce** — "the text is written synchronously BEFORE
-     the fingerprint", "callable only after X has run".
-   - **must-NOT rules and dependency direction** — "must NOT import from service — this is the base of
-     the package".
-   - **How to extend the unit** — which registry to register a new implementation against.
-   **Not wanted — delete it, it is pure cost:**
-   - a `purpose:` that re-lists the public names declared right below it;
-   - prose restating what a signature, a type annotation, or a well-named function already says;
-   - a manifest written only to satisfy a rule, on a unit that has nothing non-derivable to declare — a
-     ONE-LINE header naming the unit's single responsibility is the entire obligation there.
-   Correct: `contract: read_recent(limit) -> the last `limit` half-turns, oldest->newest; limit<=0 returns []; the hot path NEVER reads the whole history.`
-   Incorrect: `purpose: the value types of the facts subsystem: FactState, FactSort, FactSource, …` — the code directly below the docstring says exactly that.
-   **Prefer types over prose:** an explicit dataclass/schema/type annotation IS the machine-readable
-   manifest, and it cannot fall out of sync with the code the way a paragraph can. Reach for prose only
-   for what a type cannot express — which is precisely the mandatory list above.
+2. **Comment ONLY what the code cannot say. The default is NO comment.** Silence is the correct default,
+   not a gap to be filled. The agent who will extend this file reads Python and TypeScript fluently:
+   names, signatures, types and control flow already tell it *what the code does*. Restating that in
+   prose is not "self-description" — it is duplication, paid for on every read, and it buries the few
+   lines that actually matter. Before writing any comment, ask: *would a competent agent, reading only
+   the code, get this WRONG?* If no — write nothing.
+   **There is NO manifest template.** Do not open a file with a structured header. There are no required
+   sections and no `purpose:` / `contract:` / `invariants:` / `how-to-extend:` scaffold to fill in.
+   A template is the very machine that produced this codebase's bloat: sections get written because the
+   shape demands them, not because there was anything to say. A file with nothing non-derivable to say
+   carries **no module docstring at all** — that is a finished, correct file, not an unfinished one.
+   **Write a comment when, and ONLY when, it carries one of these:**
+   - **An edge case or a trap** — behavior a reader would guess wrong (`must_not` on a field a point
+     LACKS does not match, so untyped points still return; `array_to_string` is only STABLE, so the
+     index and the query must reference the same named expression or the search silently seq-scans).
+   - **The justification of a tuned constant** — what it was measured against and what breaks above and
+     below. A bare `0.95` reads as arbitrary and the next agent will "improve" it and break the system.
+   - **An invariant or ordering the code does not enforce** — "the text is written synchronously BEFORE
+     the fingerprint"; "callable only after X has run".
+   - **A must-NOT** — including dependency direction, and rules whose violation fails silently.
+   - **A cross-boundary promise an implementation cannot state for itself** — on an ABC/endpoint/wire
+     type: ordering, bounds, idempotency, what an empty or `limit<=0` input returns.
+   Everything else — what a function does, what a type holds, what a module contains, which names it
+   exports — is READ FROM THE CODE. **The names and the types ARE the manifest**, and unlike prose they
+   cannot fall out of sync. When a type can carry the knowledge, use the type, not a sentence.
+   Correct: `# 0.95 sits in the measured gap: same-topic drift >= 0.965, different topics <= 0.927. Raw cosine cannot separate them.`
+   Incorrect: `purpose: the value types of the facts subsystem: FactState, FactSort, FactSource, …` — the code directly below says exactly that.
+   Incorrect: a `contract:` block restating the signature; a `how-to-extend:` block on a unit nobody extends; a `purpose:` on a file whose name already says it.
+   When you edit a file that carries such padding, **DELETE it** — do not rewrite it, do not "condense"
+   it, and never re-add a header because the file looks bare without one.
 3. **Uniformity over brevity or cleverness.** The same problem is solved the same way everywhere, so
    an agent can pattern-match across the codebase. Regular, repetitive, predictable structure beats a
    terse clever one-off. Never optimize for fewer lines at the cost of predictability.
-4. **Comments and docstrings are LLM context, not a human tutorial.** Dense, factual, structured:
-   what this unit does, its contract, its invariants, how to extend it, what it must NOT do. No
-   onboarding narrative, no motivational prose. Write them for the future agent that will modify this
-   file with no other context.
+4. **When a comment IS warranted (point 2), keep it short and factual.** State the trap, the number, the
+   invariant — one or two lines, at the line it protects. No onboarding narrative, no motivational prose,
+   no restating the code in words, and no ceremonial header wrapping it. A comment is a warning sign
+   nailed to a specific hazard, not a description of the road.
 5. **Extensibility by registration, not by core edits.** New capabilities are added by registering a
    new unit against a stable interface (plugin/registry pattern), not by editing the core. Interfaces
    are stable and explicit; the core is closed for modification, open for extension.
@@ -137,8 +139,8 @@ on `logos-coder` (how to write) and `logos-reviewer` (what to enforce). Concrete
 9. **One responsibility per module — no god-modules.** Each file/module holds a SINGLE, clearly-named
    responsibility (domain types, ranking math, a repository, a router, a service, a client, …), and
    each responsibility is its own unit. A module that bundles several responsibilities, or that grows
-   so large an agent must ingest the whole file to change one part, DIRECTLY defeats point 2 (understand
-   and extend a unit *without reading all of its code*) and clogs the extending agent's context window —
+   so large an agent must ingest the whole file to change one part, clogs the extending agent's context
+   window and forces it to read everything to change anything —
    so decomposition is an AI-readability requirement here, not a human-ergonomics nicety. Decompose by
    responsibility from the FIRST phase and keep it decomposed; never let a file accrete across phases
    into a thousand-line monolith. Treat a module crossing ~400–500 lines as a decomposition checkpoint
