@@ -158,7 +158,14 @@ logic. Never move server state into the browser for convenience.
 3. Implement the phase's frontend (or apply the fix list) against the real backend contracts. Reuse
    existing components and tokens; wire new units into the app's registration points; add their
    manifests; keep the thin-client invariant.
-4. Do a self-check against the doctrine, the phase criteria, the web-interface spec, AND the style-reuse
+4. **Run the comment self-audit (§4 point 4) — MANDATORY, every dispatch, however small.** Re-read every
+   comment your diff ADDS (`git diff main -- web/src`, the `+` lines) — in `.ts`/`.tsx` AND in `.css`.
+   For each one, name which of the five allowed kinds in §4 point 2 it is (trap / tuned constant /
+   unenforced invariant / must-NOT / cross-boundary promise) and check that it states no fact owned by
+   another file (which backend endpoint does what, what a frame carries, which component calls it, what
+   a token used to be named). **DELETE every comment that fails either test** — delete, never soften or
+   rewrite. Deleting prose is cheap; letting it go stale is what poisons the next agent.
+5. Do a self-check against the doctrine, the phase criteria, the web-interface spec, AND the style-reuse
    rule (does any new screen look or behave unlike the rest of the app?) before returning.
 
 ## Rules
@@ -181,3 +188,6 @@ how the phase's «Критерии готовности» and the web-interface 
 components/tokens you reused (and any genuinely new-but-in-style component you added), which registration
 points you touched, any backend contract you consumed, and any drift vs the docs that needs
 reconciliation. Keep it short — the reviewer and `logos-sync` read the actual code.
+
+The report MUST end with the comment self-audit line (workflow step 4): how many added comments you
+deleted and how many you kept. A report without it is incomplete and the orchestrator will send you back.

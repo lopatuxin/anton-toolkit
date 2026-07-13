@@ -118,6 +118,22 @@ on `logos-coder` (how to write) and `logos-reviewer` (what to enforce). Concrete
    Incorrect: a `contract:` block restating the signature; a `how-to-extend:` block on a unit nobody extends; a `purpose:` on a file whose name already says it.
    When you edit a file that carries such padding, **DELETE it** — do not rewrite it, do not "condense"
    it, and never re-add a header because the file looks bare without one.
+   **NEVER state in a comment a fact that lives in ANOTHER file.** This is the single largest source of
+   lying comments, and it lies *by construction*: the other file changes, this prose does not. Banned in a
+   comment or docstring, with no exceptions:
+   - **Who calls this** — "called from the notification card", "the panel button calls this", "its only
+     caller is X", "the ONE web-reachable owner-only write".
+   - **What the UI has** — buttons, cards, screens, tabs, whether a surface exists at all.
+   - **Inventories and counts of things defined elsewhere** — "there are four write doors", "the only
+     endpoint that …", lists of routes/fields/kinds owned by another module.
+   - **Names owned elsewhere** — a field name, a route path, a module path, a frame `kind` quoted in prose
+     ("`snapshot` carries `open_conflicts`"). Quote a name only where that name is DEFINED, never where it
+     is merely referenced.
+   If the knowledge genuinely matters, it belongs at its own definition site, in a type, or in a test —
+   all three fail loudly when they go stale, whereas a comment about another file fails silently and
+   misleads the next agent into hunting something that no longer exists.
+   Correct (at the definition, about ITSELF): `# limit <= 0 returns ([], False) — callers must not treat it as "no more pages".`
+   Incorrect (about another file): `# the frontend card calls this after the owner clicks «Принять».`
 3. **Uniformity over brevity or cleverness.** The same problem is solved the same way everywhere, so
    an agent can pattern-match across the codebase. Regular, repetitive, predictable structure beats a
    terse clever one-off. Never optimize for fewer lines at the cost of predictability.
@@ -125,6 +141,14 @@ on `logos-coder` (how to write) and `logos-reviewer` (what to enforce). Concrete
    invariant — one or two lines, at the line it protects. No onboarding narrative, no motivational prose,
    no restating the code in words, and no ceremonial header wrapping it. A comment is a warning sign
    nailed to a specific hazard, not a description of the road.
+   **Mandatory comment self-audit before you hand work back.** Prose is cheap to delete and expensive to
+   catch once it has gone stale, so the deletion pass happens BEFORE review, by you, not after review, by
+   a second round-trip. As the LAST step of every coder dispatch, re-read every comment and docstring your
+   diff ADDS (`git diff main -- <your layer>`, look at `+` lines) and, for each one, answer out loud:
+   *which of the five allowed kinds in point 2 is this, and does it state any fact owned by another file?*
+   **DELETE every comment that is not one of the five kinds, and every comment that reaches into another
+   file.** Do not soften them, do not rewrite them — delete. Then report, in your final message, how many
+   you deleted and how many you kept. A coder report with no self-audit line is an incomplete report.
 5. **Extensibility by registration, not by core edits.** New capabilities are added by registering a
    new unit against a stable interface (plugin/registry pattern), not by editing the core. Interfaces
    are stable and explicit; the core is closed for modification, open for extension.

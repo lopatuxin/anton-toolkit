@@ -115,7 +115,8 @@ finish before the next; feed each agent the prior agent's report.
    Hard scope boundaries (do NOT build ahead): <paste «Что НЕ входит»>.
    Implement only this phase's SERVER-SIDE layers — the web frontend is built separately by logos-frontend-coder; do NOT write browser client code. Self-describing, explicit, machine-readable, extensible by registration.
    Also bump PRODUCT_VERSION in gateway/app/version.py to 0.<phase-number>.0 (MINOR = phase number) per references/logos-project.md §9 — a phase is not built until the version reflects it.
-   Return: what you created/changed (files + one-line each), the new PRODUCT_VERSION, the backend contracts (endpoints/WS frames) this phase exposes for the frontend, and any drift you had to introduce vs the docs.
+   Before returning, run the MANDATORY comment self-audit (§4 point 4): re-read every comment your diff ADDS, delete every one that is not one of the five allowed kinds (§4 point 2) and every one that states a fact owned by another file (callers, UI surfaces, inventories, names defined elsewhere). Delete — never soften or rewrite.
+   Return: what you created/changed (files + one-line each), the new PRODUCT_VERSION, the backend contracts (endpoints/WS frames) this phase exposes for the frontend, any drift you had to introduce vs the docs, and the comment self-audit line (how many added comments you deleted, how many you kept).
    ")
    ```
    Then, **only if the phase touches the web frontend layer**, dispatch **logos-frontend-coder** (web
@@ -130,7 +131,8 @@ finish before the next; feed each agent the prior agent's report.
    Backend contracts to consume: <paste the contracts from logos-coder's report>.
    Hard scope boundaries (do NOT build ahead): <paste «Что НЕ входит»>.
    Build only this phase's web UI. REUSE the established Logos frontend style — existing design tokens, components, layout shell, CSS conventions; NEVER invent a new visual language, palette, font, or styling system. Thin client: no source-of-truth state or business logic on the client; read the product version via GET /api/version, do NOT bump it.
-   Return: frontend files created/changed (one-line each), how «Критерии готовности» + the web-interface spec are covered, which existing components/tokens you reused, and any drift vs the docs.
+   Before returning, run the MANDATORY comment self-audit (§4 point 4) over web/src (including .css): delete every added comment that is not one of the five allowed kinds (§4 point 2) and every one that states a fact owned by another file (which endpoint does what, what a frame carries, which component calls it). Delete — never soften or rewrite.
+   Return: frontend files created/changed (one-line each), how «Критерии готовности» + the web-interface spec are covered, which existing components/tokens you reused, any drift vs the docs, and the comment self-audit line (how many added comments you deleted, how many you kept).
    ")
    ```
    Routing: a **backend-only** phase skips `logos-frontend-coder`; a **frontend-only** phase (e.g. a
@@ -161,7 +163,7 @@ question in Russian, then continue.
 
 ## 4a. Doctrine guard — mechanical, runs after the coders and BEFORE the reviewer
 
-Two doctrine violations are cheap to catch mechanically and expensive to let through, because both
+These doctrine violations are cheap to catch mechanically and expensive to let through, because they
 grow without bound and every agent of every later phase pays to read the result. Run this guard
 yourself (it is a check, not production code) after step 4.1's coders and before dispatching
 `logos-reviewer` in step 4.2:
@@ -174,12 +176,33 @@ git -C "$CODE" grep -nE 'Фаза-[0-9]|ДРЕЙФ-|superseded|prior standing|RE
 # 2. Module-size guard — no app/** module over 1000 lines (reference §4 point 9).
 find "$CODE/gateway/app" "$CODE/web/src" -type f \( -name '*.py' -o -name '*.ts' -o -name '*.tsx' \) \
   -exec awk 'END {if (NR > 1000) print FILENAME": "NR" lines"}' {} \;
+
+# 3. Comment volume in the diff — prose the coders ADDED this phase (reference §4 points 2 and 4).
+git -C "$CODE" diff main --unified=0 -- 'gateway/app' 'web/src' \
+  | grep -E '^\+' | grep -vE '^\+\+\+' \
+  | awk '{ if ($0 ~ /^\+[[:space:]]*(#|\/\/|\*|"""|'"'''"')/) prose++; else if ($0 ~ /[^[:space:]+]/) code++ }
+         END { printf "added: %d code, %d prose (%.0f%%)\n", code, prose, 100*prose/(code+prose) }'
 ```
 
-A hit is a **blocker**, not a nit. Route it back to the right coder (backend → `logos-coder`, frontend
-→ `logos-frontend-coder`) with the instruction to **DELETE** the historical prose (never rewrite or
-"condense" it) or to decompose the oversized module, then re-run the guard. Only when it is clean does
-the phase proceed to review.
+Checks 1 and 2: a hit is a **blocker**, not a nit. Route it back to the right coder (backend →
+`logos-coder`, frontend → `logos-frontend-coder`) with the instruction to **DELETE** the historical prose
+(never rewrite or "condense" it) or to decompose the oversized module, then re-run the guard.
+
+Check 3 is a **smell, not a hard gate** — it tells you whether the coders actually ran their mandatory
+comment self-audit (§4 point 4). Above roughly **25% prose in the added lines**, assume they did not:
+demand the self-audit line from their report (how many comments they deleted, how many they kept), and if
+it is missing or the number is zero, send them back to run it BEFORE the reviewer sees the diff. Deleting
+prose costs one cheap pass; letting the reviewer find it stale costs a full review round-trip per finding.
+Judge the number, do not obey it blindly: a phase that is mostly new ABCs and wire contracts legitimately
+carries more cross-boundary promises than a phase of plumbing.
+
+**Read the comments the diff adds, not just their count.** The most expensive comment in this codebase is
+not the long one — it is the one that states a fact owned by ANOTHER file (who calls this, what button the
+UI has, "the only endpoint that …", a field or route name quoted where it is merely referenced). It is
+true the day it is written and false the day the other file moves, and no grep will ever catch it. If you
+see one, it is a blocker: send it back to be **deleted** (never "updated to match").
+
+Only when the guard is clean does the phase proceed to review.
 
 The one legal exception is a terse spec pointer — `spec: Фазы/Фаза-23-самость.md`. A phase name used
 as narrative («в Фазе-07 мы заменили…», «prior standing value was 0.22.0», a `history:` section) is a

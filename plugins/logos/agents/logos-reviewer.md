@@ -89,6 +89,18 @@ a 6-file change.
   (ordering, bounds, idempotency, empty/`limit<=0` behavior on an ABC/endpoint/wire type).
   Also flag prose duplicating what a TYPE could express — types cannot fall out of sync with the code;
   paragraphs can, and stale prose actively misleads.
+- **A comment that states a fact owned by ANOTHER file is a BLOCKER, not a nit (§4 point 2).** This is the
+  most common defect in this codebase and the most expensive: the other file changes, the prose does not,
+  and the next agent is sent hunting for something that no longer exists. Read every added comment as a
+  CLAIM and check it against the code it describes — a claim about a caller, a UI button/card/screen, an
+  inventory ("the four write doors", "the ONE web-reachable write"), a route path, a field or frame name
+  quoted where it is merely referenced rather than defined. Verify each such claim; if it is already false,
+  it is a blocker; if it is true today but owned by another file, it is still a blocker, because it is a lie
+  waiting to happen. The fix is always **delete** — never "update the comment to match".
+- **A comment that contradicts its own code is a BLOCKER.** A docstring promising "best-effort, never
+  fatal" over code that raises, an ABC promising fail-soft that no implementation honors, a `MUST equal`
+  the implementation cannot guarantee. Check the promise against the body, not just the prose against
+  itself. Either the code or the promise is wrong — say which, and never let both ship.
 - **Uniformity:** the same problem is solved the same way as elsewhere in the repo; flag a second
   divergent way of doing an existing thing.
 - **One responsibility per module — no god-modules (§4 point 9):** each module holds ONE responsibility.

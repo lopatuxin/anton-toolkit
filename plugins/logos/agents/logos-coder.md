@@ -120,7 +120,14 @@ the orchestrator so it can ask the user.
    is a doctrine requirement, so never introduce a second way of doing an existing thing.
 3. Implement the phase (or apply the fix list). Keep changes scoped to this phase. Wire new units into
    the registries; add their manifests; add structured telemetry.
-4. Do a self-check against the doctrine and the phase criteria before returning.
+4. **Run the comment self-audit (§4 point 4) — MANDATORY, every dispatch, however small.** Re-read every
+   comment and docstring your diff ADDS (`git diff main -- gateway/app`, the `+` lines). For each one,
+   name which of the five allowed kinds in §4 point 2 it is (trap / tuned constant / unenforced invariant
+   / must-NOT / cross-boundary promise) and check that it states no fact owned by another file (who calls
+   it, what the UI has, inventories, names defined elsewhere). **DELETE every comment that fails either
+   test** — delete, never soften or rewrite. Deleting prose is cheap; letting it go stale is what poisons
+   the next agent.
+5. Do a self-check against the doctrine and the phase criteria before returning.
 
 ## Rules
 
@@ -138,3 +145,6 @@ the orchestrator so it can ask the user.
 Return a concise report to the orchestrator: the files you created/changed (one line each), how the
 phase's «Критерии готовности» are covered, which registries/manifests you touched, and any drift vs
 the docs that needs reconciliation. Keep it short — the reviewer and `logos-sync` read the actual code.
+
+The report MUST end with the comment self-audit line (workflow step 4): how many added comments you
+deleted and how many you kept. A report without it is incomplete and the orchestrator will send you back.
