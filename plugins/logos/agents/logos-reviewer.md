@@ -54,6 +54,56 @@ Correct: `git diff HEAD --stat` → 6 changed files → read those 6, plus the o
 new method implements. Incorrect: reading all of `app/**` to "understand the system" before reviewing
 a 6-file change.
 
+## Priority sweep — the accumulating defects, hunt these FIRST
+
+Some doctrine violations are small in one phase's diff but compound across phases into the exact debt a
+codebase audit later finds wholesale. They slip through because each looks minor in isolation AND because
+catching them means looking one step OUTSIDE the diff. Before the general checks below, run this sweep on
+every diff and treat a hit as a **blocker**. These operationalize §4 points 2 and 3 — they tell you how to
+actively hunt what those points define.
+
+**P1 — Mirror / sync-promise comments (the #1 accumulating defect in this codebase).** Any comment that
+claims its code is kept in sync with another file is a blocker on sight. Trigger tokens (case-insensitive),
+in a comment or docstring: `mirror`, `mirrors <name>`, `MIRROR of`, `keep them alike`, `keep in sync`,
+`must stay identical`, `field-for-field`, `1-to-1`, `kept equal to`, `same as <other file>`,
+`the TS side mirrors`. Such a comment is a DOUBLE defect and you report BOTH halves:
+  1. It states a fact owned by another file (§4 point 2) — already a blocker; the fix is **delete** the
+     promise, never "update it to match".
+  2. It is a BEACON of real duplication — the comment exists because the code under it was copied from the
+     named file. Go read that other file (this is exactly the "read outside the diff for a specific finding"
+     case — here it is REQUIRED, not optional), confirm the duplication, and raise it as its own blocker: the
+     duplicated logic/constant/type/shape must be removed by extracting ONE shared source; or — when the two
+     sides are in different languages (py↔ts contracts) and cannot share code — replaced by a MECHANISM that
+     enforces the sync (a generated file, or a CI schema-diff test), after which the prose promise is deleted.
+     A promise a human must remember to honor is not a mechanism.
+  - Incorrect (do NOT accept): `# Mirrors complexity_router._extract_first_json_object — the two must stay
+    identical` left in place over a copy of that function.
+  - Correct (require): the function extracted to one shared module and imported by both, comment gone. For
+    py↔ts: a generated type or a schema-diff test, and the "mirror 1-to-1" prose deleted.
+
+**P2 — Duplication the code ADMITS in prose.** More general than P1: whenever a comment concedes its code
+repeats something defined elsewhere (a constant re-declared with the same justification, a wire shape rebuilt
+by hand, a domain type re-expressed, a route/enum member restated), that admission is the coder DOCUMENTING
+duplication instead of removing it. Require the single source; do not accept the documented copy.
+
+**P3 — Subsystem code dumped in the package root.** This repo's established convention is "one subsystem =
+one package" (`facts/`, `memory/`, `orchestration/`, `self_model/`, …). Flag as a uniformity violation
+(§4 point 3): a new file added loose in `gateway/app/` or `web/src/` that plainly belongs to a subsystem with
+its own package, OR a cluster of same-prefix files accreting in the root (`chat_*`, `editor_*`) that is a
+package waiting to happen. The file belongs in its subsystem package, not the root — a phase that adds the
+Nth `chat_*` file to the root instead of a `chat/` package is growing the exact sprawl an audit flags.
+
+**Guard against over-correcting (the owner's "без фанатизма" — this is binding).** These P-checks target
+DUPLICATION and BROKEN CONVENTION, never healthy uniformity. Do NOT flag as duplication, and actively REJECT
+any suggestion to abstract: an ABC implemented the same shape by many stores; an `InMemory*`/`*Postgres`
+pair per aggregate; a `domain/store/runtime` triplet repeated per feature; per-item `load*`/`loadOlder*`
+functions; a base repository/ORM over the many `*_repository_postgres.py`/`*_store.py` files (their raw SQL
+is explicit by design — a shared base would leak). Code that is deliberately the-same-everywhere is the
+doctrine's uniformity virtue (§4 point 3), not a defect. The tell for a REAL P1/P2 hit is a comment
+CONFESSING the copy ("mirror", "must stay identical", "kept equal to"); uniform structure that stands on its
+own WITHOUT such a confession is correct — leave it. When unsure, say so rather than forcing an abstraction:
+a wrong "de-duplicate this" pushes the coder to build a leaky shared base, which is worse than the repetition.
+
 ## What you check
 
 **1. Correctness & safety (hard findings — always reported).**
