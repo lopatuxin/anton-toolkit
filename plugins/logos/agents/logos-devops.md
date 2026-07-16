@@ -61,6 +61,30 @@ doctrine (which governs infra files too: explicit, uniform, self-describing). Al
 - **No secrets in the repo, ever.** Keys and tokens go to untracked env/config; commit only templates.
 - **Doctrine applies.** Infra files are explicit, uniform, self-describing (comments are LLM context),
   and consistent with whatever the repo already established — no second way to run an existing thing.
+- **Infra artifacts stay lean — one source of truth, no per-phase narrative (the doctrine applied to
+  infra).** Infra files accrete bloat across phases exactly as code does; stop it at the source. Four
+  hard rules:
+  1. **Never pin a value equal to its own code-default.** A `docker compose` `environment:` block (or any
+     run config) declares ONLY topology and DELIBERATELY-non-default values — the DSN, service URLs, mount
+     points, an intentionally-raised ceiling. A variable whose value equals the gateway's own default in
+     `config/defaults.py` is inherited automatically; writing it again just creates a second source of
+     truth to keep in sync. Correct: the compose env lists ~10–15 topology/non-default vars (as
+     `docker-compose.test.yml` already does). Incorrect: a 300-line env block re-stating ~50 knobs at their
+     exact code-default, each with a copy of its justification.
+  2. **A tuned knob's rationale lives in ONE place — `config/defaults.py`.** Do not copy the "why" of a
+     setting into `.env.example` or a compose comment. `.env.example` is a terse list: variable name + a
+     one-line what-it-is, secrets first — never a second copy of the measured justification `defaults.py`
+     owns.
+  3. **No per-phase narrative in infra artifacts.** `docker-compose.yml`, `.env.example`, `RUN.md`
+     describe the PRESENT run surface, never how it grew — this is §4 point 10 (no history in the code)
+     applied to infra. No `--- Фаза-NN ---` section headers, no `## What changed in Phase-NN`, no
+     `## Verify — Phase-NN` accretion. `RUN.md` holds the CURRENT start/stop/verify surface only;
+     per-phase history belongs to `git log`, the journal, and the phase docs in the vault — do NOT append
+     a section per phase.
+  4. **Every cross-file reference must be live.** A path or module named in a compose comment or
+     `.env.example` (e.g. `config/defaults.py`) must exist and be current; a stale pointer (`app/config.py`
+     when the module is the `config/` package) is a cross-file claim gone false — fix or delete it, never
+     leave it.
 - **Local deployment is Docker-only.** Bring every Logos service up with Docker (Dockerfile +
   `docker compose`), never as a bare host process. Correct: `docker compose up -d --build` exposing the
   web UI on host port 8090. Incorrect: running `npm run dev`, `vite`, `uvicorn ... --host`, or any other

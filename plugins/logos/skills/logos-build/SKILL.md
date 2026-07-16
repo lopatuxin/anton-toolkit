@@ -182,11 +182,22 @@ git -C "$CODE" diff main --unified=0 -- 'gateway/app' 'web/src' \
   | grep -E '^\+' | grep -vE '^\+\+\+' \
   | awk '{ if ($0 ~ /^\+[[:space:]]*(#|\/\/|\*|"""|'"'''"')/) prose++; else if ($0 ~ /[^[:space:]+]/) code++ }
          END { printf "added: %d code, %d prose (%.0f%%)\n", code, prose, 100*prose/(code+prose) }'
+
+# 4. History/bloat in the INFRA artifacts — per-phase narrative BANNED (§4 point 10 applied to infra).
+#    docker-compose.yml / .env.example / RUN.md have no reviewer loop of their own, so this is their
+#    only auto-net. A `--- Фаза-NN ---` header or a `What changed in Phase-NN` section is the tell that
+#    infra is accreting a phase-by-phase changelog (the 64KB-compose / 76KB-RUN.md bloat an audit finds).
+grep -nE 'Фаза-[0-9]|What changed in Phase|Verify.*Phase-?[0-9]|Carried over from Phase' \
+  "$CODE/docker-compose.yml" "$CODE/gateway/.env.example" "$CODE/RUN.md" 2>/dev/null
 ```
 
-Checks 1 and 2: a hit is a **blocker**, not a nit. Route it back to the right coder (backend →
-`logos-coder`, frontend → `logos-frontend-coder`) with the instruction to **DELETE** the historical prose
-(never rewrite or "condense" it) or to decompose the oversized module, then re-run the guard.
+Checks 1, 2 and 4: a hit is a **blocker**, not a nit. For checks 1 and 2 route it back to the right coder
+(backend → `logos-coder`, frontend → `logos-frontend-coder`) with the instruction to **DELETE** the
+historical prose (never rewrite or "condense" it) or to decompose the oversized module. For check 4 route
+it back to `logos-devops` to **DELETE** the per-phase narrative from the infra artifact — and, while there,
+to strip any `environment:` var pinned to its own `config/defaults.py` default (a second source of truth
+that must be kept in sync; the compose env carries only topology and deliberately-non-default values). Then
+re-run the guard.
 
 Check 3 is a **smell, not a hard gate** — it tells you whether the coders actually ran their mandatory
 comment self-audit (§4 point 4). Above roughly **25% prose in the added lines**, assume they did not:
