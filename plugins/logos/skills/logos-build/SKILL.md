@@ -114,7 +114,7 @@ finish before the next; feed each agent the prior agent's report.
    Build plan / layer→stack routing: <paste the plan from step 3>.
    Hard scope boundaries (do NOT build ahead): <paste «Что НЕ входит»>.
    Implement only this phase's SERVER-SIDE layers — the web frontend is built separately by logos-frontend-coder; do NOT write browser client code. Self-describing, explicit, machine-readable, extensible by registration.
-   Also bump PRODUCT_VERSION in gateway/app/version.py to 0.<phase-number>.0 (MINOR = phase number) per references/logos-project.md §9 — a phase is not built until the version reflects it.
+   Also bump PRODUCT_VERSION in gateway/app/version.py per references/logos-project.md §9 — plain semver BY THE MEANING of the release (MAJOR = large/incompatible leap, MINOR = a notable new capability, PATCH = a small/in-phase change), DECOUPLED from the phase number (do NOT set 0.<phase>.0; the first real release 1.0.0 shipped in Фаза-34). A phase is not built until the version reflects the release it delivered.
    Before returning, run the MANDATORY comment self-audit (§4 point 4): re-read every comment your diff ADDS, delete every one that is not one of the five allowed kinds (§4 point 2) and every one that states a fact owned by another file (callers, UI surfaces, inventories, names defined elsewhere). Delete — never soften or rewrite.
    Return: what you created/changed (files + one-line each), the new PRODUCT_VERSION, the backend contracts (endpoints/WS frames) this phase exposes for the frontend, any drift you had to introduce vs the docs, and the comment self-audit line (how many added comments you deleted, how many you kept).
    ")
@@ -242,8 +242,10 @@ Re-run `logos-sync` until it reports no unresolved drift.
 ## 6. Bump the version, commit the code, and record the phase
 
 1. **Verify the product version (mandatory — reference §9).** `PRODUCT_VERSION` in
-   `$CODE/gateway/app/version.py` (the single source of truth) MUST reflect this build: a phase build →
-   `MINOR` = phase number (Фаза-NN → `0.NN.0`); an in-phase fix → `PATCH`+1 (`0.3.0` → `0.3.1`). The
+   `$CODE/gateway/app/version.py` (the single source of truth) MUST reflect this build: the number moves
+   by the MEANING of the release (semver — MAJOR = large/incompatible leap, MINOR = a notable new
+   capability, PATCH = a small/in-phase change), DECOUPLED from the phase number (do NOT set `0.NN.0`; the
+   first real release `1.0.0` shipped in Фаза-34). The
    bump is a one-line edit made by `logos-coder` in step 4 (you never write production code) — if it
    was missed, send `logos-coder` back to do ONLY the version bump, then continue. A phase is NOT
    `готово` until the version reflects it. The frontend reads it via `GET /api/version`; nothing else

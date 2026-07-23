@@ -209,7 +209,7 @@ phase, orchestrated by `logos-build`:
 1. **Read the spec** — the phase file + the architecture sections it touches. The phase's «Критерии
    готовности» are the acceptance tests; «Что НЕ входит» are hard scope boundaries.
 2. **Implement** — `logos-coder` writes the code per the doctrine, routing each layer to its stack;
-   it also bumps the product version per §9 (`MINOR` = phase number for a phase build).
+   it also bumps the product version per §9 (plain semver BY THE MEANING of the release, decoupled from the phase number).
 3. **Review** — `logos-reviewer` checks the diff against the architecture docs AND the doctrine.
 4. **Test** — `logos-test-writer` writes machine-checkable tests covering the «Критерии готовности».
 5. **DevOps + local deploy** — `logos-devops` makes the phase runnable (containers/run scripts/infra)
@@ -255,20 +255,25 @@ the user means by «версионирование проекта»: the build m
 - **Single source of truth.** The literal lives in EXACTLY one place — `$CODE/gateway/app/version.py`
   (`PRODUCT_VERSION`). Everything else reads it (the frontend via `GET /api/version`); never hard-code
   or duplicate the number anywhere else, and never introduce per-layer versions.
-- **MINOR = phase number.** Building Фаза-NN sets the version to `0.NN.0` (Фаза-01 → `0.1.0`,
-  Фаза-03 → `0.3.0`, …). A phase is NOT `готово` until `PRODUCT_VERSION` reflects its number.
+- **Version by MEANING, DECOUPLED from the phase number.** The number moves by the SUBSTANCE of the
+  release, never by a phase counter: **MAJOR** — a large or incompatible leap; **MINOR** — a notable new
+  capability; **PATCH** — a bugfix or small in-phase change. A phase is NOT `готово` until
+  `PRODUCT_VERSION` reflects the release it delivered. (The early history `0.1.0`…`0.34.0` happened to
+  track phase numbers — that was a documentation drift corrected in Фаза-34, not the rule. Do NOT set
+  `0.NN.0` from the phase number.)
 - **PATCH = an in-phase fix.** Any shipped change AFTER a phase was built — a bugfix, a conformance
   fix, a touch-up that is NOT a new phase — bumps the PATCH: `0.3.0` → `0.3.1` → `0.3.2` … . This holds
   even for a change made by a direct `logos-coder` dispatch outside a full phase build: **if you ship
   code to the repo, you bump the version.**
-- **MAJOR = 0.** The product is pre-release; the move to `1.0.0` is a separate, deliberate future
-  decision, never mechanical.
+- **MAJOR rises on a large/incompatible leap.** The first real release on the owner's own machine —
+  `1.0.0` — shipped in Фаза-34 (exit from pre-release), so MAJOR is no longer pinned to 0. A further
+  MAJOR bump is a deliberate call on the substance of the change, never mechanical.
 - **Who bumps it.** The bump is a one-line edit to `version.py`, made by `logos-coder` as part of the
   change (the orchestrator never writes production code). `logos-build` VERIFIES the version reflects
   the build before it commits and before it marks a phase `готово`; if the bump was missed, it sends
   `logos-coder` back to do only the bump.
 - **`version.py` holds the literal and its rule — NOTHING else.** It is a SHORT file (tens of lines):
-  the constant, its contract, its invariants, and the MINOR=phase / PATCH=fix rule above. It is NOT a
+  the constant, its contract, its invariants, and the semver-by-meaning rule above. It is NOT a
   changelog. Never append a per-phase narrative, a `history:` section, a "what the previous value was"
   note, or a summary of what a phase delivered — that is a §4 point-10 violation and it is what let this
   one-constant file bloat past 800 lines. What each phase delivered belongs to the journal
