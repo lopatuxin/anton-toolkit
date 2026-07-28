@@ -4,7 +4,7 @@
 
 [![Plugins](https://img.shields.io/badge/plugins-7-blue)]()
 [![Skills](https://img.shields.io/badge/skills-32-green)]()
-[![Agents](https://img.shields.io/badge/agents-30-orange)]()
+[![Agents](https://img.shields.io/badge/agents-31-orange)]()
 [![Language](https://img.shields.io/badge/lang-ru-red)]()
 
 ---
@@ -47,7 +47,7 @@
 
 | 🏷 | Плагин | Версия | О чём | Skills | Agents |
 |---|--------|--------|-------|--------|--------|
-| 🛠 | **anton-toolkit** | 0.20.3 | Коммиты, ревью, дебаг, devops, dev-агенты | 5 | 8 |
+| 🛠 | **anton-toolkit** | 0.21.0 | Коммиты, ревью, дебаг, devops, dev-агенты | 5 | 9 |
 | 📓 | **lichnost** | 0.8.2 | Дневник, идеи, фильмы, итоги, психологический профиль | 5 | 0 |
 | 🧠 | **logos** | 0.9.4 | Проектирование **и разработка** автономного ИИ-ассистента Logos (собеседник по проекту + совет архитекторов + детализация элементов в отдельные документы + журнал + спека веб-интерфейса + нарезка на фазы + команда разработки: оркестратор `logos-build` и агенты backend-coder/frontend-coder/reviewer/test/qa/devops/sync) | 6 | 14 |
 | 🏗 | **plugin-builder** | 0.4.1 | Создание, расширение и точечная правка плагинов в этом маркетплейсе | 3 | 0 |
@@ -214,6 +214,7 @@ plugins/<plugin-name>/
 | 🟧 **java-dev** | Файл внутри Java-модуля (`pom.xml` в дереве) | Пишет/правит `.java`, SQL, Spring XML, Velocity, HTML/CSS/JS в `src/main/`. **Триггер — модуль, не расширение.** |
 | 🟪 **kotlin-dev** | Файл внутри Kotlin-модуля (`build.gradle.kts`) | Пишет/правит `.kt`, `.kts`, SQL, Liquibase XML, YAML-конфиги. |
 | 🐍 **python-dev** | Файл внутри Python-модуля (`pyproject.toml`/`setup.py`/`requirements.txt`) | Реализует по step-by-step плану: `.py`, Alembic, Jinja, Dockerfile, конфиги. |
+| 🐹 **go-dev** | Файл внутри Go-модуля (`go.mod` в дереве) | Пишет/правит `.go`, systemd-юниты, деплой-скрипты, WiX/MSI XML, конфиги. Done = `gofmt` + `go build` + `go vet`. |
 | 🌐 **frontend-dev** | `*.tsx`, `*.ts`, `*.jsx`, `*.js`, `*.css`, `*.scss`, `*.html`, ассеты в `public/` | Любая фронтовая правка — даже одна строчка идёт через агента. |
 | 👀 **code-reviewer** | `"проверь код"`, `"сделай ревью"`. Автоматически после dev-агентов (по правилу в `CLAUDE.md`) | Структурированный отчёт: баги, безопасность, нарушения паттернов. Java, Kotlin, TS, React, CSS, SQL, Dockerfile. |
 | 📝 **mr-spec-reviewer** | Только командой `/mr-review` — без триггер-фраз | Сверяет всю ветку (MR) с твоей документацией из `project/documentation/` и выдаёт готовые тексты замечаний для MR: `файл:строка` + короткое сообщение без жаргона. Ищет и баги/безопасность, и нарушения контрактов из доки; дока же отсеивает ложные срабатывания. |
@@ -639,7 +640,8 @@ Hook, акты, CTA, темп. Максимум 20 минут.
 ```
 1. /feature-planner           → детальный план фичи
 2. java-dev / kotlin-dev /    → реализация по плану
-   python-dev / frontend-dev
+   python-dev / go-dev /
+   frontend-dev
 3. test-writer                → автоматически после dev-агента, пишет тесты
 4. code-reviewer              → автоматически после dev-агента, делает ревью
 5. qa-engineer                → end-to-end проверка фичи
@@ -679,7 +681,7 @@ Hook, акты, CTA, темп. Максимум 20 минут.
 3. (агент module-designer)        → Модули/*.md по одному на модуль
 4. (агент roadmap-planner)        → Дорожная карта.md
 5. (агент phase-detailer)         → Фазы/Фаза-01-*.md
-6. python-dev / kotlin-dev        → реализация фазы по детальному плану
+6. python-dev / kotlin-dev / go-dev → реализация фазы по детальному плану
 ```
 
 ### 🧠 Проектирование и разработка Logos
