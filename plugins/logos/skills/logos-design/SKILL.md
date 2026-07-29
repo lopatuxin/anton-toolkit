@@ -438,9 +438,20 @@ sed -n 'A,Bp' "$DOC" > "${DOC%.md}/<Страница>.md"
 Extraction MUST be mechanical. A model retyping thousands of lines silently drops and paraphrases
 content, and this document is the build's source of truth — never "tidy up while moving", never summarize,
 never drop a section you judge redundant. What you DO write by hand on each new page is only its header:
-the frontmatter copied from the source document, plus the same backlink line the source carried
-(`[[Архитектура]] · [[Концепт]] · …`), plus the page's own `# ` title. If the moved block started at `##`,
-promote its headings one level so the page has exactly one top-level title.
+the frontmatter copied from the source document, plus a backlink line `[[<хаб>]] · [[Архитектура]] ·
+[[Концепт]]`, plus the page's own `# <Название страницы>` title.
+
+**Never promote or renumber the moved headings.** The slice keeps its `##`/`###` levels underneath the
+page's `# ` title. Promotion looks tidier and is a trap: it changes lines you are supposed to be moving
+untouched, and it turns a multi-section page into a file with several `#` titles. The ONE allowed
+deletion is the slice's leading `## Заголовок` line when the page holds exactly that one section AND the
+page title repeats its text verbatim — the heading text survives as the title, so nothing is lost.
+
+**The new subfolder needs its own folder note.** The vault's folder-notes plugin opens a note named
+exactly like the folder, so create an EMPTY `<Папка>/<Папка>.md` alongside the pages — the same empty
+placeholder the existing `Модули/Планировщик/` and `Модули/Процедурная-память/` folders carry. The real
+hub stays the sibling `Модули/<имя>.md`; do not put content in the placeholder or you will have two
+documents claiming the same name.
 
 ### Step 5.3 — Rewrite the original file as the hub
 
@@ -452,17 +463,23 @@ resolves — never rewrite inbound links after a split. Its new body holds only 
 
 ### Step 5.4 — Prove nothing was lost, then record
 
-Verify mechanically before reporting success, and show the numbers:
+Verify mechanically before reporting success, and show the result. **The check that actually proves the
+move is the line-by-line one below — a line COUNT does not prove anything**, because a page that lost 40
+lines while the headers added 60 still shows a healthy-looking surplus. Compare the lines themselves:
+
 ```bash
-# 1. every heading of the original survives somewhere in the hub or the pages
-diff <(grep -h '^#' "$DOC.bak" | sort) \
-     <(cat "$DOC" "${DOC%.md}"/*.md | grep -h '^#' | sort)
-# 2. no body content vanished: non-empty lines after >= before (headers add lines, never remove)
-grep -cv '^\s*$' "$DOC.bak"
-cat "$DOC" "${DOC%.md}"/*.md | grep -cv '^\s*$'
+# every non-empty line of the original must still exist somewhere in the hub or the pages
+comm -23 <(grep -v '^[[:space:]]*$' "$DOC.bak" | sort) \
+         <(cat "$DOC" "${DOC%.md}"/*.md | grep -v '^[[:space:]]*$' | sort)
 ```
-Only when both checks pass, delete `$DOC.bak`. If a heading is missing or the line count dropped, restore
-from the backup and redo the carve — never patch the gap by retyping the lost text from memory.
+The output must be EMPTY, with exactly one allowed exception: a `## Заголовок` line you deliberately
+consumed as a page title (see step 5.2) — confirm each such line by eye and name it in your report. Any
+other line in the output is lost content: restore from `$DOC.bak` and redo the carve. Never patch a gap by
+retyping the missing text — you do not have it, you would be inventing it.
+
+Only when the check is clean, delete `$DOC.bak`. Leaving the backup behind is not harmless: the vault
+auto-commits, so a stray `.md.bak` becomes a second copy of the whole document in the user's knowledge
+base and the next lint run reads it as a real note.
 
 Then write ONE journal entry (`тип: наблюдение`, `область` matching the element) per
 `references/diary-format.md`: which document was decomposed, into how many pages, and the resulting sizes.
