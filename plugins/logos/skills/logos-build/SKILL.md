@@ -239,6 +239,18 @@ For each reported drift, resolve it (do NOT leave docs and code disagreeing):
   the design skills for a structural change) and record the change as a journal entry.
 Re-run `logos-sync` until it reports no unresolved drift.
 
+`logos-sync` also returns a **documentation health** block — broken wiki-links, orphan pages, oversized
+documents, missing/stale `проверено` stamps, and contradictions between documents. Resolve it as follows,
+and never by restructuring a design document yourself:
+- **A contradiction between two design documents blocks the phase.** They are the source of truth and
+  cannot disagree with each other — route the fix to the owning tool (`logos-design` for architecture and
+  module documents, `logos-ui` for the web-interface spec, `logos-phases` for phase documents) and record
+  the resolution as a journal entry.
+- **Broken wiki-links** — fix the link inline; correcting a link target is not a structural change.
+- **Oversized documents and orphan pages** — informational, never a blocker. Name them in the step-7 report
+  and offer to route the split to `logos-design`; the decomposition rule they violate is in
+  `references/design-templates.md`, "Document decomposition".
+
 ## 6. Bump the version, commit the code, and record the phase
 
 1. **Verify the product version (mandatory — reference §9).** `PRODUCT_VERSION` in
@@ -259,6 +271,11 @@ Re-run `logos-sync` until it reports no unresolved drift.
    собрана», plus `тип: решение` entries for any significant stack/structure decisions made, each with
    the matching `область`, `статус: принято`, `вес: 5`. The journal is the assistant's own memory —
    no review gate; do not ask the user to review or sign off these entries.
+5. **Stamp the verified documents.** For every design document listed in the "Verified clean" block of the
+   final `logos-sync` report, set `проверено: <сегодня, ГГГГ-ММ-ДД>` and `проверено-код: <the code commit
+   hash from item 2>` in its frontmatter (`references/design-templates.md`, "Freshness stamp"). Stamp
+   EXACTLY that list — never the whole design tree, and never a document you edited after the audit that
+   cleared it. This is the only place these two fields are ever written.
 
 ## 7. Report to the user (Russian, brief)
 

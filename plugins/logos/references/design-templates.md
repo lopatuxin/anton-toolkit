@@ -48,6 +48,45 @@ document:
 - Incorrect: leaving a note «раньше на CPU, это разрешённый дрейф, см. Фазу-06» in the document, or keeping
   an already-resolved item under `Открытые вопросы`.
 
+**Document decomposition (hard rule — split by responsibility, never let one document grow unbounded).**
+These documents are read by AI agents that must load a document whole to use any part of it, so an
+oversized document taxes every later build: the coder implementing ONE contract pays to read the entire
+file. The code doctrine (`references/logos-project.md` §4 point 9) already forbids god-modules for exactly
+this reason — the same rule binds the documents.
+- **Checkpoint at ~600 lines, hard ceiling at 1200.** When the document you are writing or editing crosses
+  ~600 lines, ask whether it now holds more than one responsibility; if it does, split it. NEVER leave a
+  design document above 1200 lines — split it in the same round in which you grew it past the ceiling.
+- **Split into a subfolder of pages, one responsibility per page, keeping the original file as the hub
+  note:** `Дизайн/Модули/Планировщик.md` (hub) plus `Дизайн/Модули/Планировщик/Цена-и-потолки.md`,
+  `.../Задачи-и-крючки.md`, … . This layout already exists in the vault (`Модули/Планировщик/`,
+  `Модули/Процедурная-память/`) — follow it, never invent a second one.
+- **Every subfolder gets a hub note named exactly like the folder** (the vault's folder-notes plugin opens
+  it when the folder is clicked). The hub keeps only what a page cannot: the element's purpose and
+  boundaries, the map of its pages with a ONE-LINE description of each, and the cross-links to sibling
+  documents. All deep detail moves down into the pages.
+- **Split along responsibilities, never along a line count.** Each page must be one coherent thing an agent
+  can read alone and act on (the lifecycle, the data model, the edge cases, the resource footprint,
+  the contract with its callers). Cutting a document mid-topic at line 600 is worse than leaving it long.
+- Correct: `Модули/Процедурная-память.md` as a hub (purpose, boundaries, page map) plus one page per
+  responsibility under `Модули/Процедурная-память/`.
+- Incorrect: `Модули/Память.md` at 2800 lines holding purpose, internals, interfaces, data model,
+  algorithms, dependencies and edge cases at once — no agent can load it to change one contract.
+
+**Freshness stamp (`проверено`) — machine-maintained, never written by hand.** A design document may carry
+two frontmatter fields recording when it was last confirmed to agree with the code:
+
+```yaml
+проверено: 2026-07-29     # date of the last clean sync audit of THIS document
+проверено-код: a1b2c3d    # the code-repo commit it was checked against
+```
+
+- **Only `logos-build` writes them**, in its record step, and only for the documents `logos-sync` audited
+  and reported clean in that run. No other tool sets them, and `logos-sync` itself changes nothing.
+- **As a document writer you never add or update them.** A document you have just written or edited is
+  unverified by definition: if the fields are present and you changed the document's substance, DELETE
+  them rather than carrying a stale stamp forward.
+- **Absence means "never verified"** — a normal state for a new document, not an error to fix.
+
 ---
 
 ## Концепт

@@ -5,8 +5,10 @@ description: >
   documentation and reports every drift (code does X, the docs say Y), so the binding rule
   "documentation is the source of truth" actually holds. It reads the architecture, the phase
   documents, and the implemented code, then returns a structured drift report with file:line and which
-  side looks wrong — it does NOT change code or docs itself; the orchestrator resolves each drift. Runs
-  autonomously, one-shot, no dialog.
+  side looks wrong — it does NOT change code or docs itself; the orchestrator resolves each drift. It also
+  lints the documentation against itself — broken wiki-links, orphan pages, oversized documents, stale
+  freshness stamps, and contradictions between two documents — and reports the design documents it verified
+  clean, so the orchestrator can stamp them. Runs autonomously, one-shot, no dialog.
 
   Invoked by the logos-build orchestrator at the end of a phase build (and re-run until drift is clean).
   Not triggered by user phrases directly — the orchestrator dispatches it.
@@ -69,6 +71,38 @@ Compare the implemented code for this phase against the documents in both direct
    - Significant build decisions visible in the code have a corresponding journal entry (or you flag
      the gap so the orchestrator records it).
 
+## Documentation health check (lint) — the docs against themselves
+
+Code-vs-docs drift is only half of what rots. The design tree is hundreds of documents that reference each
+other by wiki-link: links break, pages fall out of the graph, documents outgrow what an agent can load, and
+two documents start telling different stories with nobody noticing. Run this pass on EVERY dispatch,
+alongside the drift audit above.
+
+**Mechanical checks — whole tree, cheap.** These read file NAMES, link targets, line counts and frontmatter
+only, never document bodies, so they cost almost nothing and are deliberately NOT bound by the phase scope
+above. Run them with shell commands, not by reading documents:
+- **Broken wiki-links.** Every `[[Имя]]` / `[[Папка/Имя]]` target in `$DOCS/Дизайн/**` and `$DOCS/Журнал/**`
+  must resolve to an existing note. Obsidian resolves by note NAME, so match against the file basename, and
+  strip any `#заголовок` anchor and `|подпись` alias before matching.
+- **Orphan pages.** A design document with fewer than two incoming wiki-links from other documents is
+  effectively unreachable — report it with its incoming-link count.
+- **Oversized documents.** Any document under `$DOCS/Дизайн/**` over 1200 lines (the hard ceiling) or over
+  ~600 lines (the checkpoint) — see `references/design-templates.md`, "Document decomposition". Report the
+  line count for each.
+- **Missing or stale freshness stamps.** Design documents whose `проверено` date is older than 60 days, and
+  documents carrying no `проверено` at all — a work list, never a blocker.
+
+**Semantic check — bounded to what this phase touched.** Within the documents you already read for the
+drift audit, flag any statement that contradicts another document you read, and any statement this phase's
+code made untrue. Do NOT widen your reading to hunt for contradictions elsewhere in the tree — the
+mechanical pass above is what covers the whole tree.
+
+Report these findings as their OWN block, separate from the code-vs-docs drifts: they are resolved by
+different tools (a design document is restructured by `logos-design` / `logos-ui` / `logos-phases`, never by
+a coder). State severity the same way: **a contradiction between two design documents is a blocker** — the
+documents are the source of truth and cannot disagree with each other — while broken links, orphans,
+oversized documents and stale stamps are informational and never block a phase.
+
 ## For each drift, report
 
 - **Where:** the `file:line` in the code AND the document section it disagrees with.
@@ -90,6 +124,15 @@ Compare the implemented code for this phase against the documents in both direct
 
 ## Output
 
-Return a structured drift report: a one-line verdict (in sync / N drifts), then each drift with where
-(code `file:line` ↔ doc section), what, which-side-looks-wrong, and severity. If there is no drift, say
-so plainly so the orchestrator can mark the phase `готово`.
+Return a structured report in three blocks:
+
+1. **Drift** — a one-line verdict (in sync / N drifts), then each drift with where (code `file:line` ↔ doc
+   section), what, which-side-looks-wrong, and severity. If there is no drift, say so plainly so the
+   orchestrator can mark the phase `готово`.
+2. **Documentation health** — the lint findings, grouped by check (broken links / orphans / oversized /
+   stale stamps / contradictions), each with the document path and the concrete number (line count,
+   incoming-link count, stamp date). Say plainly which are blockers (contradictions only) and which are
+   informational.
+3. **Verified clean** — the explicit list of design documents you audited in this run and found to agree
+   with the code. The orchestrator stamps `проверено` on exactly this list and nothing else, so list only
+   documents you actually read and checked; an unaudited document must never appear here.
