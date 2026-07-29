@@ -26,7 +26,10 @@ only HOW it is said, never dumb down the substance.
   память не падает, а отвечает пустым срезом.»
 
 Cross-reference sibling documents with Obsidian wiki-links: `[[Концепт]]`, `[[Архитектура]]`,
-`[[Модули/Память]]` — never relative markdown paths.
+`[[Модули/Память]]` — never relative markdown paths. **A wiki-link may point ONLY at a note that exists
+inside the vault**: never link your own assistant-memory files (kebab-case English slugs living outside
+the vault), skill names, plugin folders, or bare concepts — none of them are notes, the link can never
+resolve, and it shows the user a dead link. Write the substance as plain prose instead.
 
 **Documentation hygiene (hard rule — the document states the current + target system, never its history).**
 A design document describes how the system works now and the target design it is heading toward — it is

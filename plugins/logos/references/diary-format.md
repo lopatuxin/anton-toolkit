@@ -157,6 +157,19 @@ Cross-reference related entries and design documents with Obsidian wiki-links �
 `[[2026-06-07-выбор-центрального-оркестратора]]`, `[[Архитектура]]`, `[[Модули/Память]]` —
 never relative markdown paths.
 
+**A wiki-link may point ONLY at a note that exists inside the vault. Linking your own memory files is
+banned outright.** Your assistant memory (the kebab-case English slugs under the session memory directory,
+e.g. `pull-not-guess-memory-access`, `prototype-live-before-conclusions`) lives OUTSIDE the vault: such a
+link can never resolve, it renders as a dead link for the user, and it pollutes every later lint run with
+noise that looks like a real defect. The same goes for skill names, plugin folders and bare concepts
+(`logos-build`, `references`, `версионирование`) — they are not notes.
+- If the substance of a memory matters to the entry, **write the substance as plain prose** in the entry
+  itself; the entry is the durable record, your memory file is not.
+- Before writing any `[[…]]`, confirm the target note exists in the vault; if it does not, either create it
+  or write plain text.
+- Correct: «Обращения к памяти идут только по смыслу, без чисел — это уже проверено на Фазе-30.»
+- Incorrect: «см. [[pull-not-guess-memory-access]]», «см. [[logos-build]]», «см. [[версионирование]]».
+
 ## 6. Writing rules
 
 - **Capture faithfully.** When recording the user's own thoughts, do not invent, embellish, or moralize — clean up mechanics only, like a diary. When recording a design decision the council made, summarize it accurately without adding new claims.
