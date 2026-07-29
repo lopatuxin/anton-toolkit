@@ -82,10 +82,15 @@ alongside the drift audit above.
 only, never document bodies, so they cost almost nothing and are deliberately NOT bound by the phase scope
 above. Run them with shell commands, not by reading documents:
 - **Broken wiki-links.** Every `[[Имя]]` / `[[Папка/Имя]]` target in `$DOCS/Дизайн/**` and `$DOCS/Журнал/**`
-  must resolve to an existing note. Obsidian resolves by note NAME, so match against the file basename, and
-  strip any `#заголовок` anchor and `|подпись` alias before matching.
-- **Orphan pages.** A design document with fewer than two incoming wiki-links from other documents is
-  effectively unreachable — report it with its incoming-link count.
+  must resolve to an existing note. Obsidian resolves by note NAME, so reduce `[[Папка/Имя]]` to its
+  basename before matching, and strip the anchor and the alias first. **Strip BOTH alias forms:** the plain
+  `[[Имя|подпись]]` and the backslash-escaped `[[Имя\|подпись]]` that Obsidian requires inside a markdown
+  table. Missing the escaped form turns every table link into a false "broken link" ending in `\`.
+- **Orphan pages.** A design document with ZERO incoming wiki-links from other documents. Two cases are NOT
+  orphans and must never be reported: a **hub note** (named exactly like its own folder — the folder-notes
+  plugin opens it when the folder is clicked, so it needs no inbound link) and a **page reached from its
+  hub** (a single link from the hub is sufficient reachability in the hub-and-pages layout). The "at least
+  two incoming links" heuristic belongs to a flat wiki; in this tree it reports pure noise — do not apply it.
 - **Oversized documents.** Any document under `$DOCS/Дизайн/**` over 1200 lines (the hard ceiling) or over
   ~600 lines (the checkpoint) — see `references/design-templates.md`, "Document decomposition". Report the
   line count for each.

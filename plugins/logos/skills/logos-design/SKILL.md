@@ -106,7 +106,9 @@ Cross-references between documents use Obsidian wiki-links (`[[Концепт]]`
 - If it exists but `Архитектура.md` does NOT → go to **Phase 2 — Architecture**.
 - If both exist → ask the user in Russian what they want to do, and route: a change/addition to the
   design → **Phase 3 — Change management**; a deep per-element document → **Phase 4 — Module detailing**
-  (the user wants to "детализировать/проработать элемент"); a full re-do of the architecture → Phase 2.
+  (the user wants to "детализировать/проработать элемент"); splitting a document that has grown too large
+  → **Phase 5 — Decomposition** (the user wants to "разбить/распилить документ", or `logos-sync` reported
+  it oversized); a full re-do of the architecture → Phase 2.
 
 ## Phase 1 — Concept (dialog, written inline)
 
@@ -401,6 +403,69 @@ per key decision (`тип: решение`, `область` matching the elemen
 `вес: 5`) plus the contested points as `тип: наблюдение`/`тупик`. No review gate — if the user asks for
 changes, keep the entries consistent. For small
 fixes, re-dispatch ONLY the synthesizer (or edit inline) — do NOT re-run the whole module council.
+
+## Phase 5 — Decomposition of an oversized document (mechanical split, no council)
+
+A design document that outgrew the size rule in `references/design-templates.md` ("Document
+decomposition") is split into a hub note plus one page per responsibility. This is a MOVE, not a redesign:
+no design decision is taken, nothing is reworded, and the council is NOT convened. Run it when the user
+asks to split a document, or when `logos-sync` reports one over the ceiling.
+
+### Step 5.1 — Map the document and agree the split (short dialog, Russian)
+
+Read the STRUCTURE, never the whole document into your context:
+```bash
+DOC="$VAULT/Logos/Дизайн/Модули/<имя>.md"
+wc -l "$DOC"
+grep -n '^#\{2,3\} ' "$DOC"     # headings with line numbers = the section map
+```
+Group the sections into pages BY RESPONSIBILITY — the lifecycle, the data model, the contract with
+callers, the edge cases, the resource footprint — never by cutting at a line count. A section that is
+itself huge becomes its own page. Name every page in Russian, as a real topic, never as a number.
+
+Show the user the proposed split in ONE short Russian message (page names, which sections land in each,
+resulting line counts) and wait for a yes. This restructures his knowledge base, so one confirmation is
+correct — and it is the only dialog in this phase.
+
+### Step 5.2 — Carve the pages mechanically (shell, never by retyping)
+
+Back the document up first, then extract each page's line range with `sed`:
+```bash
+cp "$DOC" "$DOC.bak"
+mkdir -p "${DOC%.md}"
+sed -n 'A,Bp' "$DOC" > "${DOC%.md}/<Страница>.md"
+```
+Extraction MUST be mechanical. A model retyping thousands of lines silently drops and paraphrases
+content, and this document is the build's source of truth — never "tidy up while moving", never summarize,
+never drop a section you judge redundant. What you DO write by hand on each new page is only its header:
+the frontmatter copied from the source document, plus the same backlink line the source carried
+(`[[Архитектура]] · [[Концепт]] · …`), plus the page's own `# ` title. If the moved block started at `##`,
+promote its headings one level so the page has exactly one top-level title.
+
+### Step 5.3 — Rewrite the original file as the hub
+
+The original file KEEPS its name and path, so every `[[Модули/<имя>]]` link in the other documents still
+resolves — never rewrite inbound links after a split. Its new body holds only what a page cannot:
+- the element's purpose and boundaries (MOVED from «Назначение и границы», not rewritten),
+- the **page map** — one line per page: `[[Модули/<имя>/<Страница>]] — что внутри`,
+- the cross-links to sibling documents the source carried.
+
+### Step 5.4 — Prove nothing was lost, then record
+
+Verify mechanically before reporting success, and show the numbers:
+```bash
+# 1. every heading of the original survives somewhere in the hub or the pages
+diff <(grep -h '^#' "$DOC.bak" | sort) \
+     <(cat "$DOC" "${DOC%.md}"/*.md | grep -h '^#' | sort)
+# 2. no body content vanished: non-empty lines after >= before (headers add lines, never remove)
+grep -cv '^\s*$' "$DOC.bak"
+cat "$DOC" "${DOC%.md}"/*.md | grep -cv '^\s*$'
+```
+Only when both checks pass, delete `$DOC.bak`. If a heading is missing or the line count dropped, restore
+from the backup and redo the carve — never patch the gap by retyping the lost text from memory.
+
+Then write ONE journal entry (`тип: наблюдение`, `область` matching the element) per
+`references/diary-format.md`: which document was decomposed, into how many pages, and the resulting sizes.
 
 ## General rules
 
