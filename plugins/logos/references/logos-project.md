@@ -28,22 +28,45 @@ disagreeing. `logos-sync` audits this; the orchestrator enforces it after every 
 ## 2. Resolve the paths (every run, by every tool)
 
 Find the Obsidian vault root (the directory containing `.obsidian/`), then derive the code repo as
-its sibling `Logos/` directory. Walk up from the current directory, with a fallback to the known
-machine path:
+its sibling `Logos/` directory. The vault is found BY CONTENT, in three widening steps — never from a
+hardcoded path, because the vault has moved before and a stale hardcoded path fails silently:
 
 ```bash
 VAULT=""
 DIR="$(pwd)"
+# 1. Walk up — finds the vault when a tool runs from inside it.
 while [ "$DIR" != "/" ] && [ -n "$DIR" ]; do
   if [ -d "$DIR/.obsidian" ]; then VAULT="$DIR"; break; fi
   DIR="$(dirname "$DIR")"
 done
-[ -z "$VAULT" ] && [ -d "/c/projects/Claude/.obsidian" ] && VAULT="/c/projects/Claude"
+# 2. Scan every level one directory deep. REQUIRED, not a nicety: the code repo is the vault's
+#    SIBLING, never its child, so walking up from the code repo can never reach the vault. A
+#    candidate must hold BOTH `.obsidian/` and `Logos/`, so an unrelated vault is not picked up.
+if [ -z "$VAULT" ]; then
+  DIR="$(pwd)"
+  while [ "$DIR" != "/" ] && [ -n "$DIR" ]; do
+    for CANDIDATE in "$DIR"/*/; do
+      if [ -d "$CANDIDATE/.obsidian" ] && [ -d "$CANDIDATE/Logos" ]; then VAULT="${CANDIDATE%/}"; break; fi
+    done
+    [ -n "$VAULT" ] && break
+    DIR="$(dirname "$DIR")"
+  done
+fi
+# 3. Last resort — the usual project roots, scanned the same way and matched the same way (by
+#    content). Renaming or moving the vault inside these roots keeps working.
+if [ -z "$VAULT" ]; then
+  for CANDIDATE in /c/projects/*/ "$HOME"/*/; do
+    if [ -d "$CANDIDATE/.obsidian" ] && [ -d "$CANDIDATE/Logos" ]; then VAULT="${CANDIDATE%/}"; break; fi
+  done
+fi
 
 DOCS="$VAULT/Logos"                 # design docs, phases, journal (vault, auto-synced)
 CODE="$(dirname "$VAULT")/Logos"    # code repo, e.g. /c/projects/Logos
 echo "VAULT=$VAULT  DOCS=$DOCS  CODE=$CODE"
 ```
+
+Never replace this search with a literal path, and never "simplify" it back to the walk-up alone —
+the walk-up alone resolves nothing when a tool is invoked from the code repo, which is the normal case.
 
 If `$VAULT` is empty, tell the user in Russian: «Не нашёл хранилище Obsidian (папку `.obsidian`).
 Запусти из папки хранилища.» — then stop.
