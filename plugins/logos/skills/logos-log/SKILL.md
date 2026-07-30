@@ -22,6 +22,24 @@ description: >
 
 # Logos-log — the Logos decision journal
 
+**Reference files — resolve the path BEFORE reading (this plugin's most frequent failure).** Every
+`references/<file>.md` cited anywhere in this document means `<plugin-root>/references/<file>.md`: the
+reference files live at the PLUGIN ROOT, never inside a skill's own folder. The base directory given to
+this skill at load time is `<plugin-root>/skills/<this-skill>/`, so a bare relative path resolves to
+`<plugin-root>/skills/<this-skill>/references/<file>.md` — that file does not exist and the read fails.
+Resolve it as `<this skill's base directory>/../../references/<file>.md`. If no base directory was given,
+locate the file with Glob (pattern `**/references/<file>.md`, path `<user home>/.claude/plugins`) and take
+the match under `.../logos/` — either the installed cache
+`.claude/plugins/cache/anton-toolkit-marketplace/logos/<version>/references/` or the marketplace working
+copy `.claude/plugins/marketplaces/anton-toolkit-marketplace/plugins/logos/references/`.
+
+- Correct: `C:\Users\<user>\.claude\plugins\cache\anton-toolkit-marketplace\logos\<version>\references\logos-project.md`
+- Incorrect: `references/logos-project.md` — resolves under the skill folder, which has no `references/`.
+
+Never report a reference file as missing, and never proceed on remembered content, without running that
+Glob first. The same rule applies to every path you paste into an agent prompt: pass the RESOLVED absolute
+path, never the bare `references/...` form.
+
 The journal is Logos's long-term project memory: every decision, experiment, and dead end as a
 separate, searchable note. The storage format, file locations, frontmatter fields, and the
 self-updating Dataview index are defined in `references/diary-format.md` — **read it and follow it
