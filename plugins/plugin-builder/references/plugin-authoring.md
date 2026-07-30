@@ -114,6 +114,7 @@ Run before every commit that touches plugin files:
 5. If any plugin file was modified, the corresponding `plugin.json` `version` is incremented.
 6. If a `hooks/hooks.json` or `.mcp.json` was created, it parses as valid JSON (covered by check 1).
 7. The root `README.md` reflects the change per the **README sync** section (counts, table version cell, and any added/removed/reworked tool), and `README.md` is staged in the same commit.
+8. Every created/modified skill or agent that cites a `references/*.md` file carries the path-resolution block required by **Citing a reference from a skill or agent** (see the File layout conventions section).
 
 If any check fails: do not commit. Report the specific failure to the user in Russian. Files stay on disk for the next pass.
 
@@ -183,3 +184,18 @@ plugins/<plugin-name>/
 - One SKILL.md per skill, each in its own subdirectory.
 - Agents and commands live as flat `*.md` files directly under `agents/` and `commands/`.
 - References are flat under `references/`, named by topic (not by the component that reads them).
+
+### Citing a reference from a skill or agent (mandatory)
+
+A bare relative path to a reference does NOT resolve, and this is the single most common runtime failure across this marketplace. A skill's base directory is `<plugin-root>/skills/<skill-name>/`, so `references/<file>.md` resolves to `<plugin-root>/skills/<skill-name>/references/<file>.md`, which never exists. An agent gets no base directory at all, so the same path resolves against the user's current working directory. Both fail, and the model then either reports the reference as missing or proceeds on invented content.
+
+Therefore every skill or agent you create or modify that cites a reference MUST carry an explicit path-resolution block immediately after its H1 heading. The block states that `references/<file>.md` means `<plugin-root>/references/<file>.md`, gives the resolution procedure, and shows one correct/incorrect example pair:
+
+- **Skill:** resolve as `<this skill's base directory>/../../references/<file>.md`.
+- **Agent:** use the absolute path supplied in the dispatch prompt; if none was supplied, locate the file with Glob (pattern `**/references/<file>.md`, path `<user home>/.claude/plugins`) and take the match under `.../<plugin-name>/`.
+- **Both:** never report a reference as missing without running that Glob first.
+
+A skill that passes a reference path into an agent prompt must pass the RESOLVED absolute path, never the bare `references/...` form.
+
+- Correct (in an agent body): ``Read the doctrine at `<plugin-root>/references/project.md` — if the dispatch prompt did not give the absolute path, resolve it with Glob.``
+- Incorrect: ``Read `references/project.md`.``

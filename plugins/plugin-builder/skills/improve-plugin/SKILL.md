@@ -27,6 +27,23 @@ description: >
 
 # Improve Plugin — explicit plugin fix
 
+**Reference files — resolve the path BEFORE reading (the most frequent failure in this marketplace).**
+Every `references/<file>.md` cited anywhere in this document means `<plugin-root>/references/<file>.md`:
+the reference files live at the PLUGIN ROOT, never inside a skill's own folder. The base directory given to
+this skill at load time is `<plugin-root>/skills/<this-skill>/`, so a bare relative path resolves to
+`<plugin-root>/skills/<this-skill>/references/<file>.md` — that file does not exist and the read fails.
+Resolve it as `<this skill's base directory>/../../references/<file>.md`. If no base directory was given,
+locate the file with Glob (pattern `**/references/<file>.md`, path `<user home>/.claude/plugins`) and take
+the match under `.../plugin-builder/` — either the installed cache
+`.claude/plugins/cache/anton-toolkit-marketplace/plugin-builder/<version>/references/` or the marketplace
+working copy `.claude/plugins/marketplaces/anton-toolkit-marketplace/plugins/plugin-builder/references/`.
+
+- Correct: `C:\Users\<user>\.claude\plugins\cache\anton-toolkit-marketplace\plugin-builder\<version>\references\plugin-authoring.md`
+- Incorrect: `references/plugin-authoring.md` — resolves under the skill folder, which has no `references/`.
+
+Never report a reference file as missing, and never proceed on remembered content, without running that
+Glob first.
+
 The user explicitly asked to update a plugin component. Read the recent session history to understand which skill/agent and what change is wanted, apply the minimal fix, and ship via git.
 
 **Before starting, read** `references/plugin-authoring.md` for the validation checklist and language rules.
