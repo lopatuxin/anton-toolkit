@@ -25,7 +25,7 @@ Use the transcripts to match the user's actual speaking voice: sentence rhythm, 
 
 ## Step 0b — Calibrate style from existing written scripts (MANDATORY when any exist)
 
-Before writing, read the already-written scripts in the vault folder `C:\projects\Claude\youtube\сценарии\`. These are the user's PREFERRED, hand-approved style — the gold standard for how a script should read. The user has stated that scripts written without this calibration come out stylistically wrong and have to be rewritten almost entirely. Treat this step as required, not optional.
+Before writing, read the already-written scripts in the vault folder `C:\projects\obsidian\youtube\сценарии\`. These are the user's PREFERRED, hand-approved style — the gold standard for how a script should read. The user has stated that scripts written without this calibration come out stylistically wrong and have to be rewritten almost entirely. Treat this step as required, not optional.
 
 Procedure:
 1. List the `.md` files in `сценарии/`. If the folder is empty or absent, skip this step.
@@ -119,7 +119,7 @@ This style calibration takes precedence over any generic "good script" instinct.
 
 After producing the script in chat, persist it to the Obsidian vault following `${CLAUDE_PLUGIN_ROOT}/references/vault.md`.
 
-- Target folder: `C:\projects\Claude\youtube\сценарии\`.
+- Target folder: `C:\projects\obsidian\youtube\сценарии\`.
 - Filename: `<video-slug>.md`. The slug is derived from the working title — keep it in Russian (Cyrillic), do NOT transliterate to Latin. Lowercase, kebab-case, strip punctuation, ≤ 60 chars. Example: `Курсор выкинул проект` → `курсор-выкинул-проект.md`. Reuse this exact slug across `сценарии/`, `seo/`, `превью/` so the three files form a video bundle. If a script with this slug already exists, append `-v2`, `-v3`…
 - Frontmatter:
 
@@ -138,9 +138,9 @@ After producing the script in chat, persist it to the Obsidian vault following `
     - youtube/script
     - youtube/series/<series>
   related:
-    - "[[идеи/<ideas-file>]]"    # the idea this script came from, if any
-    - "[[seo/<slug>]]"           # forward link — SEO file for the same video
-    - "[[превью/<slug>]]"        # forward link — thumbnail file for the same video
+    - "[[youtube/идеи/<ideas-file>]]"    # the idea this script came from, if any
+    - "[[youtube/seo/<slug>]]"           # forward link — SEO file for the same video
+    - "[[youtube/превью/<slug>]]"        # forward link — thumbnail file for the same video
   ---
   ```
 

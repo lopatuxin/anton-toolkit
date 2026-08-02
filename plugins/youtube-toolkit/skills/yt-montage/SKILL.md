@@ -46,7 +46,7 @@ Pick the "что на экране" value for each beat from these types (mix th
 
 The script is required input. Resolve it in this order:
 1. If a `yt-script` output is present in the conversation — use it.
-2. If the user names a video by title or slug — read `C:\projects\Claude\youtube\сценарии\<slug>.md`.
+2. If the user names a video by title or slug — read `C:\projects\obsidian\youtube\сценарии\<slug>.md`.
 3. If the user pasted a script — use the pasted text.
 4. Otherwise — ask the user (in Russian) which video / paste the script. Do NOT invent a script.
 
@@ -74,7 +74,7 @@ Capture the `video_slug` from the script's frontmatter — the editing sheet reu
 **Видео:** <working title>
 **Длительность:** ~<N> мин
 **Формат:** faceless (закадровый голос + визуал, ведущего в кадре нет)
-**Исходный сценарий:** [[сценарии/<slug>]]
+**Исходный сценарий:** [[youtube/сценарии/<slug>]]
 
 ---
 
@@ -109,7 +109,7 @@ Capture the `video_slug` from the script's frontmatter — the editing sheet reu
 
 After producing the sheet in chat, persist it to the Obsidian vault following `${CLAUDE_PLUGIN_ROOT}/references/vault.md`.
 
-- Target folder: `C:\projects\Claude\youtube\монтаж\`.
+- Target folder: `C:\projects\obsidian\youtube\монтаж\`.
 - Filename: `<video-slug>.md` — the SAME Cyrillic kebab-case slug as the script, so `сценарии/<slug>.md` and `монтаж/<slug>.md` form one bundle. If a sheet with this slug exists, append `-v2`, `-v3`…
 - Frontmatter:
 
@@ -123,7 +123,7 @@ After producing the sheet in chat, persist it to the Obsidian vault following `$
   tags:
     - youtube/montage
   related:
-    - "[[сценарии/<slug>]]"      # the script this sheet is built from
+    - "[[youtube/сценарии/<slug>]]"      # the script this sheet is built from
   ---
   ```
 

@@ -47,7 +47,7 @@ If at least one is present, proceed.
 1. **Read the analytical input.** Pull out:
    - From `yt-my-channel`: top-performer hypotheses, underperformer causes, recommended next moves, hypotheses about what works.
    - From `yt-competitors`: niche gaps, top-performing hooks/formats, hypotheses for our channel (section 10).
-   - From the knowledge base: titles + transcripts of top cards (signal for what hooks/topics worked), titles + `classification_reason` of fail cards (signal for what to avoid). When citing in the "Why this idea" field, reference the specific video by slug, e.g. `"KB: [[база/видео/курсор-выкинул-проект]] — top, vpd 2.4x median"`.
+   - From the knowledge base: titles + transcripts of top cards (signal for what hooks/topics worked), titles + `classification_reason` of fail cards (signal for what to avoid). When citing in the "Why this idea" field, reference the specific video by slug, e.g. `"KB: [[youtube/база/видео/курсор-выкинул-проект]] — top, vpd 2.4x median"`.
 
 2. **Apply generation rules** from `references/generation-rules.md`:
    - Gap-fill (take niche gaps directly)
@@ -98,7 +98,7 @@ If at least one is present, proceed.
 
 After producing the ideas in chat, persist them to the Obsidian vault following `${CLAUDE_PLUGIN_ROOT}/references/vault.md`.
 
-- Target folder: `C:\projects\Claude\youtube\идеи\`.
+- Target folder: `C:\projects\obsidian\youtube\идеи\`.
 - Filename: `YYYY-MM-DD-идеи.md` (Russian, Cyrillic, kebab-case; current session date). If a batch for today already exists, append `-v2`, `-v3`…
 - Frontmatter:
 
@@ -112,8 +112,8 @@ After producing the ideas in chat, persist them to the Obsidian vault following 
   tags:
     - youtube/idea-batch
   related:
-    - "[[канал/<channel-file>]]"          # if a yt-my-channel report was used
-    - "[[конкуренты/<competitor-file>]]"  # if a yt-competitors report was used
+    - "[[youtube/канал/<channel-file>]]"          # if a yt-my-channel report was used
+    - "[[youtube/конкуренты/<competitor-file>]]"  # if a yt-competitors report was used
   ---
   ```
 

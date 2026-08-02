@@ -9,7 +9,7 @@ Always check at the start of the skill, BEFORE asking the user any clarifying qu
 ## Where the base lives
 
 ```
-C:\projects\Claude\youtube\база\
+C:\projects\obsidian\youtube\база\
 ├── канал.md            # channel-level stats + medians + classification counts
 ├── индекс.md           # one-row-per-video index (slug, title, published, views, vpd, classification)
 └── видео\<slug>.md     # full card: metadata + description + tags + metrics + transcript
@@ -17,7 +17,7 @@ C:\projects\Claude\youtube\база\
 
 ## Read procedure
 
-1. **Check existence**. Test whether `C:\projects\Claude\youtube\база\канал.md` exists.
+1. **Check existence**. Test whether `C:\projects\obsidian\youtube\база\канал.md` exists.
    - Does not exist → set `kb_available: false`, continue with the skill's normal cold-start flow. Optionally tell the user once in Russian: "Базы знаний канала нет — работаю без неё. Хочешь собрать её? Запусти `yt-knowledge-base`."
    - Exists → set `kb_available: true`, proceed.
 

@@ -27,7 +27,7 @@ Three layers — data, generators, strategy:
 └────────────────────────────────────────────────────────┘
 ```
 
-All artefacts live in the Obsidian vault at `C:\projects\Claude\youtube\`. See `references/vault.md` for folder layout, filename rules (Cyrillic kebab-case), and frontmatter conventions.
+All artefacts live in the Obsidian vault at `C:\projects\obsidian\youtube\`. See `references/vault.md` for folder layout, filename rules (Cyrillic kebab-case), and frontmatter conventions.
 
 ## Skills
 
@@ -94,10 +94,10 @@ After the plugin is enabled and `YOUTUBE_API_KEY` is set, these MCP tools become
 
 ## Vault layout
 
-Skills write Markdown to `C:\projects\Claude\youtube\`. Folders (one per tool, Cyrillic, lowercase):
+Skills write Markdown to `C:\projects\obsidian\youtube\`. Folders (one per tool, Cyrillic, lowercase):
 
 ```
-C:\projects\Claude\youtube\
+C:\projects\obsidian\youtube\
 ├── канал\           # yt-my-channel reports (dated)
 ├── конкуренты\      # yt-competitors reports
 ├── идеи\            # yt-ideas batches + yt-strategist shortlists

@@ -32,7 +32,7 @@ Build and maintain the user's own-channel knowledge base on disk. Every video th
 All files go into the Obsidian vault under a dedicated folder:
 
 ```
-C:\projects\Claude\youtube\база\
+C:\projects\obsidian\youtube\база\
 ├── канал.md            # channel-level snapshot (subs, total views, medians, last_updated)
 ├── индекс.md           # one-line-per-video index with classification
 └── видео\              # one file per video
@@ -49,7 +49,7 @@ The video slug used here is the SAME slug that `сценарии/`, `seo/`, `п�
 
 Ask once if not already in conversation: "Какой handle или ID вашего канала?" Accept `@handle`, channel URL, or channel ID.
 
-Check whether `C:\projects\Claude\youtube\база\канал.md` exists:
+Check whether `C:\projects\obsidian\youtube\база\канал.md` exists:
 - Exists → **REFRESH** mode.
 - Does not exist → **INIT** mode.
 
@@ -87,7 +87,7 @@ Apply the rules in `references/segmentation.md` to classify each video as `top` 
 
 ### Step 6 — Write the files
 
-For each video, write `C:\projects\Claude\youtube\база\видео\<slug>.md` using the template in `references/video-card-template.md`. Use the SAME slug rules as the rest of the vault (Cyrillic, lowercase, kebab-case, derived from working title — see `${CLAUDE_PLUGIN_ROOT}/references/vault.md`).
+For each video, write `C:\projects\obsidian\youtube\база\видео\<slug>.md` using the template in `references/video-card-template.md`. Use the SAME slug rules as the rest of the vault (Cyrillic, lowercase, kebab-case, derived from working title — see `${CLAUDE_PLUGIN_ROOT}/references/vault.md`).
 
 In REFRESH mode for EXISTING videos: read the existing file, preserve the transcript body (it doesn't change), update only frontmatter metrics (`view_count`, `like_count`, `comment_count`, `classification`, `classification_reason`, `last_updated`). Do NOT re-fetch the transcript if it was already saved successfully — transcripts don't change.
 
@@ -107,7 +107,7 @@ Do NOT dump the full per-video data into chat — that is what the files are for
 ## Inputs and outputs
 
 - **Input:** channel handle / URL / ID. Nothing else from the user.
-- **Output:** files under `C:\projects\Claude\youtube\база\` + one short Russian summary in chat.
+- **Output:** files under `C:\projects\obsidian\youtube\база\` + one short Russian summary in chat.
 
 ## How downstream skills consume this
 
@@ -124,7 +124,7 @@ The skill itself must keep the file layout stable so consumers don't break.
 ## Boundaries
 
 - This skill is data collection ONLY. Do NOT produce analysis, recommendations, or ideas — those belong to `yt-my-channel` / `yt-ideas`.
-- Do NOT write outside `C:\projects\Claude\youtube\база\`.
+- Do NOT write outside `C:\projects\obsidian\youtube\база\`.
 - Do NOT touch other vault folders (`канал\`, `идеи\`, `сценарии\`, etc.).
 - Do NOT classify based on absolute view counts — always normalize by age (see `references/segmentation.md`).
 - Do NOT skip the transcript fetch silently — if it failed, record `transcript_available: false` so the user knows.

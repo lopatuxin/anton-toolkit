@@ -60,7 +60,7 @@ This agent is the strategic filter ON TOP of the existing data layer.
 
 ### Step 1 — Load the knowledge base
 
-Read these files from `C:\projects\Claude\youtube\база\`:
+Read these files from `C:\projects\obsidian\youtube\база\`:
 1. `канал.md` — channel stats, medians, classification counts.
 2. `индекс.md` — every video with classification.
 3. Full cards (`видео\<slug>.md`) for the top 8 `top`-classified videos by `vpd`.
@@ -72,7 +72,7 @@ If `канал.md` `last_updated` is older than 14 days → record a freshness w
 
 ### Step 2 — Load competitor context
 
-Glob `C:\projects\Claude\youtube\конкуренты\*.md`. Take the 2 most recent files by date in the filename prefix (`YYYY-MM-DD-*.md`).
+Glob `C:\projects\obsidian\youtube\конкуренты\*.md`. Take the 2 most recent files by date in the filename prefix (`YYYY-MM-DD-*.md`).
 
 Read those files in full. Extract: niche gaps, top-performing competitor hooks/formats, hypotheses for our channel.
 
@@ -120,8 +120,8 @@ Use this exact structure (Russian body, English metadata):
 - **Type:** <flagship | tutorial | case | review | lead-gen>
 - **Series:** <Logos | CRM | standalone>
 - **Evidence (specific):** <cite KB slug or competitor report line — e.g.,
-  "[[база/видео/курсор-выкинул-проект]] — top, vpd 2.4x median, transcript
-  shows hook pattern X" or "[[конкуренты/2026-05-12-разбор-ниши]] §8 gap:
+  "[[youtube/база/видео/курсор-выкинул-проект]] — top, vpd 2.4x median, transcript
+  shows hook pattern X" or "[[youtube/конкуренты/2026-05-12-разбор-ниши]] §8 gap:
   'AI agent for invoicing'">
 - **Lead-gen angle:** <how it funnels — or "top-funnel only">
 - **Score:** evidence <N>/5, lead-gen <N>/5, execution <N>/5, total <N>/15
@@ -146,7 +146,7 @@ Short notes on 2–3 candidates that did NOT make the top 5, with one-sentence r
 
 Follow `${CLAUDE_PLUGIN_ROOT}/references/vault.md` conventions.
 
-- Target folder: `C:\projects\Claude\youtube\идеи\` (same folder as `yt-ideas`, different `type` in frontmatter).
+- Target folder: `C:\projects\obsidian\youtube\идеи\` (same folder as `yt-ideas`, different `type` in frontmatter).
 - Filename: `YYYY-MM-DD-стратег-топ5.md`. If exists, append `-v2`, `-v3`…
 - Frontmatter:
   ```yaml
@@ -157,12 +157,12 @@ Follow `${CLAUDE_PLUGIN_ROOT}/references/vault.md` conventions.
   kb_last_updated: <YYYY-MM-DD>
   kb_fresh: <true | false>
   competitor_inputs:
-    - "[[конкуренты/<file-without-ext>]]"
+    - "[[youtube/конкуренты/<file-without-ext>]]"
   tags:
     - youtube/strategic-shortlist
   related:
-    - "[[база/канал]]"
-    - "[[база/индекс]]"
+    - "[[youtube/база/канал]]"
+    - "[[youtube/база/индекс]]"
   ---
   ```
 - Body: the report from Step 5 verbatim.

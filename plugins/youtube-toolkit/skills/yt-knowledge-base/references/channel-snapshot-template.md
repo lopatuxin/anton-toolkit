@@ -1,6 +1,6 @@
 # Channel snapshot template — канал.md
 
-One file at `C:\projects\Claude\youtube\база\канал.md`. Overwritten on every run (this file is the "latest state" snapshot, not a history). Per-snapshot dated reports live in `канал\` (the `yt-my-channel` folder) — do NOT confuse the two.
+One file at `C:\projects\obsidian\youtube\база\канал.md`. Overwritten on every run (this file is the "latest state" snapshot, not a history). Per-snapshot dated reports live in `канал\` (the `yt-my-channel` folder) — do NOT confuse the two.
 
 ## File format
 

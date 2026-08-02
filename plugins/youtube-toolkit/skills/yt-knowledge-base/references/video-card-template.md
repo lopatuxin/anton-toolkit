@@ -1,6 +1,6 @@
 # Video card template
 
-One file per video at `C:\projects\Claude\youtube\база\видео\<slug>.md`.
+One file per video at `C:\projects\obsidian\youtube\база\видео\<slug>.md`.
 
 The slug follows the vault rule (`${CLAUDE_PLUGIN_ROOT}/references/vault.md`): Cyrillic, lowercase, kebab-case, derived from the video's working title (Russian, NOT transliterated to Latin), ≤ 60 chars. The SAME slug is reused across `сценарии/`, `seo/`, `превью/` for the same video.
 

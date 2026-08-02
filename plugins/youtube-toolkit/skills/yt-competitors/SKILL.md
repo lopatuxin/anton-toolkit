@@ -98,7 +98,7 @@ Apply the framework in `references/analysis-framework.md`:
 
 After producing the report in chat, persist it to the Obsidian vault following `${CLAUDE_PLUGIN_ROOT}/references/vault.md`.
 
-- Target folder: `C:\projects\Claude\youtube\конкуренты\`.
+- Target folder: `C:\projects\obsidian\youtube\конкуренты\`.
 - Filename (Russian, Cyrillic, kebab-case — see `${CLAUDE_PLUGIN_ROOT}/references/vault.md` for the rules):
   - SINGLE mode → `YYYY-MM-DD-канал-<handle>.md`. The `<handle>` token is the competitor's `@handle` without the `@` — leave it as-is (Latin handles stay Latin, Cyrillic handles stay Cyrillic); do not transliterate. Example: `2026-05-13-канал-yandexedu.md`, `2026-05-13-канал-логос.md`.
   - BATCH mode → `YYYY-MM-DD-разбор-ниши.md`.

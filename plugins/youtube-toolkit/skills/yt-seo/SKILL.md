@@ -95,7 +95,7 @@ Variant <N> — <one-sentence rationale>.
 
 After producing the SEO block in chat, persist it to the Obsidian vault following `${CLAUDE_PLUGIN_ROOT}/references/vault.md`.
 
-- Target folder: `C:\projects\Claude\youtube\seo\`.
+- Target folder: `C:\projects\obsidian\youtube\seo\`.
 - Filename: `<video-slug>.md`. The slug is Russian (Cyrillic) kebab-case, no transliteration. Reuse the same slug as the script for this video (lives in `сценарии/<slug>.md`). If a SEO file with this slug exists, append `-v2`, `-v3`…
 - Frontmatter:
 
@@ -115,8 +115,8 @@ After producing the SEO block in chat, persist it to the Obsidian vault followin
     - youtube/seo
     - youtube/series/<series>
   related:
-    - "[[сценарии/<slug>]]"
-    - "[[превью/<slug>]]"
+    - "[[youtube/сценарии/<slug>]]"
+    - "[[youtube/превью/<slug>]]"
   ---
   ```
 
