@@ -19,7 +19,8 @@ description: >
   Discrimination: this skill TALKS about Logos and ROUTES to the other Logos tools; it never designs,
   slices, specs, builds, or logs by itself. For designing the architecture use logos-design; for
   slicing into phases use logos-phases; for the web-interface spec use logos-ui; for building real
-  code use logos-build; for recording/searching decisions use logos-log. This skill runs DIRECTLY in
+  code use logos-build; for recording/searching decisions use logos-log; for the research-branch
+  experiment diary (Logos/Исследования/, repo Logos-Lab) use logos-lab. This skill runs DIRECTLY in
   conversation. Do NOT launch agents for the dialog part.
 ---
 
@@ -88,6 +89,7 @@ The canonical sources, by question type (paths resolved in step 0; full table in
 | The web interface (pages, blocks, navigation, behavior) | `$DOCS/Дизайн/Веб-интерфейс.md` |
 | Delivery phases — what exists, what is in/out of scope, done criteria, status | `$DOCS/Дизайн/Фазы/Фаза-NN-*.md` (and the folder for the overview) |
 | Past decisions, experiments, dead ends, "why did we choose X" | `$DOCS/Журнал/` (format in `references/diary-format.md`) |
+| The research branch — small self-learning models, its directions, experiments, lab code | `$DOCS/Исследования/` (format in `references/lab-format.md`) + the lab repo `Logos-Lab` (the code repo's sibling); overview in `references/logos-project.md` §10 |
 | What the code actually does, current implementation state | the code repo at `$CODE` (read files, `git log`, `git status`) |
 | What the running system actually DID — did a pass run, why did a step produce nothing, what failed | the live stand: `docker ps`, `docker logs <container>`, and the diagnostic/telemetry endpoints |
 | What the system HOLDS right now — stored memory, facts, entities, settings, telemetry records | the stand's HTTP API first (`GET /api/...`), and the databases (PostgreSQL, Neo4j) when the API does not expose it |
@@ -135,6 +137,7 @@ Skill tool (for skills) or the Agent tool (for agents). Routing table:
 | Spec / change the web interface structure | skill `logos-ui` |
 | Build a phase into real code (implement / continue development / fix QA findings) | skill `logos-build` |
 | Record a decision/experiment/dead end, or review/search the journal | skill `logos-log` |
+| Start/close/search a RESEARCH-BRANCH experiment, or maintain its direction notes | skill `logos-lab` |
 | Audit code-vs-docs drift on demand (point-check, outside a full build) | agent `logos-sync` |
 
 Delegation rules:

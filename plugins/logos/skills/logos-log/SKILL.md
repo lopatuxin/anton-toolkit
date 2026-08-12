@@ -16,8 +16,11 @@ description: >
   "отметь результат эксперимента", "эксперимент сработал", "эксперимент провалился".
 
   Discrimination: this is the Logos PROJECT decision journal. For a personal life diary use dnevnik;
-  for designing the Logos architecture use logos-design. This skill only records, searches,
-  and updates journal entries — it does not design anything.
+  for designing the Logos architecture use logos-design; for experiments of the RESEARCH BRANCH
+  (Logos/Исследования/, repo Logos-Lab — the hypothesis→result loop) use logos-lab: the journal keeps
+  project decisions, including the cross-cutting ones about the branch itself, while the branch's
+  experiment diary lives in logos-lab. This skill only records, searches, and updates journal
+  entries — it does not design anything.
 ---
 
 # Logos-log — the Logos decision journal
@@ -48,7 +51,10 @@ verbatim**. This skill is the user-facing interface over that format: record, se
 **Project context:** the journal records both DESIGN decisions and BUILD decisions. Where the Logos
 code lives, where the docs live, and how they stay in sync is described in
 `references/logos-project.md` — read it so build-related entries use the right `область` and link to
-the right artifacts.
+the right artifacts. An experiment of the RESEARCH BRANCH (`Logos/Исследования/`, repo `Logos-Lab` —
+see that reference's §10) is NOT a journal entry — route it to the `logos-lab` skill; the journal
+keeps only cross-cutting project decisions about the branch (e.g. a matured conclusion entering the
+main design).
 
 ## 0. Setup (every run)
 
