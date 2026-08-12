@@ -304,3 +304,32 @@ the user means by «версионирование проекта»: the build m
   When you bump the version, you CHANGE the literal — you do not add to a story.
 - **Must NOT.** Never duplicate the literal, never auto-derive it from git tags / CI, never add
   per-layer versions. It stays one manual literal in `version.py`.
+
+## 10. The research branch — Исследования + Logos-Lab (founded 2026-08-12)
+
+Logos has a SEPARATE research branch: moving away from big LLMs toward a swarm of small
+specialized self-learning models on cheap hardware (tiny recursive models, continual learning,
+ternary networks, neuromorphic hardware). It deliberately does NOT mix with the production
+system's development — different docs, different repo, different discipline.
+
+- **Documentation:** `$DOCS/Исследования/` in the vault — `Концепт-исследований.md` (goal,
+  hypotheses, constraints), `Направления/` (one note per research direction), `Эксперименты/`
+  (the experiment diary: one note = one experiment, hypothesis written BEFORE the code).
+  On-disk format: `references/lab-format.md`.
+- **Code:** the SEPARATE repo `Logos-Lab` (`git@github.com:lopatuxin/Logos-Lab.git`), locally
+  the vault's sibling `Logos-Lab/` next to the main code repo. One root folder = one
+  experiment, named as its diary note slug.
+- **Discipline differs by design.** The production rules of this reference — the §4 doctrine's
+  production overhead, §5 phase pipeline, §9 product semver, the mandatory full test suite —
+  do NOT apply in `Logos-Lab`. Research code is disposable; that is normal there. Russian
+  commits and no-secrets-in-git still hold.
+- **Diary vs journal.** The experiment diary (`$DOCS/Исследования/Эксперименты/`) is NOT the
+  decision journal (`$DOCS/Журнал/`): the journal records PROJECT decisions (including the
+  decision that this branch exists, and any matured conclusion entering the main design); the
+  diary records the branch's hypothesis→result loop. `logos-log` owns the journal; the
+  **`logos-lab` skill owns the diary** (record / outcome / search / direction notes).
+- **Routing.** `logos-chat` routes research-branch work (record an experiment, append a
+  result, search the diary, maintain directions) to `logos-lab`. The build tools
+  (`logos-build`, `logos-coder`, `logos-qa`, `logos-sync`, …) never touch `Logos-Lab` or
+  `$DOCS/Исследования/` — drift audits and phase pipelines apply to the production system
+  only.
