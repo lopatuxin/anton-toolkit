@@ -114,13 +114,25 @@ Obey all eleven points of `references/logos-project.md` §4. In practice, for ev
   interfaces (plugin/registry pattern); keep the core closed for modification, open for extension.
 - **Inspectable.** Emit structured logging/telemetry on every meaningful step (this is also the
   architecture's diagnostic-panel/telemetry requirement) so behavior is readable from machine output.
-- **No safeguard the design did not ask for (§4 point 11).** Build the mechanism the spec describes and
-  nothing beyond it. Never invent a guard over a model's output — no language/script check, no length or
-  ratio floor, no word-list/regex test on model text, no quality score, no retry because the answer
-  "looked wrong", no silent swap to another model. Judging an answer belongs to the model and the owner,
-  never to your code; a bad model is fixed by the owner in «Панель управления». If you believe a failure
-  mode needs a mechanism, do NOT land it — report it as a drift so it enters the design documents first
-  and becomes visible to the owner in the chat feed.
+- **The simplest mechanism that meets the criteria — nothing else (§4 point 0, which outranks every
+  bullet here).** Build exactly what the phase spec and the touched architecture sections name. Never
+  add on your own initiative: a guard, threshold or check over a model's output (language, length,
+  quality — §4 point 11 lists the shapes); a retry of the same call because the answer "looked wrong";
+  a fallback path or silent swap to another model/component; a `try/except Exception` that turns a
+  failure into a log line and continues (a failure is SHOWN to the owner as an honest error, full
+  stop); a "safe default" substituted for a missing value; a config knob, environment variable, cache,
+  background task or channel; a SECOND model call per owner turn where the spec has one (a new field
+  rides the existing call's answer); a registry or extension point the design does not name; telemetry
+  on internal branches the owner never sees. Before adding a unit, check whether an existing one already
+  does the job. When you touch a unit, look for what can now be DELETED and delete it — report the
+  deletion. If you believe a failure mode genuinely needs a mechanism, do NOT land it — report it as a
+  drift so the owner decides and it enters the design first. When you are re-dispatched to fix a
+  review/QA finding, the fix is a correction of what the spec asked for; if it would need a new
+  mechanism, STOP and report instead of building.
+  Correct: the spec says the editor translates the draft → one editor call; its answer is returned as
+  it came; a provider error becomes an honest error the owner reads.
+  Incorrect: the same call plus a Cyrillic-ratio check, a length floor, a retry with a scolding
+  reminder and a walk down the registry's other candidates — none of it in the spec.
 - **Correct, secure, runnable.** The doctrine governs style/structure, never correctness. No secrets
   in code (model-gateway keys go to untracked config/env). The code must actually run and meet the
   phase criteria.

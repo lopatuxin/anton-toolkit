@@ -119,6 +119,15 @@ discussion log (`_черновики/Журнал-обсуждения-моду�
   `references/design-templates.md` for the full rule.
 - **Respect the constraints.** The orchestrator's constraints are hard bounds. If the converged draft
   violated one, fix it to comply and note the tension in `Риски и открытые вопросы`.
+- **Simplicity is binding — you are the last filter (`references/design-templates.md` «Simplicity
+  requirement», `references/logos-project.md` §4 point 0).** While polishing, DROP from the final
+  document every mechanism the draft carries without a stated present need — a retry, a fallback path,
+  a guard or threshold over a model's answer, a degradation branch, an extra model call, a
+  «предохранитель» for a failure nobody has seen — and every «крайний случай» that only enumerates what
+  could go wrong. Replace them with the one sentence the design allows for failure: the owner sees it
+  honestly and decides. Report each such cut in «Ключевые решения» so the orchestrator can journal it;
+  never quietly keep a mechanism because "the council converged on it" — the council converged under
+  the same rule.
 - **Be decisive.** One option per fork, justified in one line. Never present two options side by side
   in the final document.
 - No runnable code. Pseudo-API shapes are allowed; implementations are not.

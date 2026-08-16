@@ -54,15 +54,28 @@ back to the orchestrator.
    - **Web UI:** drive the page in the browser (Chrome DevTools MCP) — load it, type a message, send,
      assert the model's answer appears; open the diagnostic log panel and assert it shows the required
      fields (prompt, response, model name, latency) for the pass.
-   - **Failure paths the criteria require:** deliberately break what the phase says must fail
-     gracefully (e.g. an invalid model key / unreachable provider) and assert the system reports a
-     clean diagnostic and does not crash silently.
+   - **Failure paths — only where a criterion names one, and «gracefully» means VISIBLY.** If the phase
+     says a failure must be handled (e.g. an invalid model key / unreachable provider), break it and
+     assert the OWNER SEES an honest error in the chat feed or panel. «Did not crash» is NOT a pass: a
+     failure that vanished into a log line while the owner got a calm answer or nothing at all is a
+     FAIL of the kind «сбой скрыт от хозяина» — route it as a code bug whose fix is to SHOW the failure,
+     never as a request for a fallback. Do not invent failure paths the criteria do not name.
 3. Check the console and network for errors that contradict a "pass".
+4. **Tell a model's misbehaviour apart from a code bug.** If the running system did what the spec says
+   but the MODEL answered badly (wrong language, a stub, a hallucinated capability, an ignored
+   instruction), that is a model-quality observation for the OWNER — report it in its own block
+   («Поведение модели»), routed to the user, whose remedy is another model in «Панель управления» or a
+   prompt change he approves. NEVER route it to `logos-coder`: code around a bad model is exactly the
+   accumulation this project forbids (`references/logos-project.md` §4 point 0).
 
 ## Bug routing
 
 For each failure, classify and route:
-- **Code bug** (logic, API, UI behavior, crash) → route to `logos-coder` with `file`/endpoint/repro.
+- **Code bug** (logic, API, UI behavior, crash, a failure hidden from the owner) → route to `logos-coder`
+  with `file`/endpoint/repro. State the fix direction as «показать честно», never as «добавить
+  повтор/запасной вариант/проверку».
+- **Model behaviour** (the code did what the spec says; the model answered badly) → route to the USER
+  as an observation; never to a coder.
 - **Missing/incorrect run setup** (won't start, wrong port, missing env) → route to `logos-devops`.
 - **Spec ambiguity** (the criterion itself is unclear or untestable) → flag to the orchestrator for a
   user decision; do not invent the expected behavior.

@@ -156,6 +156,17 @@ as it governs backend code (the user never reads it; a future agent must extend 
 - **Modern, correct, accessible, runnable.** Idiomatic modern React/TS; keyboard and screen-reader
   accessible; no console errors; the UI must actually run, satisfy the phase criteria, and match the
   web-interface spec.
+- **The simplest mechanism that meets the criteria — nothing else (§4 point 0, which outranks every
+  bullet here).** Build exactly what the web-interface spec and the phase name. Never add on your own
+  initiative: a client-side retry, fallback rendering path, cache, debounce/throttle layer, feature flag,
+  "defensive" empty-state branch or error boundary that HIDES a failed request behind a calm screen — a
+  failed request is SHOWN to the owner as an honest error, full stop; a second request where the spec has
+  one; a helper, hook or abstraction "for the next screen"; a component variant the spec does not name.
+  Before adding a component or hook, check whether an existing one already does the job. When you touch a
+  file, look for what can now be DELETED and delete it — report the deletion. If you believe a failure
+  mode genuinely needs handling, do NOT land it — report it as a drift so the owner decides and it enters
+  the spec first. When re-dispatched to fix a review/QA finding, the fix is a correction of what the spec
+  asked for; if it would need a new mechanism, STOP and report instead of building.
 
 ## Thin client — a hard invariant
 

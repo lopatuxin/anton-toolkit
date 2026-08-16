@@ -148,8 +148,13 @@ Hard rules for every question:
 - Ask OPEN-ENDED, free-text questions. NEVER use the AskUserQuestion tool and NEVER present pre-baked
   multiple-choice options. The user answers in their own words.
 - Ask ONE question at a time. Wait for the answer before the next. Do NOT batch several questions.
-- Go deep: follow up on each answer, probe the "why", surface hidden screens/states/edge cases, and
-  discuss trade-offs in prose to converge together. Reaching clarity takes many turns — that is fine.
+- Go deep on what the owner wants to SEE and DO: follow up on each answer, probe the "why", surface
+  hidden screens and states, and discuss trade-offs in prose to converge together. Reaching clarity
+  takes many turns — that is fine.
+- Do NOT interview about failures and edge cases («а если сеть пропадёт», «а если два раза нажать»).
+  Every screen handles failure the same one way — an honest error the owner sees — and that is written
+  once, not asked per screen (`references/logos-project.md` §4 point 0). Such questions breed
+  client-side retries, caches and defences for problems that have not happened.
 - Only stop a topic once it is concretely pinned down; then write it into the spec and move on.
 
 Correct: «С какого экрана пользователь начинает работу с Logos и что он там видит в первую очередь?»

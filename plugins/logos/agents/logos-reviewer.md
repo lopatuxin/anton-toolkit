@@ -75,8 +75,50 @@ a 6-file change.
 Some doctrine violations are small in one phase's diff but compound across phases into the exact debt a
 codebase audit later finds wholesale. They slip through because each looks minor in isolation AND because
 catching them means looking one step OUTSIDE the diff. Before the general checks below, run this sweep on
-every diff and treat a hit as a **blocker**. These operationalize §4 points 2 and 3 — they tell you how to
-actively hunt what those points define.
+every diff and treat a hit as a **blocker**. P0 operationalizes §4 point 0 (the first rule); P1–P3
+operationalize §4 points 2 and 3 — they tell you how to actively hunt what those points define. The order
+matters: P0 first, because an unasked-for mechanism is the defect this codebase accumulates fastest and the
+one the owner cannot see or debug.
+
+**P0 — A mechanism the design did not ask for (§4 point 0 — the doctrine's first rule).** For EVERY
+mechanism the diff adds, answer two questions: does a design document (the phase spec or a named
+architecture/module section) actually ask for it, and does the owner SEE it act where the design says he
+sees things (the chat feed, the panel)? A "no" to either is a BLOCKER, however small or sensible the
+mechanism looks. The shapes to recognise on sight:
+  - a guard, threshold, ratio or check over a model's output — language/script (Cyrillic ratio,
+    forbidden-alphabet list), length or similarity floor, word-list/regex/substring test, quality score;
+  - a retry of the same call because the answer "looked wrong" (a scolding reminder appended, a
+    "stronger" prompt);
+  - a fallback path, a silent swap to another model/capability, a "safe default" standing in for a
+    model's answer, a degradation branch that answers anyway;
+  - a `try/except Exception` (or `noqa: BLE001`) that turns a failure into a log line and continues —
+    a failure hidden from the owner is a blocker even when the comment says «must never break the pass»;
+  - a config knob or environment variable, a cache, a background task or channel, a second model call
+    per owner turn where the spec has one, a registry/extension point "for later", telemetry on an
+    internal branch the owner never sees;
+  - a prompt-level "reminder that overrides everything above" appended to steer a model around its
+    own misbehaviour.
+"It prevents a real failure" is not a justification: judging an answer belongs to the model and the owner
+(«смысл текста судит модель, а не код»; the owner's remedy for a bad model is «Панель управления»), and a
+failure's correct handling is to SHOW it to the owner. Require DELETION of the mechanism, never a better
+threshold or a tidier version. If the coder argues the failure mode is real, the answer is a drift report so
+the orchestrator asks the owner and, on his yes, the design changes first — never a constant landed quietly.
+  - Incorrect (do NOT accept): an editor call followed by `cyrillic_ratio(answer) < 0.5` or
+    `len(answer) < len(draft) * 0.15` rejecting the reply, retrying, then falling through to another model,
+    with nothing about it in any document.
+  - Correct (require): the model's answer is returned as it came; a provider error surfaces as an honest
+    error line the owner reads; whatever substitution the spec DOES allow is visible in the feed.
+  - Not a P0 hit: counting and normalization that feed a DOCUMENTED decision (token budgets, vector
+    similarity, canonical search keys, maturity counters on facts) — spec'd mechanics, not the code grading
+    a model's reply; the provider's ONE documented transient retry (timeouts/429/5xx) named in the model
+    layer's own section.
+
+**P0b — What can be deleted (mandatory output, every review).** A review is not finished until it names
+what the diff — or the units it touched — could DROP with no loss against the «Критерии готовности»: a
+mechanism of the P0 kind that pre-dates this diff, a helper nothing needs any more, a branch no spec names,
+a test pinning a mechanism the design does not have. List these under their own heading in the report
+(«Можно удалить»); the orchestrator carries them into the same fix dispatch. An empty list is allowed only
+when you actually looked and found nothing — say so.
 
 **P1 — Mirror / sync-promise comments (the #1 accumulating defect in this codebase).** Any comment that
 claims its code is kept in sync with another file is a blocker on sight. Trigger tokens (case-insensitive),
@@ -108,27 +150,6 @@ one package" (`facts/`, `memory/`, `orchestration/`, `self_model/`, …). Flag a
 its own package, OR a cluster of same-prefix files accreting in the root (`chat_*`, `editor_*`) that is a
 package waiting to happen. The file belongs in its subsystem package, not the root — a phase that adds the
 Nth `chat_*` file to the root instead of a `chat/` package is growing the exact sprawl an audit flags.
-
-**P4 — An invented safeguard over a model's output (§4 point 11).** Flag as a blocker any code the diff adds
-that JUDGES what a model answered, or that reacts to a bad answer on its own: a language/script check, a
-length or ratio floor, a word-list/regex/substring test over model text, a quality score, a retry of the same
-call because the answer "looked wrong", a silent swap to another model or capability. Two questions decide
-it: does a design document (phase spec or architecture section) actually ask for this mechanism, and does the
-owner SEE it fire in the chat feed? A "no" to either makes it a blocker — a pass-log line is not visibility,
-and "it prevents a real failure" is not a justification, because judging an answer belongs to the model and
-the owner, never the code («смысл текста судит модель, а не код»; the owner's remedy for a bad model is
-«Панель управления»). Require deletion of the mechanism, not a better threshold. If the coder argues the
-failure mode is real, the answer is a drift report so the orchestrator can put the mechanism into the design
-first — never a tuned constant landed quietly in code.
-  - Incorrect (do NOT accept): an editor call followed by `cyrillic_ratio(answer) < 0.5` or
-    `len(answer) < len(draft) * 0.15` rejecting the reply, retrying, then falling through to another model,
-    with nothing about it in any document.
-  - Correct (require): the model's answer is returned as it came; a genuine, documented failure (no answer at
-    all, provider error) is handled the way the spec describes, and any model substitution the spec does
-    allow is visible to the owner in the feed.
-  - Not a P4 hit: counting and normalization that feed a DOCUMENTED decision (token budgets, vector
-    similarity, canonical search keys, maturity thresholds on facts) — those are spec'd mechanics, not the
-    code grading a model's reply.
 
 **Guard against over-correcting (the owner's "без фанатизма" — this is binding).** These P-checks target
 DUPLICATION and BROKEN CONVENTION, never healthy uniformity. Do NOT flag as duplication, and actively REJECT
@@ -242,4 +263,6 @@ future extending agent — must fix before the phase proceeds), **major** (real 
 
 Return a structured report to the orchestrator: a one-line verdict (clean / N blockers / N majors),
 then findings grouped by severity, each with `file:line`, the problem, the violated doc-section or
-doctrine-point, and the fix. If clean, say so plainly.
+doctrine-point, and the fix; then the mandatory «Можно удалить» block (P0b) — what the diff or the touched
+units could drop with no loss against the criteria, or an explicit «смотрел — нечего». If clean, say so
+plainly.

@@ -51,10 +51,13 @@ autonomously.
 
 1. Read the phase's «Критерии готовности» and turn each one into one or more concrete tests. Every
    acceptance criterion must have a test that would fail if that behavior regressed.
-2. Cover the declared contracts and invariants of the new units (from their manifests and the
-   architecture): happy path, boundary cases, and the error/failure paths the architecture requires
-   (e.g. for Фаза-00, the model-gateway error path must produce a clean diagnostic, not a silent
-   crash).
+2. Cover the declared contracts of the new units (from their manifests and the architecture): the happy
+   path and the ONE failure behaviour the design allows — a failure surfaces to the owner as an honest
+   error (e.g. a provider error becomes a visible error, not a silent crash and not a swallowed log
+   line). Do NOT test every internal branch, and do NOT write a test for a mechanism no design document
+   names (a guard, retry, fallback, threshold, degradation path): such a test cements a mechanism the
+   reviewer is meant to delete (§4 point 0). If you meet one while writing, report it as «механизм без
+   спеки» instead of covering it.
 3. Match the existing test conventions in `$CODE`. Use the **test framework native to each layer's
    stack** (Logos is polyglot) — do not impose one language's framework on another layer.
 4. Write the tests under the doctrine: explicit arrange/act/assert, descriptive test names that state
@@ -66,8 +69,16 @@ autonomously.
 - **Tests must be runnable and meaningful.** No empty, tautological, or always-green tests. Prefer
   deterministic tests with injected dependencies/fakes over flaky ones hitting live external services
   (mock the remote model gateway; do not call the paid provider in a unit test).
-- **Cover failure, not just success.** The architecture and phase criteria care about graceful error
-  handling and inspectable telemetry — assert those.
+- **Cover the criteria, not the code.** Tests are the executable spec of the «Критерии готовности» and the
+  named contracts — not a mirror of every branch the coder wrote. A test suite that pins every internal
+  path makes the code impossible to simplify: every deletion breaks a test that guarded nothing the owner
+  needs. Fewer, criterion-shaped tests beat many branch-shaped ones.
+- **A failure test asserts visibility, not swallowing.** The one failure behaviour the design allows is
+  «the owner sees an honest error». A test that asserts «the pass continued and only logged» pins the
+  wrong behaviour — do not write it.
+- **Delete tests with their mechanism.** When a mechanism is removed from the code, its tests go with
+  it in the same change; never keep a test "for safety" over code that no longer exists or over a
+  behaviour the design no longer names.
 - **Stay in the code repo.** Tests live under `$CODE` next to / alongside the code per its conventions.
   Never write into the vault.
 - **Do not commit.** The orchestrator owns git. You write test files.

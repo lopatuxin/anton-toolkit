@@ -81,6 +81,12 @@ Compare the implemented code for this phase against the documents in both direct
 2. **Code → docs (is everything built actually described?).**
    - Modules/components/capabilities/registries that exist in the code are represented in the
      architecture (or the phase document). A real component the docs do not mention is drift.
+   - **Mechanisms no document names are drift of the WORST kind** — a guard/threshold/check over a
+     model's answer, a retry of the same call, a fallback path or silent model swap, a degradation
+     branch, a `try/except` that hides a failure in a log, a config knob, a background channel, an extra
+     model call per turn. Hunt these specifically in the phase's diff (`references/logos-project.md`
+     §4 point 0 and point 11 list the shapes); each is its own drift entry, verdict «code is wrong —
+     delete» unless a named design section asks for it.
    - The code did not implement anything the phase marks «Что НЕ входит» (built-ahead is drift).
 3. **Status & journal coherence.**
    - The phase `статус` matches reality (e.g. not still `планируется` while code exists).
@@ -130,7 +136,9 @@ oversized documents and stale stamps are informational and never block a phase.
 - **What:** "code does X; docs say Y" in one or two concrete sentences.
 - **Which side looks wrong:** code (likely a bug or build-ahead → fix code) vs docs (a deliberate,
   justified change the docs have not caught up to → update docs + record a journal entry). State your
-  read, but the orchestrator decides.
+  read, but the orchestrator decides. ONE default is fixed and not yours to soften: a mechanism the
+  code has and no document names is «code is wrong — delete», never «docs should describe it» — the
+  documents absorb such a mechanism only on the owner's explicit decision, which you cannot presume.
 - **Severity:** blocker (a real contract mismatch) / minor (cosmetic or naming).
 
 ## Rules

@@ -140,7 +140,10 @@ For every entry whose `Кому` is your role (фронтенд) and whose `Ст
 - **fix it** — change the draft to address the concern, set `Статус: решён`, write a one-line
   `Резолюция`; or
 - **defend it** — keep the draft and set `Статус: решён` with a `Резолюция` justifying the choice in
-  one or two lines.
+  one or two lines; or
+- **drop it** — remove the mechanism the question is about from the draft and set `Статус: решён` with
+  `Резолюция: не строим — хозяин увидит сбой и решит сам`. This is the DEFAULT answer to a worry about a
+  failure nobody has seen; adding a mechanism to appease a worry is the answer of last resort.
 
 Do NOT open new questions in `resolve` mode — this round converges, it does not branch. If a concern
 genuinely needs the user, set `Статус: решён` with `Резолюция` `вынести в Открытые вопросы` and add
@@ -164,6 +167,14 @@ and raise nothing — silence is correct. Your lens and all rules below are unch
   about ANY part of the draft. This is what makes it a council and not a stack of monologues.
 - **Do not duplicate `[[Веб-интерфейс]]`.** That document owns the page/element/UX spec; you own the
   integration contract. Reference it; keep them consistent.
+- **Simplicity is binding (`references/design-templates.md` «Simplicity requirement»,
+  `references/logos-project.md` §4 point 0).** Design the SMALLEST set of mechanisms that delivers the
+  concept. Before adding any mechanism, state in the draft which present need it serves and what the
+  owner would see without it; a mechanism for a problem that has not happened is not designed. Failure
+  handling is one sentence — the owner sees the failure honestly, in the feed, and decides — never
+  retries, fallbacks, guards or degradation paths behind the interface. When reviewing others, an
+  unnecessary mechanism is a legitimate concern to raise («зачем это, что будет без этого?») — cutting
+  is as much your job as deepening.
 - **Respect the constraints.** Orchestrator constraints are hard bounds — never violate them to serve
   a richer interface.
 - **Document language — Russian.** Russian headings and prose; technical terms (WebSocket, SSE, REST,

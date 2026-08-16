@@ -89,9 +89,11 @@ if [ ! -d "$CODE/.git" ]; then
 fi
 ```
 
-After bootstrap, ensure `$CODE/CLAUDE.md` exists and points back at the vault docs as the source of
-truth and restates the doctrine (reference §4) in brief — create it if missing. Tell the user in
-Russian what you did (cloned vs initialized). Do NOT push anything yet.
+After bootstrap, ensure `$CODE/CLAUDE.md` exists and holds ONLY what the repo alone knows (where the
+docs live, the stands, how to run the tests, which agent does what) plus a pointer to
+`references/logos-project.md` for the doctrine — create it if missing. Never paste the doctrine into it:
+the doctrine has one home, the reference (§3). Tell the user in Russian what you did (cloned vs
+initialized). Do NOT push anything yet.
 
 ## 2. Pick the phase (short dialog, Russian)
 
@@ -157,10 +159,13 @@ finish before the next; feed each agent the prior agent's report.
    pure UI tweak) dispatches `logos-frontend-coder` for the UI and still sends `logos-coder` to make the
    one-line `PRODUCT_VERSION` bump (§9 applies to every phase).
 2. **logos-reviewer** — review the diff against the architecture docs AND the doctrine (backend and
-   frontend). Route blocking findings to the right fixer — backend findings to `logos-coder`, frontend
-   findings to `logos-frontend-coder` — then re-review. One fix loop is normal; stop after two and
-   surface unresolved findings to the user.
-3. **logos-test-writer** — write machine-checkable tests covering the phase's «Критерии готовности».
+   frontend), §4 point 0 first: every mechanism the diff adds must be one the spec names, and the
+   reviewer names what the diff could DELETE. Route blocking findings to the right fixer — backend
+   findings to `logos-coder`, frontend findings to `logos-frontend-coder` — then re-review. One fix
+   loop is normal; stop after two and surface unresolved findings to the user. Carry the reviewer's
+   «можно удалить» list into the SAME fix dispatch — deletions are not deferred to a later phase.
+3. **logos-test-writer** — write machine-checkable tests covering the phase's «Критерии готовности» —
+   the criteria, not every internal branch.
 4. **logos-devops** — make the phase runnable per its stack (containers / run scripts / infra), within
    the resource budget from the architecture, AND deploy the new version to the LOCAL stand: build the
    images and (re)start the local containers so the running system serves the JUST-BUILT
@@ -178,6 +183,19 @@ finish before the next; feed each agent the prior agent's report.
 
 If any agent reports it cannot proceed without a user decision, pause and ask the user ONE open
 question in Russian, then continue.
+
+**Routing findings — the rule that keeps §4 point 0 from eroding one fix at a time (reference §5).** A
+review, QA or sync finding goes to a coder ONLY when it is a bug in what the spec asked for. Never route
+these to a coder as "add a mechanism":
+- **A model behaved badly** (wrong language, a stub, a hallucinated capability, an ignored instruction)
+  → tell the OWNER in your report as a model-quality observation; his remedy is a different model in
+  «Панель управления» or a prompt change he approves — no code around the model.
+- **A provider / infrastructure hiccup** (timeout, 429, 5xx, empty completion) → the provider's own
+  documented retry, and beyond that an honest error the owner sees; never a new fallback path.
+- **"It crashed / an exception escaped"** → the fix is to SHOW the failure honestly to the owner, never
+  to swallow it into a log and continue.
+If a fix would require a mechanism the spec does not name, STOP and ask the owner one open Russian
+question; on his yes, update the design document FIRST (via the owning design skill), then the code.
 
 ## 4a. Doctrine guard — mechanical, runs after the coders and BEFORE the reviewer
 
@@ -253,8 +271,14 @@ Report every drift (code does X, docs say Y) with file:line and which side looks
 For each reported drift, resolve it (do NOT leave docs and code disagreeing):
 - Code is wrong → re-dispatch the right coder to fix it (backend → `logos-coder`, frontend →
   `logos-frontend-coder`).
-- The docs are now outdated by a deliberate, justified change → update the affected doc inline (or via
-  the design skills for a structural change) and record the change as a journal entry.
+- **Code holds a mechanism no design document names** (a guard, retry, fallback, threshold, extra model
+  call, background channel, config knob) → the CODE is the wrong side BY DEFAULT: dispatch the coder to
+  DELETE it. The documents absorb such a mechanism ONLY when the owner explicitly decides so (ask him
+  one open Russian question; record his yes as a journal `решение`). Never "update the docs to match"
+  on your own — that is how invented mechanisms became design.
+- The docs are outdated by a deliberate, justified change the owner already knows about → update the
+  affected doc inline (or via the design skills for a structural change) and record the change as a
+  journal entry.
 Re-run `logos-sync` until it reports no unresolved drift.
 
 `logos-sync` also returns a **documentation health** block — broken wiki-links, orphan pages, oversized
@@ -305,6 +329,12 @@ with the next phase.
 
 - **Never use the anton-toolkit dev agents for Logos.** Only the `logos-*` agents. They carry Logos's
   context and the "code for AI, not humans" doctrine; the generic ones do not.
+- **Simplicity is the first rule of the whole pipeline (reference §4 point 0).** The phase is built as
+  the SMALLEST set of mechanisms that meets its «Критерии готовности»; nothing is added for a problem
+  that has not happened; a failure is shown to the owner, never swallowed; a model's answer is never
+  judged by code. Every dispatch prompt above already carries the doctrine — but YOU are the one who
+  decides where a finding goes and what gets deleted, so the routing rule in step 4 and the drift default
+  in step 5 are yours to enforce, every phase, without exception.
 - **Code repo = manual git; vault = auto-sync.** Do not confuse the two. Push code only with the
   user's ok; never `git commit` the vault.
 - **Keep docs and code in sync, always.** A phase is not `готово` until `logos-sync` is clean.

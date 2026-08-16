@@ -94,9 +94,11 @@ exists and operate inside it.
   block orchestrators, the inference server may each use a different stack. Tools route work by
   *layer*, reading the architecture's stack section to decide — they never assume Java just because
   that is the user's day-job stack.
-- **The code repo carries its own `CLAUDE.md`** at `$CODE/CLAUDE.md` pointing back at the vault docs
-  as the source of truth and restating the doctrine in section 4, so any session opened directly in
-  the code repo inherits the same rules. The orchestrator creates/refreshes it on bootstrap.
+- **The code repo carries its own `CLAUDE.md`** at `$CODE/CLAUDE.md` holding ONLY what the repo alone
+  knows (where the docs live, the stands, how to run the tests, which agent does what) plus a pointer to
+  this reference for the doctrine. It NEVER restates the doctrine — the doctrine has ONE home, this file;
+  a copy drifts (the repo once carried an eight-point copy while this file had eleven). The orchestrator
+  creates it on bootstrap; nobody pastes §4 into it.
 - **Manual git for code.** The code repo is committed and pushed by the build tools with Russian
   commit messages (this is the OPPOSITE of the vault, which auto-syncs). Branch per phase; never
   force-push; never commit secrets (API keys for the model gateway live in untracked config / env).
@@ -108,6 +110,29 @@ code ergonomic, pretty, or approachable for a human reader. Optimize the code so
 can read it, understand it fully, and *extend* it later without breaking it. This doctrine is binding
 on `logos-coder` (how to write) and `logos-reviewer` (what to enforce). Concretely:
 
+0. **THE FIRST RULE — the simplest mechanism that meets the criteria, and nothing else. This point
+   outranks every point below it; where any of them pulls toward more code, this one wins.** Logos is
+   built to be simple, functional, easy to extend and easy to debug. A mechanism is built ONLY for a
+   need that exists today — named in the phase spec or the architecture, or already observed and
+   reported by the owner — never for a problem that has not happened yet («не выдумывай проблемы там,
+   где они ещё не возникли»). Every mechanism must be explainable to the owner in ONE plain Russian
+   sentence; if that sentence cannot be written, the mechanism is not built. Failure is not hidden:
+   when something fails, the owner sees an honest error in the chat feed; the code does NOT swallow the
+   exception into a log, does NOT degrade silently to a lesser path, does NOT retry with a "stronger"
+   prompt, does NOT quietly swap models or components. Code never judges what a model answered — its
+   language, length, quality, «is this a stub» — that judgment belongs to the model and to the owner,
+   whose remedy for a bad model is «Панель управления». Extension points, registries, telemetry, config
+   knobs, background channels, caches and extra model calls are COSTS, not virtues: add each one only
+   when the spec names it or the owner asked for it. Before adding a unit, check whether an existing one
+   already does the job; when touching a unit, ask whether something in it can now be DELETED, and
+   delete it. When two designs both meet the criteria, the one with fewer moving parts wins, even if the
+   other is "more robust" — robustness the owner cannot see and did not ask for is complexity he pays
+   for and cannot debug.
+   Correct: the spec says «редактор переводит черновик» → one call to the editor; its answer goes to the
+   owner as it came; a provider error surfaces as an honest error line in the feed.
+   Incorrect: the same call wrapped in a Cyrillic-ratio check, a length floor, a retry with a scolding
+   reminder, a walk down the registry's other candidates and a final «brain as editor» rung — five
+   mechanisms, none in the spec, all invisible to the owner.
 1. **Explicit over implicit, always.** No magic, no clever implicit conventions, no relying on the
    reader's intuition. Full descriptive names, explicit types/contracts at every boundary, explicit
    wiring. An agent should never have to *infer* what is happening.
@@ -174,10 +199,13 @@ on `logos-coder` (how to write) and `logos-reviewer` (what to enforce). Concrete
    you deleted and how many you kept. A coder report with no self-audit line is an incomplete report.
 5. **Extensibility by registration, not by core edits.** New capabilities are added by registering a
    new unit against a stable interface (plugin/registry pattern), not by editing the core. Interfaces
-   are stable and explicit; the core is closed for modification, open for extension.
-6. **Inspectable by construction.** Structured logging/telemetry on every meaningful step (this is
-   also the architecture's telemetry/diagnostic-panel requirement), so an agent can read *what
-   actually happened* from machine-readable output, not guess.
+   are stable and explicit; the core is closed for modification, open for extension. A registry or
+   extension point exists ONLY where the design names one (point 0) — never speculatively "so a future
+   phase can plug in".
+6. **Inspectable by construction.** Structured logging/telemetry on the steps the design says the
+   owner sees (the pass log, the metrics pages) — so an agent can read *what actually happened* from
+   machine-readable output, not guess. Not on every internal branch: a log line is never a substitute
+   for showing the owner a failure (point 0), and telemetry nobody reads is cost (point 0).
 7. **Determinism and isolation.** Prefer pure, deterministic units with explicit dependencies passed
    in (so they are trivially testable and reasoned about) over hidden global state.
 8. **It must still run and be correct.** AI-readability is never an excuse for broken, insecure, or
@@ -217,31 +245,22 @@ on `logos-coder` (how to write) and `logos-reviewer` (what to enforce). Concrete
    Pointing at a phase document as the SPEC a unit implements is allowed ONLY in the terse pointer form
    `spec: Фазы/Фаза-23-самость.md` — a reference, never a retelling. When you edit a file that already
    carries such history, DELETE the historical prose rather than appending to it.
-11. **No safeguard the design did not ask for — and code NEVER judges what a model answered.** Build the
-   mechanism the phase spec and the architecture describe, and nothing beyond it. Never add on your own
-   initiative a guard, threshold, ratio floor, filter, retry, fallback, or "sanity check" over a model's
-   output because you imagine the model might misbehave: no language/script check, no length or
-   similarity floor, no word-list/regex/substring test, no quality score, no silent swap to another
-   model. Deciding whether an answer is good, meaningful, on-topic, or in the right language is the
-   MODEL's job and the OWNER's, never the code's — this is the architecture's standing decision «смысл
-   текста судит модель, а не код»; code keeps only counting and normalization. When a model answers
-   badly, the remedy is the owner choosing a different model in «Панель управления», not code built
-   around the bad model. If a real failure mode genuinely needs a mechanism, it goes into the design
-   documents FIRST and is surfaced to the owner in the chat feed — never landed silently in code with
-   only a line in the pass log. A silent invented safeguard is a BLOCKER even when it "works": the owner
-   cannot debug a mechanism he was never told exists, and such a guard eventually misfires on a path its
-   author never considered. Prefer the simplest mechanism that meets the «Критерии готовности»; when
-   torn between a plain mechanism and a defended one, ship the plain one and report the risk to the
-   orchestrator instead of defending it in code.
-   Correct: the spec describes a fallback ladder → build exactly that ladder, and show each swap to the
-   owner exactly where the spec says it must be visible.
-   Incorrect: the spec asks for an editor call → the code additionally measures the answer's Cyrillic
-   ratio, rejects any reply shorter than 15% of the draft as a "stub", retries, then silently hands the
-   turn to a different model — none of it in any document, all of it invisible to the owner.
+11. **The concrete shapes point 0 bans over a model's output** — recognise them on sight, in code and in
+   review: a language/script check (Cyrillic ratio, forbidden-alphabet list), a length or similarity
+   floor, a word-list/regex/substring test on model text, a quality score, a retry of the same call
+   because the answer "looked wrong", a silent swap to another model or capability, a "safe default"
+   substituted for a model's answer. All of these decide about the MEANING or QUALITY of text, which is
+   the architecture's standing decision «смысл текста судит модель, а не код»; code keeps only counting
+   and normalization that feed a mechanism the design names (token budgets, vector similarity, canonical
+   keys, maturity counters). If a real failure mode genuinely needs a mechanism, it goes into the design
+   documents FIRST and is shown to the owner in the chat feed — a line in the pass log is not visibility.
+   A silent invented safeguard is a BLOCKER even when it "works": the owner cannot debug a mechanism he
+   was never told exists, and it eventually misfires on a path its author never considered.
 
 When a human-ergonomics convention (short names, "self-evident" code, minimal comments, idiomatic
-terseness) conflicts with these eleven points, the doctrine wins. The reviewer rejects human-oriented
-"cleanups" that reduce explicitness or machine-readability.
+terseness) conflicts with these points, the doctrine wins. The reviewer rejects human-oriented
+"cleanups" that reduce explicitness or machine-readability. And when the doctrine's own points 1–11
+pull toward MORE code than the criteria need, point 0 wins over them.
 
 ## 5. Phase-driven workflow (how a phase becomes code)
 
@@ -254,8 +273,11 @@ phase, orchestrated by `logos-build`:
    готовности» are the acceptance tests; «Что НЕ входит» are hard scope boundaries.
 2. **Implement** — `logos-coder` writes the code per the doctrine, routing each layer to its stack;
    it also bumps the product version per §9 (plain semver BY THE MEANING of the release, decoupled from the phase number).
-3. **Review** — `logos-reviewer` checks the diff against the architecture docs AND the doctrine.
-4. **Test** — `logos-test-writer` writes machine-checkable tests covering the «Критерии готовности».
+3. **Review** — `logos-reviewer` checks the diff against the architecture docs AND the doctrine — first
+   of all §4 point 0: every mechanism the diff adds must be one the spec names, and the reviewer names
+   what the diff could DELETE.
+4. **Test** — `logos-test-writer` writes machine-checkable tests covering the «Критерии готовности» —
+   the criteria, not every internal branch.
 5. **DevOps + local deploy** — `logos-devops` makes the phase runnable (containers/run scripts/infra)
    per the stack AND deploys the new version to the LOCAL stand (build + (re)start) so the running
    system serves the just-built version. Runs BEFORE QA — automatic; the user never asks for it.
@@ -264,6 +286,24 @@ phase, orchestrated by `logos-build`:
    against its «Критерии готовности».
 7. **Sync + record** — `logos-sync` audits code-vs-docs drift; the orchestrator updates the phase
    `статус` and writes a journal entry per `references/diary-format.md`.
+
+**How findings are routed — the rule that keeps §4 point 0 from eroding one fix at a time.** A review,
+QA or sync finding is fixed in code ONLY when it is a bug in what the spec asked for. Three classes of
+finding never go to a coder as "add a mechanism":
+- **A model behaved badly** (wrong language, a stub, a hallucinated capability, ignored an instruction)
+  → reported to the OWNER as a model-quality observation; his remedy is a different model in «Панель
+  управления» or a prompt change he approves — never code around the model.
+- **A provider or infrastructure hiccup** (timeout, 429, 5xx, empty completion) → the provider's own
+  documented retry, and beyond that an honest error the owner sees; never a new fallback path.
+- **"It crashed / an exception escaped"** → the fix is to SHOW the failure to the owner honestly, never
+  to swallow it into a log and continue.
+If a fix genuinely requires a mechanism the spec does not name, the orchestrator STOPS and asks the owner
+in one open Russian question; on his yes the design document is updated FIRST, then the code.
+**Drift resolution default:** when `logos-sync` finds a mechanism in the code that no design document
+names, the CODE is the wrong side by default — it is deleted, not written into the documents. Documents
+absorb code only on the owner's explicit decision (recorded in the journal).
+**Every phase asks what to delete:** the reviewer names removable code in every review, and the
+orchestrator carries those deletions into the same phase rather than leaving them "for later".
 
 ## 6. Status field on a phase document
 

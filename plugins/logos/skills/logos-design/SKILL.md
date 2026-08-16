@@ -72,9 +72,15 @@ Hard rules for every question you ask the user:
   multiple-choice answer options (no "вариант А / Б / В" lists). The user answers in their own words.
 - Ask ONE question at a time. Wait for the answer before asking the next. Do NOT batch several
   questions into a single message.
-- Go deep: follow up on each answer, probe for the "why", surface hidden assumptions, and where the
-  right path is unclear, discuss the trade-offs WITH the user in prose to converge on the target
-  picture together. It is expected and encouraged that reaching clarity takes many turns.
+- Go deep on WHAT the user wants and WHY: follow up on each answer, probe for the "why", surface hidden
+  assumptions, and where the right path is unclear, discuss the trade-offs WITH the user in prose to
+  converge on the target picture together. It is expected and encouraged that reaching clarity takes
+  many turns.
+- Do NOT go deep on what could go wrong. Never interview the user about failure modes, edge cases or
+  "what if the model…" — those questions breed mechanisms for problems that have not happened
+  (`references/design-templates.md`, «Simplicity requirement»). Failure handling in the design is one
+  sentence: the owner sees the failure honestly and decides. Depth belongs to the intent, not to the
+  defences.
 - Only stop interviewing a topic once the user's intent on it is concretely pinned down — then write
   it into the document and move to the next topic.
 
@@ -256,6 +262,7 @@ Your mode: contribute.
 Read <VAULT>/Logos/Дизайн/Концепт.md, the shared draft <VAULT>/Logos/Дизайн/_черновики/Черновик-архитектуры.md, and the discussion log <VAULT>/Logos/Дизайн/_черновики/Журнал-обсуждения.md in full.
 (1) Deepen your owned section of the draft with concrete, opinionated decisions; edit it in place, leave other domains intact.
 (2) Critically review the rest of the draft and open NEW discussion-log entries (status открыт) addressed at the role that owns each weak spot.
+SIMPLICITY IS BINDING (references/design-templates.md «Simplicity requirement», references/logos-project.md §4 point 0): design the SMALLEST set of mechanisms that delivers the concept. Before you add any mechanism, answer two questions in the draft's own words — which present need it serves, and what the owner would see if it were not built. A mechanism for a problem that has not happened is not designed. Failure handling is one sentence (the owner sees the failure honestly and decides), never retries/fallbacks/guards/thresholds. When you review others, a mechanism you find unnecessary is a legitimate concern to raise («зачем это, что будет без этого?») — cutting is as much your job as deepening.
 Council roster and order: оркестрация (lead) → память → модели → автономность → фронтенд → ресурсы (last).
 User's architectural constraints (hard bounds — never violate): <paste verbatim>.
 Follow the 'Архитектура' template in references/design-templates.md. Reference the concept as [[Концепт]]. Do not include runnable code.
@@ -277,7 +284,7 @@ members with no open questions directed at them.
 Agent(subagent_type="<member>", prompt="
 Your mode: resolve.
 Read the shared draft <VAULT>/Logos/Дизайн/_черновики/Черновик-архитектуры.md and the discussion log <VAULT>/Logos/Дизайн/_черновики/Журнал-обсуждения.md in full.
-For every open question whose 'Кому' is your role: either fix the draft and mark the entry решён with a one-line Резолюция, or defend the choice and mark it решён with the justification. Do NOT open new questions. If something genuinely needs the user, mark it решён with Резолюция 'вынести в Открытые вопросы' and add it to the draft's 'Риски и открытые вопросы'.
+For every open question whose 'Кому' is your role: fix the draft and mark the entry решён with a one-line Резолюция; or defend the choice and mark it решён with the justification; or DROP the mechanism the question is about and mark it решён with Резолюция 'не строим — хозяин увидит сбой и решит сам'. Dropping is the DEFAULT answer to a worry about a failure nobody has seen; adding a mechanism to appease a worry is the answer of last resort. Do NOT open new questions. If something genuinely needs the user, mark it решён with Резолюция 'вынести в Открытые вопросы' and add it to the draft's 'Риски и открытые вопросы'.
 User's architectural constraints (hard bounds — never violate): <paste verbatim>.
 Do not include runnable code.
 ")
@@ -395,6 +402,7 @@ Agent(subagent_type="logos-orchestration-architect", prompt="
 Your mode: module-detailing.
 Lead the deep-dive on the system element '<имя>'. Read <VAULT>/Logos/Дизайн/Концепт.md and <VAULT>/Logos/Дизайн/Архитектура.md (source of truth) in full.
 Create the module draft at <VAULT>/Logos/Дизайн/_черновики/Черновик-модуля-<имя>.md from the 'Модуль' template in references/design-templates.md, following the «Детализация модуля» protocol there. Fill every Модуль section at a high level from the architecture, make the orchestration/control aspects of this element deep, and park the deep per-lens decisions in 'Открытые вопросы' for the specialists.
+SIMPLICITY IS BINDING (references/design-templates.md «Simplicity requirement»): the module is the SMALLEST set of mechanisms that delivers this element's purpose; every mechanism names its present need; «Как ведёт себя при сбое» is one sentence (the owner sees the failure honestly), never a catalogue of cases with a mechanism each.
 Module discussion-log path (do not touch it in skeleton mode): <VAULT>/Logos/Дизайн/_черновики/Журнал-обсуждения-модуля-<имя>.md.
 Council roster and order for this element: оркестрация (lead) → <only the relevant lenses, resource last>.
 User's architectural constraints (hard bounds — never violate): <paste verbatim>.
@@ -406,10 +414,11 @@ Reference the architecture as [[Архитектура]]. Do not include runnabl
 
 For each relevant lens after the lead, in order (resource realist last), dispatch it in
 `module-detailing` mode, ONE AT A TIME (each must read the prior contributions). Same prompt shape as
-Step 2.3, but: `Your mode: module-detailing.`, the target is the module draft + module discussion log,
-the structure is the `Модуль` template, and the task is to deepen the parts of element '<имя>' under
-that lens. Pass the element name, both module paths, the roster of relevant lenses, and the
-constraints verbatim. Tell each member to reference `[[Архитектура]]`.
+Step 2.3 (INCLUDING its «SIMPLICITY IS BINDING» paragraph verbatim), but: `Your mode: module-detailing.`,
+the target is the module draft + module discussion log, the structure is the `Модуль` template, and the
+task is to deepen the parts of element '<имя>' under that lens. Pass the element name, both module paths,
+the roster of relevant lenses, and the constraints verbatim. Tell each member to reference
+`[[Архитектура]]`.
 
 After the round, read the module discussion log to see which lenses have open questions addressed to
 them — that determines the resolution round.
@@ -417,8 +426,9 @@ them — that determines the resolution round.
 ### Step 4.5 — Resolution round (addressed lenses, SEQUENTIAL)
 
 For each lens with at least one OPEN question addressed to it, dispatch it in `module-detailing` mode
-with the same resolve instructions as Step 2.4 (fix or defend, no new questions, one bounded round),
-pointed at the module draft and module discussion log. Skip lenses with no open questions.
+with the same resolve instructions as Step 2.4 (fix, defend, or DROP the mechanism — dropping is the
+default answer to a worry about an unseen failure; no new questions, one bounded round), pointed at the
+module draft and module discussion log. Skip lenses with no open questions.
 
 ### Step 4.6 — Synthesize the module document
 

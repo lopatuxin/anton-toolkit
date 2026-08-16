@@ -25,6 +25,25 @@ only HOW it is said, never dumb down the substance.
 - Correct: «Записи упорядочиваются по близости к запросу; кандидатов берём с запасом. При сбоях
   память не падает, а отвечает пустым срезом.»
 
+**Simplicity requirement (hard rule — the design decides what the code becomes, so bloat starts here).**
+The system these documents describe must be simple, functional, easy to extend and easy to debug
+(`references/logos-project.md` §4 point 0 is binding on the DOCUMENTS too). A design document names a
+mechanism ONLY for a need that exists today — a scenario in the concept, a capability the owner asked for,
+a failure already observed — never for a problem that has not happened yet, and never "for robustness".
+Every mechanism must be explainable to the owner in ONE plain sentence, and it must be VISIBLE to him where
+it acts (a line in the chat feed, a card in the panel); a mechanism that would work silently is not
+designed. Failure handling in the design is always the same one sentence — «сбой честно показывается
+хозяину, дальше решает он» — never a per-case machinery of retries, fallbacks, guards, thresholds and
+degradation paths. Judging what a model answered (language, length, quality) is never a design mechanism:
+the owner judges, and swaps the model from «Панель управления». Extra model calls, background channels,
+config knobs, registries and telemetry are costs the document must justify by a present need, not features.
+When a document grows a section that only enumerates what could go wrong, that section is cut, not built.
+- Correct: «Редактор переводит черновик мозга; его ответ уходит хозяину как есть. Если редактор не ответил,
+  хозяин видит в ленте честную ошибку и при желании меняет модель в панели.»
+- Incorrect: «После редактуры ответ проверяется на долю кириллицы и длину; при провале переспрашивается та
+  же модель, затем следующий кандидат реестра, затем модель мозга в роли редактора, затем черновик как
+  есть» — five mechanisms for a failure nobody has seen, all silent.
+
 Cross-reference sibling documents with Obsidian wiki-links: `[[Концепт]]`, `[[Архитектура]]`,
 `[[Модули/Память]]` — never relative markdown paths. **A wiki-link may point ONLY at a note that exists
 inside the vault**: never link your own assistant-memory files (kebab-case English slugs living outside
@@ -181,9 +200,16 @@ tags:
 ## Модель данных
 ## Ключевые алгоритмы (прозой)
 ## Зависимости от других модулей
-## Обработка ошибок и крайние случаи
+## Как ведёт себя при сбое
 ## Открытые вопросы
 ```
+
+«Как ведёт себя при сбое» is ONE short paragraph, not a catalogue: what the owner sees when this element
+fails (the honest error line, where), and nothing more, unless the concept itself demands a specific
+behaviour on a specific failure — then name that ONE behaviour and the present need behind it. Do NOT
+enumerate hypothetical edge cases and give each its own mechanism; do NOT design retries, fallbacks,
+guards or "safe defaults" here. A former «Обработка ошибок и крайние случаи» section met in an existing
+document is read under the same rule: only what a present need demands survives, the rest is cut.
 
 ---
 
@@ -223,8 +249,8 @@ to the named element.
 2. **Contribute** — each relevant member, SEQUENTIALLY, deepens the parts of the `Модуль` document
    under its lens and opens cross-lens questions in the module discussion log (same numbered-entry
    format as the architecture log).
-3. **Resolve** — each member with open questions addressed to it answers them (fix or defend), one
-   bounded round.
+3. **Resolve** — each member with open questions addressed to it answers them (fix, defend, or drop the
+   mechanism — dropping is the default answer to a worry about an unseen failure), one bounded round.
 4. **Synthesize** — the synthesizer consolidates the converged module draft into the final
    `Модули/<имя>.md`, references the architecture as `[[Архитектура]]`, and folds anything STILL genuinely
    open into `Открытые вопросы` (resolved items and drift flags are dropped from the document, not

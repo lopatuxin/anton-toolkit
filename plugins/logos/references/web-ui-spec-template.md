@@ -108,10 +108,14 @@ shows in each.>
 
 **Валидации и обратная связь:** <what is validated, what messages/confirmations/toasts appear.>
 
-**Крайние случаи:** <empty collections, long lists, very long text, concurrent edits, offline, etc.>
+**Крайние случаи:** <ONLY the display states the owner will actually meet — an empty collection, a long
+list, very long text. NOT offline/reconnect machinery, optimistic updates, retries, conflict resolution
+or "what if the server…" — a failed request is one thing on every screen: an honest error the owner
+sees (`references/logos-project.md` §4 point 0). Leave the line out when there is nothing real to say.>
 ```
 
-Repeat for every screen in the sitemap. Be exhaustive — this is what `logos-frontend-coder` builds from.
+Repeat for every screen in the sitemap. Be complete about what the owner sees and does — this is what
+`logos-frontend-coder` builds from — and silent about defences he did not ask for.
 
 ### 6. Переиспользуемые компоненты
 Shared UI components used across screens (buttons, cards, modals, tables, forms, dropdowns,

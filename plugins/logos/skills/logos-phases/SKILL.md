@@ -199,8 +199,15 @@ Hard rules for every question:
 - Ask OPEN-ENDED, free-text questions. NEVER use the AskUserQuestion tool and NEVER present pre-baked
   multiple-choice options. The user answers in their own words.
 - Ask ONE question at a time. Wait for the answer before the next. Do NOT batch several questions.
-- Go deep: follow up on each answer, probe the "why", surface hidden scope and edge cases, and discuss
-  trade-offs in prose to converge together. Reaching clarity takes many turns — that is fine.
+- Go deep on WHAT the owner wants to touch and WHY: follow up on each answer, probe the "why", surface
+  hidden scope, and discuss trade-offs in prose to converge together. Reaching clarity takes many
+  turns — that is fine.
+- Do NOT interview about failure modes or edge cases («а что если модель…», «а если провайдер упадёт»).
+  Such questions turn into criteria like «должно корректно переживать X», and those criteria turn into
+  mechanisms for problems that have not happened (`references/logos-project.md` §4 point 0). The only
+  failure criterion a phase ever carries is the standing one: a failure is shown to the owner honestly
+  in the feed. Anything beyond that enters a phase ONLY if the owner himself asks for it in his own
+  words.
 - Carve ONE phase at a time. Pin a phase down fully, write it, then move to the next phase.
 - Only stop a phase once it is concretely pinned down; then write it and move on.
 
@@ -223,7 +230,10 @@ For each phase, pin down at least these, anchored to what the architecture says 
   therefore which must already exist or be stubbed). Wiki-link them.
 - **Dependencies.** Which prior phases must be done first. Phase 00 has none.
 - **Done criteria.** Concrete acceptance scenarios the user can run by hand to confirm the phase works
-  end-to-end (e.g. «открываю веб-чат, пишу сообщение, получаю ответ модели»).
+  end-to-end (e.g. «открываю веб-чат, пишу сообщение, получаю ответ модели»). Criteria describe what
+  the owner TOUCHES on the happy path; a criterion of the shape «система корректно обрабатывает сбой X /
+  не падает при Y / переживает Z» is NOT written unless the owner asked for that behaviour in his own
+  words — the coder reads such a criterion as a licence for a guard, a retry or a fallback.
 - **Risks / open questions** specific to this phase.
 
 ## 4. Write the phase document
