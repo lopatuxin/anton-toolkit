@@ -109,6 +109,27 @@ its own package, OR a cluster of same-prefix files accreting in the root (`chat_
 package waiting to happen. The file belongs in its subsystem package, not the root — a phase that adds the
 Nth `chat_*` file to the root instead of a `chat/` package is growing the exact sprawl an audit flags.
 
+**P4 — An invented safeguard over a model's output (§4 point 11).** Flag as a blocker any code the diff adds
+that JUDGES what a model answered, or that reacts to a bad answer on its own: a language/script check, a
+length or ratio floor, a word-list/regex/substring test over model text, a quality score, a retry of the same
+call because the answer "looked wrong", a silent swap to another model or capability. Two questions decide
+it: does a design document (phase spec or architecture section) actually ask for this mechanism, and does the
+owner SEE it fire in the chat feed? A "no" to either makes it a blocker — a pass-log line is not visibility,
+and "it prevents a real failure" is not a justification, because judging an answer belongs to the model and
+the owner, never the code («смысл текста судит модель, а не код»; the owner's remedy for a bad model is
+«Панель управления»). Require deletion of the mechanism, not a better threshold. If the coder argues the
+failure mode is real, the answer is a drift report so the orchestrator can put the mechanism into the design
+first — never a tuned constant landed quietly in code.
+  - Incorrect (do NOT accept): an editor call followed by `cyrillic_ratio(answer) < 0.5` or
+    `len(answer) < len(draft) * 0.15` rejecting the reply, retrying, then falling through to another model,
+    with nothing about it in any document.
+  - Correct (require): the model's answer is returned as it came; a genuine, documented failure (no answer at
+    all, provider error) is handled the way the spec describes, and any model substitution the spec does
+    allow is visible to the owner in the feed.
+  - Not a P4 hit: counting and normalization that feed a DOCUMENTED decision (token budgets, vector
+    similarity, canonical search keys, maturity thresholds on facts) — those are spec'd mechanics, not the
+    code grading a model's reply.
+
 **Guard against over-correcting (the owner's "без фанатизма" — this is binding).** These P-checks target
 DUPLICATION and BROKEN CONVENTION, never healthy uniformity. Do NOT flag as duplication, and actively REJECT
 any suggestion to abstract: an ABC implemented the same shape by many stores; an `InMemory*`/`*Postgres`
@@ -135,7 +156,7 @@ a wrong "de-duplicate this" pushes the coder to build a leaky shared base, which
   sections — not a different design. Deviations are drift: flag them with the doc section they violate.
 - The right stack was used per «Стек и инфраструктура» (polyglot routing), not a default language.
 
-**3. The doctrine (references/logos-project.md §4) — enforce all ten.**
+**3. The doctrine (references/logos-project.md §4) — enforce all eleven.**
 - **Explicitness:** no magic, no implicit conventions, full names, explicit contracts at boundaries,
   explicit dependencies. Flag anything an agent would have to *infer*.
 - **Comments carry only what the code CANNOT say — the default is NO comment (§4 point 2). Judge both

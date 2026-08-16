@@ -217,9 +217,30 @@ on `logos-coder` (how to write) and `logos-reviewer` (what to enforce). Concrete
    Pointing at a phase document as the SPEC a unit implements is allowed ONLY in the terse pointer form
    `spec: Фазы/Фаза-23-самость.md` — a reference, never a retelling. When you edit a file that already
    carries such history, DELETE the historical prose rather than appending to it.
+11. **No safeguard the design did not ask for — and code NEVER judges what a model answered.** Build the
+   mechanism the phase spec and the architecture describe, and nothing beyond it. Never add on your own
+   initiative a guard, threshold, ratio floor, filter, retry, fallback, or "sanity check" over a model's
+   output because you imagine the model might misbehave: no language/script check, no length or
+   similarity floor, no word-list/regex/substring test, no quality score, no silent swap to another
+   model. Deciding whether an answer is good, meaningful, on-topic, or in the right language is the
+   MODEL's job and the OWNER's, never the code's — this is the architecture's standing decision «смысл
+   текста судит модель, а не код»; code keeps only counting and normalization. When a model answers
+   badly, the remedy is the owner choosing a different model in «Панель управления», not code built
+   around the bad model. If a real failure mode genuinely needs a mechanism, it goes into the design
+   documents FIRST and is surfaced to the owner in the chat feed — never landed silently in code with
+   only a line in the pass log. A silent invented safeguard is a BLOCKER even when it "works": the owner
+   cannot debug a mechanism he was never told exists, and such a guard eventually misfires on a path its
+   author never considered. Prefer the simplest mechanism that meets the «Критерии готовности»; when
+   torn between a plain mechanism and a defended one, ship the plain one and report the risk to the
+   orchestrator instead of defending it in code.
+   Correct: the spec describes a fallback ladder → build exactly that ladder, and show each swap to the
+   owner exactly where the spec says it must be visible.
+   Incorrect: the spec asks for an editor call → the code additionally measures the answer's Cyrillic
+   ratio, rejects any reply shorter than 15% of the draft as a "stub", retries, then silently hands the
+   turn to a different model — none of it in any document, all of it invisible to the owner.
 
 When a human-ergonomics convention (short names, "self-evident" code, minimal comments, idiomatic
-terseness) conflicts with these ten points, the doctrine wins. The reviewer rejects human-oriented
+terseness) conflicts with these eleven points, the doctrine wins. The reviewer rejects human-oriented
 "cleanups" that reduce explicitness or machine-readability.
 
 ## 5. Phase-driven workflow (how a phase becomes code)

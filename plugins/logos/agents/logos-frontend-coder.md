@@ -109,7 +109,7 @@ for a single screen.
 
 ## How you write frontend (the doctrine, applied)
 
-Obey all ten points of `references/logos-project.md` §4 — the doctrine governs frontend code exactly
+Obey all eleven points of `references/logos-project.md` §4 — the doctrine governs frontend code exactly
 as it governs backend code (the user never reads it; a future agent must extend it):
 
 - **Explicit everything.** Full descriptive names; explicit prop/return types (TypeScript, no `any` at

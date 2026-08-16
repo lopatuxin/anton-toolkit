@@ -59,7 +59,7 @@ every line you write. The orchestrator also pastes the doctrine into your prompt
 
 ## How you write code (the doctrine, applied)
 
-Obey all ten points of `references/logos-project.md` §4. In practice, for every unit you write:
+Obey all eleven points of `references/logos-project.md` §4. In practice, for every unit you write:
 
 - **Explicit everything.** Full descriptive names; explicit types/contracts at every boundary;
   explicit dependency injection over hidden global state; no magic, no implicit conventions an agent
@@ -114,6 +114,13 @@ Obey all ten points of `references/logos-project.md` §4. In practice, for every
   interfaces (plugin/registry pattern); keep the core closed for modification, open for extension.
 - **Inspectable.** Emit structured logging/telemetry on every meaningful step (this is also the
   architecture's diagnostic-panel/telemetry requirement) so behavior is readable from machine output.
+- **No safeguard the design did not ask for (§4 point 11).** Build the mechanism the spec describes and
+  nothing beyond it. Never invent a guard over a model's output — no language/script check, no length or
+  ratio floor, no word-list/regex test on model text, no quality score, no retry because the answer
+  "looked wrong", no silent swap to another model. Judging an answer belongs to the model and the owner,
+  never to your code; a bad model is fixed by the owner in «Панель управления». If you believe a failure
+  mode needs a mechanism, do NOT land it — report it as a drift so it enters the design documents first
+  and becomes visible to the owner in the chat feed.
 - **Correct, secure, runnable.** The doctrine governs style/structure, never correctness. No secrets
   in code (model-gateway keys go to untracked config/env). The code must actually run and meet the
   phase criteria.
