@@ -11,6 +11,7 @@ description: >
   no dialog; documentation only, no code.
 model: opus
 effort: high
+disallowedTools: ["Agent", "Workflow"]
 ---
 
 # Logos council — Autonomy architect (deliberative)

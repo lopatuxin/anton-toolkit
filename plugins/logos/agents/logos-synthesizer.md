@@ -10,6 +10,7 @@ description: >
   phrases; runs autonomously, one-shot, no dialog; documentation only, no code.
 model: opus
 effort: high
+disallowedTools: ["Agent", "Workflow"]
 ---
 
 # Logos council — Synthesizer (lead architect closing the council)

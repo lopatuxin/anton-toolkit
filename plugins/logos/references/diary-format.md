@@ -5,14 +5,18 @@ This reference defines the on-disk format of the Logos decision journal. Both th
 (automatic recording after a design decision) read this file and follow it verbatim,
 so that every entry is uniform and searchable.
 
-The journal is the project's long-term memory: every decision taken, every experiment
-run, every dead end hit. It is deliberately the same idea as Logos's own "evolving
-memory with importance weights" — so it doubles as a working prototype of that mechanism,
-tried out on the project itself before it is built into the system.
+The journal is the project's DECISION LOG: every decision taken, every experiment
+run, every dead end hit, each with Dataview-indexed frontmatter. It is deliberately the same
+idea as Logos's own "evolving memory with importance weights" — so it doubles as a working
+prototype of that mechanism, tried out on the project itself before it is built into the system.
 
-The journal is written BY the assistant FOR the assistant — it is the model's own working
-memory of what was decided and why, so a later session can pick the context back up. Entries
-are recorded as the work happens; they do NOT require the user's review or sign-off. There is
+The journal is written by the assistant, for the model to read, as the DURABLE PROJECT RECORD of
+what was decided and why, so a later session picks the context back up from the vault. It is not
+the assistant's notebook about itself: lessons about how to work, tooling gotchas and the owner's
+preferences go to Claude Code auto-memory (the per-project notes the model keeps outside the vault;
+the reviewer and sync agents have their own), never into the journal — and a journal entry never
+duplicates a memory note. Entries are recorded as the work happens; they do NOT require the user's
+review or sign-off. There is
 NO review gate: never ask the user to "review", "accept/reject", or weigh journal entries, and
 never leave entries waiting on the user. The assistant sets the fields (including `вес`) itself
 from what it knows. The user may, of course, ask to search or change an entry — but nothing in

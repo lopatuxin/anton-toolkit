@@ -1,7 +1,7 @@
 ---
 name: logos-ui
 description: >
-  Writes the build-ready structural spec of the Logos web interface to Logos/Дизайн/Веб-интерфейс.md
+  Writes the build-ready structural spec of the Logos web interface to the folder Logos/Дизайн/Веб-интерфейс/ (hub note plus one page per screen)
   for the logos-frontend-coder agent — screens, the blocks and elements of each, navigation, behaviour
   and states — with no visual design: colours, typography and theme come from the established Logos
   style; built through an interview (open questions, one at a time), then synchronized with
@@ -54,7 +54,7 @@ Paths (Russian names — you own all path construction):
 
 | Document | Path |
 |---|---|
-| Web interface spec | `$VAULT/Logos/Дизайн/Веб-интерфейс.md` |
+| Web interface spec | folder `$VAULT/Logos/Дизайн/Веб-интерфейс/` — hub `Веб-интерфейс.md` inside it, one page per screen, `Контракты-с-системой.md` (see `${CLAUDE_PLUGIN_ROOT}/references/web-ui-spec-template.md`) |
 | Concept (read) | `$VAULT/Logos/Дизайн/Концепт.md` |
 | Architecture (read + sync target) | `$VAULT/Logos/Дизайн/Архитектура.md` |
 | Decision journal | `$VAULT/Logos/Журнал/` |
@@ -69,7 +69,7 @@ to see and control. Note which Logos features imply a screen or control (e.g. a 
 orchestrators, a memory browser, a journal of decisions).
 
 - If `Архитектура.md` does NOT exist, tell the user in Russian: «Архитектуры ещё нет — интерфейс будет проектироваться вслепую. Сначала прогоним `logos-design`? Если хочешь, можем всё равно набросать спеку по концепту.» and let them decide (do not hard-stop).
-- If `Веб-интерфейс.md` already exists → this is an EXTEND/REVISE run: read it, ask the user what to add or change, and update it in place. Otherwise it is a fresh spec.
+- If the folder `Веб-интерфейс/` with its hub already exists → this is an EXTEND/REVISE run: read it, ask the user what to add or change, and update it in place. Otherwise it is a fresh spec.
 
 ## 2. Interview style (the spec is built from the user's own words)
 
@@ -111,7 +111,7 @@ Cover at least these, anchored to what Logos does (from the architecture). Skip 
 
 ## 4. Write the spec
 
-When a topic is pinned down, write/extend `$VAULT/Logos/Дизайн/Веб-интерфейс.md` following the
+When a topic is pinned down, write/extend the pages of `$VAULT/Logos/Дизайн/Веб-интерфейс/` (hub + screen pages) following the
 structure in `${CLAUDE_PLUGIN_ROOT}/references/web-ui-spec-template.md` (read it and follow it) — including its YAML
 frontmatter (`tags: [logos, дизайн, интерфейс]`) and the `[[Концепт]] · [[Архитектура]]` link line.
 Russian headings, all details captured, **no colours or visual styling**. Be exhaustive at the
@@ -120,7 +120,7 @@ element level — every button and field named, its purpose, behaviour, and stat
 The vault auto-syncs via `obsidian-git` — no manual git commit for vault files.
 
 After writing, summarize to the user in Russian and ask what to refine:
-«Спеку интерфейса записал в `Logos/Дизайн/Веб-интерфейс.md`. Посмотри — что добавить или поправить?»
+«Спеку интерфейса записал в `Logos/Дизайн/Веб-интерфейс/` (хаб и страницы экранов). Посмотри — что добавить или поправить?»
 
 ## 5. Synchronize the design (mandatory after any spec change)
 
@@ -154,7 +154,7 @@ itself reshape the interface, note it and let the next interview turn resolve it
 
 ## 6. Iteration
 
-When the user requests changes to the interface, edit `Веб-интерфейс.md` in place (re-interview only
+When the user requests changes to the interface, edit the hub and the affected screen pages in `Веб-интерфейс/` in place (re-interview only
 the affected topic), then re-run Step 5 (sync) for the touched area. Keep edits minimal and scoped —
 do not rewrite settled sections.
 

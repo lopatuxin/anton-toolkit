@@ -54,8 +54,8 @@ The canonical sources, by question type (paths resolved in step 0; full table in
 | The user asks about… | Read this source of truth |
 |---|---|
 | What Logos is, its vision/goals | `$DOCS/Дизайн/Концепт.md` |
-| How the system is built (orchestration, memory, models, autonomy, resources, stack) | `$DOCS/Дизайн/Архитектура.md` |
-| The web interface (pages, blocks, navigation, behavior) | `$DOCS/Дизайн/Веб-интерфейс.md` |
+| How the system is built (orchestration, memory, models, autonomy, resources, stack) | `$DOCS/Дизайн/Архитектура.md` — the hub (overview, key decisions, data flows, stack, risks) with the domain pages in `$DOCS/Дизайн/Архитектура/` (`Иерархия-оркестрации.md`, `Подсистема-памяти.md`, `Модельный-слой.md`, `Автономность.md`, `Ресурсный-бюджет.md`); deep per-element specs in `$DOCS/Дизайн/Модули/` |
+| The web interface (pages, blocks, navigation, behavior) | the folder `$DOCS/Дизайн/Веб-интерфейс/`: the hub `Веб-интерфейс.md` (shell, navigation, components), one page per screen (`Чат.md`, `Метрики.md`, `Память.md`, `Уведомления.md`, `Панель-управления.md`), the screen↔system contracts in `Контракты-с-системой.md` |
 | Delivery phases — what exists, what is in/out of scope, done criteria, status | `$DOCS/Дизайн/Фазы/Фаза-NN-*.md` (and the folder for the overview) |
 | Past decisions, experiments, dead ends, "why did we choose X" | `$DOCS/Журнал/` (format in `${CLAUDE_PLUGIN_ROOT}/references/diary-format.md`) |
 | The research branch — small self-learning models, its directions, experiments, lab code | `$DOCS/Исследования/` (format in `${CLAUDE_PLUGIN_ROOT}/references/lab-format.md`) + the lab repo `Logos-Lab` (the code repo's sibling); overview in `${CLAUDE_PLUGIN_ROOT}/references/logos-project.md` §10 |

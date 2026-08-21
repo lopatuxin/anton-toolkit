@@ -14,8 +14,10 @@ when_to_use: >
 
 # Logos-log — the Logos decision journal
 
-The journal is Logos's long-term project memory: every decision, experiment, and dead end as a
-separate, searchable note. The storage format, file locations, frontmatter fields, and the
+The journal is the project's decision log: every decision, experiment, and dead end as a
+separate, searchable note — the durable project record, written for the model. Lessons about how to
+work, tooling gotchas and the owner's preferences belong to Claude Code auto-memory, not to the
+journal. The storage format, file locations, frontmatter fields, and the
 self-updating Dataview index are defined in `${CLAUDE_PLUGIN_ROOT}/references/diary-format.md` — **read
 it and follow it verbatim**. This skill is the user-facing interface over that format: record, search,
 outcome.

@@ -21,14 +21,17 @@ write production code yourself and you never use the generic anton-toolkit dev a
 tuned for the user's day-job projects; the Logos agents carry Logos's specifics and doctrine.
 
 **Read `${CLAUDE_PLUGIN_ROOT}/references/logos-project.md` first, every run.** It is the canonical context: the two
-locations (code repo vs vault docs), the resolve-paths snippet, the code-repo bootstrap rules, the
-"code for AI, not humans" doctrine, and the phase-driven workflow. Everything below assumes it.
+locations (code repo vs vault docs), the resolve-paths snippet, the code-repo bootstrap rules, and the
+phase-driven workflow. The "code for AI, not humans" doctrine is the `logos-doctrine` skill
+(`${CLAUDE_PLUGIN_ROOT}/skills/logos-doctrine/SKILL.md`), preloaded into every Logos build agent.
+Everything below assumes both.
 
 **Critical rules:**
 - **Documentation is the source of truth.** You build what `Архитектура.md` and the phase document
   specify. You never let code and docs silently diverge — section "Sync" enforces it.
-- **The code is for AI, not humans.** Pass the doctrine (reference §4) into every coder/reviewer
-  dispatch. Never ask an agent to make code "readable for a human".
+- **The code is for AI, not humans.** Every coder and reviewer already carries the doctrine as a
+  preloaded skill; a dispatch prompt does not repeat it. Never ask an agent to make code "readable
+  for a human".
 - **One phase at a time.** Default to the next unbuilt phase; do not build ahead of what the docs
   define.
 
@@ -60,10 +63,11 @@ fi
 ```
 
 After bootstrap, ensure `$CODE/CLAUDE.md` exists and holds ONLY what the repo alone knows (where the
-docs live, the stands, how to run the tests, which agent does what) plus a pointer to
-the `logos-project.md` reference of the logos plugin (by name — the plugin cache path changes with every version) for the doctrine — create it if missing. Never paste the doctrine into it:
-the doctrine has one home, the reference (§3). Tell the user in Russian what you did (cloned vs
-initialized). Do NOT push anything yet.
+docs live, the stands, how to run the tests, which agent does what) plus a pointer to the
+`logos-doctrine` skill of the logos plugin (by name — the plugin cache path changes with every
+version) for the doctrine — create it if missing. Never paste the doctrine into it: the doctrine has
+one home, that skill. Tell the user in Russian what you did (cloned vs initialized). Do NOT push
+anything yet.
 
 ## 2. Pick the phase (short dialog, Russian)
 
@@ -89,23 +93,24 @@ Produce a short build plan (the tasks, their layer, their stack) and set the pha
 ## 4. Implement → Review → Test → DevOps (deploy locally) → QA (dispatch the Logos agents)
 
 Dispatch the dedicated Logos agents IN ORDER. Each gets the resolved `$CODE`/`$DOCS` paths verbatim,
-the phase document path, the relevant architecture sections, the phase scope boundaries, and an
-instruction to obey `${CLAUDE_PLUGIN_ROOT}/references/logos-project.md` (especially the §4 doctrine). Wait for each to
-finish before the next; feed each agent the prior agent's report.
+the phase document path, the relevant architecture sections, and the phase scope boundaries; the
+doctrine is already preloaded into each of them, so the prompt does not tell them to read it. Wait
+for each to finish before the next; feed each agent the prior agent's report.
+
+Never touch the prod stand (`docker-compose.prod.yml`, project `logos-prod`); a hook blocks it — the
+test stand is the only target of a build.
 
 1. **logos-coder** (backend / server-side layers) — implement the phase's backend per the doctrine,
    routing each server-side layer to its stack, and own the `PRODUCT_VERSION` bump. The web frontend is
    built separately by `logos-frontend-coder` (next).
    ```
    Agent(subagent_type="logos-coder", prompt="
-   Obey ${CLAUDE_PLUGIN_ROOT}/references/logos-project.md (code repo, paths, and the §4 doctrine 'code for AI, not humans').
    Code repo: <CODE>. Docs root: <DOCS>. Phase spec: <DOCS>/Дизайн/Фазы/<file> (read it fully).
    Architecture source of truth: <DOCS>/Дизайн/Архитектура.md, sections: <list from «Затрагиваемые части»>.
    Build plan / layer→stack routing: <paste the plan from step 3>.
-   Hard scope boundaries (do NOT build ahead): <paste «Что НЕ входит»>.
-   Implement only this phase's SERVER-SIDE layers — the web frontend is built separately by logos-frontend-coder; do NOT write browser client code. Self-describing, explicit, machine-readable, extensible by registration.
-   Also bump PRODUCT_VERSION in gateway/app/version.py per ${CLAUDE_PLUGIN_ROOT}/references/logos-project.md §9 — plain semver BY THE MEANING of the release (MAJOR = large/incompatible leap, MINOR = a notable new capability, PATCH = a small/in-phase change), DECOUPLED from the phase number (do NOT set 0.<phase>.0; the first real release 1.0.0 shipped in Фаза-34). A phase is not built until the version reflects the release it delivered.
-   Before returning, run the MANDATORY comment self-audit (§4 point 4): re-read every comment your diff ADDS, delete every one that is not one of the five allowed kinds (§4 point 2) and every one that states a fact owned by another file (callers, UI surfaces, inventories, names defined elsewhere). Delete — never soften or rewrite.
+   Hard scope boundaries (do not build ahead): <paste «Что НЕ входит»>.
+   Implement only this phase's server-side layers — the web frontend is built separately by logos-frontend-coder; do not write browser client code.
+   Also bump PRODUCT_VERSION in gateway/app/version.py per ${CLAUDE_PLUGIN_ROOT}/references/logos-project.md §9 — plain semver by the meaning of the release (MAJOR = large/incompatible leap, MINOR = a notable new capability, PATCH = a small/in-phase change), decoupled from the phase number (do not set 0.<phase>.0; the first real release 1.0.0 shipped in Фаза-34). A phase is not built until the version reflects the release it delivered.
    Return: what you created/changed (files + one-line each), the new PRODUCT_VERSION, the backend contracts (endpoints/WS frames) this phase exposes for the frontend, any drift you had to introduce vs the docs, and the comment self-audit line (how many added comments you deleted, how many you kept).
    ")
    ```
@@ -114,26 +119,26 @@ finish before the next; feed each agent the prior agent's report.
    frontend style (it must not invent a new look). Feed it the backend coder's reported contracts.
    ```
    Agent(subagent_type="logos-frontend-coder", prompt="
-   Obey ${CLAUDE_PLUGIN_ROOT}/references/logos-project.md (code repo, paths, and the §4 doctrine 'code for AI, not humans').
    Code repo: <CODE>. Docs root: <DOCS>. Phase spec: <DOCS>/Дизайн/Фазы/<file> (read it fully).
-   Web-interface spec (structural source of truth): <DOCS>/Дизайн/Веб-интерфейс/ — sections this phase touches.
-   Architecture: <DOCS>/Дизайн/Архитектура.md → «Стек и инфраструктура» (React+TS+Vite) and the thin-client doctrine.
+   Web-interface spec (structural source of truth): <DOCS>/Дизайн/Веб-интерфейс/ — the hub note and the screen pages this phase touches.
+   Architecture: <DOCS>/Дизайн/Архитектура.md → «Стек и инфраструктура» (React+TS+Vite) and the thin-client rule.
    Backend contracts to consume: <paste the contracts from logos-coder's report>.
-   Hard scope boundaries (do NOT build ahead): <paste «Что НЕ входит»>.
-   Build only this phase's web UI. REUSE the established Logos frontend style — existing design tokens, components, layout shell, CSS conventions; NEVER invent a new visual language, palette, font, or styling system. Thin client: no source-of-truth state or business logic on the client; read the product version via GET /api/version, do NOT bump it.
-   Before returning, run the MANDATORY comment self-audit (§4 point 4) over web/src (including .css): delete every added comment that is not one of the five allowed kinds (§4 point 2) and every one that states a fact owned by another file (which endpoint does what, what a frame carries, which component calls it). Delete — never soften or rewrite.
+   Hard scope boundaries (do not build ahead): <paste «Что НЕ входит»>.
+   Build only this phase's web UI. Reuse the established Logos frontend style — existing design tokens, components, layout shell, CSS conventions; never invent a new visual language, palette, font, or styling system. Thin client: no source-of-truth state or business logic on the client; read the product version via GET /api/version, do not bump it.
    Return: frontend files created/changed (one-line each), how «Критерии готовности» + the web-interface spec are covered, which existing components/tokens you reused, any drift vs the docs, and the comment self-audit line (how many added comments you deleted, how many you kept).
    ")
    ```
    Routing: a **backend-only** phase skips `logos-frontend-coder`; a **frontend-only** phase (e.g. a
    pure UI tweak) dispatches `logos-frontend-coder` for the UI and still sends `logos-coder` to make the
    one-line `PRODUCT_VERSION` bump (§9 applies to every phase).
-2. **logos-reviewer** — review the diff against the architecture docs AND the doctrine (backend and
-   frontend), §4 point 0 first: every mechanism the diff adds must be one the spec names, and the
-   reviewer names what the diff could DELETE. Route blocking findings to the right fixer — backend
-   findings to `logos-coder`, frontend findings to `logos-frontend-coder` — then re-review. One fix
-   loop is normal; stop after two and surface unresolved findings to the user. Carry the reviewer's
-   «можно удалить» list into the SAME fix dispatch — deletions are not deferred to a later phase.
+2. **logos-reviewer** — review the diff against the architecture docs and the doctrine (backend and
+   frontend): every mechanism the diff adds must be one the spec names, and the reviewer names what
+   the diff could delete. It ends each run by recording a review mark over the files it reviewed —
+   the mark the review gates check before a commit (step 6). Route blocking findings to the right
+   fixer — backend findings to `logos-coder`, frontend findings to `logos-frontend-coder` — then
+   re-review. One fix loop is normal; stop after two and surface unresolved findings to the user.
+   Carry the reviewer's «можно удалить» list into the SAME fix dispatch — deletions are not deferred
+   to a later phase.
 3. **logos-test-writer** — write machine-checkable tests covering the phase's «Критерии готовности» —
    the criteria, not every internal branch.
 4. **logos-devops** — make the phase runnable per its stack (containers / run scripts / infra), within
@@ -154,7 +159,7 @@ finish before the next; feed each agent the prior agent's report.
 If any agent reports it cannot proceed without a user decision, pause and ask the user ONE open
 question in Russian, then continue.
 
-**Routing findings — the rule that keeps §4 point 0 from eroding one fix at a time (reference §5).** A
+**Routing findings — the rule that keeps the doctrine's simplicity rule (point 0) from eroding one fix at a time (reference §5).** A
 review, QA or sync finding goes to a coder ONLY when it is a bug in what the spec asked for. Never route
 these to a coder as "add a mechanism":
 - **A model behaved badly** (wrong language, a stub, a hallucinated capability, an ignored instruction)
@@ -170,43 +175,40 @@ question; on his yes, update the design document FIRST (via the owning design sk
 ## 4a. Doctrine guard — mechanical, runs after the coders and BEFORE the reviewer
 
 These doctrine violations are cheap to catch mechanically and expensive to let through, because they
-grow without bound and every agent of every later phase pays to read the result. Run this guard
-yourself (it is a check, not production code) after step 4.1's coders and before dispatching
+grow without bound and every agent of every later phase pays to read the result.
+
+Checks 1 and 2 of this guard — phase history in the code and the 1000-line module ceiling — are the
+plugin's PostToolUse hook now, not yours: it inspects every file an agent edits under `gateway/app/`,
+`gateway/tests/` and `web/src/` right after the edit (the `spec:` pointer form stays allowed) and
+reports the offending lines with the reason, so the coder fixes them on the spot. Do not re-grep for
+history or module size after the coders. What a per-file hook cannot see — the prose ratio over the
+whole diff and the narrative in the infra files — is still your step: run checks 3 and 4 yourself
+(they are checks, not production code) after step 4.1's coders and before dispatching
 `logos-reviewer` in step 4.2:
 
 ```bash
-# 1. History in the code — BANNED under app/** and web/src/** (reference §4 point 10).
-git -C "$CODE" grep -nE 'Фаза-[0-9]|ДРЕЙФ-|superseded|prior standing|RETROSPECTIVE|^\s*history:|^\s*changelog:' \
-  -- 'gateway/app/*' 'web/src/*'
-
-# 2. Module-size guard — no app/** module over 1000 lines (reference §4 point 9).
-find "$CODE/gateway/app" "$CODE/web/src" -type f \( -name '*.py' -o -name '*.ts' -o -name '*.tsx' \) \
-  -exec awk 'END {if (NR > 1000) print FILENAME": "NR" lines"}' {} \;
-
-# 3. Comment volume in the diff — prose the coders ADDED this phase (reference §4 points 2 and 4).
+# 3. Comment volume in the diff — prose the coders ADDED this phase (doctrine: comments and the self-audit).
 git -C "$CODE" diff main --unified=0 -- 'gateway/app' 'web/src' \
   | grep -E '^\+' | grep -vE '^\+\+\+' \
   | awk '{ if ($0 ~ /^\+[[:space:]]*(#|\/\/|\*|"""|'"'''"')/) prose++; else if ($0 ~ /[^[:space:]+]/) code++ }
          END { printf "added: %d code, %d prose (%.0f%%)\n", code, prose, 100*prose/(code+prose) }'
 
-# 4. History/bloat in the INFRA artifacts — per-phase narrative BANNED (§4 point 10 applied to infra).
-#    docker-compose.yml / .env.example / RUN.md have no reviewer loop of their own, so this is their
-#    only auto-net. A `--- Фаза-NN ---` header or a `What changed in Phase-NN` section is the tell that
-#    infra is accreting a phase-by-phase changelog (the 64KB-compose / 76KB-RUN.md bloat an audit finds).
+# 4. History/bloat in the INFRA artifacts — per-phase narrative is banned there too (doctrine: no history in code).
+#    docker-compose.yml / .env.example / RUN.md are outside the hook's paths and have no reviewer loop of
+#    their own, so this is their only auto-net. A `--- Фаза-NN ---` header or a `What changed in Phase-NN`
+#    section is the tell that infra is accreting a phase-by-phase changelog (the 64KB-compose / 76KB-RUN.md
+#    bloat an audit finds).
 grep -nE 'Фаза-[0-9]|What changed in Phase|Verify.*Phase-?[0-9]|Carried over from Phase' \
   "$CODE/docker-compose.yml" "$CODE/gateway/.env.example" "$CODE/RUN.md" 2>/dev/null
 ```
 
-Checks 1, 2 and 4: a hit is a **blocker**, not a nit. For checks 1 and 2 route it back to the right coder
-(backend → `logos-coder`, frontend → `logos-frontend-coder`) with the instruction to **DELETE** the
-historical prose (never rewrite or "condense" it) or to decompose the oversized module. For check 4 route
-it back to `logos-devops` to **DELETE** the per-phase narrative from the infra artifact — and, while there,
-to strip any `environment:` var pinned to its own `config/defaults.py` default (a second source of truth
-that must be kept in sync; the compose env carries only topology and deliberately-non-default values). Then
-re-run the guard.
+Check 4: a hit is a **blocker**, not a nit. Route it back to `logos-devops` to **delete** the per-phase
+narrative from the infra artifact — and, while there, to strip any `environment:` var pinned to its own
+`config/defaults.py` default (a second source of truth that must be kept in sync; the compose env carries
+only topology and deliberately-non-default values). Then re-run the guard.
 
-Check 3 is a **smell, not a hard gate** — it tells you whether the coders actually ran their mandatory
-comment self-audit (§4 point 4). Above roughly **25% prose in the added lines**, assume they did not:
+Check 3 is a **smell, not a hard gate** — it tells you whether the coders actually ran the doctrine's
+mandatory comment self-audit. Above roughly **25% prose in the added lines**, assume they did not:
 demand the self-audit line from their report (how many comments they deleted, how many they kept), and if
 it is missing or the number is zero, send them back to run it BEFORE the reviewer sees the diff. Deleting
 prose costs one cheap pass; letting the reviewer find it stale costs a full review round-trip per finding.
@@ -221,9 +223,9 @@ see one, it is a blocker: send it back to be **deleted** (never "updated to matc
 
 Only when the guard is clean does the phase proceed to review.
 
-The one legal exception is a terse spec pointer — `spec: Фазы/Фаза-23-самость.md`. A phase name used
-as narrative («в Фазе-07 мы заменили…», «prior standing value was 0.22.0», a `history:` section) is a
-violation regardless of how informative it looks.
+The one legal exception to the history ban is a terse spec pointer — `spec: Фазы/Фаза-23-самость.md`
+(the hook passes this form). A phase name used as narrative («в Фазе-07 мы заменили…», «prior
+standing value was 0.22.0», a `history:` section) is a violation regardless of how informative it looks.
 
 The bump of `PRODUCT_VERSION` is a ONE-LINE literal change. If a coder "bumped" it by also appending a
 paragraph about what this phase delivered, that is exactly this violation — send it back.
@@ -233,9 +235,9 @@ paragraph about what this phase delivered, that is exactly this violation — se
 Dispatch **logos-sync** to audit the code repo against the design documents:
 ```
 Agent(subagent_type="logos-sync", prompt="
-Obey ${CLAUDE_PLUGIN_ROOT}/references/logos-project.md. Code repo: <CODE>. Docs: <DOCS>.
-Audit the code implementing phase <NN> against <DOCS>/Дизайн/Архитектура.md and the phase document.
-Report every drift (code does X, docs say Y) with file:line and which side looks wrong. Do NOT change code.
+Code repo: <CODE>. Docs: <DOCS>. Phase document: <DOCS>/Дизайн/Фазы/<file>.
+Audit the code implementing phase <NN> against <DOCS>/Дизайн/Архитектура.md (the hub and the Архитектура/ pages it names) and the phase document.
+Report every drift (code does X, docs say Y) with file:line and which side looks wrong. Do not change code.
 ")
 ```
 For each reported drift, resolve it (do NOT leave docs and code disagreeing):
@@ -274,39 +276,44 @@ and never by restructuring a design document yourself:
    was missed, send `logos-coder` back to do ONLY the version bump, then continue. A phase is NOT
    `готово` until the version reflects it. The frontend reads it via `GET /api/version`; nothing else
    changes.
-2. **Commit the code** (manual git for the code repo — reference §3). Stage explicit paths, never
+2. **Final delta review.** If any code file changed after `logos-reviewer`'s last run (tests written
+   by `logos-test-writer`, QA fixes, a sync fix), dispatch `logos-reviewer` once more on the files
+   changed since its mark — a light pass; it records the mark. Only then commit. In a repository with
+   `.claude/review-gate` the commit is refused otherwise: the gate compares the working tree with the
+   last review mark.
+3. **Commit the code** (manual git for the code repo — reference §3). Stage explicit paths, never
    `-A`; Russian commit message describing the phase delivered. Push to `origin` only after the user
    confirms (ask once: «Запушить в репозиторий Logos?»). Never commit secrets.
-3. **Advance the phase status.** Set the phase document `статус` to `готово` (or `заблокирована` with
+4. **Advance the phase status.** Set the phase document `статус` to `готово` (or `заблокирована` with
    a reason if QA/criteria did not pass). The vault auto-syncs — no manual git for docs.
-4. **Record in the journal** per `${CLAUDE_PLUGIN_ROOT}/references/diary-format.md`: a `тип: наблюдение` entry «Фаза NN
+5. **Record in the journal** per `${CLAUDE_PLUGIN_ROOT}/references/diary-format.md`: a `тип: наблюдение` entry «Фаза NN
    собрана», plus `тип: решение` entries for any significant stack/structure decisions made, each with
-   the matching `область`, `статус: принято`, `вес: 5`. The journal is the assistant's own memory —
-   no review gate; do not ask the user to review or sign off these entries.
-5. **Stamp the verified documents.** For every design document listed in the "Verified clean" block of the
+   the matching `область`, `статус: принято`, `вес: 5`. The journal is the project's decision log,
+   written for the model — no review gate; do not ask the user to review or sign off these entries.
+6. **Stamp the verified documents.** For every design document listed in the "Verified clean" block of the
    final `logos-sync` report, set `проверено: <сегодня, ГГГГ-ММ-ДД>` and `проверено-код: <the code commit
-   hash from item 2>` in its frontmatter (`${CLAUDE_PLUGIN_ROOT}/references/design-templates.md`, "Freshness stamp"). Stamp
+   hash from item 3>` in its frontmatter (`${CLAUDE_PLUGIN_ROOT}/references/design-templates.md`, "Freshness stamp"). Stamp
    EXACTLY that list — never the whole design tree, and never a document you edited after the audit that
    cleared it. This is the only place these two fields are ever written.
 
 ## 7. Report to the user (Russian, brief)
 
 Summarize: which phase, what was built (a few lines), test/QA result, sync status, the code commit
-hash, the new phase `статус`, and the journal entries awaiting review. Then ask whether to continue
+hash, the new phase `статус`, and the journal entries recorded. Then ask whether to continue
 with the next phase.
 
 ## General rules
 
 - **Never use the anton-toolkit dev agents for Logos.** Only the `logos-*` agents. They carry Logos's
   context and the "code for AI, not humans" doctrine; the generic ones do not.
-- **Simplicity is the first rule of the whole pipeline (reference §4 point 0).** The phase is built as
+- **Simplicity is the first rule of the whole pipeline (doctrine point 0).** The phase is built as
   the SMALLEST set of mechanisms that meets its «Критерии готовности»; nothing is added for a problem
   that has not happened; a failure is shown to the owner, never swallowed; a model's answer is never
-  judged by code. Every dispatch prompt above already carries the doctrine — but YOU are the one who
-  decides where a finding goes and what gets deleted, so the routing rule in step 4 and the drift default
-  in step 5 are yours to enforce, every phase, without exception.
+  judged by code. Every Logos agent already carries the doctrine as a preloaded skill — but YOU are the
+  one who decides where a finding goes and what gets deleted, so the routing rule in step 4 and the drift
+  default in step 5 are yours to enforce, every phase, without exception.
 - **Code repo = manual git; vault = auto-sync.** Do not confuse the two. Push code only with the
-  user's ok; never `git commit` the vault.
+  user's ok; never `git commit` the vault (a hook blocks git writes there).
 - **Keep docs and code in sync, always.** A phase is not `готово` until `logos-sync` is clean.
 - **`$DOCS/Дизайн/_черновики/` is NOT a source of truth.** It is scratch material from the design
   sessions. Never read it yourself and never name it in an agent prompt — the agents build against the

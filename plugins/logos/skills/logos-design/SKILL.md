@@ -76,7 +76,7 @@ Canonical layout (Russian names):
 | Document | Path |
 |---|---|
 | Concept | `$VAULT/Logos/Дизайн/Концепт.md` |
-| Architecture (final) | `$VAULT/Logos/Дизайн/Архитектура.md` |
+| Architecture (final) | `$VAULT/Logos/Дизайн/Архитектура.md` — today a hub; the domain sections are pages in `$VAULT/Logos/Дизайн/Архитектура/` (layout in `${CLAUDE_PLUGIN_ROOT}/references/design-templates.md`, «Архитектура») |
 | Modules folder | `$VAULT/Logos/Дизайн/Модули/` |
 | One module | `$VAULT/Logos/Дизайн/Модули/<Русское-имя>.md` |
 | Council scratch (shared draft + discussion log) | `$VAULT/Logos/Дизайн/_черновики/` (deleted before the phase ends) |
@@ -199,7 +199,7 @@ Your mode: contribute.
 Read <VAULT>/Logos/Дизайн/Концепт.md, the shared draft <VAULT>/Logos/Дизайн/_черновики/Черновик-архитектуры.md, and the discussion log <VAULT>/Logos/Дизайн/_черновики/Журнал-обсуждения.md in full.
 (1) Deepen your owned section of the draft with concrete, opinionated decisions; edit it in place, leave other domains intact.
 (2) Critically review the rest of the draft and open NEW discussion-log entries (status открыт) addressed at the role that owns each weak spot.
-SIMPLICITY IS BINDING (${CLAUDE_PLUGIN_ROOT}/references/design-templates.md «Simplicity requirement», ${CLAUDE_PLUGIN_ROOT}/references/logos-project.md §4 point 0): design the SMALLEST set of mechanisms that delivers the concept. Before you add any mechanism, answer two questions in the draft's own words — which present need it serves, and what the owner would see if it were not built. A mechanism for a problem that has not happened is not designed. Failure handling is one sentence (the owner sees the failure honestly and decides), never retries/fallbacks/guards/thresholds. When you review others, a mechanism you find unnecessary is a legitimate concern to raise («зачем это, что будет без этого?») — cutting is as much your job as deepening.
+SIMPLICITY IS BINDING (${CLAUDE_PLUGIN_ROOT}/references/design-templates.md «Simplicity requirement», and the simplicity rule of the code doctrine in ${CLAUDE_PLUGIN_ROOT}/skills/logos-doctrine/SKILL.md): design the SMALLEST set of mechanisms that delivers the concept. Before you add any mechanism, answer two questions in the draft's own words — which present need it serves, and what the owner would see if it were not built. A mechanism for a problem that has not happened is not designed. Failure handling is one sentence (the owner sees the failure honestly and decides), never retries/fallbacks/guards/thresholds. When you review others, a mechanism you find unnecessary is a legitimate concern to raise («зачем это, что будет без этого?») — cutting is as much your job as deepening.
 Council roster and order: оркестрация (lead) → память → модели → автономность → фронтенд → ресурсы (last).
 User's architectural constraints (hard bounds — never violate): <paste verbatim>.
 Follow the 'Архитектура' template in ${CLAUDE_PLUGIN_ROOT}/references/design-templates.md. Reference the concept as [[Концепт]]. Do not include runnable code.
@@ -253,9 +253,9 @@ committed: `rm -rf "$VAULT/Logos/Дизайн/_черновики"`. Only `Ар�
 
 ### Step 2.7 — Present and record in the journal
 
-This step records every key decision and shows the user the result. The journal is the assistant's
-own memory of the work — do NOT ask the user to "review", accept/reject, or weigh entries, and do
-NOT leave anything waiting on the user.
+This step records every key decision and shows the user the result. The journal is the project's
+decision log, written for the model — do NOT ask the user to "review", accept/reject, or weigh entries,
+and do NOT leave anything waiting on the user.
 
 1. Read `Архитектура.md` and the synthesizer's report. Summarize to the user in Russian: 3–4 key
    decisions and the short **debate summary** (straight from the synthesizer's «Ключевые споры и как
@@ -287,7 +287,8 @@ Triggered by "давай добавим в дизайн", "а что если", 
 
 1. Short dialog (Russian) to understand the change concretely — what is added/changed/removed and why.
 2. Apply the change: for an architecture-level change, re-dispatch the **logos-synthesizer** with the
-   change described and the current `Архитектура.md` as input; for a concept-level change, edit
+   change described and the current `Архитектура.md` hub plus the `Архитектура/` page(s) the change
+   touches as input — the edit lands in the page that holds the section; for a concept-level change, edit
    `Концепт.md` inline. For a brand-new subsystem (or any element) that deserves its own deep
    document, do NOT write it inline — run **Phase 4 — Module detailing** so the council works it out,
    producing `$VAULT/Logos/Дизайн/Модули/<Русское-имя>.md`.

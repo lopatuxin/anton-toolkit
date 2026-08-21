@@ -27,7 +27,7 @@ only HOW it is said, never dumb down the substance.
 
 **Simplicity requirement (hard rule — the design decides what the code becomes, so bloat starts here).**
 The system these documents describe must be simple, functional, easy to extend and easy to debug
-(`${CLAUDE_PLUGIN_ROOT}/references/logos-project.md` §4 point 0 is binding on the DOCUMENTS too). A design document names a
+(the simplicity rule of the code doctrine, `${CLAUDE_PLUGIN_ROOT}/skills/logos-doctrine/SKILL.md`, is binding on the DOCUMENTS too). A design document names a
 mechanism ONLY for a need that exists today — a scenario in the concept, a capability the owner asked for,
 a failure already observed — never for a problem that has not happened yet, and never "for robustness".
 Every mechanism must be explainable to the owner in ONE plain sentence, and it must be VISIBLE to him where
@@ -73,17 +73,20 @@ never in the document:
 **Document decomposition (hard rule — split by responsibility, never let one document grow unbounded).**
 These documents are read by AI agents that must load a document whole to use any part of it, so an
 oversized document taxes every later build: the coder implementing ONE contract pays to read the entire
-file. The code doctrine (`${CLAUDE_PLUGIN_ROOT}/references/logos-project.md` §4 point 9) already forbids
+file. The code doctrine (the `logos-doctrine` skill, its module-size rule) already forbids
 god-modules for exactly this reason — the same rule binds the documents.
 - **Checkpoint at ~600 lines, hard ceiling at 1200.** When the document you are writing or editing crosses
   ~600 lines, ask whether it now holds more than one responsibility; if it does, split it. NEVER leave a
   design document above 1200 lines — split it in the same round in which you grew it past the ceiling.
 - **Split into a subfolder of pages, one responsibility per page, keeping the original file as the hub
-  note:** `Дизайн/Модули/Планировщик.md` (hub) plus `Дизайн/Модули/Планировщик/Цена-и-потолки.md`,
-  `.../Задачи-и-крючки.md`, … . This layout already exists in the vault (`Модули/Планировщик/`,
-  `Модули/Процедурная-память/`) — follow it, never invent a second one.
-- **Every subfolder gets a hub note named exactly like the folder** (the vault's folder-notes plugin opens
-  it when the folder is clicked). The hub keeps only what a page cannot: the element's purpose and
+  note beside the folder:** `Дизайн/Модули/Планировщик.md` (hub) plus `Дизайн/Модули/Планировщик/Цена-и-потолки.md`,
+  `.../Задачи-и-крючки.md`, … . This layout already exists in the vault (`Дизайн/Архитектура.md` +
+  `Дизайн/Архитектура/`, `Модули/Планировщик/`, `Модули/Процедурная-память/`, `Модули/Память/`) — follow
+  it, never invent a second one.
+- **Inside the subfolder lives a small folder note named exactly like the folder** (`Планировщик/Планировщик.md`,
+  `Архитектура/Архитектура.md`) — the vault's folder-notes plugin opens it when the folder is clicked. It is
+  NOT the document: it says so, points back at the hub one level up, and lists the pages with a Dataview
+  `LIST` query. The hub beside the folder keeps only what a page cannot: the element's purpose and
   boundaries, the map of its pages with a ONE-LINE description of each, and the cross-links to sibling
   documents. All deep detail moves down into the pages.
 - **Split along responsibilities, never along a line count.** Each page must be one coherent thing an agent
@@ -139,13 +142,29 @@ tags:
 
 ## Архитектура
 
-Path of the final: `$VAULT/Logos/Дизайн/Архитектура.md`. The council's shared working draft
-(`_черновики/Черновик-архитектуры.md`) uses this SAME structure: the lead writes the skeleton over
-all sections, then each member deepens the one section matching their role and reviews the rest. The
-sections map onto the council's areas of expertise — that is deliberate, so each member owns exactly
-one section and addresses questions to whoever owns the section they object to.
+Path of the final: `$VAULT/Logos/Дизайн/Архитектура.md`. In the vault today this is a **hub plus a
+folder of pages**, the decomposition layout described above: `Дизайн/Архитектура.md` is the hub and
+holds the cross-cutting sections (`Обзор`, `Ключевые архитектурные решения`, a page map «Карта
+архитектуры», `Потоки данных`, `Стек и инфраструктура`, `Риски и открытые вопросы`); each domain-owned
+section is its own page in `Дизайн/Архитектура/` (`Иерархия-оркестрации.md`, `Подсистема-памяти.md`,
+`Модельный-слой.md`, `Автономность.md`, `Ресурсный-бюджет.md`), and `Архитектура/Архитектура.md` is only
+the folder note pointing back at the hub. The interaction layer has no page of its own there: its
+architecture-level rules (thin client, the control panel) sit in the hub's key decisions and the
+screen↔system contracts in `Веб-интерфейс/Контракты-с-системой.md`. A fresh architecture is still
+written as ONE document with all the sections below and is split into this shape only when it outgrows
+the size rule (Phase 5 of `logos-design`); an edit to an existing section goes to the page that holds it.
+Two notes share the name `Архитектура`; the vault links the hub with the bare `[[Архитектура]]` almost
+everywhere, and `[[Дизайн/Архитектура]]` is the unambiguous form when a link must not be mistaken for the
+folder note.
 
-Sections, strictly in this order, with exactly these Russian names:
+The council's shared working draft (`_черновики/Черновик-архитектуры.md`) uses this SAME section list:
+the lead writes the skeleton over all sections, then each member deepens the one section matching their
+role and reviews the rest. The sections map onto the council's areas of expertise — that is deliberate,
+so each member owns exactly one section and addresses questions to whoever owns the section they object
+to.
+
+Sections — the required content whatever the file layout — strictly in this order, with exactly these
+Russian names:
 
 1. **Обзор** — 3–5 sentences linking the concept to the technical approach.
 2. **Ключевые архитектурные решения** — bulleted major decisions, one-line justification each.
@@ -153,7 +172,7 @@ Sections, strictly in this order, with exactly these Russian names:
 4. **Подсистема памяти** — how memory is stored and evolves: importance/strength weights, the nightly consolidation pass (generalize, tag, re-weight), how strength rises on success and falls on failure, retrieval. (This is the heart of Logos — detail it.)
 5. **Модельный слой** — the swarm of small specialized models vs one large LLM; the path from ready-made models (Chinese via OpenRouter) to local models on owned hardware; routing a task to the right model; fine-tuning approach.
 6. **Автономность и самомодификация** — how the system writes its own tools/skills, how new capabilities are registered, and the SAFETY boundaries on self-modification (what it may not touch, rollback, human gate).
-7. **Слой взаимодействия и веб-интерфейс** — how the user-facing web frontend integrates into the system as a first-class layer: the client↔brain contract (how user input enters the orchestration hierarchy, how results and live telemetry/diagnostics stream back), the real-time channel, the session/state boundary, and which surfaces exist at the architecture level (e.g. chat, metrics/diagnostics). This section owns the *integration contract* that wires the frontend into orchestration, memory, and models — NOT the detailed page/element/UX spec, which lives in `[[Веб-интерфейс]]` (owned by the `logos-ui` skill). Keep the two consistent: this section says how the frontend plugs into the system; `[[Веб-интерфейс]]` says what each screen contains.
+7. **Слой взаимодействия и веб-интерфейс** — how the user-facing web frontend integrates into the system as a first-class layer: the client↔brain contract (how user input enters the orchestration hierarchy, how results and live telemetry/diagnostics stream back), the real-time channel, the session/state boundary, and which surfaces exist at the architecture level (e.g. chat, metrics/diagnostics). This section owns the *integration contract* that wires the frontend into orchestration, memory, and models — NOT the detailed page/element/UX spec, which lives in `[[Веб-интерфейс]]` (owned by the `logos-ui` skill; a folder `Дизайн/Веб-интерфейс/` with a hub note of the same name and one page per screen, see `${CLAUDE_PLUGIN_ROOT}/references/web-ui-spec-template.md`). Keep the two consistent: this section says how the frontend plugs into the system; `[[Веб-интерфейс]]` says what each screen contains.
 8. **Ресурсный бюджет** — hardware assumptions (e.g. ~72 GB VRAM target), what runs where, what is feasible without datacenter-scale compute, and where cost/compute forces a simpler path.
 9. **Потоки данных** — 2–4 of the most important end-to-end flows in prose or numbered lists (e.g. "user asks to fix code → central brain → programming orchestrator → agents → memory updated"). No diagrams-as-code.
 10. **Стек и инфраструктура** — concrete technology choices per layer with one-line justifications, fitted to the resource constraints.

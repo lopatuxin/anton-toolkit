@@ -1,0 +1,49 @@
+{
+  "description": "logos hooks. PreToolUse on Bash/PowerShell: prod-guard blocks any command that touches the Logos prod stand (docker-compose.prod.yml, compose project logos-prod, compose down -v, docker volume rm/prune; deliberate bypass: LOGOS_PROD_OK=1 in the command); vault-guard blocks git write commands (add, commit, push, stash, reset, checkout, ...) whose effective directory is the Obsidian vault, which obsidian-git commits on its own. PostToolUse on Edit/Write/MultiEdit: doctrine-guard reports, for a file under gateway/app, gateway/tests or web/src of the Logos code repo, lines that carry phase history / narrative (a `spec:` pointer is the only allowed phase reference) and app/web modules over 1000 lines, so the coder fixes them at once. Every script fails open: garbage input, another repository or an internal error never blocks.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PLUGIN_ROOT}/hooks/prod-guard.ps1\"",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PLUGIN_ROOT}/hooks/vault-guard.ps1\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PLUGIN_ROOT}/hooks/prod-guard.ps1\"",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PLUGIN_ROOT}/hooks/vault-guard.ps1\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PLUGIN_ROOT}/hooks/doctrine-guard.ps1\"",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}

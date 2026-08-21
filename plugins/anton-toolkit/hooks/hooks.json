@@ -26,7 +26,7 @@
     ],
     "SubagentStop": [
       {
-        "matcher": "^(anton-toolkit:)?(code-reviewer|mr-spec-reviewer)$",
+        "matcher": "^((anton-toolkit:)?(code-reviewer|mr-spec-reviewer)|logos:logos-reviewer)$",
         "hooks": [
           {
             "type": "command",

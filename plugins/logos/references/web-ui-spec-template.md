@@ -1,7 +1,14 @@
 # Logos web interface — specification template
 
-Canonical structure for the Logos web-interface spec written by the `logos-ui` skill. The document
-lives at `$VAULT/Logos/Дизайн/Веб-интерфейс.md` with a Russian file name and Russian headings.
+Canonical structure for the Logos web-interface spec written by the `logos-ui` skill. The spec is the
+folder `$VAULT/Logos/Дизайн/Веб-интерфейс/` with Russian file names and Russian headings: the hub note
+`Веб-интерфейс/Веб-интерфейс.md` holds the shell and the cross-cutting sections (1–4, 6–12 below), every
+screen is its own page in the same folder (`Чат.md`, `Метрики.md`, `Память.md`, `Уведомления.md`,
+`Панель-управления.md` — section 5 in the hub is only the map of these pages), and section 11's body
+lives in the page `Контракты-с-системой.md`. A screen page carries the same frontmatter as the hub, the
+link line `[[Концепт]] · [[Архитектура]] · [[Веб-интерфейс]]`, and the per-screen block of section 5.
+The wiki-link `[[Веб-интерфейс]]` resolves to the hub. A new screen is a new page plus a row in the hub's
+screen map — never a section appended to the hub.
 
 This spec is the **build-ready input for the `logos-frontend-coder` agent**. It must be complete
 enough that the interface can be assembled from it without guessing the screens, the elements, or
@@ -83,7 +90,8 @@ search, user menu, notifications), sidebar/nav (sections, order, collapse behavi
 area, optional right panel, footer. Define the regions and their content/order — not their look.
 
 ### 5. Экраны (детально)
-The core of the spec. **One subsection per screen.** For each:
+The core of the spec. **One page per screen** in the `Веб-интерфейс/` folder; the hub's section 5 is the
+map of those pages (screen, page link, route). Each screen page holds this block:
 
 ```markdown
 ### 5.X <Название экрана>  (route: `/...`)
@@ -111,8 +119,8 @@ shows in each.>
 **Крайние случаи:** <ONLY the display states the owner will actually meet — an empty collection, a long
 list, very long text. NOT offline/reconnect machinery, optimistic updates, retries, conflict resolution
 or "what if the server…" — a failed request is one thing on every screen: an honest error the owner
-sees (`${CLAUDE_PLUGIN_ROOT}/references/logos-project.md` §4 point 0). Leave the line out when there is
-nothing real to say.>
+sees (the simplicity rule of the code doctrine, `${CLAUDE_PLUGIN_ROOT}/skills/logos-doctrine/SKILL.md`). Leave the
+line out when there is nothing real to say.>
 ```
 
 Repeat for every screen in the sitemap. Be complete about what the owner sees and does — this is what
@@ -146,8 +154,9 @@ No colour-contrast (that is inherited from the established Logos style, not spec
 
 ### 11. Связь экранов с системой
 For each screen (or grouped), which Logos capability, data source, or API surface it consumes —
-mapping the interface onto `[[Архитектура]]`. THIS section is the primary place the spec touches the
-architecture, so the `logos-ui` sync step reads it to find what the architecture must support.
+mapping the interface onto `[[Архитектура]]`. The hub keeps a one-paragraph pointer here; the table itself
+is the page `Контракты-с-системой.md` in the same folder. THIS section is the primary place the spec
+touches the architecture, so the `logos-ui` sync step reads it to find what the architecture must support.
 
 ### 12. Открытые вопросы и расхождения с архитектурой
 Anything the interface needs that the architecture does not yet cover or contradicts, plus genuine

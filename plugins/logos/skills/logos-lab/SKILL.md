@@ -25,6 +25,8 @@ This skill is the user-facing interface over that format: record an experiment, 
 outcome, search the diary, maintain direction notes. It writes ONLY inside
 `Logos/Исследования/` (and reads `Logos-Lab`); it never touches the production code repo, the
 design docs, or the journal — a cross-cutting project decision still goes through `logos-log`.
+The diary in the vault is the single place of record for an experiment: Claude Code auto-memory
+keeps at most a one-line pointer per experiment (name, status), never a second copy of the write-up.
 
 ## 0. Setup (every run)
 
@@ -70,7 +72,10 @@ If ambiguous, ask the user in Russian which they want, in one short question.
 1. Locate the target note (by name or via SEARCH). Never guess between two candidates — ask.
 2. Update ITS file: `статус` → `сработало` / `провал`, adjust `вес` (raise for an important
    result — positive OR negative; lower for a marginal one), write the actual outcome with
-   numbers into «Результат» and the takeaway into «Вывод».
+   numbers into «Результат» and the takeaway into «Вывод». Then bring the living summary
+   `Анализ/Сквозные-результаты.md` up to date (best result per measure, a proven technique, a dead
+   end — `${CLAUDE_PLUGIN_ROOT}/references/lab-format.md` section 2), and say so if a measure fell
+   below the best level reached earlier.
 3. If the takeaway matters beyond the branch (changes a direction's status, or is ready for
    the production design), say so in Russian and offer the owning move: update the direction
    note (DIRECTION mode), or record a project decision via `logos-log`. Do not silently edit
@@ -86,8 +91,9 @@ The diary is built to be queried, not scrolled:
    Russian list (file link + one-line summary), sorted by `дата` (or `вес` for importance
    queries). «покажи провалы» → `статус: провал` plus `тип: тупик`.
 2. **Point to the live index:** the folder note `Исследования/Исследования.md` holds live
-   Dataview tables (активные направления / эксперименты в работе / провалы / все) the user
-   can open in Obsidian. Do NOT hand-maintain it.
+   Dataview tables (активные направления / сводные разборы / эксперименты в работе / провалы /
+   все) the user can open in Obsidian. Do NOT hand-maintain it. For "what is the best we have
+   reached" or "which techniques work", the answer is `Анализ/Сквозные-результаты.md`.
 
 ## 5. DIRECTION mode
 

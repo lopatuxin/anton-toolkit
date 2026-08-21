@@ -42,7 +42,19 @@ Logos/Исследования/
   Эксперименты/
     Эксперименты.md          — folder note: diary index + the experiment note template
     <YYYY-MM-DD>-<слаг>.md   — one note = one experiment
+  Анализ/
+    Анализ.md                — folder note: index of the analyses
+    <YYYY-MM-DD>-<слаг>.md   — one note = one cross-experiment analysis on a date (never rewritten)
+    Сквозные-результаты.md   — the LIVING running summary: best result per measure, proven techniques, dead ends
+  Обучение.md                — the owner's learning note, owned by the logos-teach skill (not part of the diary)
 ```
+
+`Анализ/` sits above the diary and the directions: a dated analysis (`тип: анализ`, frontmatter `дата`,
+`охват`) looks across several experiments and fixes the course at that moment; a new view is a new note,
+an old one is never rewritten. `Сквозные-результаты.md` (`тип: сводка`) is the one living document of the
+branch: it is consulted BEFORE a new experiment and updated AFTER it, so a measure that falls below the
+best level reached earlier is noticed instead of building on the last step only — the rule is in
+`Концепт-исследований.md`, section «Процесс».
 
 ## 3. First-run setup (idempotent — run these checks EVERY time)
 
@@ -52,8 +64,9 @@ folder notes ARE the searchable index — never maintained by hand.
 
 If `Исследования.md` is missing or empty, create it with: an H1, a two-to-three-sentence Russian
 intro naming the branch's goal and the lab repo, wiki-links to [[Концепт-исследований]],
-[[Направления/Направления|Направления]] and [[Эксперименты/Эксперименты|Эксперименты]], and
-Dataview tables over `"Logos/Исследования/Направления"` (columns: file.link, статус, дата) and
+[[Направления/Направления|Направления]], [[Эксперименты/Эксперименты|Эксперименты]] and
+[[Анализ/Анализ|Анализ]], and Dataview tables over `"Logos/Исследования/Направления"` (columns:
+file.link, статус, дата), `"Logos/Исследования/Анализ"` (columns: file.link, охват, дата) and
 `"Logos/Исследования/Эксперименты"` (tables: `статус = "проверяется"`; provals/dead ends via
 `статус = "провал" OR тип = "тупик"`; all entries with область/статус/вес/дата). Frontmatter
 tags: `logos`, `исследования`. Every `WHERE` clause excludes the folder note itself
@@ -68,6 +81,11 @@ Russian (one note = one experiment; hypothesis is written BEFORE the code; the r
 appended to the SAME note; failures are recorded as diligently as successes; the code of an
 experiment is one root folder in `Logos-Lab` named as the note slug), the experiment note
 template from section 4 inside a fenced block, and a Dataview table over the folder.
+
+If `Анализ/Анализ.md` is missing or empty, create it with: one paragraph of Russian rules (one note =
+one analysis on a date, frontmatter `дата`, `тип: анализ`, `охват`; an analysis is a view over the
+diary and the directions, not a replacement for either; past analyses are never rewritten) and a
+Dataview table over the folder (columns: file.link, охват, дата) sorted by дата descending.
 
 ## 4. Experiment note (one note = one experiment)
 

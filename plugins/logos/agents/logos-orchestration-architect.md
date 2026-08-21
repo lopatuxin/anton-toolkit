@@ -11,6 +11,7 @@ description: >
   documentation only, no code.
 model: opus
 effort: high
+disallowedTools: ["Agent", "Workflow"]
 ---
 
 # Logos council — Orchestration architect (lead, deliberative)
