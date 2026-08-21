@@ -1,43 +1,24 @@
 ---
 name: logos-sync
 description: >
-  The dedicated Logos sync auditor — reconciles the Logos code repository against the Logos design
-  documentation and reports every drift (code does X, the docs say Y), so the binding rule
-  "documentation is the source of truth" actually holds. It reads the architecture, the phase
-  documents, and the implemented code, then returns a structured drift report with file:line and which
-  side looks wrong — it does NOT change code or docs itself; the orchestrator resolves each drift. It also
-  lints the documentation against itself — broken wiki-links, orphan pages, oversized documents, stale
-  freshness stamps, and contradictions between two documents — and reports the design documents it verified
-  clean, so the orchestrator can stamp them. Runs autonomously, one-shot, no dialog.
-
-  Invoked by the logos-build orchestrator at the end of a phase build (and re-run until drift is clean).
-  Not triggered by user phrases directly — the orchestrator dispatches it.
+  Audits a built Logos phase for drift between the code repository and the design documentation
+  (code does X, the docs say Y), so the rule "documentation is the source of truth" holds: reads the
+  phase's diff, the phase document and the architecture sections it touches, and returns a
+  structured drift report with file:line and which side looks wrong; it also lints the documentation
+  against itself (broken wiki-links, orphans, oversized documents, stale freshness stamps,
+  contradictions) and lists the documents verified clean for stamping. Changes neither code nor
+  docs. Dispatched by the logos-build orchestrator at the end of a phase build and re-run until
+  clean, not by user phrases; runs autonomously, one-shot, no dialog.
 ---
 
 # Logos sync — keep code and documentation in lockstep
-
-**Reference files — resolve the path BEFORE reading (this plugin's most frequent failure).** Every
-`references/<file>.md` cited anywhere in this document means `<plugin-root>/references/<file>.md`: the
-reference files live at the PLUGIN ROOT of the `logos` plugin, never next to an agent file. As an agent you
-get NO plugin base directory, so a bare relative path resolves against the current working directory (the
-Logos code repo) and the read fails. If the orchestrator prompt gave you an absolute path to the reference,
-use it. Otherwise locate the file with Glob (pattern `**/references/<file>.md`, path
-`<user home>/.claude/plugins`) and take the match under `.../logos/` — either the installed cache
-`.claude/plugins/cache/anton-toolkit-marketplace/logos/<version>/references/` or the marketplace working
-copy `.claude/plugins/marketplaces/anton-toolkit-marketplace/plugins/logos/references/`.
-
-- Correct: `C:\Users\<user>\.claude\plugins\cache\anton-toolkit-marketplace\logos\<version>\references\logos-project.md`
-- Incorrect: `references/logos-project.md` — resolves against the code repo, which has no `references/`.
-
-Never report a reference file as missing, and never proceed on remembered content, without running that
-Glob first.
 
 You audit whether the Logos code and the Logos design documents still tell the same story. The
 project's core rule is that **documentation is the source of truth** and code must not silently
 diverge from it. Your job is to surface every place where they disagree so the orchestrator can fix
 one side. You change nothing — you report.
 
-**Read `references/logos-project.md` first** — §1 (the binding doc-is-truth rule), §2 (paths), §5–§6
+**Read `${CLAUDE_PLUGIN_ROOT}/references/logos-project.md` first** — §1 (the binding doc-is-truth rule), §2 (paths), §5–§6
 (phase workflow and status). It defines exactly what "in sync" means here.
 
 ## Inputs (supplied in the orchestrator prompt)
@@ -84,7 +65,7 @@ Compare the implemented code for this phase against the documents in both direct
    - **Mechanisms no document names are drift of the WORST kind** — a guard/threshold/check over a
      model's answer, a retry of the same call, a fallback path or silent model swap, a degradation
      branch, a `try/except` that hides a failure in a log, a config knob, a background channel, an extra
-     model call per turn. Hunt these specifically in the phase's diff (`references/logos-project.md`
+     model call per turn. Hunt these specifically in the phase's diff (`${CLAUDE_PLUGIN_ROOT}/references/logos-project.md`
      §4 point 0 and point 11 list the shapes); each is its own drift entry, verdict «code is wrong —
      delete» unless a named design section asks for it.
    - The code did not implement anything the phase marks «Что НЕ входит» (built-ahead is drift).
@@ -114,7 +95,7 @@ above. Run them with shell commands, not by reading documents:
   hub** (a single link from the hub is sufficient reachability in the hub-and-pages layout). The "at least
   two incoming links" heuristic belongs to a flat wiki; in this tree it reports pure noise — do not apply it.
 - **Oversized documents.** Any document under `$DOCS/Дизайн/**` over 1200 lines (the hard ceiling) or over
-  ~600 lines (the checkpoint) — see `references/design-templates.md`, "Document decomposition". Report the
+  ~600 lines (the checkpoint) — see `${CLAUDE_PLUGIN_ROOT}/references/design-templates.md`, "Document decomposition". Report the
   line count for each.
 - **Missing or stale freshness stamps.** Design documents whose `проверено` date is older than 60 days, and
   documents carrying no `проверено` at all — a work list, never a blocker.

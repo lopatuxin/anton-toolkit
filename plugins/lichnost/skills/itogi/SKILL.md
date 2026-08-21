@@ -1,11 +1,13 @@
 ---
 name: itogi
 description: >
-  Produce an analytical period review (итог) of the user's Obsidian diary and write it into
-  the vault. Three levels — week, month, year — built as a cascade: the weekly итог analyses
-  the daily diary entries, the monthly итог analyses the weekly итоги (NOT the daily entries),
-  the yearly итог analyses the monthly итоги. Invoked explicitly via the /itogi command only —
-  no auto-trigger. Analysis, not a flat summary; for raw capture use `dnevnik`.
+  Writes an analytical period review (итог) of the user's Obsidian diary into the vault: themes,
+  trajectory, blockers, insights — interpretation, not a summary. Three levels chosen by the
+  command argument, built as a cascade: the weekly review reads the daily diary entries, the
+  monthly review reads the weekly reviews (never the daily entries), the yearly review reads the
+  monthly ones. Unlike `dnevnik` (raw capture) it analyses; unlike `profil` it describes a period,
+  not the person.
+disable-model-invocation: true
 ---
 
 # Itogi — analytical period review for the Obsidian diary

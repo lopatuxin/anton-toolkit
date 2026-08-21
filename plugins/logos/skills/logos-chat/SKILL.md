@@ -1,48 +1,16 @@
 ---
 name: logos-chat
 description: >
-  The Logos project companion — a conversational interlocutor that holds the whole Logos context
-  (where the design docs live, where the code lives, what the project is, its current state) and
-  discusses any question about it with the user. It is the catch-all "let's talk about Logos" tool:
-  it answers from the actual sources of truth — the WHOLE system, not the docs alone: design
-  documentation, the code repository, AND the running stands (containers, logs, HTTP API, PostgreSQL
-  and Neo4j data) — and when a concrete ACTION surfaces in the conversation it dispatches the right
-  ready-made tool of this plugin instead of doing the work itself. Runs DIRECTLY in conversation,
-  multi-turn dialog. Docs, code, and live system state are read but this skill itself writes
-  nothing — every change goes through the dedicated Logos tool it delegates to.
-
-  Invocation: COMMAND ONLY — "/logos-chat". This skill does NOT auto-trigger on free-text phrases.
-  Other phrases the user might say ("расскажи про logos", "что у нас по logos", "как устроена память
-  logos", "объясни архитектуру logos", "в каком состоянии logos", "обсудим logos") are context for
-  the user, not auto-triggers — act only when the user runs /logos-chat.
-
-  Discrimination: this skill TALKS about Logos and ROUTES to the other Logos tools; it never designs,
-  slices, specs, builds, or logs by itself. For designing the architecture use logos-design; for
-  slicing into phases use logos-phases; for the web-interface spec use logos-ui; for building real
-  code use logos-build; for recording/searching decisions use logos-log; for the research-branch
-  experiment diary (Logos/Исследования/, repo Logos-Lab) use logos-lab. This skill runs DIRECTLY in
-  conversation. Do NOT launch agents for the dialog part.
+  The Logos project companion: discusses any question about Logos in a multi-turn dialog, answering
+  from the real sources of truth — the design docs, the code repository and the running stands
+  (containers, logs, HTTP API, PostgreSQL and Neo4j data) — and when a concrete action surfaces
+  dispatches the Logos tool that owns it instead of doing the work; reads everything, writes nothing
+  itself. Designing goes to logos-design, phases to logos-phases, the web-interface spec to logos-ui,
+  code to logos-build, the decision journal to logos-log, research-branch experiments to logos-lab.
+disable-model-invocation: true
 ---
 
 # Logos-chat — the Logos project companion
-
-**Reference files — resolve the path BEFORE reading (this plugin's most frequent failure).** Every
-`references/<file>.md` cited anywhere in this document means `<plugin-root>/references/<file>.md`: the
-reference files live at the PLUGIN ROOT, never inside a skill's own folder. The base directory given to
-this skill at load time is `<plugin-root>/skills/<this-skill>/`, so a bare relative path resolves to
-`<plugin-root>/skills/<this-skill>/references/<file>.md` — that file does not exist and the read fails.
-Resolve it as `<this skill's base directory>/../../references/<file>.md`. If no base directory was given,
-locate the file with Glob (pattern `**/references/<file>.md`, path `<user home>/.claude/plugins`) and take
-the match under `.../logos/` — either the installed cache
-`.claude/plugins/cache/anton-toolkit-marketplace/logos/<version>/references/` or the marketplace working
-copy `.claude/plugins/marketplaces/anton-toolkit-marketplace/plugins/logos/references/`.
-
-- Correct: `C:\Users\<user>\.claude\plugins\cache\anton-toolkit-marketplace\logos\<version>\references\logos-project.md`
-- Incorrect: `references/logos-project.md` — resolves under the skill folder, which has no `references/`.
-
-Never report a reference file as missing, and never proceed on remembered content, without running that
-Glob first. The same rule applies to every path you paste into an agent prompt: pass the RESOLVED absolute
-path, never the bare `references/...` form.
 
 This skill is the user's conversational partner about the Logos project. It is in context of the
 WHOLE project at once: it knows where the documentation lives, where the code lives, what Logos is,
@@ -50,7 +18,7 @@ and what state it is in — and it can discuss any of it. When the conversation 
 to *doing*, it does not improvise the work — it hands off to the dedicated Logos tool that owns that
 work.
 
-**Project context — read it first, every run:** `references/logos-project.md` is the single source
+**Project context — read it first, every run:** `${CLAUDE_PLUGIN_ROOT}/references/logos-project.md` is the single source
 of truth about WHERE Logos lives (the two locations: docs in the vault, code in the repo), HOW code
 and docs stay in sync (documentation is the source of truth), and the doctrine "code for AI, not for
 humans". This skill answers from those real artifacts, never from memory or guesswork.
@@ -68,19 +36,20 @@ databases — every mutation is delegated to the tool that owns it.
 
 ## 0. Setup (every run)
 
-1. Read `references/logos-project.md` fully — it defines the locations, the binding sync rule, the
-   doctrine, the phase workflow, and the journal. Everything below depends on it.
-2. Resolve the paths exactly as that reference's section 2 prescribes (find the Obsidian vault by its
-   `.obsidian/` folder, derive `$DOCS = $VAULT/Logos` and the code repo `$CODE` as the vault's
-   sibling `Logos/`). If the vault is not found, tell the user in Russian as that reference instructs,
+1. Read `${CLAUDE_PLUGIN_ROOT}/references/logos-project.md` fully — it defines the locations, the
+   binding sync rule, the doctrine, the phase workflow, and the journal. Everything below depends on it.
+2. Resolve `VAULT` (the folder holding both `.obsidian/` and `Logos/`) and `CODE`
+   (`$(dirname "$VAULT")/Logos`) with the search procedure in the paths section of
+   `${CLAUDE_PLUGIN_ROOT}/references/logos-project.md`; never hard-code the path. `$DOCS` is
+   `$VAULT/Logos`. If the vault is not found, tell the user in Russian as that reference instructs,
    then stop.
 3. Do NOT eagerly read every document. Hold the MAP (which file answers which kind of question, from
    the reference's path table) and read the specific source on demand when a question needs it.
 
 ## 1. Orient — build the project picture on demand
 
-The canonical sources, by question type (paths resolved in step 0; full table in
-`references/logos-project.md` section 2):
+The canonical sources, by question type (paths resolved in step 0; full table in the paths section of
+`${CLAUDE_PLUGIN_ROOT}/references/logos-project.md`):
 
 | The user asks about… | Read this source of truth |
 |---|---|
@@ -88,8 +57,8 @@ The canonical sources, by question type (paths resolved in step 0; full table in
 | How the system is built (orchestration, memory, models, autonomy, resources, stack) | `$DOCS/Дизайн/Архитектура.md` |
 | The web interface (pages, blocks, navigation, behavior) | `$DOCS/Дизайн/Веб-интерфейс.md` |
 | Delivery phases — what exists, what is in/out of scope, done criteria, status | `$DOCS/Дизайн/Фазы/Фаза-NN-*.md` (and the folder for the overview) |
-| Past decisions, experiments, dead ends, "why did we choose X" | `$DOCS/Журнал/` (format in `references/diary-format.md`) |
-| The research branch — small self-learning models, its directions, experiments, lab code | `$DOCS/Исследования/` (format in `references/lab-format.md`) + the lab repo `Logos-Lab` (the code repo's sibling); overview in `references/logos-project.md` §10 |
+| Past decisions, experiments, dead ends, "why did we choose X" | `$DOCS/Журнал/` (format in `${CLAUDE_PLUGIN_ROOT}/references/diary-format.md`) |
+| The research branch — small self-learning models, its directions, experiments, lab code | `$DOCS/Исследования/` (format in `${CLAUDE_PLUGIN_ROOT}/references/lab-format.md`) + the lab repo `Logos-Lab` (the code repo's sibling); overview in `${CLAUDE_PLUGIN_ROOT}/references/logos-project.md` §10 |
 | What the code actually does, current implementation state | the code repo at `$CODE` (read files, `git log`, `git status`) |
 | What the running system actually DID — did a pass run, why did a step produce nothing, what failed | the live stand: `docker ps`, `docker logs <container>`, and the diagnostic/telemetry endpoints |
 | What the system HOLDS right now — stored memory, facts, entities, settings, telemetry records | the stand's HTTP API first (`GET /api/...`), and the databases (PostgreSQL, Neo4j) when the API does not expose it |
@@ -181,7 +150,7 @@ Delegation rules:
   log line, an API response, a row — and say which one it was.
 - **The whole system, not the docs alone.** Docs = spec, code = implementation, running stand =
   reality. A question about reality is answered from the stand, always.
-- **The map lives in `references/logos-project.md`.** Locations, sync rule, doctrine, phase workflow,
+- **The map lives in `${CLAUDE_PLUGIN_ROOT}/references/logos-project.md`.** Locations, sync rule, doctrine, phase workflow,
   and journal are defined there — follow it verbatim; do not re-derive paths or rules from memory.
 - **Talk, then route — never both.** Discuss freely; the instant it becomes an action, hand off to
   the one tool that owns it.

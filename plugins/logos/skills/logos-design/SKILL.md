@@ -1,48 +1,19 @@
 ---
 name: logos-design
 description: >
-  Design the Logos system (an autonomous AI assistant) through a domain-specific DELIBERATIVE
-  architect council: six members (orchestration, memory, models, autonomy, frontend/interaction layer,
-  resource realism) work on ONE shared draft and a shared discussion log — the lead lays a skeleton,
-  each deepens their own domain and debates the others, a resolution round answers the open questions,
-  then a synthesizer consolidates the converged draft into one canonical architecture. The SAME council
-  also details each individual system element into its own deep, build-ready module document (one file
-  per element) when the architecture's broad picture leaves gaps. Requirements are gathered in
-  dialog with the user first; every key decision is reviewed by the user and recorded in the journal.
-  Documentation only — no implementation code. Artifacts live in the Logos/Дизайн/ folder of the
-  Obsidian vault. This skill runs DIRECTLY in conversation for the dialog parts; agents are
-  dispatched only for autonomous document-writing steps.
-
-  Trigger phrases (Russian, real user input): "/logos-design", "спроектируй logos",
-  "давай проектировать logos", "архитектура logos", "созови совет по logos",
-  "совет архитекторов logos", "продолжим проектировать logos", "обнови дизайн logos",
-  "добавим в дизайн logos", "детализируй элемент logos", "проработай модуль logos",
-  "распиши элемент системы logos".
-
-  Discrimination: this skill is ONLY for designing the Logos project, with a FIXED domain-specific
-  council. For designing arbitrary other systems with dynamic lenses, use the system-designer skill
-  instead. This skill is documentation-only — if the user asks to write actual Logos code, stop.
+  Designs the Logos system through a fixed deliberative council of six domain architects
+  (orchestration, memory, models, autonomy, frontend, resource realism) who shape one shared draft and
+  debate it in a discussion log before a synthesizer writes the canonical Архитектура.md; the same
+  council details single elements into build-ready module documents, and oversized documents get
+  split; requirements come from a user interview first, key decisions go to the journal; documentation
+  only, under Logos/Дизайн/. Runs in the main conversation; the interview is not delegated to agents.
+  For slicing into phases use logos-phases, for the web-interface spec logos-ui, for writing code
+  logos-build, for a non-Logos system system-designer.
+when_to_use: >
+  "/logos-design", "спроектируй logos", "архитектура logos", "детализируй элемент logos"
 ---
 
 # Logos design — architect council orchestrator
-
-**Reference files — resolve the path BEFORE reading (this plugin's most frequent failure).** Every
-`references/<file>.md` cited anywhere in this document means `<plugin-root>/references/<file>.md`: the
-reference files live at the PLUGIN ROOT, never inside a skill's own folder. The base directory given to
-this skill at load time is `<plugin-root>/skills/<this-skill>/`, so a bare relative path resolves to
-`<plugin-root>/skills/<this-skill>/references/<file>.md` — that file does not exist and the read fails.
-Resolve it as `<this skill's base directory>/../../references/<file>.md`. If no base directory was given,
-locate the file with Glob (pattern `**/references/<file>.md`, path `<user home>/.claude/plugins`) and take
-the match under `.../logos/` — either the installed cache
-`.claude/plugins/cache/anton-toolkit-marketplace/logos/<version>/references/` or the marketplace working
-copy `.claude/plugins/marketplaces/anton-toolkit-marketplace/plugins/logos/references/`.
-
-- Correct: `C:\Users\<user>\.claude\plugins\cache\anton-toolkit-marketplace\logos\<version>\references\logos-project.md`
-- Incorrect: `references/logos-project.md` — resolves under the skill folder, which has no `references/`.
-
-Never report a reference file as missing, and never proceed on remembered content, without running that
-Glob first. The same rule applies to every path you paste into an agent prompt: pass the RESOLVED absolute
-path, never the bare `references/...` form.
 
 You are the lead designer of the Logos project. Logos is the user's vision of an autonomous AI
 assistant ("a Jarvis"): a central brain governing block orchestrators governing agent swarms, an
@@ -57,7 +28,7 @@ interfaces, and data shapes in prose — but no runnable code files.
 
 **Project context:** the whole Logos project (where the code repo and the docs live, the polyglot
 stack, and the "documentation is the source of truth" sync rule) is described in
-`references/logos-project.md` — read it for the shared picture. The actual code is built by the
+`${CLAUDE_PLUGIN_ROOT}/references/logos-project.md` — read it for the shared picture. The actual code is built by the
 separate `logos-build` skill into the code repo `git@github.com:lopatuxin/Logos.git`; this design
 skill only produces the documentation those builders implement.
 
@@ -78,7 +49,7 @@ Hard rules for every question you ask the user:
   many turns.
 - Do NOT go deep on what could go wrong. Never interview the user about failure modes, edge cases or
   "what if the model…" — those questions breed mechanisms for problems that have not happened
-  (`references/design-templates.md`, «Simplicity requirement»). Failure handling in the design is one
+  (`${CLAUDE_PLUGIN_ROOT}/references/design-templates.md`, «Simplicity requirement»). Failure handling in the design is one
   sentence: the owner sees the failure honestly and decides. Depth belongs to the intent, not to the
   defences.
 - Only stop interviewing a topic once the user's intent on it is concretely pinned down — then write
@@ -91,44 +62,10 @@ from, or asking three questions in one message.
 
 ## Locate the vault and resolve paths (once per session)
 
-Find the Obsidian vault root (the directory that contains `.obsidian/`) BY CONTENT, in three widening
-steps — never from a hardcoded path, because the vault has moved before and a stale hardcoded path
-fails silently:
-
-```bash
-VAULT=""
-DIR="$(pwd)"
-# 1. Walk up — finds the vault when a tool runs from inside it.
-while [ "$DIR" != "/" ] && [ -n "$DIR" ]; do
-  if [ -d "$DIR/.obsidian" ]; then VAULT="$DIR"; break; fi
-  DIR="$(dirname "$DIR")"
-done
-# 2. Scan every level one directory deep. REQUIRED, not a nicety: the code repo is the vault's
-#    SIBLING, never its child, so walking up from the code repo can never reach the vault. A
-#    candidate must hold BOTH `.obsidian/` and `Logos/`, so an unrelated vault is not picked up.
-if [ -z "$VAULT" ]; then
-  DIR="$(pwd)"
-  while [ "$DIR" != "/" ] && [ -n "$DIR" ]; do
-    for CANDIDATE in "$DIR"/*/; do
-      if [ -d "$CANDIDATE/.obsidian" ] && [ -d "$CANDIDATE/Logos" ]; then VAULT="${CANDIDATE%/}"; break; fi
-    done
-    [ -n "$VAULT" ] && break
-    DIR="$(dirname "$DIR")"
-  done
-fi
-# 3. Last resort — the usual project roots, scanned and matched the same way (by content).
-if [ -z "$VAULT" ]; then
-  for CANDIDATE in /c/projects/*/ "$HOME"/*/; do
-    if [ -d "$CANDIDATE/.obsidian" ] && [ -d "$CANDIDATE/Logos" ]; then VAULT="${CANDIDATE%/}"; break; fi
-  done
-fi
-echo "VAULT=$VAULT"
-```
-
-Never replace this search with a literal path, and never "simplify" it back to the walk-up alone —
-the walk-up alone resolves nothing when a tool is invoked from the code repo, which is the normal case.
-
-If `$VAULT` is empty, tell the user in Russian: «Не нашёл хранилище Obsidian (папку `.obsidian`). Запусти скилл из папки хранилища.» — then stop.
+Resolve `VAULT` (the folder holding both `.obsidian/` and `Logos/`) and `CODE`
+(`$(dirname "$VAULT")/Logos`) with the search procedure in the paths section of
+`${CLAUDE_PLUGIN_ROOT}/references/logos-project.md`; never hard-code the path. If the vault is not
+found, tell the user in Russian as that reference instructs, then stop.
 
 The design root is `$VAULT/Logos/Дизайн`. Create it if missing: `mkdir -p "$VAULT/Logos/Дизайн"`.
 You (the orchestrator) own all path construction — resolve concrete paths yourself and pass them
@@ -176,7 +113,7 @@ sharpest first use case and why it, who the system is for, how the user interact
 couple of quick gap-fillers, and do NOT ask about tech stack — that is Phase 2.
 
 When you have enough, write `Концепт.md` yourself (it is short — inline, no agent) following the
-`Концепт` template in `references/design-templates.md`, all Russian headings. Then summarize to the
+`Концепт` template in `${CLAUDE_PLUGIN_ROOT}/references/design-templates.md`, all Russian headings. Then summarize to the
 user in Russian and ask: «Концепт записал в Logos/Дизайн/Концепт.md. Посмотри — всё верно? Что уточнить перед тем, как созывать совет?»
 
 Iterate until the user confirms. The vault auto-syncs via `obsidian-git` — no manual git commit.
@@ -241,7 +178,7 @@ verbatim):
 Agent(subagent_type="logos-orchestration-architect", prompt="
 Your mode: skeleton.
 Read <VAULT>/Logos/Дизайн/Концепт.md (source of truth for WHAT is built).
-Write the baseline architecture skeleton to the shared draft <VAULT>/Logos/Дизайн/_черновики/Черновик-архитектуры.md, filling all eleven sections of the 'Архитектура' template in references/design-templates.md at a high level — make Иерархия оркестрации deep, keep the other domains high-level and park their deep decisions in 'Риски и открытые вопросы' for the specialists.
+Write the baseline architecture skeleton to the shared draft <VAULT>/Logos/Дизайн/_черновики/Черновик-архитектуры.md, filling all eleven sections of the 'Архитектура' template in ${CLAUDE_PLUGIN_ROOT}/references/design-templates.md at a high level — make Иерархия оркестрации deep, keep the other domains high-level and park their deep decisions in 'Риски и открытые вопросы' for the specialists.
 Discussion-log path (do not touch it in skeleton mode): <VAULT>/Logos/Дизайн/_черновики/Журнал-обсуждения.md.
 Council roster and order: оркестрация (lead, skeleton) → память → модели → автономность → фронтенд → ресурсы (last).
 User's architectural constraints (hard bounds — never violate): <paste verbatim>.
@@ -262,10 +199,10 @@ Your mode: contribute.
 Read <VAULT>/Logos/Дизайн/Концепт.md, the shared draft <VAULT>/Logos/Дизайн/_черновики/Черновик-архитектуры.md, and the discussion log <VAULT>/Logos/Дизайн/_черновики/Журнал-обсуждения.md in full.
 (1) Deepen your owned section of the draft with concrete, opinionated decisions; edit it in place, leave other domains intact.
 (2) Critically review the rest of the draft and open NEW discussion-log entries (status открыт) addressed at the role that owns each weak spot.
-SIMPLICITY IS BINDING (references/design-templates.md «Simplicity requirement», references/logos-project.md §4 point 0): design the SMALLEST set of mechanisms that delivers the concept. Before you add any mechanism, answer two questions in the draft's own words — which present need it serves, and what the owner would see if it were not built. A mechanism for a problem that has not happened is not designed. Failure handling is one sentence (the owner sees the failure honestly and decides), never retries/fallbacks/guards/thresholds. When you review others, a mechanism you find unnecessary is a legitimate concern to raise («зачем это, что будет без этого?») — cutting is as much your job as deepening.
+SIMPLICITY IS BINDING (${CLAUDE_PLUGIN_ROOT}/references/design-templates.md «Simplicity requirement», ${CLAUDE_PLUGIN_ROOT}/references/logos-project.md §4 point 0): design the SMALLEST set of mechanisms that delivers the concept. Before you add any mechanism, answer two questions in the draft's own words — which present need it serves, and what the owner would see if it were not built. A mechanism for a problem that has not happened is not designed. Failure handling is one sentence (the owner sees the failure honestly and decides), never retries/fallbacks/guards/thresholds. When you review others, a mechanism you find unnecessary is a legitimate concern to raise («зачем это, что будет без этого?») — cutting is as much your job as deepening.
 Council roster and order: оркестрация (lead) → память → модели → автономность → фронтенд → ресурсы (last).
 User's architectural constraints (hard bounds — never violate): <paste verbatim>.
-Follow the 'Архитектура' template in references/design-templates.md. Reference the concept as [[Концепт]]. Do not include runnable code.
+Follow the 'Архитектура' template in ${CLAUDE_PLUGIN_ROOT}/references/design-templates.md. Reference the concept as [[Концепт]]. Do not include runnable code.
 ")
 ```
 
@@ -301,7 +238,7 @@ Dispatch the **logos-synthesizer** agent:
 Agent(subagent_type="logos-synthesizer", prompt="
 Read <VAULT>/Logos/Дизайн/Концепт.md, the converged shared draft <VAULT>/Logos/Дизайн/_черновики/Черновик-архитектуры.md, and the discussion log <VAULT>/Logos/Дизайн/_черновики/Журнал-обсуждения.md in full.
 User's architectural constraints (hard bounds): <paste verbatim>.
-Start from the converged draft (the council already decided) and polish it into the final document at <VAULT>/Logos/Дизайн/Архитектура.md following references/design-templates.md section 'Архитектура'. Verify every решён question is consistently reflected; fold anything left open into 'Риски и открытые вопросы'.
+Start from the converged draft (the council already decided) and polish it into the final document at <VAULT>/Logos/Дизайн/Архитектура.md following ${CLAUDE_PLUGIN_ROOT}/references/design-templates.md section 'Архитектура'. Verify every решён question is consistently reflected; fold anything left open into 'Риски и открытые вопросы'.
 Reference the concept as [[Концепт]].
 For contested decisions, append a short parenthetical rationale so the reader sees the trade-off was deliberate.
 Return: 'Ключевые решения' (3–4 lines) and 'Ключевые споры и как разрешены' (per major contested point: which lens objected, the worry, and how the council settled it).
@@ -325,7 +262,7 @@ NOT leave anything waiting on the user.
    разрешены»), then invite corrections openly:
    «Вот архитектура и ключевые решения. Что поправить?»
 2. **Record each key decision in the journal.** For every key decision from the synthesizer, write a
-   journal entry following `references/diary-format.md` — one note per decision under
+   journal entry following `${CLAUDE_PLUGIN_ROOT}/references/diary-format.md` — one note per decision under
    `$VAULT/Logos/Журнал/`, with `тип: решение`, the matching `область`, `статус: принято`,
    `вес: 5` (the assistant's importance estimate). Also record each major contested
    point from «Ключевые споры и как разрешены» as `тип: наблюдение` (or `тип: тупик` if the council
@@ -354,7 +291,7 @@ Triggered by "давай добавим в дизайн", "а что если", 
    `Концепт.md` inline. For a brand-new subsystem (or any element) that deserves its own deep
    document, do NOT write it inline — run **Phase 4 — Module detailing** so the council works it out,
    producing `$VAULT/Logos/Дизайн/Модули/<Русское-имя>.md`.
-3. **Record the change in the journal** per `references/diary-format.md`: a `тип: решение` (or
+3. **Record the change in the journal** per `${CLAUDE_PLUGIN_ROOT}/references/diary-format.md`: a `тип: решение` (or
    `тип: откат` if it reverses a prior decision) entry, `статус: принято`. No review gate; if the
    user later asks to change it, keep the entry consistent exactly as in Phase 2.7.
 4. Echo a short diff-summary to the user in Russian and iterate.
@@ -367,7 +304,7 @@ architecture is deliberately the broad system picture and leaves gaps inside eac
 closes those gaps for ONE element by running the SAME deliberative council, scoped to that element,
 and produces a single deep, build-ready document at `$VAULT/Logos/Дизайн/Модули/<Русское-имя>.md`. It
 reuses the council agents in their **`module-detailing`** mode, following the «Детализация модуля»
-protocol in `references/design-templates.md`. Run it once per element; the user can ask for several
+protocol in `${CLAUDE_PLUGIN_ROOT}/references/design-templates.md`. Run it once per element; the user can ask for several
 elements in turn.
 
 **Precondition:** `Архитектура.md` must exist (the module is detailed *against* it). If it does not,
@@ -401,8 +338,8 @@ mode:
 Agent(subagent_type="logos-orchestration-architect", prompt="
 Your mode: module-detailing.
 Lead the deep-dive on the system element '<имя>'. Read <VAULT>/Logos/Дизайн/Концепт.md and <VAULT>/Logos/Дизайн/Архитектура.md (source of truth) in full.
-Create the module draft at <VAULT>/Logos/Дизайн/_черновики/Черновик-модуля-<имя>.md from the 'Модуль' template in references/design-templates.md, following the «Детализация модуля» protocol there. Fill every Модуль section at a high level from the architecture, make the orchestration/control aspects of this element deep, and park the deep per-lens decisions in 'Открытые вопросы' for the specialists.
-SIMPLICITY IS BINDING (references/design-templates.md «Simplicity requirement»): the module is the SMALLEST set of mechanisms that delivers this element's purpose; every mechanism names its present need; «Как ведёт себя при сбое» is one sentence (the owner sees the failure honestly), never a catalogue of cases with a mechanism each.
+Create the module draft at <VAULT>/Logos/Дизайн/_черновики/Черновик-модуля-<имя>.md from the 'Модуль' template in ${CLAUDE_PLUGIN_ROOT}/references/design-templates.md, following the «Детализация модуля» protocol there. Fill every Модуль section at a high level from the architecture, make the orchestration/control aspects of this element deep, and park the deep per-lens decisions in 'Открытые вопросы' for the specialists.
+SIMPLICITY IS BINDING (${CLAUDE_PLUGIN_ROOT}/references/design-templates.md «Simplicity requirement»): the module is the SMALLEST set of mechanisms that delivers this element's purpose; every mechanism names its present need; «Как ведёт себя при сбое» is one sentence (the owner sees the failure honestly), never a catalogue of cases with a mechanism each.
 Module discussion-log path (do not touch it in skeleton mode): <VAULT>/Logos/Дизайн/_черновики/Журнал-обсуждения-модуля-<имя>.md.
 Council roster and order for this element: оркестрация (lead) → <only the relevant lenses, resource last>.
 User's architectural constraints (hard bounds — never violate): <paste verbatim>.
@@ -438,7 +375,7 @@ Agent(subagent_type="logos-synthesizer", prompt="
 Close a module-detailing round for the element '<имя>'.
 Read <VAULT>/Logos/Дизайн/Архитектура.md, the converged module draft <VAULT>/Logos/Дизайн/_черновики/Черновик-модуля-<имя>.md, and the module discussion log <VAULT>/Logos/Дизайн/_черновики/Журнал-обсуждения-модуля-<имя>.md in full.
 User's architectural constraints (hard bounds): <paste verbatim>.
-Polish the converged draft into the final module document at <VAULT>/Logos/Дизайн/Модули/<имя>.md following the 'Модуль' template and the «Детализация модуля» protocol in references/design-templates.md. Verify every решён question is reflected; fold anything left open into 'Открытые вопросы'.
+Polish the converged draft into the final module document at <VAULT>/Logos/Дизайн/Модули/<имя>.md following the 'Модуль' template and the «Детализация модуля» protocol in ${CLAUDE_PLUGIN_ROOT}/references/design-templates.md. Verify every решён question is reflected; fold anything left open into 'Открытые вопросы'.
 Reference the architecture as [[Архитектура]] and sibling modules as [[Модули/<имя>]].
 Return: 'Ключевые решения' (3–4 lines) and 'Ключевые споры и как разрешены', scoped to this element.
 Do not include runnable code, and do not mention the council/draft/discussion-log inside the document.
@@ -457,7 +394,7 @@ fixes, re-dispatch ONLY the synthesizer (or edit inline) — do NOT re-run the w
 
 ## Phase 5 — Decomposition of an oversized document (mechanical split, no council)
 
-A design document that outgrew the size rule in `references/design-templates.md` ("Document
+A design document that outgrew the size rule in `${CLAUDE_PLUGIN_ROOT}/references/design-templates.md` ("Document
 decomposition") is split into a hub note plus one page per responsibility. This is a MOVE, not a redesign:
 no design decision is taken, nothing is reworded, and the council is NOT convened. Run it when the user
 asks to split a document, or when `logos-sync` reports one over the ceiling.
@@ -533,7 +470,7 @@ auto-commits, so a stray `.md.bak` becomes a second copy of the whole document i
 base and the next lint run reads it as a real note.
 
 Then write ONE journal entry (`тип: наблюдение`, `область` matching the element) per
-`references/diary-format.md`: which document was decomposed, into how many pages, and the resulting sizes.
+`${CLAUDE_PLUGIN_ROOT}/references/diary-format.md`: which document was decomposed, into how many pages, and the resulting sizes.
 
 ## General rules
 

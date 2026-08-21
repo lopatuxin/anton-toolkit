@@ -1,21 +1,14 @@
 ---
 name: yt-competitors
 description: >
-  IMPORTANT: Invoke this skill via the Skill tool IMMEDIATELY when the user
-  asks to analyse competitor channels, scan a niche, find what works in the
-  niche, compare with competitors, or look at niche trends. Do NOT skip —
-  this skill contains the analysis framework, single-channel and batch
-  templates, and the niche-query construction procedure in references/.
-
-  Trigger phrases (Russian): "проанализируй конкурента", "разбор конкурента",
-  "анализ конкурентов", "анализ ниши", "что делают конкуренты", "сравни с
-  конкурентами", "тренды в нише", "топ каналы в нише", "разбери канал X",
-  "посмотри конкурентов", "посмотри что у других", "что заходит в нише",
-  "какие темы заходят".
-
-  Two modes: SINGLE (one competitor — deep dive) and BATCH (niche scan
-  across channels above a subscriber threshold). Do NOT analyse the user's
-  own channel here — that is yt-my-channel.
+  Analyses competitor channels on YouTube and writes the report to the
+  Obsidian vault. Two modes, chosen from the request: SINGLE — one named
+  channel, deep dive; BATCH — a niche scan across channels above a
+  subscriber threshold, whose search queries are built from the user's own
+  channel context plus competitor seeds the user names. The user's own
+  channel is only context here — analysing it is `yt-my-channel`, and the
+  report feeds `yt-ideas` rather than generating ideas itself.
+disable-model-invocation: true
 ---
 
 # yt-competitors — competitor and niche analysis
@@ -26,8 +19,8 @@ Analyse one competitor (deep dive) or scan a niche (batch). In batch mode the se
 
 Pick the mode from how the user framed the request:
 
-- **SINGLE** — user named one channel ("разбери канал @X", "проанализируй <ссылка>"). Use `references/single-mode.md`.
-- **BATCH** — user said "ниша", "конкуренты" (plural), "тренды", "топ каналы". Use `references/batch-mode.md`.
+- **SINGLE** — user named one channel ("разбери канал @X", "проанализируй <ссылка>"). Use `${CLAUDE_SKILL_DIR}/references/single-mode.md`.
+- **BATCH** — user said "ниша", "конкуренты" (plural), "тренды", "топ каналы". Use `${CLAUDE_SKILL_DIR}/references/batch-mode.md`.
 
 If unclear, ask once: "Один канал глубоко или сводный анализ ниши?"
 
@@ -41,7 +34,7 @@ If unclear, ask once: "Один канал глубоко или сводный 
 4. For the top 10, `getVideoDetails` — title, duration, publish date, tags, description.
 5. `getVideoEngagementRatio` on the same set.
 6. Inspect last 10 uploads (not just top) to see current direction.
-7. Build the report using `references/single-mode.md`.
+7. Build the report using `${CLAUDE_SKILL_DIR}/references/single-mode.md`.
 
 ## BATCH — niche scan
 
@@ -57,7 +50,7 @@ In batch mode, build the niche query from the user's own channel context (this i
    - `getChannelTopVideos` (top 5–10).
    - Read each top video's title, tags, and description.
 
-3. **Construct niche queries** using the procedure in `references/niche-query.md`. Produce **8–15 queries** (was 4–8 — widened because the previous range systematically under-covered the niche). Coverage requirements:
+3. **Construct niche queries** using the procedure in `${CLAUDE_SKILL_DIR}/references/niche-query.md`. Produce **8–15 queries** (was 4–8 — widened because the previous range systematically under-covered the niche). Coverage requirements:
    - At least 2 tool-anchored queries (Cursor, Claude Code, Cline, Windsurf, v0, …).
    - At least 2 outcome-anchored queries ("сделал приложение за", "запустил стартап за", "сэкономил время с ai").
    - At least 2 process/workflow queries ("vibe coding", "ai-разработка", "ai-ассистент для кода").
@@ -77,11 +70,11 @@ In batch mode, build the niche query from the user's own channel context (this i
 
 9. **Sanity check coverage before writing the report.** If the deduped candidate pool from steps 4–5 contains fewer than 25 distinct channels, the scan is too narrow — add 2–4 more queries from neighbouring angles and re-run search before producing the report.
 
-10. **Build the niche report** using `references/batch-mode.md`.
+10. **Build the niche report** using `${CLAUDE_SKILL_DIR}/references/batch-mode.md`.
 
 ## Analysis framework
 
-Apply the framework in `references/analysis-framework.md`:
+Apply the framework in `${CLAUDE_SKILL_DIR}/references/analysis-framework.md`:
 - Hook formulas (extract reusable patterns from titles)
 - Periodicity (uploads per month, gap distribution)
 - Length distribution and the format–length link

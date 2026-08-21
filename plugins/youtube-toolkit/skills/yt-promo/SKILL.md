@@ -1,22 +1,14 @@
 ---
 name: yt-promo
 description: >
-  IMPORTANT: Invoke this skill via the Skill tool IMMEDIATELY when the user
-  asks about promotion strategy, channel growth, lead generation, attracting
-  orders, conversion, pinned comments, end-screens, or how to monetise the
-  channel commercially. Do NOT skip — this skill contains the on-channel
-  lead-gen patterns and funnel design in references/.
-
-  Trigger phrases (Russian): "продвижение канала", "как раскрутить канал",
-  "лидген на канале", "лиды с ютуба", "стратегия роста канала", "привлечь
-  заказы", "как продавать через канал", "конверсия в заказы", "закреп под
-  видео", "что писать в pinned комментарий", "end screen для видео",
-  "конечная заставка", "воронка с ютуба".
-
-  This skill covers ON-CHANNEL lead generation only: pinned comments,
-  end-screens, in-video and in-description CTAs, funnel into the
-  business-card site. It does NOT cover cross-promo posts on other
-  platforms (Telegram, Habr, etc.) — those are out of scope.
+  Designs the channel's on-channel lead generation and saves the artefact to
+  the Obsidian vault. Four request types: audit the current setup, write the
+  pinned comment for one video, plan a video's end-screen, or design the
+  funnel from view to contact to order. Covers only what happens on the
+  channel itself — pinned comments, end-screens, in-video and in-description
+  CTAs, the path into the business-card site; cross-promo posts on Telegram,
+  Habr and other platforms are out of scope.
+disable-model-invocation: true
 ---
 
 # yt-promo — on-channel lead generation
@@ -33,13 +25,13 @@ Design and refine the on-channel lead-gen system: pinned comments, end-screens, 
 
    Match the request type to the relevant section below.
 
-2. **Apply on-channel patterns** from `references/on-channel.md`:
+2. **Apply on-channel patterns** from `${CLAUDE_SKILL_DIR}/references/on-channel.md`:
    - Pinned comment patterns
    - End-screen elements (subscribe, related video, playlist)
    - In-video mid-roll CTA timing
    - In-description CTA placement
 
-3. **Apply funnel rules** from `references/funnel.md`:
+3. **Apply funnel rules** from `${CLAUDE_SKILL_DIR}/references/funnel.md`:
    - The single-destination rule (one CTA per video, one place to click)
    - Soft → medium → explicit ladder (let viewers self-select)
    - Pre-site mode (placeholder) vs post-site mode (real URL) handling

@@ -1,12 +1,12 @@
 ---
 name: idea
 description: >
-  Capture and develop personal ideas as well-structured Obsidian notes. Each idea is its own
-  note under Личная/Идеи, written as light documentation — not a verbatim transcript: reword and
-  organize for clarity, but never change the essence or invent content the user did not say.
-  Two flows, inferred from the command argument: create a NEW idea note, or REFINE/augment an
-  existing one with more detail. Invoked explicitly via the /idea command only — no auto-trigger.
-  For raw diary capture use `dnevnik`.
+  Captures and develops personal ideas as Obsidian notes, one note per idea under Личная/Идеи,
+  written as light documentation: wording and structure are reworked for clarity, the essence is
+  never changed and nothing the user did not say is added. Two flows, chosen from the command
+  argument: create a new idea note, or refine an existing one by merging new detail into it.
+  Unlike `dnevnik` (raw diary capture, verbatim), this skill may rephrase and reorganize.
+disable-model-invocation: true
 ---
 
 # Idea — capture and develop ideas in the Obsidian vault

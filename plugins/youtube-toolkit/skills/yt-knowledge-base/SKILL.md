@@ -1,26 +1,14 @@
 ---
 name: yt-knowledge-base
 description: >
-  IMPORTANT: Invoke this skill via the Skill tool IMMEDIATELY when the user
-  asks to build, refresh, or update the local YouTube knowledge base for
-  their own channel — a persistent on-disk dataset of every video (metadata
-  card + transcript + top/fail classification) that downstream skills consume
-  as context. Do NOT skip — this skill contains the data-collection
-  procedure, segmentation rules, and the file layout other skills rely on
-  in references/.
-
-  Trigger phrases (Russian): "собери базу по моему каналу", "собери базу
-  знаний канала", "обнови базу видео", "обнови БД канала", "загрузи мои
-  видео в БД", "база знаний канала", "yt-knowledge-base", "построй базу
-  канала", "пересобери базу видео".
-
-  Two modes: INIT (full build from scratch — every video on the channel)
-  and REFRESH (incremental — new videos since last run + refreshed metrics
-  for existing ones). The skill auto-detects which mode applies by checking
-  whether the vault folder already has content.
-
-  Do NOT use this skill for one-off channel analysis — that is yt-my-channel.
-  Do NOT use this skill for competitor data — that is yt-competitors.
+  Builds and maintains the knowledge base of the user's own channel in the
+  Obsidian vault: one card per video (metadata, statistics, transcript) plus
+  a channel snapshot and index, every video classified top / fail / neutral
+  against channel medians. Two modes, auto-detected from the folder's state:
+  INIT (full build) and REFRESH (new videos plus updated metrics). Data
+  collection only — downstream skills read these files, one-off analysis is
+  `yt-my-channel`, competitor data is `yt-competitors`.
+disable-model-invocation: true
 ---
 
 # yt-knowledge-base — persistent channel knowledge base
@@ -83,15 +71,15 @@ After all video stats are loaded, compute on the full set:
 - `median_views_per_day` — for each video, `viewCount / max(days_since_publish, 1)`; take the median.
 - `median_engagement` — `(likeCount + commentCount) / max(viewCount, 1)`; take the median.
 
-Apply the rules in `references/segmentation.md` to classify each video as `top` / `fail` / `neutral`. Always normalize by video age (use views-per-day, not absolute views) — a 3-year-old video naturally accumulates more views than a 3-month-old one.
+Apply the rules in `${CLAUDE_SKILL_DIR}/references/segmentation.md` to classify each video as `top` / `fail` / `neutral`. Always normalize by video age (use views-per-day, not absolute views) — a 3-year-old video naturally accumulates more views than a 3-month-old one.
 
 ### Step 6 — Write the files
 
-For each video, write `C:\projects\obsidian\youtube\база\видео\<slug>.md` using the template in `references/video-card-template.md`. Use the SAME slug rules as the rest of the vault (Cyrillic, lowercase, kebab-case, derived from working title — see `${CLAUDE_PLUGIN_ROOT}/references/vault.md`).
+For each video, write `C:\projects\obsidian\youtube\база\видео\<slug>.md` using the template in `${CLAUDE_SKILL_DIR}/references/video-card-template.md`. Use the SAME slug rules as the rest of the vault (Cyrillic, lowercase, kebab-case, derived from working title — see `${CLAUDE_PLUGIN_ROOT}/references/vault.md`).
 
 In REFRESH mode for EXISTING videos: read the existing file, preserve the transcript body (it doesn't change), update only frontmatter metrics (`view_count`, `like_count`, `comment_count`, `classification`, `classification_reason`, `last_updated`). Do NOT re-fetch the transcript if it was already saved successfully — transcripts don't change.
 
-Write `канал.md` using the template in `references/channel-snapshot-template.md`. Write `индекс.md` as a sortable table — one row per video with title, slug, published_at, views, classification.
+Write `канал.md` using the template in `${CLAUDE_SKILL_DIR}/references/channel-snapshot-template.md`. Write `индекс.md` as a sortable table — one row per video with title, slug, published_at, views, classification.
 
 ### Step 7 — Report in Russian
 
@@ -126,6 +114,6 @@ The skill itself must keep the file layout stable so consumers don't break.
 - This skill is data collection ONLY. Do NOT produce analysis, recommendations, or ideas — those belong to `yt-my-channel` / `yt-ideas`.
 - Do NOT write outside `C:\projects\obsidian\youtube\база\`.
 - Do NOT touch other vault folders (`канал\`, `идеи\`, `сценарии\`, etc.).
-- Do NOT classify based on absolute view counts — always normalize by age (see `references/segmentation.md`).
+- Do NOT classify based on absolute view counts — always normalize by age (see `${CLAUDE_SKILL_DIR}/references/segmentation.md`).
 - Do NOT skip the transcript fetch silently — if it failed, record `transcript_available: false` so the user knows.
 - Do NOT delete files for videos that disappeared from the API response (the video may be unlisted/private temporarily). Mark `last_seen` instead in a future iteration; for now, leave stale files alone.

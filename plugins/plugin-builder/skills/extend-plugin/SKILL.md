@@ -1,20 +1,13 @@
 ---
 name: extend-plugin
 description: >
-  Proactively extend an existing plugin in the anton-toolkit-marketplace:
-  add a new skill, add a new agent, add references, or substantially rework
-  an existing component. Triggered in a fresh session when the user wants to
-  add functionality (not fix a recent incident). Example phrases: "добавь в
-  плагин", "допили скилл", "расширь плагин", "хочу в <name> добавить", "нужно
-  дополнить плагин".
-
-  Discrimination: only trigger when the target plugin already exists AND
-  there was NO incident with that plugin in the current session. If an
-  incident just happened, delegate to `improve-plugin`. If the plugin does
-  not yet exist, delegate to `create-plugin`.
-
-  This skill runs DIRECTLY in conversation. Do NOT launch agents for the
-  interview part.
+  Extends an existing plugin in the anton-toolkit-marketplace — adds a skill, an agent, or references,
+  or substantially reworks an existing component. Use in a fresh session when the target plugin already
+  exists and the user wants added functionality; if an incident with that plugin just happened use
+  improve-plugin, and if the plugin does not exist yet use create-plugin. Runs in the main
+  conversation; the interview is not delegated to agents.
+when_to_use: >
+  "добавь в плагин", "допили скилл", "расширь плагин", "нужно дополнить плагин"
 ---
 
 # Extend Plugin — guided plugin extension

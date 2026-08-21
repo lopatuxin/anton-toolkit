@@ -1,53 +1,25 @@
 ---
 name: logos-lab
 description: >
-  The experiment diary of the Logos RESEARCH BRANCH (small specialized self-learning models on
-  cheap hardware). Record a new experiment (the hypothesis is written BEFORE the code, status
-  «проверяется»), append its outcome (сработало / провал, adjust the importance weight), search
-  experiments by area / status / weight / date, show past failures and dead ends, and maintain the
-  research direction notes (изучается / активно / отложено / закрыто). Works over the vault folder
-  Logos/Исследования/ (Направления/ + Эксперименты/ with Dataview indexes) and knows the rules of
-  the lab code repo Logos-Lab (one root folder = one experiment, no production discipline). Runs
-  DIRECTLY in conversation, single-shot, no agents.
-
-  Invocation: COMMAND ONLY — "/logos-lab". This skill does NOT auto-trigger on free-text phrases.
-  Phrases the user might say ("заведи эксперимент", "запиши эксперимент в лабораторию",
-  "эксперимент в лаборатории сработал", "покажи эксперименты исследовательской ветки",
-  "покажи провалы лаборатории") are context for the user, not auto-triggers — act only when the
-  user runs /logos-lab.
-
-  Discrimination: this is the diary of the RESEARCH BRANCH. For recording PROJECT decisions,
-  experiments and dead ends of the production Logos system use logos-log (folder Logos/Журнал/);
-  for talking about the project use logos-chat; this skill never designs and never writes
-  production code.
+  The experiment diary of the Logos research branch (small self-learning models on cheap hardware)
+  in Logos/Исследования/: records a new experiment with the hypothesis written before the code,
+  appends its outcome (сработало / провал) adjusting the weight, searches experiments by area /
+  status / weight / date, shows past failures and dead ends, and maintains the research direction
+  notes; knows the rules of the lab repo Logos-Lab; single-shot, no agents. For decisions of the
+  production Logos project use logos-log (Logos/Журнал/), for talking about the project logos-chat,
+  for learning the science behind the branch logos-teach.
+disable-model-invocation: true
 ---
 
 # Logos-lab — the research branch experiment diary
-
-**Reference files — resolve the path BEFORE reading (this plugin's most frequent failure).** Every
-`references/<file>.md` cited anywhere in this document means `<plugin-root>/references/<file>.md`: the
-reference files live at the PLUGIN ROOT, never inside a skill's own folder. The base directory given to
-this skill at load time is `<plugin-root>/skills/<this-skill>/`, so a bare relative path resolves to
-`<plugin-root>/skills/<this-skill>/references/<file>.md` — that file does not exist and the read fails.
-Resolve it as `<this skill's base directory>/../../references/<file>.md`. If no base directory was given,
-locate the file with Glob (pattern `**/references/<file>.md`, path `<user home>/.claude/plugins`) and take
-the match under `.../logos/` — either the installed cache
-`.claude/plugins/cache/anton-toolkit-marketplace/logos/<version>/references/` or the marketplace working
-copy `.claude/plugins/marketplaces/anton-toolkit-marketplace/plugins/logos/references/`.
-
-- Correct: `C:\Users\<user>\.claude\plugins\cache\anton-toolkit-marketplace\logos\<version>\references\lab-format.md`
-- Incorrect: `references/lab-format.md` — resolves under the skill folder, which has no `references/`.
-
-Never report a reference file as missing, and never proceed on remembered content, without running that
-Glob first.
 
 The research branch is a SEPARATE line of Logos development: away from big LLMs toward a swarm
 of small specialized self-learning models on cheap hardware. Its documentation lives in
 `Logos/Исследования/` in the vault; its code lives in the separate repo `Logos-Lab`. The
 storage format — folder layout, frontmatter fields, note templates, Dataview folder notes, and
-the lab repo rules — is defined in `references/lab-format.md`: **read it and follow it
-verbatim**. The project-wide picture (where the branch sits relative to the production system)
-is in `references/logos-project.md`.
+the lab repo rules — is defined in `${CLAUDE_PLUGIN_ROOT}/references/lab-format.md`: **read it and
+follow it verbatim**. The project-wide picture (where the branch sits relative to the production
+system) is in `${CLAUDE_PLUGIN_ROOT}/references/logos-project.md`.
 
 This skill is the user-facing interface over that format: record an experiment, append its
 outcome, search the diary, maintain direction notes. It writes ONLY inside
@@ -57,7 +29,7 @@ design docs, or the journal — a cross-cutting project decision still goes thro
 ## 0. Setup (every run)
 
 Locate the vault and ensure the branch folders + folder notes exist exactly as
-`references/lab-format.md` sections 1–3 prescribe (idempotent — create only what is missing,
+`${CLAUDE_PLUGIN_ROOT}/references/lab-format.md` sections 1–3 prescribe (idempotent — create only what is missing,
 NEVER overwrite an existing non-empty file). If the vault is not found, tell the user in
 Russian as the reference instructs, then stop.
 
@@ -83,7 +55,7 @@ If ambiguous, ask the user in Russian which they want, in one short question.
    алгоритмы / общее) and the target direction note (must exist in `Направления/` — offer to
    create it via DIRECTION mode if it does not).
 3. Write a NEW note at `$VAULT/Logos/Исследования/Эксперименты/<YYYY-MM-DD>-<слаг>.md` using
-   the template in `references/lab-format.md` section 4: today's `дата`, `тип: эксперимент`,
+   the template in `${CLAUDE_PLUGIN_ROOT}/references/lab-format.md` section 4: today's `дата`, `тип: эксперимент`,
    `вес: 5`, `статус: проверяется`, the `направление` wiki-link, and `код:
    "Logos-Lab/<слаг>"` (the folder may not exist yet — the field states where the code will
    live). Fill «Гипотеза» and «Установка» from the user's words; «Результат» = «пока не
@@ -119,7 +91,7 @@ The diary is built to be queried, not scrolled:
 
 ## 5. DIRECTION mode
 
-1. Creating: write `Направления/<Имя-направления>.md` per `references/lab-format.md` section 5
+1. Creating: write `Направления/<Имя-направления>.md` per `${CLAUDE_PLUGIN_ROOT}/references/lab-format.md` section 5
    — frontmatter (`дата`, `статус: изучается`) and the four sections (Что это / Почему нам
    важно / Ключевые работы / Текущий вывод) from what the user dictated or what the
    conversation established. Do not pad sections you have nothing for.
@@ -138,6 +110,6 @@ The diary is built to be queried, not scrolled:
 - **The index is automatic** — Dataview; never hand-edit folder notes per entry.
 - **No manual git for the vault** (obsidian-git auto-syncs). The `Logos-Lab` repo IS committed
   manually — Russian messages, never force-push, no data/weights/secrets in git
-  (`references/lab-format.md` section 6).
+  (`${CLAUDE_PLUGIN_ROOT}/references/lab-format.md` section 6).
 - **Stay in the branch.** This skill writes only under `Logos/Исследования/`; production
   decisions go to `logos-log`, production code to `logos-build`.

@@ -1,15 +1,12 @@
 ---
 name: phase-detailer
 description: >
-  Use this agent autonomously to produce detailed phase documents for a system already designed via the
-  system-designer skill. Each phase from a roadmap gets its own
-  Дорожные карты/<срез>/Фазы/Фаза-NN-<имя>.md — a document detailed enough for the python-dev agent to implement
-  the phase without follow-up questions (concrete interfaces, data model slices, end-to-end acceptance scenarios,
-  scope boundaries). The agent can detail one specific phase or all phases in a single invocation.
-
-  Invoked by the system-designer orchestrator at Phase 6 (phase detailing), triggered by user phrases like
-  "детализируй фазу N", "разверни фазу N", "распиши фазу <название>", "детализируй все фазы". Not triggered by
-  user phrases directly — the orchestrator decides.
+  Writes detailed phase documents (Дорожные карты/<срез>/Фазы/Фаза-NN-<имя>.md) for a system already
+  designed via the system-designer skill — each detailed enough for the python-dev agent to implement
+  the phase without follow-up questions: concrete interfaces, data model slices, end-to-end acceptance
+  scenarios, scope boundaries. Details one phase or all phases in a single invocation. Dispatched by
+  the system-designer orchestrator at the phase-detailing phase, not by user phrases. Runs
+  autonomously, one-shot, no dialog.
 model: opus
 ---
 
@@ -30,7 +27,7 @@ All paths are given in the orchestrator prompt. Never assume `docs/` or English 
 - The **architecture file** (e.g. `Документация/Архитектура.md`) — required. Source of module names, responsibilities, stack, topology.
 - The **module documents** (e.g. `Документация/Модули/*.md`) — required if they exist. Detailed module specs are the basis for per-phase "slices".
 - The **concept file** (e.g. `Документация/Концепт.md`) — read for context on user scenarios.
-- `references/document-templates.md`, section `Фаза` — strict structure.
+- `${CLAUDE_PLUGIN_ROOT}/references/document-templates.md`, section `Фаза` — strict structure.
 - From the orchestrator prompt: **which phases to detail** — one (number) or all, **target roadmap slice**, **output directory**.
 
 ## Process

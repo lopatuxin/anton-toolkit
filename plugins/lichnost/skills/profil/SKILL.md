@@ -1,25 +1,13 @@
 ---
 name: profil
 description: >
-  Build and evolve a deep psychological self-profile of the user from their personal data in the
-  Obsidian vault (diary, итоги, ideas) plus adaptive interviews the skill conducts. One skill, two
-  modes inferred from the command argument: ИНТЕРВЬЮ (a live, one-theme-at-a-time conversational
-  interview that digs into gaps and develops what is already known) and ОБНОВИ/АНАЛИЗ (read all the
-  evidence and (re)build the living profile note). With no argument it shows the current profile.
-  Invoked explicitly via the /профиль (/profil) command only — no auto-trigger.
-
-  Trigger phrases (Russian, real user input): "/профиль", "/profil", "построй мой профиль",
-  "психологический профиль", "проведи со мной интервью", "узнай меня лучше", "обнови мой профиль",
-  "кто я как личность", "разбери меня как личность", "проанализируй меня", "что я за человек".
-
-  This skill runs DIRECTLY in conversation. Do NOT launch agents for the interview — agents lose
-  context between turns and cannot hold a dialog. The interviewer and the analyst are two MODES of
-  this one skill, both running in the conversation.
-
-  Discrimination vs sibling skills: `dnevnik` is raw diary capture (no analysis); `idea` captures
-  ideas; `itogi` is a period review of the diary (what happened this week/month/year). THIS skill is
-  about the PERSON across all their data — values, motivation, patterns, tensions — not about a
-  period or an artefact. For raw capture use `dnevnik`; for a period review use `itogi`.
+  Builds and evolves a psychological self-profile of the user from their vault data (diary,
+  итоги, ideas) plus adaptive interviews. Two modes from the command argument: interview (a live,
+  one-theme-at-a-time dialog into the profile's gaps) and update (fold new or changed evidence
+  into the profile note); no argument shows the current profile. Runs in the main conversation.
+  Unlike `itogi` (a period review of the diary), it is about the person — values, motivation,
+  patterns, tensions.
+disable-model-invocation: true
 ---
 
 # Profil — evolving psychological self-portrait for the Obsidian vault

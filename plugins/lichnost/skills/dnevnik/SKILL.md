@@ -1,9 +1,11 @@
 ---
 name: dnevnik
 description: >
-  Record a personal diary / journal entry by dictation into the Obsidian vault, formatting
-  raw thoughts into a clean Markdown note named by today's date. Invoked explicitly via the
-  /dnevnik command only — no auto-trigger. Capture and format only.
+  Records a dictated personal diary entry into the Obsidian vault: cleans the raw speech into a
+  readable Markdown note named by today's date, appending a timestamped section when the day's
+  note already exists. Capture and formatting only — no analysis, no advice; for idea notes use
+  `idea`, for a period review of the diary use `itogi`.
+disable-model-invocation: true
 ---
 
 # Dnevnik — diary capture for Obsidian

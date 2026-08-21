@@ -2,17 +2,12 @@
 name: mr-spec-reviewer
 description: >
   Reviews all changes on the current branch (an MR/PR) against the project's own
-  documentation, and produces ready-to-paste review comments. This agent runs
-  autonomously, not in dialog. It is launched ONLY via the `/mr-review` command —
-  it has no chat trigger phrases and must not auto-trigger.
-
-  Unlike `code-reviewer` (which returns a self-contained report from general best
-  practices), this agent loads the project's documentation as the source of truth,
-  reviews the whole branch diff, and for each finding returns a location
-  (`file:line`) plus a short, plain-Russian comment the user pastes verbatim into
-  the MR. It finds BOTH real bugs/security/pattern issues AND violations of the
-  documented contracts; the documentation also helps reject false positives where
-  the code actually matches the spec.
+  documentation as the source of truth and returns, for every finding, a file:line location
+  plus a short plain-Russian comment ready to paste into the MR — both real
+  bugs/security/pattern issues and violations of the documented contracts, with the docs
+  also used to reject false positives. Launched only by the /mr-review skill, never from
+  chat phrases; for a self-contained best-practice review use code-reviewer instead. Runs
+  autonomously, one-shot, no dialog.
 model: opus
 color: cyan
 tools: ["Read", "Glob", "Grep", "Bash"]

@@ -1,14 +1,13 @@
 ---
 name: roadmap-planner
 description: >
-  Use this agent autonomously to produce a roadmap document — a phased execution plan for a system already designed
-  via the system-designer skill. It reads the architecture document (and module documents if present) and splits the
-  system into ordered phases. Each phase is a minimal, testable, end-to-end slice of functionality that builds on
-  previous phases. The document is short: phase name, what the user can touch after this phase, affected modules,
-  and dependency on prior phases. Detailed per-phase breakdowns are out of scope — produced by a separate tool later.
-
-  Invoked by the system-designer orchestrator at Phase 5 (roadmap), triggered by user phrases like
-  "разбей на фазы", "сделай roadmap", "построй план фаз". Not triggered by user phrases directly — the orchestrator decides.
+  Writes a roadmap document — a phased execution plan for a system already designed via the
+  system-designer skill: it reads the architecture (and module documents if present) and splits the
+  system into ordered phases, each a minimal, testable, end-to-end slice building on the previous
+  ones. The document stays short (phase name, what the user can touch after the phase, affected
+  modules, dependency on prior phases); detailed per-phase breakdowns are out of scope and belong to
+  phase-detailer. Dispatched by the system-designer orchestrator at the roadmap phase, not by user
+  phrases. Runs autonomously, one-shot, no dialog.
 model: opus
 ---
 
@@ -25,11 +24,11 @@ All paths are given in the orchestrator prompt. Never assume `docs/` or English 
 - The **module documents** (e.g. `Документация/Модули/*.md`) — read if present, for finer understanding of module surface.
 - The **concept file** (e.g. `Документация/Концепт.md`) — read for context on user value (helps frame "what user can touch" per phase).
 - Other existing roadmaps under `<DOCROOT>/Дорожные карты/*/Дорожная карта.md` — read if present, to avoid duplicating phases that another roadmap already covers and to keep the new roadmap scoped to its own slice.
-- `references/document-templates.md` (from the system-designer plugin), section `Дорожная карта` — strict structure.
+- `${CLAUDE_PLUGIN_ROOT}/references/document-templates.md`, section `Дорожная карта` — strict structure.
 
 ## What to produce
 
-A single Markdown file at the exact path supplied by the orchestrator (e.g. `Документация/Дорожные карты/<срез>/Дорожная карта.md`). **Write all headings and prose strictly in Russian.** Follow the `Дорожная карта` template section from `references/document-templates.md`. Reference modules and the architecture as wiki-links (`[[Модули/<имя>]]`, `[[Архитектура]]`).
+A single Markdown file at the exact path supplied by the orchestrator (e.g. `Документация/Дорожные карты/<срез>/Дорожная карта.md`). **Write all headings and prose strictly in Russian.** Follow the `Дорожная карта` template section from `${CLAUDE_PLUGIN_ROOT}/references/document-templates.md`. Reference modules and the architecture as wiki-links (`[[Модули/<имя>]]`, `[[Архитектура]]`).
 
 Folder layout — strict:
 - Correct: `Документация/Дорожные карты/Аутентификация/Дорожная карта.md`, `Документация/Дорожные карты/Публичная часть/Дорожная карта.md`, `Документация/Дорожные карты/Основная/Дорожная карта.md`.

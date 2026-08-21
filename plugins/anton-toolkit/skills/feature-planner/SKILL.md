@@ -1,28 +1,15 @@
 ---
 name: feature-planner
 description: >
-  IMPORTANT: Invoke this skill via the Skill tool IMMEDIATELY when the user
-  wants to plan a new feature, gather requirements, refine a task brief into
-  an actionable spec, or design something before implementation. Do NOT skip
-  the interview — feature implementation without confirmed scope produces
-  wrong results.
-
-  Trigger phrases: "спланируй фичу", "распланируй фичу", "разработай план реализации",
-  "продумай фичу", "спроектируй фичу", "хочу реализовать фичу", "нужно реализовать фичу",
-  "вот задача — спланируй", "вот документация — спланируй", "вот тз", "уточни детали",
-  "уточни нюансы", "помоги спланировать", "interview по фиче", "/feature-planner",
-  "/plan-feature", or any request to plan or design a feature before writing code.
-
-  Discrimination: this skill runs the REQUIREMENTS interview BEFORE implementation.
-  If the user already has a confirmed spec and only wants implementation — skip this
-  skill and delegate directly to the appropriate dev agent (java-dev, kotlin-dev,
-  python-dev, frontend-dev). If the user reports a bug — use `debug` instead. If the
-  feature is a new skill or agent for a plugin in the `anton-toolkit-marketplace` (not
-  product code) — use `improve-plugin` / `create-plugin` / `extend-plugin` instead.
-
-  This skill runs DIRECTLY in conversation. Do NOT launch subagents for the
-  interview part — subagents lose context between turns and cannot do iterative
-  dialog with the user.
+  Interview-driven feature planning: turns a vague idea, ticket, or brief into a confirmed,
+  actionable spec saved to docs/plans/ before any code is written, then offers handoff to
+  a dev agent. Use when the user wants to plan, refine, or clarify a feature before
+  implementation; skip it when the spec is already confirmed (delegate straight to
+  java-dev, kotlin-dev, python-dev, go-dev, or frontend-dev), use debug for a bug report, and
+  improve-plugin / create-plugin / extend-plugin for a plugin skill or agent. Runs in the
+  main conversation; the interview is not delegated to agents.
+when_to_use: >
+  "спланируй фичу", "продумай фичу", "вот тз", "помоги спланировать", "/feature-planner"
 ---
 
 # Feature Planner — interview-driven feature spec
@@ -100,36 +87,28 @@ Ask only what is relevant — do not enumerate the whole checklist when half is 
 - **Test data**: any specific fixtures or edge values the user wants verified?
 - **Manual verification**: is there a manual smoke check after deployment?
 
-### Step 6 — Verify current library docs via context7 (mandatory)
+### Step 6 — Check current library docs (when the feature depends on a library API)
 
-Before drafting the plan, list every library / framework / SDK / cloud service that this feature will touch (derived from Step 3 — Technical context). For EACH one, query the `context7` MCP to fetch current documentation:
-
-1. Resolve the library ID — use the context7 tool whose name ends in `resolve-library-id` (typically exposed as `mcp__plugin_context7_context7__resolve-library-id`).
-2. Pull the relevant section — use the context7 tool that returns documentation by library ID. Depending on the wrapper version it is exposed as `mcp__plugin_context7_context7__get-library-docs` or `mcp__plugin_context7_context7__query-docs`. Pick whichever is available in the current environment.
-3. Narrow the query to the specific API / feature in use (e.g. "Spring Boot 3 WebFlux router function", "Kotlin coroutines flow buffer operator", "PostgreSQL JSONB indexing") — not just the library name.
+If the feature depends on the API of a library, framework, SDK, or cloud service (from Step 3 — Technical context), consult its current documentation through the documentation tools available in the session — a docs connector with resolve-library-id / query-docs when present, otherwise WebFetch of the official docs. Narrow the query to the specific API / feature in use (e.g. "Spring Boot 3 WebFlux router function", "Kotlin coroutines flow buffer operator", "PostgreSQL JSONB indexing") — not just the library name.
 
 Tell the user briefly what you are checking:
 
 ```
-Сверяюсь с актуальной документацией через context7: <библиотека 1>, <библиотека 2>, ...
+Сверяюсь с актуальной документацией: <библиотека 1>, <библиотека 2>, ...
 ```
 
-Use the freshly fetched docs to:
+Use the fetched docs to:
 - Validate the technical approach against current best practices (not training-data assumptions).
 - Catch deprecated methods, renamed APIs, signature changes, new required arguments.
 - Cite specific version-correct syntax / configuration in the plan.
 
-Skip context7 ONLY when:
-- The feature is pure business logic with no external library calls.
-- The library is internal to the user's monorepo (context7 will not have it) — say so explicitly.
+Skip this step when the feature is pure business logic with no external library calls, or when the library is internal to the user's monorepo — say so explicitly.
 
-In all other cases — ALWAYS run context7. Training data lags behind real library versions, and outdated assumptions silently corrupt the plan.
-
-If context7 returns nothing useful for a given library — say so in the plan ("context7: no current docs for X, used training-data assumption") so the dev agent knows the source is uncertain.
+If no current docs could be found for a given library — say so in the plan ("актуальных доков для X не нашёл, использована память из обучения") so the dev agent knows the source is uncertain.
 
 ### Step 7 — Present and confirm the plan
 
-Once requirements are gathered AND context7 verification is done, present a structured plan in this exact format (in Russian — user-facing output):
+Once requirements are gathered (and library docs checked where Step 6 applied), present a structured plan in this exact format (in Russian — user-facing output):
 
 ```markdown
 ## Фича: <название>
@@ -153,10 +132,10 @@ Once requirements are gathered AND context7 verification is done, present a stru
 - API: <method, path, request, response>
 - UI: <pages/components affected>
 
-### Актуальные библиотеки (context7)
+### Актуальные библиотеки
 - <library@version>: <key API decision / current syntax used in plan>
 - <library@version>: <...>
-- <library>: context7 не вернул актуальных доков — использована память из обучения (uncertain)
+- <library>: актуальных доков не нашёл — использована память из обучения (uncertain)
 
 ### Non-functional
 - <only relevant items>
@@ -208,7 +187,7 @@ Create the `docs/plans/` directory if it does not exist. After writing, tell the
 After the plan is saved, offer to launch implementation (the user may decline — that is fine):
 
 ```
-Запустить реализацию через <java-dev | kotlin-dev | python-dev | frontend-dev>? Передам путь к плану.
+Запустить реализацию через <java-dev | kotlin-dev | python-dev | go-dev | frontend-dev>? Передам путь к плану.
 ```
 
 Pick the agent based on the affected module type. Pass the plan file path in the agent's prompt — do NOT inline the plan body. If work spans multiple stacks, list the agents that will run sequentially.
@@ -217,10 +196,10 @@ Pick the agent based on the affected module type. Pass the plan file path in the
 
 - **Limit per turn**: 2-4 questions per turn, never a wall of 20. The user will give shallow answers to long lists.
 - **Prefer `AskUserQuestion`** for binary / multi-choice. Use chat for open-ended.
-- **Skip irrelevant sections**: applies to steps 2-5 only. Step 6 (context7) follows its own skip rules described inside that step. Steps 7-8 (plan + persist) are always executed.
+- **Skip irrelevant sections**: applies to steps 2-6 (step 6 has its own skip rule inside). Steps 7-8 (plan + persist) are always executed.
 - **Quote the doc**: when asking about an ambiguity in provided documentation, quote the exact fragment — do not paraphrase. Example: "В тз сказано «возвращает список заказов» — какой формат: массив объектов или объект с полем `items`?"
 - **Read code first**: if the user references existing modules / classes / endpoints, read them before asking. Do not ask questions the codebase answers.
-- **Always verify libraries via context7**: do not write a technical plan from training-data memory. Query context7 for every external library touched, even ones you "know".
+- **Check library docs when the feature depends on a library API**: do not write version-specific API details from training-data memory when the documentation tools in the session can confirm them.
 - **Always persist the plan to a file**: never keep the confirmed plan only in chat — context compaction will lose it.
 - **Do not start implementation during the interview**. No file edits, no agent launches, until the user confirms the plan at step 7 AND the plan is saved at step 8.
 - **Stop when clear**: the goal is a confident plan, not maximum question count.
@@ -233,6 +212,6 @@ Pick the agent based on the affected module type. Pass the plan file path in the
 - Skipping the interview because the task "seems clear" — it almost never is.
 - Re-asking what the documentation already states clearly.
 - Starting to write code mid-interview because an answer felt sufficient.
-- Skipping context7 because you "know" the library — training data lags behind real versions; verify.
+- Writing version-specific library API details from memory because you "know" the library — training data lags behind real versions; check the docs when the feature depends on them.
 - Keeping the plan only in chat — always write `docs/plans/<feature-slug>.md`, no exceptions.
 - Inlining the entire plan body into a dev agent prompt — pass the file path instead.

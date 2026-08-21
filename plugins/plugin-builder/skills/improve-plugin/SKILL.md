@@ -1,28 +1,14 @@
 ---
 name: improve-plugin
 description: >
-  Fix a plugin in the anton-toolkit-marketplace when the user explicitly
-  asks to update a skill or agent. Updates the plugin source so the
-  correction persists across sessions.
-
-  Invoke ONLY on explicit user request. Do NOT invoke proactively.
-  Do NOT suggest running this skill in response to complaints, reprimands,
-  or evaluative remarks about a skill/agent's output ("это косяк",
-  "глючит", "не сработало", etc.) — wait for the user to call the skill
-  themselves.
-
-  Triggers (explicit only): "/improve", "/improve-plugin", "улучши плагин",
-  "обнови плагин", "обнови скилл", "обнови агента", "исправь скилл",
-  "исправь агента", "поправь плагин", "запомни это в плагине",
-  "улучши <имя плагина / скилла / агента>".
-
-  Discrimination: this skill is for explicit requests to modify the plugin
-  source. For fresh-session planning of new plugin behavior — use
-  `extend-plugin` or `create-plugin` instead. For one-off file overrides
-  in the current project with no plugin-level rule change — skip.
-
-  This skill runs DIRECTLY in conversation. Engages in at most one round
-  of user interaction — the target-plugin confirmation in Step 1.
+  Fixes a plugin in the anton-toolkit-marketplace by editing its source, so the correction persists
+  across sessions. Use only on an explicit request to change plugin source, not in response to
+  complaints or evaluative remarks about a skill or agent's output. For fresh-session planning of new
+  plugin behavior use extend-plugin, or create-plugin when the plugin does not exist yet; for a one-off
+  file override with no plugin-level rule change, skip it. Runs in the main conversation, with at most
+  one question — the target-plugin confirmation.
+when_to_use: >
+  "улучши плагин", "обнови скилл", "обнови агента", "исправь агента"
 ---
 
 # Improve Plugin — explicit plugin fix

@@ -1,9 +1,11 @@
 ---
 name: commit
 description: >
-  Use when the user wants to commit changes to git with a Russian-language
-  commit message. Triggers on: "commit", "коммит", "закоммить", "сохрани изменения",
-  "/commit", or any request to create a git commit.
+  Creates a git commit with a Russian past-tense message from the current changes — stages
+  files explicitly by name, one commit by default, never pushes. Use when the user asks to
+  commit or save changes.
+when_to_use: >
+  "коммит", "закоммить", "сохрани изменения", "/commit"
 ---
 
 # Commit — Russian-language commits

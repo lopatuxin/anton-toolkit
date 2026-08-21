@@ -1,19 +1,14 @@
 ---
 name: yt-ideas
 description: >
-  IMPORTANT: Invoke this skill via the Skill tool IMMEDIATELY when the user
-  asks for video ideas, topics, what to film next, or content brainstorm.
-  Do NOT skip — this skill contains the generation rules and niche context
-  in references/.
-
-  HARD REQUIREMENT: this skill REFUSES to generate ideas without analytical
-  input. It needs either a yt-my-channel report OR a yt-competitors report
-  in the conversation (or pasted by the user). If neither is present, the
-  skill MUST tell the user to run yt-my-channel or yt-competitors first.
-
-  Trigger phrases (Russian): "идеи для роликов", "идеи для видео", "придумай
-  идеи", "о чём снять", "темы для видео", "что снять следующим", "какое
-  видео снять", "предложи темы", "идеи контента".
+  Generates 10-20 video ideas for the user's IT / vibe-coding channel, each
+  one traced back to a specific finding in the analytical input, and saves
+  the batch to the Obsidian vault. Requires that input — a `yt-my-channel`
+  report, a `yt-competitors` report, or the channel knowledge base; with
+  none of them present it stops and asks the user to run one first instead
+  of improvising. For a prioritised top-5 shortlist use the `yt-strategist`
+  agent; for scheduling the ideas use `yt-content-plan`.
+disable-model-invocation: true
 ---
 
 # yt-ideas — generate ideas grounded in analytics
@@ -49,14 +44,14 @@ If at least one is present, proceed.
    - From `yt-competitors`: niche gaps, top-performing hooks/formats, hypotheses for our channel (section 10).
    - From the knowledge base: titles + transcripts of top cards (signal for what hooks/topics worked), titles + `classification_reason` of fail cards (signal for what to avoid). When citing in the "Why this idea" field, reference the specific video by slug, e.g. `"KB: [[youtube/база/видео/курсор-выкинул-проект]] — top, vpd 2.4x median"`.
 
-2. **Apply generation rules** from `references/generation-rules.md`:
+2. **Apply generation rules** from `${CLAUDE_SKILL_DIR}/references/generation-rules.md`:
    - Gap-fill (take niche gaps directly)
    - Series continuation (extend the user's flagship series — Logos, CRM, etc.)
    - Format-shift (take a user's top topic, repackage in a niche-favoured length/format)
    - Trend-ride (take a niche-rising tool/topic, apply user's angle)
    - Lead-gen anchor (case study showing the user can deliver — orders for app development is the channel goal)
 
-3. **Apply niche context** from `references/niche-context.md`:
+3. **Apply niche context** from `${CLAUDE_SKILL_DIR}/references/niche-context.md`:
    - Vibe-coding / AI-assisted dev focus
    - Flagship series Logos and CRM are first-class
    - Russian-speaking IT audience

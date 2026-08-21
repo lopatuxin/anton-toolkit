@@ -1,13 +1,13 @@
 ---
 name: film
 description: >
-  Personal film curator living in the Obsidian vault. Maintains three notes — a taste profile
-  (the user's "viewing personality"), a watched-films log with detailed reviews, and a short
-  curated recommendation shortlist (≤10 films, each with a one-line "what it is / why it fits"
-  blurb). Invoked explicitly via the /film command only — no auto-trigger. Three flows, inferred
-  from the command argument: recommend what to watch next, log a freshly watched film with a
-  detailed review, or (on first run) migrate the legacy `films.md` note into the structured vault
-  folder. For diary capture use `dnevnik`.
+  Personal film curator in the Obsidian vault: keeps a taste profile (the user's viewing
+  personality), a watched-films log with reviews, and a shortlist of at most 10 recommendations,
+  each with a one-line what-it-is / why-it-fits blurb. Three flows, chosen from the command
+  argument: recommend what to watch next, log a watched film with a review, or (first run)
+  migrate the legacy `films.md` note into the vault folder. Reviews feed the taste profile, which
+  drives the next recommendations.
+disable-model-invocation: true
 ---
 
 # Film — personal film curator for the Obsidian vault

@@ -1,52 +1,18 @@
 ---
 name: logos-ui
 description: >
-  Design the web interface of the Logos system as a complete, build-ready structural specification
-  for the Logos frontend coder (the logos-frontend-coder agent) — WHICH pages/screens exist, WHAT
-  blocks and elements (buttons, fields, lists, tables, modals) each one holds, HOW the user navigates
-  between them, and how every element behaves (states, validations, data shown, edge cases). It does
-  NOT design a new visual look: no colours, typography, spacing, or theme — the frontend coder renders
-  the spec in the ALREADY-ESTABLISHED Logos style (reusing existing tokens/components/shell), so the
-  spec defines structure and behaviour, not appearance. The skill runs a deep DIALOG-interview with
-  the user (open-ended, one question at a time) to pin down exactly what they want from the interface,
-  writes the spec to Logos/Дизайн/Веб-интерфейс.md, and then SYNCHRONIZES it with the rest of the
-  Logos design: if the interface requires something not in (or contradicting) Архитектура.md, it
-  goes and fixes the architecture document so the whole design stays consistent, recording the
-  significant change in the decision journal. Documentation only — no runnable code.
-
-  Invocation: COMMAND ONLY — "/logos-ui". This skill does NOT auto-trigger on free-text phrases.
-  Other phrases ("спроектируй интерфейс logos", "распиши веб-интерфейс logos", "какие страницы у
-  logos") are context for the user, not auto-triggers — act only when the user runs /logos-ui.
-
-  Discrimination: this skill designs the Logos web INTERFACE structure (UX/IA spec that the
-  logos-frontend-coder agent builds from). For designing the Logos SYSTEM architecture (orchestration, memory, models) use
-  logos-design; for recording/searching decisions use logos-log; for an arbitrary non-Logos system
-  use system-designer. This skill is documentation-only — if the user asks to write actual frontend
-  code, stop.
-
-  This skill runs DIRECTLY in conversation. Do NOT launch agents for the interview part — agents lose
-  context between turns and cannot hold a dialog.
+  Writes the build-ready structural spec of the Logos web interface to Logos/Дизайн/Веб-интерфейс.md
+  for the logos-frontend-coder agent — screens, the blocks and elements of each, navigation, behaviour
+  and states — with no visual design: colours, typography and theme come from the established Logos
+  style; built through an interview (open questions, one at a time), then synchronized with
+  Архитектура.md, recording significant changes in the journal; documentation only. Runs in the main
+  conversation; the interview is not delegated to agents. For the system architecture use
+  logos-design, for delivery phases logos-phases, for the journal logos-log, for a non-Logos system
+  system-designer.
+disable-model-invocation: true
 ---
 
 # Logos-ui — web interface specification for the Logos frontend coder
-
-**Reference files — resolve the path BEFORE reading (this plugin's most frequent failure).** Every
-`references/<file>.md` cited anywhere in this document means `<plugin-root>/references/<file>.md`: the
-reference files live at the PLUGIN ROOT, never inside a skill's own folder. The base directory given to
-this skill at load time is `<plugin-root>/skills/<this-skill>/`, so a bare relative path resolves to
-`<plugin-root>/skills/<this-skill>/references/<file>.md` — that file does not exist and the read fails.
-Resolve it as `<this skill's base directory>/../../references/<file>.md`. If no base directory was given,
-locate the file with Glob (pattern `**/references/<file>.md`, path `<user home>/.claude/plugins`) and take
-the match under `.../logos/` — either the installed cache
-`.claude/plugins/cache/anton-toolkit-marketplace/logos/<version>/references/` or the marketplace working
-copy `.claude/plugins/marketplaces/anton-toolkit-marketplace/plugins/logos/references/`.
-
-- Correct: `C:\Users\<user>\.claude\plugins\cache\anton-toolkit-marketplace\logos\<version>\references\logos-project.md`
-- Incorrect: `references/logos-project.md` — resolves under the skill folder, which has no `references/`.
-
-Never report a reference file as missing, and never proceed on remembered content, without running that
-Glob first. The same rule applies to every path you paste into an agent prompt: pass the RESOLVED absolute
-path, never the bare `references/...` form.
 
 You design the **web interface of Logos** as a structural specification precise enough that the
 **logos-frontend-coder** agent can build the UI from it without guessing the layout, the screens, the
@@ -74,49 +40,15 @@ the already-established Logos look (reusing the existing tokens, components, and
 established Logos frontend style, so write the spec FOR it: exhaustive structure and behaviour, and,
 where useful, point it at the existing reusable components/shell rather than describing a look. The
 full project picture — code repo vs vault docs, the polyglot stack, and the "documentation is the
-source of truth" sync rule — is in `references/logos-project.md`. Read it so the interface spec stays
-build-ready and consistent with the code.
+source of truth" sync rule — is in `${CLAUDE_PLUGIN_ROOT}/references/logos-project.md`. Read it so the
+interface spec stays build-ready and consistent with the code.
 
 ## 0. Locate the vault and resolve paths (once per session)
 
-Find the Obsidian vault root (the directory that contains `.obsidian/`) BY CONTENT, in three widening
-steps — never from a hardcoded path, because the vault has moved before and a stale hardcoded path
-fails silently:
-
-```bash
-VAULT=""
-DIR="$(pwd)"
-# 1. Walk up — finds the vault when a tool runs from inside it.
-while [ "$DIR" != "/" ] && [ -n "$DIR" ]; do
-  if [ -d "$DIR/.obsidian" ]; then VAULT="$DIR"; break; fi
-  DIR="$(dirname "$DIR")"
-done
-# 2. Scan every level one directory deep. REQUIRED, not a nicety: the code repo is the vault's
-#    SIBLING, never its child, so walking up from the code repo can never reach the vault. A
-#    candidate must hold BOTH `.obsidian/` and `Logos/`, so an unrelated vault is not picked up.
-if [ -z "$VAULT" ]; then
-  DIR="$(pwd)"
-  while [ "$DIR" != "/" ] && [ -n "$DIR" ]; do
-    for CANDIDATE in "$DIR"/*/; do
-      if [ -d "$CANDIDATE/.obsidian" ] && [ -d "$CANDIDATE/Logos" ]; then VAULT="${CANDIDATE%/}"; break; fi
-    done
-    [ -n "$VAULT" ] && break
-    DIR="$(dirname "$DIR")"
-  done
-fi
-# 3. Last resort — the usual project roots, scanned and matched the same way (by content).
-if [ -z "$VAULT" ]; then
-  for CANDIDATE in /c/projects/*/ "$HOME"/*/; do
-    if [ -d "$CANDIDATE/.obsidian" ] && [ -d "$CANDIDATE/Logos" ]; then VAULT="${CANDIDATE%/}"; break; fi
-  done
-fi
-echo "VAULT=$VAULT"
-```
-
-Never replace this search with a literal path, and never "simplify" it back to the walk-up alone —
-the walk-up alone resolves nothing when a tool is invoked from the code repo, which is the normal case.
-
-If `$VAULT` is empty, tell the user in Russian: «Не нашёл хранилище Obsidian (папку `.obsidian`). Запусти скилл из папки хранилища.» — then stop.
+Resolve `VAULT` (the folder holding both `.obsidian/` and `Logos/`) and `CODE`
+(`$(dirname "$VAULT")/Logos`) with the search procedure in the paths section of
+`${CLAUDE_PLUGIN_ROOT}/references/logos-project.md`; never hard-code the path. If the vault is not
+found, tell the user in Russian as that reference instructs, then stop.
 
 Paths (Russian names — you own all path construction):
 
@@ -153,7 +85,7 @@ Hard rules for every question:
   takes many turns — that is fine.
 - Do NOT interview about failures and edge cases («а если сеть пропадёт», «а если два раза нажать»).
   Every screen handles failure the same one way — an honest error the owner sees — and that is written
-  once, not asked per screen (`references/logos-project.md` §4 point 0). Such questions breed
+  once, not asked per screen (`${CLAUDE_PLUGIN_ROOT}/references/logos-project.md` §4 point 0). Such questions breed
   client-side retries, caches and defences for problems that have not happened.
 - Only stop a topic once it is concretely pinned down; then write it into the spec and move on.
 
@@ -180,7 +112,7 @@ Cover at least these, anchored to what Logos does (from the architecture). Skip 
 ## 4. Write the spec
 
 When a topic is pinned down, write/extend `$VAULT/Logos/Дизайн/Веб-интерфейс.md` following the
-structure in `references/web-ui-spec-template.md` (read it and follow it) — including its YAML
+structure in `${CLAUDE_PLUGIN_ROOT}/references/web-ui-spec-template.md` (read it and follow it) — including its YAML
 frontmatter (`tags: [logos, дизайн, интерфейс]`) and the `[[Концепт]] · [[Архитектура]]` link line.
 Russian headings, all details captured, **no colours or visual styling**. Be exhaustive at the
 element level — every button and field named, its purpose, behaviour, and states.
@@ -201,12 +133,14 @@ propagated across the whole design.** After writing or changing the spec:
    architecture describes differently.
 2. **Reconcile by fixing the architecture document.** For each genuine gap/contradiction, update
    `Архитектура.md` (and `Концепт.md` if a concept-level assumption changed) so the documents agree.
-   Keep the architecture's existing structure and template (`references/design-templates.md`); add the
-   minimal consistent change, never reflow untouched sections. If a divergence cannot be resolved
-   without a real architectural decision, do NOT silently invent one — surface it to the user and add
-   it to `Архитектура.md` → «Риски и открытые вопросы».
+   Keep the architecture's existing structure and template
+   (`${CLAUDE_PLUGIN_ROOT}/references/design-templates.md`); add the minimal consistent change, never
+   reflow untouched sections. If a divergence cannot be resolved without a real architectural decision,
+   do NOT silently invent one — surface it to the user and add it to `Архитектура.md` → «Риски и
+   открытые вопросы».
 3. **Record significant changes in the journal.** For each non-trivial sync edit to the architecture,
-   write a journal entry per `references/diary-format.md` — one note under `$VAULT/Logos/Журнал/`,
+   write a journal entry per `${CLAUDE_PLUGIN_ROOT}/references/diary-format.md` — one note under
+   `$VAULT/Logos/Журнал/`,
    `тип: решение` (or `тип: наблюдение` for a noted gap), `область: общее` (the interface is
    cross-cutting and the journal's `область` taxonomy has no UI value — never write `область: интерфейс`),
    `статус: принято`, `вес: 5` (the assistant's importance estimate). Trivial wording

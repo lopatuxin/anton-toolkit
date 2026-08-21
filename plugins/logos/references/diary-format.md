@@ -20,44 +20,9 @@ the journal is ever blocked on the user looking at it.
 
 ## 1. Locate the vault and the Logos folder
 
-Find the Obsidian vault root (the directory that contains `.obsidian/`) BY CONTENT, in three
-widening steps — never from a hardcoded path, because the vault has moved before and a stale
-hardcoded path fails silently:
-
-```bash
-VAULT=""
-DIR="$(pwd)"
-# 1. Walk up — finds the vault when a tool runs from inside it.
-while [ "$DIR" != "/" ] && [ -n "$DIR" ]; do
-  if [ -d "$DIR/.obsidian" ]; then VAULT="$DIR"; break; fi
-  DIR="$(dirname "$DIR")"
-done
-# 2. Scan every level one directory deep. REQUIRED, not a nicety: the code repo is the vault's
-#    SIBLING, never its child, so walking up from the code repo can never reach the vault. A
-#    candidate must hold BOTH `.obsidian/` and `Logos/`, so an unrelated vault is not picked up.
-if [ -z "$VAULT" ]; then
-  DIR="$(pwd)"
-  while [ "$DIR" != "/" ] && [ -n "$DIR" ]; do
-    for CANDIDATE in "$DIR"/*/; do
-      if [ -d "$CANDIDATE/.obsidian" ] && [ -d "$CANDIDATE/Logos" ]; then VAULT="${CANDIDATE%/}"; break; fi
-    done
-    [ -n "$VAULT" ] && break
-    DIR="$(dirname "$DIR")"
-  done
-fi
-# 3. Last resort — the usual project roots, scanned and matched the same way (by content).
-if [ -z "$VAULT" ]; then
-  for CANDIDATE in /c/projects/*/ "$HOME"/*/; do
-    if [ -d "$CANDIDATE/.obsidian" ] && [ -d "$CANDIDATE/Logos" ]; then VAULT="${CANDIDATE%/}"; break; fi
-  done
-fi
-echo "VAULT=$VAULT"
-```
-
-Never replace this search with a literal path, and never "simplify" it back to the walk-up alone —
-the walk-up alone resolves nothing when a tool is invoked from the code repo, which is the normal case.
-
-If `$VAULT` is empty, tell the user in Russian: «Не нашёл хранилище Obsidian (папку `.obsidian`). Запусти скилл из папки хранилища.» — then stop.
+Resolve `$VAULT` with the vault search in `${CLAUDE_PLUGIN_ROOT}/references/logos-project.md`,
+section «2. Paths: locating the vault and the code repo» — that section is the single copy of the
+procedure (including what to tell the user when the vault is not found); never duplicate it here.
 
 The Logos root is `$VAULT/Logos`. The journal lives in `$VAULT/Logos/Журнал`.
 

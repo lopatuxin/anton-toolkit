@@ -8,16 +8,17 @@ direction note is uniform and searchable.
 The research branch is a SEPARATE line of Logos development: moving away from big LLMs toward
 a swarm of small specialized self-learning models on cheap hardware. It deliberately does NOT
 mix with the production system's development. The experiment diary here is DISTINCT from the
-decision journal (`Logos/Журнал/`, format in `references/diary-format.md`): the journal records
+decision journal (`Logos/Журнал/`, format in `${CLAUDE_PLUGIN_ROOT}/references/diary-format.md`): the journal records
 project decisions; the diary records research-branch experiments. A cross-cutting decision
 (e.g. "the branch exists", "a matured conclusion enters the main design") still goes to the
 journal; the day-to-day hypothesis→result loop lives here.
 
 ## 1. Locate the vault and the branch folders
 
-Locate the Obsidian vault EXACTLY as `references/diary-format.md` section 1 prescribes (the
-three-step content-based search; never a hardcoded path). If the vault is not found, tell the
-user in Russian as that reference instructs, then stop.
+Locate the Obsidian vault EXACTLY as `${CLAUDE_PLUGIN_ROOT}/references/logos-project.md` section
+«2. Paths: locating the vault and the code repo» prescribes (the three-step content-based search;
+never a hardcoded path). If the vault is not found, tell the user in Russian as that reference
+instructs, then stop.
 
 Derived paths:
 

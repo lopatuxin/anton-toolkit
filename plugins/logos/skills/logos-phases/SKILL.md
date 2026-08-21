@@ -1,51 +1,18 @@
 ---
 name: logos-phases
 description: >
-  Carve the Logos system, as defined in Архитектура.md, into incremental delivery PHASES — each phase
-  a finished, end-to-end slice of functionality the user can actually touch, run, and test (starting
-  from an MVP-zero, e.g. a bare chat in a web UI backed by one model, then growing one tangible
-  capability at a time). The skill runs a deep DIALOG-interview with the user (open-ended, one question
-  at a time) to pin down each phase: its goal / what becomes touchable, what is explicitly in and out
-  of scope, which parts of the architecture it exercises, its dependency on prior phases, and concrete
-  done criteria the user can verify by hand. It writes ONE markdown file per phase to
-  Logos/Дизайн/Фазы/Фаза-NN-<имя>.md (no roadmap document — the development journal is the overview),
-  records each carved phase in the Logos journal, and KEEPS THE DOCUMENTATION IN SYNC: if a phase needs
-  something not in (or contradicting) Архитектура.md, it fixes the architecture (and concept) document
-  immediately and records the significant change in the journal. Documentation only — no runnable code.
-
-  Invocation: COMMAND ONLY — "/logos-phases". This skill does NOT auto-trigger on free-text phrases.
-  Other phrases ("выдели фазы logos", "разбей logos на фазы", "нарежь MVP logos", "какая первая фаза
-  logos") are context for the user, not auto-triggers — act only when the user runs /logos-phases.
-
-  Discrimination: this skill slices the Logos design into testable delivery phases. For designing the
-  Logos SYSTEM architecture (orchestration, memory, models) use logos-design; for the web INTERFACE
-  spec use logos-ui; for recording/searching decisions use logos-log; for phasing an arbitrary
-  non-Logos system use system-designer. This skill is documentation-only — if the user asks to write
-  actual Logos code, stop.
-
-  This skill runs DIRECTLY in conversation. Do NOT launch agents for the interview part — agents lose
-  context between turns and cannot hold a dialog.
+  Carves the Logos system defined in Архитектура.md into incremental delivery phases — each an
+  end-to-end slice the user can touch and test, starting from an MVP-zero — through an interview that
+  pins down each phase's goal, scope, architecture surface, dependencies and hand-verifiable done
+  criteria; writes one file per phase to Logos/Дизайн/Фазы/, records it in the journal and fixes
+  Архитектура.md immediately when a phase needs something it lacks; documentation only. Runs in the
+  main conversation; the interview is not delegated to agents. For the architecture use logos-design,
+  for the web-interface spec logos-ui, for the journal logos-log, for building a phase logos-build,
+  for a non-Logos system system-designer.
+disable-model-invocation: true
 ---
 
 # Logos-phases — incremental delivery phases for Logos
-
-**Reference files — resolve the path BEFORE reading (this plugin's most frequent failure).** Every
-`references/<file>.md` cited anywhere in this document means `<plugin-root>/references/<file>.md`: the
-reference files live at the PLUGIN ROOT, never inside a skill's own folder. The base directory given to
-this skill at load time is `<plugin-root>/skills/<this-skill>/`, so a bare relative path resolves to
-`<plugin-root>/skills/<this-skill>/references/<file>.md` — that file does not exist and the read fails.
-Resolve it as `<this skill's base directory>/../../references/<file>.md`. If no base directory was given,
-locate the file with Glob (pattern `**/references/<file>.md`, path `<user home>/.claude/plugins`) and take
-the match under `.../logos/` — either the installed cache
-`.claude/plugins/cache/anton-toolkit-marketplace/logos/<version>/references/` or the marketplace working
-copy `.claude/plugins/marketplaces/anton-toolkit-marketplace/plugins/logos/references/`.
-
-- Correct: `C:\Users\<user>\.claude\plugins\cache\anton-toolkit-marketplace\logos\<version>\references\logos-project.md`
-- Incorrect: `references/logos-project.md` — resolves under the skill folder, which has no `references/`.
-
-Never report a reference file as missing, and never proceed on remembered content, without running that
-Glob first. The same rule applies to every path you paste into an agent prompt: pass the RESOLVED absolute
-path, never the bare `references/...` form.
 
 You slice the Logos system — as it is described in `Архитектура.md` — into a sequence of **delivery
 phases**. Each phase is a finished, end-to-end slice of functionality the user can touch, run, and
@@ -88,49 +55,15 @@ a deep interview, write each as its own document, and keep the whole design cons
 code (in the code repo `git@github.com:lopatuxin/Logos.git`, the vault's sibling `Logos/` folder),
 one phase at a time. The full project picture — code repo vs vault docs, the polyglot stack, the
 status field a phase advances through (`планируется` → `в работе` → `готово`), and the
-"documentation is the source of truth" sync rule — is in `references/logos-project.md`. Read it so
-your phase documents and their `статус`/«Критерии готовности» are build-ready.
+"documentation is the source of truth" sync rule — is in `${CLAUDE_PLUGIN_ROOT}/references/logos-project.md`.
+Read it so your phase documents and their `статус`/«Критерии готовности» are build-ready.
 
 ## 0. Locate the vault and resolve paths (once per session)
 
-Find the Obsidian vault root (the directory that contains `.obsidian/`) BY CONTENT, in three widening
-steps — never from a hardcoded path, because the vault has moved before and a stale hardcoded path
-fails silently:
-
-```bash
-VAULT=""
-DIR="$(pwd)"
-# 1. Walk up — finds the vault when a tool runs from inside it.
-while [ "$DIR" != "/" ] && [ -n "$DIR" ]; do
-  if [ -d "$DIR/.obsidian" ]; then VAULT="$DIR"; break; fi
-  DIR="$(dirname "$DIR")"
-done
-# 2. Scan every level one directory deep. REQUIRED, not a nicety: the code repo is the vault's
-#    SIBLING, never its child, so walking up from the code repo can never reach the vault. A
-#    candidate must hold BOTH `.obsidian/` and `Logos/`, so an unrelated vault is not picked up.
-if [ -z "$VAULT" ]; then
-  DIR="$(pwd)"
-  while [ "$DIR" != "/" ] && [ -n "$DIR" ]; do
-    for CANDIDATE in "$DIR"/*/; do
-      if [ -d "$CANDIDATE/.obsidian" ] && [ -d "$CANDIDATE/Logos" ]; then VAULT="${CANDIDATE%/}"; break; fi
-    done
-    [ -n "$VAULT" ] && break
-    DIR="$(dirname "$DIR")"
-  done
-fi
-# 3. Last resort — the usual project roots, scanned and matched the same way (by content).
-if [ -z "$VAULT" ]; then
-  for CANDIDATE in /c/projects/*/ "$HOME"/*/; do
-    if [ -d "$CANDIDATE/.obsidian" ] && [ -d "$CANDIDATE/Logos" ]; then VAULT="${CANDIDATE%/}"; break; fi
-  done
-fi
-echo "VAULT=$VAULT"
-```
-
-Never replace this search with a literal path, and never "simplify" it back to the walk-up alone —
-the walk-up alone resolves nothing when a tool is invoked from the code repo, which is the normal case.
-
-If `$VAULT` is empty, tell the user in Russian: «Не нашёл хранилище Obsidian (папку `.obsidian`). Запусти скилл из папки хранилища.» — then stop.
+Resolve `VAULT` (the folder holding both `.obsidian/` and `Logos/`) and `CODE`
+(`$(dirname "$VAULT")/Logos`) with the search procedure in the paths section of
+`${CLAUDE_PLUGIN_ROOT}/references/logos-project.md`; never hard-code the path. If the vault is not
+found, tell the user in Russian as that reference instructs, then stop.
 
 Paths (Russian names — you own all path construction):
 
@@ -204,7 +137,7 @@ Hard rules for every question:
   turns — that is fine.
 - Do NOT interview about failure modes or edge cases («а что если модель…», «а если провайдер упадёт»).
   Such questions turn into criteria like «должно корректно переживать X», and those criteria turn into
-  mechanisms for problems that have not happened (`references/logos-project.md` §4 point 0). The only
+  mechanisms for problems that have not happened (`${CLAUDE_PLUGIN_ROOT}/references/logos-project.md` §4 point 0). The only
   failure criterion a phase ever carries is the standing one: a failure is shown to the owner honestly
   in the feed. Anything beyond that enters a phase ONLY if the owner himself asks for it in his own
   words.
@@ -240,7 +173,7 @@ For each phase, pin down at least these, anchored to what the architecture says 
 
 When a phase is pinned down, write it as its OWN file
 `$VAULT/Logos/Дизайн/Фазы/Фаза-NN-<краткое-русское-имя>.md` following the structure in
-`references/phase-template.md` (read it and follow it) — including its YAML frontmatter and the
+`${CLAUDE_PLUGIN_ROOT}/references/phase-template.md` (read it and follow it) — including its YAML frontmatter and the
 `[[Концепт]] · [[Архитектура]]` link line. Russian headings, all details captured, **no runnable
 code**.
 
@@ -263,12 +196,14 @@ After writing or changing any phase:
    control surface, or a flow the architecture describes differently.
 2. **Reconcile by fixing the architecture document immediately.** For each genuine gap/contradiction,
    update `Архитектура.md` (and `Концепт.md` if a concept-level assumption changed) so the documents
-   agree. Keep the architecture's existing structure and template (`references/design-templates.md`);
-   add the minimal consistent change, never reflow untouched sections. If a divergence cannot be
-   resolved without a real architectural decision, do NOT silently invent one — surface it to the user
-   and add it to `Архитектура.md` → «Риски и открытые вопросы».
+   agree. Keep the architecture's existing structure and template
+   (`${CLAUDE_PLUGIN_ROOT}/references/design-templates.md`); add the minimal consistent change, never
+   reflow untouched sections. If a divergence cannot be resolved without a real architectural decision,
+   do NOT silently invent one — surface it to the user and add it to `Архитектура.md` → «Риски и
+   открытые вопросы».
 3. **Record significant changes in the journal.** For each non-trivial sync edit to the architecture,
-   write a journal entry per `references/diary-format.md` — one note under `$VAULT/Logos/Журнал/`,
+   write a journal entry per `${CLAUDE_PLUGIN_ROOT}/references/diary-format.md` — one note under
+   `$VAULT/Logos/Журнал/`,
    `тип: решение` (or `тип: наблюдение` for a noted gap), `область: общее` (phases are cross-cutting;
    the journal's `область` taxonomy has no phase value — never invent one), `статус: принято`,
    `вес: 5` (the assistant's importance estimate). Trivial wording fixes need no entry.
@@ -282,7 +217,7 @@ phase, note it and let the next interview turn resolve it.
 ## 6. Record the phase in the development journal (the overview lives here)
 
 Because there is no roadmap document, the journal IS the phase overview. After writing each phase,
-record it as its own journal entry per `references/diary-format.md`:
+record it as its own journal entry per `${CLAUDE_PLUGIN_ROOT}/references/diary-format.md`:
 - One note under `$VAULT/Logos/Журнал/<YYYY-MM-DD>-фаза-NN-<краткое-имя>.md`.
 - Frontmatter: today's `дата`, `тип: решение`, `область: общее`, `вес: 5`, `статус: принято`,
   the `теги` from the reference.

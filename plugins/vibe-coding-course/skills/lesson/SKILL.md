@@ -1,9 +1,11 @@
 ---
 name: lesson
 description: >
-  Write ONE concrete vibe-coding lesson from the course roadmap, in simple beginner-friendly
-  Russian, guided by the teacher's own input for that lesson, and save it as a separate file in
-  the vault's Курс/ folder. Invoked explicitly via the /lesson command only — no auto-trigger.
+  Writes one vibe-coding lesson from the course roadmap in simple, beginner-friendly Russian —
+  guided by the teacher's own input for that lesson, which it asks for first — and saves it as a
+  separate file in the vault's Курс/ folder. One lesson per run, so the teacher reviews each
+  before the next; the course program itself is built by `roadmap`.
+disable-model-invocation: true
 ---
 
 # Lesson — write one beginner-friendly lesson from the roadmap

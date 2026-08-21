@@ -25,11 +25,13 @@ docs do not describe (or contradict), that is a *drift*, and it is resolved by e
 code to match the docs or recording a decision and updating the docs — never by leaving them
 disagreeing. `logos-sync` audits this; the orchestrator enforces it after every phase.
 
-## 2. Resolve the paths (every run, by every tool)
+## 2. Paths: locating the vault and the code repo
 
-Find the Obsidian vault root (the directory containing `.obsidian/`), then derive the code repo as
-its sibling `Logos/` directory. The vault is found BY CONTENT, in three widening steps — never from a
-hardcoded path, because the vault has moved before and a stale hardcoded path fails silently:
+Every tool resolves these paths on every run — this section is the ONLY copy of the vault search in
+the plugin; other files point here instead of repeating it. Find the Obsidian vault root (the
+directory containing `.obsidian/`), then derive the code repo as its sibling `Logos/` directory. The
+vault is found BY CONTENT, in three widening steps — never from a hardcoded path, because the vault
+has moved before and a stale hardcoded path fails silently:
 
 ```bash
 VAULT=""
@@ -80,7 +82,7 @@ Canonical documentation paths (Russian names — never assume English folder nam
 | Web-interface spec | `$DOCS/Дизайн/Веб-интерфейс.md` |
 | Phases folder | `$DOCS/Дизайн/Фазы/` |
 | One phase | `$DOCS/Дизайн/Фазы/Фаза-NN-<имя>.md` |
-| Decision journal | `$DOCS/Журнал/` (format in `references/diary-format.md`) |
+| Decision journal | `$DOCS/Журнал/` (format in `${CLAUDE_PLUGIN_ROOT}/references/diary-format.md`) |
 
 ## 3. The code repository — bootstrap and layout
 
@@ -285,7 +287,7 @@ phase, orchestrated by `logos-build`:
    (`GET /api/version`; redeploy via `logos-devops` if stale), then exercises the phase end-to-end
    against its «Критерии готовности».
 7. **Sync + record** — `logos-sync` audits code-vs-docs drift; the orchestrator updates the phase
-   `статус` and writes a journal entry per `references/diary-format.md`.
+   `статус` and writes a journal entry per `${CLAUDE_PLUGIN_ROOT}/references/diary-format.md`.
 
 **How findings are routed — the rule that keeps §4 point 0 from eroding one fix at a time.** A review,
 QA or sync finding is fixed in code ONLY when it is a bug in what the spec asked for. Three classes of
@@ -316,7 +318,8 @@ owns its initial creation.
 ## 7. Recording build work in the journal
 
 Every significant build decision or outcome is recorded in the Logos decision journal exactly like
-design decisions — one note per event under `$DOCS/Журнал/`, format in `references/diary-format.md`.
+design decisions — one note per event under `$DOCS/Журнал/`, format in
+`${CLAUDE_PLUGIN_ROOT}/references/diary-format.md`.
 Use `тип: решение` for a build/stack/structure decision, `тип: эксперимент` for something tried,
 `тип: наблюдение` for a recorded drift or a completed phase, `тип: тупик` for an approach proven
 unworkable. Set `область` to the architecture layer touched (`оркестрация` / `память` / `модели` /
@@ -376,7 +379,7 @@ system's development — different docs, different repo, different discipline.
 - **Documentation:** `$DOCS/Исследования/` in the vault — `Концепт-исследований.md` (goal,
   hypotheses, constraints), `Направления/` (one note per research direction), `Эксперименты/`
   (the experiment diary: one note = one experiment, hypothesis written BEFORE the code).
-  On-disk format: `references/lab-format.md`.
+  On-disk format: `${CLAUDE_PLUGIN_ROOT}/references/lab-format.md`.
 - **Code:** the SEPARATE repo `Logos-Lab` (`git@github.com:lopatuxin/Logos-Lab.git`), locally
   the vault's sibling `Logos-Lab/` next to the main code repo. One root folder = one
   experiment, named as its diary note slug.

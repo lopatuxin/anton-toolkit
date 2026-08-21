@@ -27,7 +27,7 @@ only HOW it is said, never dumb down the substance.
 
 **Simplicity requirement (hard rule — the design decides what the code becomes, so bloat starts here).**
 The system these documents describe must be simple, functional, easy to extend and easy to debug
-(`references/logos-project.md` §4 point 0 is binding on the DOCUMENTS too). A design document names a
+(`${CLAUDE_PLUGIN_ROOT}/references/logos-project.md` §4 point 0 is binding on the DOCUMENTS too). A design document names a
 mechanism ONLY for a need that exists today — a scenario in the concept, a capability the owner asked for,
 a failure already observed — never for a problem that has not happened yet, and never "for robustness".
 Every mechanism must be explainable to the owner in ONE plain sentence, and it must be VISIBLE to him where
@@ -52,8 +52,8 @@ resolve, and it shows the user a dead link. Write the substance as plain prose i
 
 **Documentation hygiene (hard rule — the document states the current + target system, never its history).**
 A design document describes how the system works now and the target design it is heading toward — it is
-NOT a changelog. All history lives in the decision journal (`references/diary-format.md`), never in the
-document:
+NOT a changelog. All history lives in the decision journal (`${CLAUDE_PLUGIN_ROOT}/references/diary-format.md`),
+never in the document:
 - **No history narration in the document.** No "we decided / it used to be / resolved on Фаза-NN / this is
   (not) a drift" prose. State the current fact and, where useful, the target design plainly; put the
   decision, the rejected alternatives, and the "why" in the journal.
@@ -73,8 +73,8 @@ document:
 **Document decomposition (hard rule — split by responsibility, never let one document grow unbounded).**
 These documents are read by AI agents that must load a document whole to use any part of it, so an
 oversized document taxes every later build: the coder implementing ONE contract pays to read the entire
-file. The code doctrine (`references/logos-project.md` §4 point 9) already forbids god-modules for exactly
-this reason — the same rule binds the documents.
+file. The code doctrine (`${CLAUDE_PLUGIN_ROOT}/references/logos-project.md` §4 point 9) already forbids
+god-modules for exactly this reason — the same rule binds the documents.
 - **Checkpoint at ~600 lines, hard ceiling at 1200.** When the document you are writing or editing crosses
   ~600 lines, ask whether it now holds more than one responsibility; if it does, split it. NEVER leave a
   design document above 1200 lines — split it in the same round in which you grew it past the ceiling.

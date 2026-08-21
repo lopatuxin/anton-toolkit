@@ -1,17 +1,12 @@
 ---
 name: yt-content-plan
 description: >
-  IMPORTANT: Invoke this skill via the Skill tool IMMEDIATELY when the user
-  asks to build a content plan, publication calendar, schedule, or month-of
-  content. Do NOT skip — this skill contains the cadence rules and calendar
-  template in references/.
-
-  Trigger phrases (Russian): "контент-план", "контент план", "расписание
-  видео", "план публикаций", "календарь канала", "контент на месяц",
-  "контент на неделю", "распиши план", "график выхода видео", "план роликов".
-
-  This channel ships 1 video/week, ≤ 20 min, NO Shorts. Plans must respect
-  this cap.
+  Schedules concrete video ideas against weeks and writes the publication
+  calendar to the Obsidian vault, balancing flagship-series episodes,
+  tutorials and lead-gen anchors at 1 video per week, no Shorts. Takes the
+  idea pool from `yt-ideas` (it invents none) and reads the channel
+  knowledge base to avoid re-scheduling recently published topics.
+disable-model-invocation: true
 ---
 
 # yt-content-plan — publication calendar
@@ -32,13 +27,13 @@ Use the index to space topics on the new calendar: do NOT schedule a topic that 
 
 3. **Read the start date.** Default — next Monday from today. Confirm if the user has a specific cadence weekday.
 
-4. **Apply the balance** from `references/cadence.md`:
+4. **Apply the balance** from `${CLAUDE_SKILL_DIR}/references/cadence.md`:
    - Mix: roughly 1 flagship-series episode every 2 weeks, 1 lead-gen every 3–4 weeks, the rest tutorial / case / tool review.
    - Never two flagship episodes back-to-back (lock-in risk).
    - Never two lead-gen back-to-back (audience tunes out the pitch).
    - Open with a strong (top-funnel friendly) idea, not a niche deep-dive.
 
-5. **Render the calendar** using `references/calendar-template.md`.
+5. **Render the calendar** using `${CLAUDE_SKILL_DIR}/references/calendar-template.md`.
 
 6. **Add reservations.** Mark gaps if there are not enough ideas for the period — show the user where they need to source more from `yt-ideas`.
 

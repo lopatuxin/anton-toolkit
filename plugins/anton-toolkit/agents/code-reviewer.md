@@ -1,43 +1,13 @@
 ---
 name: code-reviewer
 description: >
-  Use this agent to review code. Trigger phrases: "проверь код", "сделай ревью",
-  "code review", "проверь что написал", "ревью перед мержем". The agent may also
-  be invoked automatically after a dev agent (java-dev, kotlin-dev, frontend-dev,
-  python-dev) completes a code change when the user's global policy requires it —
-  in that case launch this agent before reporting the task as complete.
-
-  Accepts a file, package, or git diff — returns a structured report with bugs,
-  security issues, and pattern violations. Covers Java, Kotlin, TypeScript, React,
-  CSS, SQL, Dockerfiles.
-
-  <example>
-  Context: User explicitly asks for a review
-  user: "Проверь что я написал"
-  assistant: "Запускаю code-reviewer для проверки изменений."
-  <commentary>
-  Explicit request — launch the agent.
-  </commentary>
-  </example>
-
-  <example>
-  Context: Before merging a branch
-  user: "Сделай ревью перед мержем"
-  assistant: "Запускаю code-reviewer для ревью ветки."
-  <commentary>
-  Explicit request — launch the agent.
-  </commentary>
-  </example>
-
-  <example>
-  Context: Dev agent just finished editing code and the user's global policy mandates a review
-  user: (had previously instructed in CLAUDE.md: "ALWAYS invoke code-reviewer after any code change")
-  assistant: "Запускаю code-reviewer по глобальному правилу пользователя."
-  <commentary>
-  Global policy treats every code change as a trigger — launch automatically, do not wait for an explicit request this turn.
-  </commentary>
-  </example>
-
+  Reviews code — a file, a package, or a git diff — and returns a structured report of bugs,
+  security issues, performance problems, and pattern violations across Java, Kotlin,
+  TypeScript/React, CSS, SQL, and Dockerfiles. Use when the user asks for a review
+  ("проверь код", "сделай ревью", "ревью перед мержем"); also launched automatically after
+  a dev agent finishes when the user's policy requires a review, before the task is reported
+  as complete. Runs autonomously, one-shot, no dialog; for a review against the project's
+  documentation with paste-ready MR comments use /mr-review (mr-spec-reviewer) instead.
 model: opus
 color: yellow
 tools: ["Read", "Glob", "Grep", "Bash"]

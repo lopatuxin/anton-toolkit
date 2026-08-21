@@ -1,46 +1,14 @@
 ---
 name: yt-strategist
 description: >
-  Use this agent autonomously to produce a weekly strategic top-5 video idea
-  shortlist for the user's own YouTube channel. The agent reads the persistent
-  knowledge base built by yt-knowledge-base (own channel) and the most recent
-  competitor reports in the vault, then synthesises 5 prioritised ideas with
-  evidence-backed rationale. Runs one-shot, returns a structured Russian
-  report and persists it to the Obsidian vault. Does NOT modify the knowledge
-  base — refresh is the responsibility of yt-knowledge-base.
-
-  Trigger phrases (Russian): "что снимать на этой неделе", "стратегические
-  идеи", "топ идеи на неделю", "выдай топ-5 идей", "стратег по каналу",
-  "yt-strategist", "приоритет идей", "что в приоритете снять".
-
-  Typical use:
-  <example>
-  Context: User wants a weekly idea shortlist driven by the channel's accumulated data.
-  user: "Что снимать на этой неделе?"
-  assistant: "Запускаю yt-strategist — соберу топ-5 идей по базе канала и свежим отчётам конкурентов."
-  <commentary>
-  Weekly cadence query — exactly what the agent is designed for. The user
-  typically runs yt-knowledge-base refresh before this agent, but the agent
-  also works on stale data (with a freshness warning) and on a missing
-  competitor report (will note the gap).
-  </commentary>
-  </example>
-
-  <example>
-  Context: User invokes via /schedule to run this agent every Monday at 09:00.
-  user: (cron-triggered) "Прогон yt-strategist"
-  assistant: (runs the agent, posts the resulting shortlist)
-  <commentary>
-  Recurring strategic pipeline — Monday morning shortlist that feeds yt-script
-  and yt-content-plan for the rest of the week.
-  </commentary>
-  </example>
-
-  Discrimination:
-  - For brainstorming 10–20 raw ideas without prioritisation — use the
-    yt-ideas skill, not this agent.
-  - For refreshing the knowledge base — use yt-knowledge-base, not this agent.
-  - For writing the script of a chosen idea — use yt-script, not this agent.
+  Produces the weekly strategic top-5 video shortlist for the user's own
+  YouTube channel: reads the knowledge base built by `yt-knowledge-base` and
+  the two most recent competitor reports in the vault, scores candidates on
+  evidence, lead-gen potential and execution cost, and writes 5 prioritised
+  ideas whose rationale traces to a real vault file. Runs autonomously,
+  one-shot, and does not modify the knowledge base — refreshing it is
+  `yt-knowledge-base`. For an unprioritised batch of 10-20 ideas dispatch
+  the `yt-ideas` skill instead.
 tools: ["Read", "Glob", "Grep", "Write"]
 model: opus
 ---

@@ -1,18 +1,13 @@
 ---
 name: yt-thumbnail
 description: >
-  IMPORTANT: Invoke this skill via the Skill tool IMMEDIATELY when the user
-  asks for thumbnail concept, preview image idea, превью для видео, or
-  thumbnail text. Do NOT skip — this skill contains thumbnail patterns and
-  composition rules in references/.
-
-  Trigger phrases (Russian): "превью для видео", "превью для ролика", "сделай
-  превью", "идея превью", "обложка для видео", "thumbnail для видео",
-  "thumbnail концепт", "что нарисовать на превью", "текст на превью",
-  "композиция превью", "превью на ролик".
-
-  This skill produces a CONCEPT (text + composition + colour + emotion), not
-  the actual image. The user designs the image themselves or in a tool.
+  Produces 2-3 thumbnail concepts for a video with a recommended pick and
+  saves the brief to the Obsidian vault: a 3-5 word Russian text overlay,
+  the composition layers, a 2-3 colour scheme and one dominant emotion,
+  checked for legibility at mobile size. A brief the user takes to a design
+  tool, not the image itself, and it composes with the title rather than
+  repeating it — the title, description and tags are `yt-seo`.
+disable-model-invocation: true
 ---
 
 # yt-thumbnail — thumbnail concept
@@ -34,9 +29,9 @@ Use the loaded titles to keep the new thumbnail text coherent with what the chan
 
    If unclear, ask once: "Какой момент в видео самый визуально яркий — экран IDE с кодом, ты с реакцией, готовый интерфейс приложения, что-то ещё?"
 
-2. **Pick a pattern** from `references/patterns.md`. Patterns are channel-coherent layouts that work for IT content. Pick one that matches the title formula and content type.
+2. **Pick a pattern** from `${CLAUDE_SKILL_DIR}/references/patterns.md`. Patterns are channel-coherent layouts that work for IT content. Pick one that matches the title formula and content type.
 
-3. **Generate the concept** following `references/composition.md`:
+3. **Generate the concept** following `${CLAUDE_SKILL_DIR}/references/composition.md`:
    - Text overlay: 3–5 words. Russian. High-contrast.
    - Composition: foreground / mid / background layers, with what goes where.
    - Colour scheme: 2–3 colours max, one dominant.

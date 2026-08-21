@@ -111,7 +111,8 @@ shows in each.>
 **Крайние случаи:** <ONLY the display states the owner will actually meet — an empty collection, a long
 list, very long text. NOT offline/reconnect machinery, optimistic updates, retries, conflict resolution
 or "what if the server…" — a failed request is one thing on every screen: an honest error the owner
-sees (`references/logos-project.md` §4 point 0). Leave the line out when there is nothing real to say.>
+sees (`${CLAUDE_PLUGIN_ROOT}/references/logos-project.md` §4 point 0). Leave the line out when there is
+nothing real to say.>
 ```
 
 Repeat for every screen in the sitemap. Be complete about what the owner sees and does — this is what

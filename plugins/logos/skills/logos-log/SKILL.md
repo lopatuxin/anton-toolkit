@@ -1,56 +1,28 @@
 ---
 name: logos-log
 description: >
-  The Logos decision journal — the project's long-term memory. Record a design decision, an
-  experiment, or a dead end as its own searchable note; search the journal by area / type / weight /
-  status / date instead of scrolling through it; and mark the outcome of an experiment (worked /
-  failed), adjusting its importance weight. The journal is the assistant's own working memory — it is
-  written for the model, not for the user to sign off; there is no user-review step. Each
-  entry carries frontmatter fields that the vault's Dataview plugin indexes, so finding a specific
-  event is a query, not a manual hunt. Runs DIRECTLY in conversation, single-shot, no agents.
-  Entries live in the Logos/Журнал/ folder of the Obsidian vault.
-
-  Trigger phrases (Russian, real user input): "/logos-log", "запиши решение logos",
-  "залогируй решение", "журнал logos", "что мы решали по", "найди в журнале logos",
-  "покажи решения по памяти", "покажи тупики logos",
-  "отметь результат эксперимента", "эксперимент сработал", "эксперимент провалился".
-
-  Discrimination: this is the Logos PROJECT decision journal. For a personal life diary use dnevnik;
-  for designing the Logos architecture use logos-design; for experiments of the RESEARCH BRANCH
-  (Logos/Исследования/, repo Logos-Lab — the hypothesis→result loop) use logos-lab: the journal keeps
-  project decisions, including the cross-cutting ones about the branch itself, while the branch's
-  experiment diary lives in logos-lab. This skill only records, searches, and updates journal
-  entries — it does not design anything.
+  The Logos project decision journal in Logos/Журнал/: records a design decision, an experiment or a
+  dead end as its own note with Dataview-indexed frontmatter, searches the journal by area / type /
+  weight / status / date, and marks an experiment's outcome (worked / failed) adjusting its weight;
+  written for the model, no user sign-off; single-shot, no agents. For a personal diary use dnevnik,
+  for designing the architecture logos-design, for experiments of the research branch
+  (Logos/Исследования/, repo Logos-Lab) logos-lab — this skill only records, searches and updates
+  entries.
+when_to_use: >
+  "/logos-log", "запиши решение logos", "найди в журнале logos", "покажи тупики logos"
 ---
 
 # Logos-log — the Logos decision journal
 
-**Reference files — resolve the path BEFORE reading (this plugin's most frequent failure).** Every
-`references/<file>.md` cited anywhere in this document means `<plugin-root>/references/<file>.md`: the
-reference files live at the PLUGIN ROOT, never inside a skill's own folder. The base directory given to
-this skill at load time is `<plugin-root>/skills/<this-skill>/`, so a bare relative path resolves to
-`<plugin-root>/skills/<this-skill>/references/<file>.md` — that file does not exist and the read fails.
-Resolve it as `<this skill's base directory>/../../references/<file>.md`. If no base directory was given,
-locate the file with Glob (pattern `**/references/<file>.md`, path `<user home>/.claude/plugins`) and take
-the match under `.../logos/` — either the installed cache
-`.claude/plugins/cache/anton-toolkit-marketplace/logos/<version>/references/` or the marketplace working
-copy `.claude/plugins/marketplaces/anton-toolkit-marketplace/plugins/logos/references/`.
-
-- Correct: `C:\Users\<user>\.claude\plugins\cache\anton-toolkit-marketplace\logos\<version>\references\logos-project.md`
-- Incorrect: `references/logos-project.md` — resolves under the skill folder, which has no `references/`.
-
-Never report a reference file as missing, and never proceed on remembered content, without running that
-Glob first. The same rule applies to every path you paste into an agent prompt: pass the RESOLVED absolute
-path, never the bare `references/...` form.
-
 The journal is Logos's long-term project memory: every decision, experiment, and dead end as a
 separate, searchable note. The storage format, file locations, frontmatter fields, and the
-self-updating Dataview index are defined in `references/diary-format.md` — **read it and follow it
-verbatim**. This skill is the user-facing interface over that format: record, search, outcome.
+self-updating Dataview index are defined in `${CLAUDE_PLUGIN_ROOT}/references/diary-format.md` — **read
+it and follow it verbatim**. This skill is the user-facing interface over that format: record, search,
+outcome.
 
 **Project context:** the journal records both DESIGN decisions and BUILD decisions. Where the Logos
 code lives, where the docs live, and how they stay in sync is described in
-`references/logos-project.md` — read it so build-related entries use the right `область` and link to
+`${CLAUDE_PLUGIN_ROOT}/references/logos-project.md` — read it so build-related entries use the right `область` and link to
 the right artifacts. An experiment of the RESEARCH BRANCH (`Logos/Исследования/`, repo `Logos-Lab` —
 see that reference's §10) is NOT a journal entry — route it to the `logos-lab` skill; the journal
 keeps only cross-cutting project decisions about the branch (e.g. a matured conclusion entering the
@@ -59,7 +31,8 @@ main design).
 ## 0. Setup (every run)
 
 Locate the vault and ensure the journal folder + folder note exist exactly as described in
-`references/diary-format.md` sections 1–2 (idempotent — create only what is missing, never overwrite).
+`${CLAUDE_PLUGIN_ROOT}/references/diary-format.md` sections 1–2 (idempotent — create only what is
+missing, never overwrite).
 If the vault is not found, tell the user in Russian as that reference instructs, then stop.
 
 ## 1. Determine the mode
@@ -77,7 +50,7 @@ If ambiguous, ask the user in Russian which they want, in one short question.
 
 1. Get the content from the user. If nothing was dictated, ask in Russian: «Диктуй решение — запишу в журнал.» and wait. Never create an empty entry.
 2. Classify with the user's words (ask briefly only if you cannot infer): `тип` (решение / эксперимент / тупик / откат / наблюдение) and `область` (оркестрация / память / модели / автономность / ресурсы / общее).
-3. Set initial frontmatter per `references/diary-format.md` section 4: today's `дата`, the `тип` and
+3. Set initial frontmatter per `${CLAUDE_PLUGIN_ROOT}/references/diary-format.md` section 4: today's `дата`, the `тип` and
    `область`, `вес: 5` (default), `статус` (`принято` for a decision, `проверяется` for an
    experiment, `тупик`/`откат` for those).
 4. Write the entry as a NEW note at `$VAULT/Logos/Журнал/<YYYY-MM-DD>-<краткое-русское-имя>.md`

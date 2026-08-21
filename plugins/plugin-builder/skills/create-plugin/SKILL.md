@@ -1,18 +1,12 @@
 ---
 name: create-plugin
 description: >
-  Create a new plugin from scratch in the anton-toolkit-marketplace via a
-  task-centric interview. Triggers when the user wants a plugin that does not
-  yet exist. Example phrases: "создай плагин", "нужен новый плагин", "хочу
-  плагин для", "сделай плагин, который", "создай инструмент".
-
-  Discrimination: if the plugin the user mentions already exists in
-  `plugins/<name>/`, delegate to `extend-plugin` (proactive modification) or
-  `improve-plugin` (reactive fix after an incident). Only trigger when the
-  plugin directory does not exist.
-
-  This skill runs DIRECTLY in conversation. Do NOT launch agents for the
-  interview part — agents lose context between turns and cannot do dialog.
+  Creates a new plugin from scratch in the anton-toolkit-marketplace through a task-centric interview.
+  Use when the plugin the user wants does not yet exist under `plugins/<name>/`; if it already exists,
+  use extend-plugin to add to it or improve-plugin to fix it after an incident. Runs in the main
+  conversation; the interview is not delegated to agents.
+when_to_use: >
+  "создай плагин", "нужен новый плагин", "хочу плагин для", "сделай плагин, который"
 ---
 
 # Create Plugin — guided plugin creation

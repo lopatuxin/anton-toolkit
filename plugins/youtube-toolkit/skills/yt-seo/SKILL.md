@@ -1,17 +1,13 @@
 ---
 name: yt-seo
 description: >
-  IMPORTANT: Invoke this skill via the Skill tool IMMEDIATELY when the user
-  asks for video title (with A/B variants), description (with timestamps),
-  or tags. Do NOT skip — this skill contains title formulas, description
-  template, and tag strategy in references/.
-
-  Trigger phrases (Russian): "SEO для видео", "название и описание", "тайтл
-  и теги", "подбери название", "варианты заголовка", "опиши видео",
-  "описание для видео", "теги для видео", "оптимизация ролика", "metadata
-  для видео", "название ролика", "сделай описание".
-
-  This skill does NOT cover thumbnails — that is yt-thumbnail.
+  Produces the YouTube Studio metadata for one video and saves it to the
+  Obsidian vault: 5 annotated title variants with a recommended pick, a full
+  Russian description with timestamps, CTA and links, and 15-30 ordered tags.
+  Prefers the title formulas and tag patterns the channel's top-performing
+  videos already validated. Thumbnails are `yt-thumbnail`, the script itself
+  is `yt-script`.
+disable-model-invocation: true
 ---
 
 # yt-seo — title, description, tags
@@ -22,7 +18,7 @@ Produce: 5 title variants (A/B-style), one full description with timestamps and 
 
 Follow `${CLAUDE_PLUGIN_ROOT}/references/knowledge-base-context.md`. For `yt-seo` specifically, when `kb_available: true` read: `индекс.md` and the top 10 `top`-classified cards (frontmatter + description sections — skip the transcript body to keep context light).
 
-Use the loaded cards to mine the channel's working SEO patterns: which title formulas recur in the `top` set, which tag categories appear repeatedly, how descriptions are structured. Prefer formulas that the channel already validated over generic best practice. If the KB is absent, fall back to the generic title formulas in `references/title-formulas.md` unchanged.
+Use the loaded cards to mine the channel's working SEO patterns: which title formulas recur in the `top` set, which tag categories appear repeatedly, how descriptions are structured. Prefer formulas that the channel already validated over generic best practice. If the KB is absent, fall back to the generic title formulas in `${CLAUDE_SKILL_DIR}/references/title-formulas.md` unchanged.
 
 ## Procedure
 
@@ -34,12 +30,12 @@ Use the loaded cards to mine the channel's working SEO patterns: which title for
 
    If a `yt-script` output is in the conversation, pull from it. If only an idea exists, work from that but flag less precision in timestamps.
 
-2. **Generate 5 titles** using `references/title-formulas.md`:
+2. **Generate 5 titles** using `${CLAUDE_SKILL_DIR}/references/title-formulas.md`:
    - Pick 3 different formulas (e.g., outcome-reveal, problem-mirror, sharp-opinion).
    - For each chosen formula, produce 1–2 variants.
    - Annotate each variant with: formula name, character count, hook type, predicted CTR lever.
 
-3. **Build the description** using `references/description-template.md`:
+3. **Build the description** using `${CLAUDE_SKILL_DIR}/references/description-template.md`:
    - Hook line (1–2 sentences in plain prose, repeats the value prop).
    - Series breadcrumb if flagship.
    - Timestamps (6–10 entries for 12 min video, scaled by length). If timestamps are placeholders (script not finalised), mark them clearly.
@@ -47,7 +43,7 @@ Use the loaded cards to mine the channel's working SEO patterns: which title for
    - Useful links section (tools mentioned, repos, related videos).
    - Hashtag block at the end — 3–5 hashtags max in description.
 
-4. **Generate tags** using `references/tags.md`:
+4. **Generate tags** using `${CLAUDE_SKILL_DIR}/references/tags.md`:
    - 15–30 tags total.
    - Mix: brand (channel name + series), niche head terms, long-tail variations, tool names, Russian and selective English terms.
    - Order: most specific/searched first.

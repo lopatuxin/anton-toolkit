@@ -1,16 +1,14 @@
 ---
 name: yt-script
 description: >
-  IMPORTANT: Invoke this skill via the Skill tool IMMEDIATELY when the user
-  asks to write a video script, structure a video, draft a hook, or outline
-  acts of a video. Do NOT skip — this skill contains hook formulas,
-  structures, CTA placement and pacing rules in references/.
-
-  Trigger phrases (Russian): "сценарий для видео", "напиши сценарий", "сделай
-  сценарий", "структура ролика", "hook для видео", "хук для видео", "скрипт
-  ролика", "распиши ролик", "набросай сценарий", "план ролика".
-
-  Output is in Russian. Maximum length cap: 20 min.
+  Writes the full Russian talk track of a video — hook, acts, CTA placement,
+  outro — and saves it to the Obsidian vault, capped at 20 minutes. Picks the
+  structure and hook formula by video type, and first calibrates the voice
+  against the user's already-written scripts and the transcripts of the
+  channel's top videos. Spoken text only: no b-roll or on-screen directions
+  (that is `yt-montage`), no title, description, tags or thumbnail (those are
+  `yt-seo` and `yt-thumbnail`).
+disable-model-invocation: true
 ---
 
 # yt-script — write a video script
@@ -44,22 +42,22 @@ This style calibration takes precedence over any generic "good script" instinct.
 
    If any input is missing, ask once before writing.
 
-2. **Pick the structure** in `references/structure.md` based on type:
+2. **Pick the structure** in `${CLAUDE_SKILL_DIR}/references/structure.md` based on type:
    - Tutorial / how-to → 4-act structure
    - Case study / build-along → narrative arc
    - Tool review / opinion → claim → evidence → counter-evidence → verdict
    - Flagship episode → state-recap → goal → struggle → resolution → next-episode hook
 
-3. **Pick the hook formula** from `references/hook-formulas.md`. The hook is the first 15 seconds — the most important 30–60 spoken words. Test the formula against the idea: it must answer "почему мне смотреть дальше" in one beat.
+3. **Pick the hook formula** from `${CLAUDE_SKILL_DIR}/references/hook-formulas.md`. The hook is the first 15 seconds — the most important 30–60 spoken words. Test the formula against the idea: it must answer "почему мне смотреть дальше" in one beat.
 
-4. **Place the CTA** using `references/cta.md`:
+4. **Place the CTA** using `${CLAUDE_SKILL_DIR}/references/cta.md`:
    - Lead-gen anchor video → CTA mid-roll (40–60% mark) and end-roll. Soft mention in opening.
    - Flagship series → end-roll CTA only (audience already invested).
    - Tutorial / tool review → end-roll CTA only.
 
    Use `{{SITE_URL}}` placeholder until the site is live. Soft fallback: "контакты в закреплённом комментарии".
 
-5. **Apply pacing rules** from `references/structure.md`:
+5. **Apply pacing rules** from `${CLAUDE_SKILL_DIR}/references/structure.md`:
    - One concrete payoff every 2 minutes. No "filler" stretches.
    - Cut a section if it does not pay off.
 

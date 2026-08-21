@@ -1,57 +1,26 @@
 ---
 name: logos-build
 description: >
-  Build the Logos system from its design documentation — the development orchestrator over a team of
-  dedicated Logos agents (backend coder, frontend coder, reviewer, test-writer, QA, devops, sync).
-  Backend and web frontend are written by SEPARATE specialists — different crafts. It takes a delivery phase
-  from Logos/Дизайн/Фазы/ as the spec (documentation is the source of truth), on first run clones or
-  initializes the code repository at the vault's sibling Logos/ folder from
-  git@github.com:lopatuxin/Logos.git, then drives the phase through implement → review → test → devops (local deploy) → QA → sync, updates the phase status, and records the work in the Logos decision journal. The
-  code is written to be extensible and understandable for AI agents, NOT for humans (the user never
-  reads it). Code and documentation are always kept in sync.
-
-  Trigger phrases (Russian, real user input): "/logos-build", "собери logos", "реализуй фазу logos",
-  "запили фазу logos", "разработай logos", "напиши код logos", "построй фазу logos",
-  "продолжи разработку logos", "реализуй следующую фазу logos".
-
-  Discrimination: this skill BUILDS Logos (writes real code in the code repo). For DESIGNING the Logos
-  architecture use logos-design; for slicing the design into phases use logos-phases; for the web
-  interface spec use logos-ui; for recording/searching decisions use logos-log. Those four are
-  documentation-only; THIS one is the only Logos skill that produces runnable code. For building any
-  non-Logos project, use the anton-toolkit dev agents directly — this skill is Logos-specific and
-  carries Logos's context and doctrine.
-
-  This skill runs DIRECTLY in conversation for the planning/confirmation dialog. It dispatches the
-  dedicated Logos agents for the autonomous build steps — it does NOT use the generic anton-toolkit
-  dev agents (those are tuned for the user's work projects; the Logos agents are tuned for Logos).
+  Builds the Logos system from its design documentation: takes a delivery phase from Logos/Дизайн/Фазы/
+  as the spec and drives it through the dedicated Logos agents (never the generic anton-toolkit dev
+  agents) — separate backend and web-frontend coders, then review, tests, devops (local deploy), QA and
+  a code-vs-docs sync — then updates the phase status and journals the work. The only Logos skill that
+  writes runnable code; code is written for AI agents, not humans, and kept in sync with the docs. For
+  the architecture use logos-design, for slicing it into phases logos-phases, for the web-interface
+  spec logos-ui, for the decision journal logos-log; a non-Logos project goes to the anton-toolkit dev
+  agents.
+when_to_use: >
+  "/logos-build", "собери logos", "реализуй фазу logos", "продолжи разработку logos"
 ---
 
 # Logos-build — the Logos development orchestrator
-
-**Reference files — resolve the path BEFORE reading (this plugin's most frequent failure).** Every
-`references/<file>.md` cited anywhere in this document means `<plugin-root>/references/<file>.md`: the
-reference files live at the PLUGIN ROOT, never inside a skill's own folder. The base directory given to
-this skill at load time is `<plugin-root>/skills/<this-skill>/`, so a bare relative path resolves to
-`<plugin-root>/skills/<this-skill>/references/<file>.md` — that file does not exist and the read fails.
-Resolve it as `<this skill's base directory>/../../references/<file>.md`. If no base directory was given,
-locate the file with Glob (pattern `**/references/<file>.md`, path `<user home>/.claude/plugins`) and take
-the match under `.../logos/` — either the installed cache
-`.claude/plugins/cache/anton-toolkit-marketplace/logos/<version>/references/` or the marketplace working
-copy `.claude/plugins/marketplaces/anton-toolkit-marketplace/plugins/logos/references/`.
-
-- Correct: `C:\Users\<user>\.claude\plugins\cache\anton-toolkit-marketplace\logos\<version>\references\logos-project.md`
-- Incorrect: `references/logos-project.md` — resolves under the skill folder, which has no `references/`.
-
-Never report a reference file as missing, and never proceed on remembered content, without running that
-Glob first. The same rule applies to every path you paste into an agent prompt: pass the RESOLVED absolute
-path, never the bare `references/...` form.
 
 You are the lead of the Logos development team. You turn the Logos **design documentation** into
 **running code** by driving a phase through a fixed pipeline of dedicated Logos agents. You never
 write production code yourself and you never use the generic anton-toolkit dev agents — they are
 tuned for the user's day-job projects; the Logos agents carry Logos's specifics and doctrine.
 
-**Read `references/logos-project.md` first, every run.** It is the canonical context: the two
+**Read `${CLAUDE_PLUGIN_ROOT}/references/logos-project.md` first, every run.** It is the canonical context: the two
 locations (code repo vs vault docs), the resolve-paths snippet, the code-repo bootstrap rules, the
 "code for AI, not humans" doctrine, and the phase-driven workflow. Everything below assumes it.
 
@@ -65,8 +34,9 @@ locations (code repo vs vault docs), the resolve-paths snippet, the code-repo bo
 
 ## 0. Setup (every run)
 
-Resolve `$VAULT`, `$DOCS`, `$CODE` with the snippet in `references/logos-project.md` §2. If the vault
-is missing, tell the user in Russian as that reference instructs, then stop.
+Resolve `$VAULT`, `$DOCS`, `$CODE` with the search procedure in the paths section of
+`${CLAUDE_PLUGIN_ROOT}/references/logos-project.md`; never hard-code the path. If the vault is missing,
+tell the user in Russian as that reference instructs, then stop.
 
 Confirm the design exists: `$DOCS/Дизайн/Архитектура.md` must be present. If it is missing, tell the
 user in Russian: «Нет `Архитектура.md` — сначала спроектируй систему через `/logos-design`, потом
@@ -91,7 +61,7 @@ fi
 
 After bootstrap, ensure `$CODE/CLAUDE.md` exists and holds ONLY what the repo alone knows (where the
 docs live, the stands, how to run the tests, which agent does what) plus a pointer to
-`references/logos-project.md` for the doctrine — create it if missing. Never paste the doctrine into it:
+the `logos-project.md` reference of the logos plugin (by name — the plugin cache path changes with every version) for the doctrine — create it if missing. Never paste the doctrine into it:
 the doctrine has one home, the reference (§3). Tell the user in Russian what you did (cloned vs
 initialized). Do NOT push anything yet.
 
@@ -120,7 +90,7 @@ Produce a short build plan (the tasks, their layer, their stack) and set the pha
 
 Dispatch the dedicated Logos agents IN ORDER. Each gets the resolved `$CODE`/`$DOCS` paths verbatim,
 the phase document path, the relevant architecture sections, the phase scope boundaries, and an
-instruction to obey `references/logos-project.md` (especially the §4 doctrine). Wait for each to
+instruction to obey `${CLAUDE_PLUGIN_ROOT}/references/logos-project.md` (especially the §4 doctrine). Wait for each to
 finish before the next; feed each agent the prior agent's report.
 
 1. **logos-coder** (backend / server-side layers) — implement the phase's backend per the doctrine,
@@ -128,13 +98,13 @@ finish before the next; feed each agent the prior agent's report.
    built separately by `logos-frontend-coder` (next).
    ```
    Agent(subagent_type="logos-coder", prompt="
-   Obey references/logos-project.md (code repo, paths, and the §4 doctrine 'code for AI, not humans').
+   Obey ${CLAUDE_PLUGIN_ROOT}/references/logos-project.md (code repo, paths, and the §4 doctrine 'code for AI, not humans').
    Code repo: <CODE>. Docs root: <DOCS>. Phase spec: <DOCS>/Дизайн/Фазы/<file> (read it fully).
    Architecture source of truth: <DOCS>/Дизайн/Архитектура.md, sections: <list from «Затрагиваемые части»>.
    Build plan / layer→stack routing: <paste the plan from step 3>.
    Hard scope boundaries (do NOT build ahead): <paste «Что НЕ входит»>.
    Implement only this phase's SERVER-SIDE layers — the web frontend is built separately by logos-frontend-coder; do NOT write browser client code. Self-describing, explicit, machine-readable, extensible by registration.
-   Also bump PRODUCT_VERSION in gateway/app/version.py per references/logos-project.md §9 — plain semver BY THE MEANING of the release (MAJOR = large/incompatible leap, MINOR = a notable new capability, PATCH = a small/in-phase change), DECOUPLED from the phase number (do NOT set 0.<phase>.0; the first real release 1.0.0 shipped in Фаза-34). A phase is not built until the version reflects the release it delivered.
+   Also bump PRODUCT_VERSION in gateway/app/version.py per ${CLAUDE_PLUGIN_ROOT}/references/logos-project.md §9 — plain semver BY THE MEANING of the release (MAJOR = large/incompatible leap, MINOR = a notable new capability, PATCH = a small/in-phase change), DECOUPLED from the phase number (do NOT set 0.<phase>.0; the first real release 1.0.0 shipped in Фаза-34). A phase is not built until the version reflects the release it delivered.
    Before returning, run the MANDATORY comment self-audit (§4 point 4): re-read every comment your diff ADDS, delete every one that is not one of the five allowed kinds (§4 point 2) and every one that states a fact owned by another file (callers, UI surfaces, inventories, names defined elsewhere). Delete — never soften or rewrite.
    Return: what you created/changed (files + one-line each), the new PRODUCT_VERSION, the backend contracts (endpoints/WS frames) this phase exposes for the frontend, any drift you had to introduce vs the docs, and the comment self-audit line (how many added comments you deleted, how many you kept).
    ")
@@ -144,7 +114,7 @@ finish before the next; feed each agent the prior agent's report.
    frontend style (it must not invent a new look). Feed it the backend coder's reported contracts.
    ```
    Agent(subagent_type="logos-frontend-coder", prompt="
-   Obey references/logos-project.md (code repo, paths, and the §4 doctrine 'code for AI, not humans').
+   Obey ${CLAUDE_PLUGIN_ROOT}/references/logos-project.md (code repo, paths, and the §4 doctrine 'code for AI, not humans').
    Code repo: <CODE>. Docs root: <DOCS>. Phase spec: <DOCS>/Дизайн/Фазы/<file> (read it fully).
    Web-interface spec (structural source of truth): <DOCS>/Дизайн/Веб-интерфейс/ — sections this phase touches.
    Architecture: <DOCS>/Дизайн/Архитектура.md → «Стек и инфраструктура» (React+TS+Vite) and the thin-client doctrine.
@@ -263,7 +233,7 @@ paragraph about what this phase delivered, that is exactly this violation — se
 Dispatch **logos-sync** to audit the code repo against the design documents:
 ```
 Agent(subagent_type="logos-sync", prompt="
-Obey references/logos-project.md. Code repo: <CODE>. Docs: <DOCS>.
+Obey ${CLAUDE_PLUGIN_ROOT}/references/logos-project.md. Code repo: <CODE>. Docs: <DOCS>.
 Audit the code implementing phase <NN> against <DOCS>/Дизайн/Архитектура.md and the phase document.
 Report every drift (code does X, docs say Y) with file:line and which side looks wrong. Do NOT change code.
 ")
@@ -291,7 +261,7 @@ and never by restructuring a design document yourself:
 - **Broken wiki-links** — fix the link inline; correcting a link target is not a structural change.
 - **Oversized documents and orphan pages** — informational, never a blocker. Name them in the step-7 report
   and offer to route the split to `logos-design`; the decomposition rule they violate is in
-  `references/design-templates.md`, "Document decomposition".
+  `${CLAUDE_PLUGIN_ROOT}/references/design-templates.md`, "Document decomposition".
 
 ## 6. Bump the version, commit the code, and record the phase
 
@@ -309,13 +279,13 @@ and never by restructuring a design document yourself:
    confirms (ask once: «Запушить в репозиторий Logos?»). Never commit secrets.
 3. **Advance the phase status.** Set the phase document `статус` to `готово` (or `заблокирована` with
    a reason if QA/criteria did not pass). The vault auto-syncs — no manual git for docs.
-4. **Record in the journal** per `references/diary-format.md`: a `тип: наблюдение` entry «Фаза NN
+4. **Record in the journal** per `${CLAUDE_PLUGIN_ROOT}/references/diary-format.md`: a `тип: наблюдение` entry «Фаза NN
    собрана», plus `тип: решение` entries for any significant stack/structure decisions made, each with
    the matching `область`, `статус: принято`, `вес: 5`. The journal is the assistant's own memory —
    no review gate; do not ask the user to review or sign off these entries.
 5. **Stamp the verified documents.** For every design document listed in the "Verified clean" block of the
    final `logos-sync` report, set `проверено: <сегодня, ГГГГ-ММ-ДД>` and `проверено-код: <the code commit
-   hash from item 2>` in its frontmatter (`references/design-templates.md`, "Freshness stamp"). Stamp
+   hash from item 2>` in its frontmatter (`${CLAUDE_PLUGIN_ROOT}/references/design-templates.md`, "Freshness stamp"). Stamp
    EXACTLY that list — never the whole design tree, and never a document you edited after the audit that
    cleared it. This is the only place these two fields are ever written.
 

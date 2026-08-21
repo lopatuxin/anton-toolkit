@@ -1,9 +1,11 @@
 ---
 name: roadmap
 description: >
-  Build a vibe-coding teaching roadmap by interviewing the teacher with open questions (one at
-  a time, no multiple-choice) and saving the program as a Russian Markdown file in the vault's
-  Курс/ folder. Invoked explicitly via the /roadmap command only — no auto-trigger.
+  Builds a vibe-coding course roadmap by interviewing the teacher with open questions, one at a
+  time and never multiple-choice, then saves the program as a Russian Markdown file in the
+  vault's Курс/ folder (update or start over when one already exists). Runs in the main
+  conversation. To write a single lesson from the roadmap use `lesson`.
+disable-model-invocation: true
 ---
 
 # Roadmap — interview-driven course program for vibe-coding

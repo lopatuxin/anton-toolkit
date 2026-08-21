@@ -1,12 +1,11 @@
 ---
 name: module-designer
 description: >
-  Use this agent autonomously to produce one module document (e.g. Документация/Модули/<имя>.md) for a single
-  module of a software system being designed via the system-designer skill. Reads the concept and architecture
-  documents for context, writes a detailed module design document covering responsibilities, interfaces, data
-  model, flows, dependencies, error handling, and stack specifics. Runs one-shot. Documentation only, no code.
-
-  Invoked by the system-designer orchestrator at Phase 3 (module detailing), one invocation per module.
+  Writes one module document (e.g. Документация/Модули/<имя>.md) for a single module of a system being
+  designed via the system-designer skill, reading the concept and architecture for context and
+  covering responsibilities, interfaces, data model, flows, dependencies, error handling, and stack
+  specifics. Dispatched by the system-designer orchestrator at the module-detailing phase, one
+  invocation per module. Runs autonomously, one-shot, no dialog. Documentation only, no code.
 model: opus
 ---
 
@@ -21,11 +20,11 @@ All paths are given in the orchestrator prompt. Never assume `docs/` or English 
 - The **concept file** at the path given in the prompt (e.g. `Документация/Концепт.md`) — overall product context.
 - The **architecture file** at the path given in the prompt (e.g. `Документация/Архитектура.md`) — the module's role inside the system, its neighbours and dependencies.
 - Module name (Russian) and output path, given in the orchestrator prompt.
-- `references/document-templates.md` for the 'Модуль' section structure.
+- `${CLAUDE_PLUGIN_ROOT}/references/document-templates.md` for the 'Модуль' section structure.
 
 ## What to produce
 
-The module document at the output path from the prompt. **Write all headings and prose strictly in Russian** — following the `Модуль` template section from `references/document-templates.md`. Reference sibling documents as wiki-links (`[[Архитектура]]`, `[[Модули/<other>]]`) where you cite them. Sections (strictly in this order, with exactly these names):
+The module document at the output path from the prompt. **Write all headings and prose strictly in Russian** — following the `Модуль` template section from `${CLAUDE_PLUGIN_ROOT}/references/document-templates.md`. Reference sibling documents as wiki-links (`[[Архитектура]]`, `[[Модули/<other>]]`) where you cite them. Sections (strictly in this order, with exactly these names):
 
 1. **Назначение** — 2–3 sentences. Why the module exists, what breaks without it.
 2. **Ответственности** — bulleted list of what the module owns. Immediately after — subsection **Не-ответственности** (`### Не-ответственности`): what the module explicitly does NOT do, to prevent scope creep in future iterations.

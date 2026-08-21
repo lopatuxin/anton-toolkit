@@ -1,17 +1,12 @@
 ---
 name: devops
 description: >
-  IMPORTANT: Invoke this skill via the Skill tool IMMEDIATELY when the user
-  mentions anything related to Docker, containers, deployment, or infrastructure.
-  Do NOT attempt to handle these tasks without loading this skill first — it
-  contains essential templates and best practices in references/.
-
-  Trigger phrases (Russian and English): "docker", "dockerfile", "compose",
-  "контейнер", "контейнеризация", "разверни", "развернуть проект", "задеплой",
-  "деплой", "запусти проект", "подними сервис", "подними в докере", "инфра",
-  "инфраструктура", "cicd", "ci/cd", "пайплайн", "pipeline", "nginx",
-  "health check", "логи контейнера", "в докере", "/devops", or any request
-  related to Docker, deployment, infrastructure setup, or service orchestration.
+  Containerization, deployment, and infrastructure for a project — Dockerfiles,
+  docker-compose with healthchecks and volumes, CI/CD pipelines, nginx, container logs and
+  startup diagnostics — using the templates and rules in references/. Load it when the user
+  asks to dockerize, deploy, bring up, or troubleshoot a service or its infrastructure.
+when_to_use: >
+  "разверни проект", "подними в докере", "задеплой", "логи контейнера", "/devops"
 ---
 
 # DevOps — containerization, deployment, and infrastructure

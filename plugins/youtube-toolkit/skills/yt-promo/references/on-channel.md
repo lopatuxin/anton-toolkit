@@ -83,11 +83,11 @@ The last 20 seconds of every video. Three elements available: subscribe, related
 | Flagship episode | — | — | soft |
 | Lead-gen anchor | tease | medium | explicit |
 
-Wording bank lives in `skills/yt-script/references/cta.md` (single source of truth — kept there to avoid duplication).
+Wording bank lives in `${CLAUDE_PLUGIN_ROOT}/skills/yt-script/references/cta.md` (single source of truth — kept there to avoid duplication).
 
 ## In-description CTA
 
-One line. Once. Always paired with the link or the soft fallback. Description block is defined in `skills/yt-seo/references/description-template.md`.
+One line. Once. Always paired with the link or the soft fallback. Description block is defined in `${CLAUDE_PLUGIN_ROOT}/skills/yt-seo/references/description-template.md`.
 
 ## Comment-thread engagement
 

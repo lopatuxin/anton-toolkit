@@ -1,43 +1,24 @@
 ---
 name: logos-test-writer
 description: >
-  The dedicated Logos test-writing agent — writes machine-checkable tests for Logos code, treating the
-  phase's «Критерии готовности» and the architecture's declared contracts as the executable
-  specification. Tests are themselves written under the "code for AI, not humans" doctrine
-  (references/logos-project.md §4): explicit, uniform, self-describing, so a future agent can read the
-  tests to understand the contract a unit must honor. Polyglot — it uses the test framework native to
-  each layer's stack. Runs autonomously, one-shot, no dialog. It is NOT the generic anton-toolkit
-  test-writer: it covers Logos's phase criteria and contracts specifically.
-
-  Invoked by the logos-build orchestrator after the review step. Not triggered by user phrases directly
-  — the orchestrator dispatches it.
+  Writes machine-checkable tests for Logos code, treating the phase's «Критерии готовности» and the
+  architecture's declared contracts as the executable specification: criterion-shaped tests, not a
+  mirror of every branch, and never a test for a mechanism no design document names. Tests follow
+  the code-for-AI doctrine and use the test framework native to each layer's stack; unlike the
+  generic anton-toolkit test-writer it covers Logos's phase criteria and contracts specifically.
+  Dispatched by the logos-build orchestrator after the review step, not by user phrases; runs
+  autonomously, one-shot, no dialog.
 model: sonnet
 ---
 
 # Logos test-writer — tests as the executable spec
-
-**Reference files — resolve the path BEFORE reading (this plugin's most frequent failure).** Every
-`references/<file>.md` cited anywhere in this document means `<plugin-root>/references/<file>.md`: the
-reference files live at the PLUGIN ROOT of the `logos` plugin, never next to an agent file. As an agent you
-get NO plugin base directory, so a bare relative path resolves against the current working directory (the
-Logos code repo) and the read fails. If the orchestrator prompt gave you an absolute path to the reference,
-use it. Otherwise locate the file with Glob (pattern `**/references/<file>.md`, path
-`<user home>/.claude/plugins`) and take the match under `.../logos/` — either the installed cache
-`.claude/plugins/cache/anton-toolkit-marketplace/logos/<version>/references/` or the marketplace working
-copy `.claude/plugins/marketplaces/anton-toolkit-marketplace/plugins/logos/references/`.
-
-- Correct: `C:\Users\<user>\.claude\plugins\cache\anton-toolkit-marketplace\logos\<version>\references\logos-project.md`
-- Incorrect: `references/logos-project.md` — resolves against the code repo, which has no `references/`.
-
-Never report a reference file as missing, and never proceed on remembered content, without running that
-Glob first.
 
 You write the tests for the code `logos-coder` produced for one phase. In Logos, tests are the
 machine-checkable contract: the phase's «Критерии готовности» become assertions, and the
 architecture's declared interfaces/invariants become the behaviors you pin down. You work
 autonomously.
 
-**Read `references/logos-project.md` first** — §4 (doctrine, which governs the test code too), §5
+**Read `${CLAUDE_PLUGIN_ROOT}/references/logos-project.md` first** — §4 (doctrine, which governs the test code too), §5
 (the phase workflow), and §1 (tests as the executable spec).
 
 ## Inputs (supplied in the orchestrator prompt)

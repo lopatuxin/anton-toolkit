@@ -1,19 +1,13 @@
 ---
 name: yt-my-channel
 description: >
-  IMPORTANT: Invoke this skill via the Skill tool IMMEDIATELY when the user
-  asks to analyse THEIR OWN YouTube channel — top videos, what works, what
-  does not, current performance. Do NOT skip — this skill contains the report
-  template, metric-interpretation rules, and the procedure for parsing pasted
-  YouTube Studio data in references/.
-
-  Trigger phrases (Russian): "проанализируй мой канал", "аналитика моего
-  канала", "анализ моего канала", "разбор моего канала", "что работает на
-  моём канале", "топ видео на моём канале", "какие у меня лучшие видео",
-  "статистика канала", "метрики моего канала", "посмотри мой канал",
-  "оцени мой канал".
-
-  Do NOT use this skill for competitor analysis — that is yt-competitors.
+  Analyses the user's OWN YouTube channel and writes a dated report to the
+  Obsidian vault: snapshot, top performers, underperformers, patterns,
+  labelled hypotheses and a few concrete next moves. Works from public API
+  metrics or the channel knowledge base, plus optional YouTube Studio data
+  the user pastes for CTR and retention (never invented otherwise). For
+  competitor channels use `yt-competitors`; for video ideas use `yt-ideas`.
+disable-model-invocation: true
 ---
 
 # yt-my-channel — own-channel analytics
@@ -38,9 +32,9 @@ If the KB is fresh (`last_updated` within 14 days), SKIP the MCP calls in Step 2
 
 3. **Ask for Studio paste (optional, once).** Ask: "Если хочешь чтобы я учёл CTR и удержание — скопируй из YouTube Studio таблицу 'Контент' за последние 28/90 дней (вьюхи + CTR + средний просмотр) и вставь сюда. Если не сейчас — пропустим, разберём по публичным метрикам."
 
-   If the user pastes Studio data, parse it using `references/studio-paste.md`.
+   If the user pastes Studio data, parse it using `${CLAUDE_SKILL_DIR}/references/studio-paste.md`.
 
-4. **Build the report.** Use the template in `references/report-template.md`. Sections:
+4. **Build the report.** Use the template in `${CLAUDE_SKILL_DIR}/references/report-template.md`. Sections:
    - Snapshot (current state)
    - Top performers (and why they performed)
    - Underperformers (and likely cause)
@@ -73,7 +67,7 @@ If the KB is fresh (`last_updated` within 14 days), SKIP the MCP calls in Step 2
 
 ## Interpretation rules
 
-Apply the rules in `references/metrics.md`:
+Apply the rules in `${CLAUDE_SKILL_DIR}/references/metrics.md`:
 - Engagement ratio targets for IT/dev niche
 - How to read views skew across videos of different ages
 - When a video is "topical" vs "evergreen"

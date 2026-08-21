@@ -1,21 +1,14 @@
 ---
 name: system-designer
 description: >
-  Use when the user wants to design a new software system/module, or iteratively extend the design of an existing one,
-  producing living documentation (concept → architecture → modules) inside a repo's documentation folder
-  (`Документация/` or `docs/`). This skill runs DIRECTLY in conversation. Do NOT launch agents for the interview part —
-  agents lose context between turns and cannot hold a dialog. Agents are only dispatched for autonomous
-  document-writing steps.
-
-  Trigger phrases (Russian, real user input):
-  "спроектируй систему", "давай спроектируем", "задизайним модуль", "новый проект, вот репо",
-  "хочу продумать архитектуру", "опиши модуль X", "давай добавим <фичу> в дизайн",
-  "я тут подумал, давай добавим", "обнови документацию под это", "продолжим проектировать",
-  "разбей на фазы", "сделай roadmap", "построй план фаз", "разнеси архитектуру по фазам",
-  "детализируй фазу", "разверни фазу", "распиши фазу", "детализируй все фазы".
-
-  Use this skill when the user is describing a SYSTEM/PRODUCT to design (not writing code yet). If the user asks to
-  implement/code something concrete, do NOT use this skill — it is documentation-only, no code is produced.
+  Designs a software system as living documentation inside a repo's documentation folder
+  (`Документация/` or `docs/`): concept → architecture → module documents → roadmap → delivery
+  phases, and iteratively extends that design when the user adds a feature. Documentation only —
+  if the user asks to implement or code something concrete, do not use this skill. Runs in the main
+  conversation; the interview is not delegated to agents (agents are dispatched only for autonomous
+  document-writing steps).
+when_to_use: >
+  "спроектируй систему", "давай добавим <фичу> в дизайн", "разбей на фазы", "детализируй фазу"
 ---
 
 # System Designer — orchestrator skill
@@ -170,7 +163,7 @@ Agent(subagent_type="consortium-specialist", prompt="
 Your role: Ведущий архитектор — overall structure, component boundaries, how pieces fit.
 Your mode: skeleton.
 Read <DOCROOT>/Концепт.md (source of truth for WHAT is built).
-Write the baseline architecture skeleton to the shared draft <DOCROOT>/_черновики/Черновик-архитектуры.md, filling every section of the 'Архитектура' template in references/document-templates.md at a high level. Keep domain-deep decisions (detailed data model, security model, scaling) high-level and list them in 'Открытые вопросы' for the specialists.
+Write the baseline architecture skeleton to the shared draft <DOCROOT>/_черновики/Черновик-архитектуры.md, filling every section of the 'Архитектура' template in ${CLAUDE_PLUGIN_ROOT}/references/document-templates.md at a high level. Keep domain-deep decisions (detailed data model, security model, scaling) high-level and list them in 'Открытые вопросы' for the specialists.
 Discussion log path (do not touch it in skeleton mode): <DOCROOT>/_черновики/Журнал-обсуждения.md.
 Council roster and order: <list the selected roles in order>.
 User's architectural constraints (hard bounds — never violate): <paste them verbatim>.
@@ -191,7 +184,7 @@ Read <DOCROOT>/Концепт.md, the shared draft <DOCROOT>/_черновики
 (2) Critically review the rest of the draft and open NEW discussion-log entries (status открыт) addressed at the role that owns each weak spot.
 Council roster and order: <list the selected roles in order>.
 User's architectural constraints (hard bounds — never violate): <paste them verbatim>.
-Follow the 'Архитектура' template in references/document-templates.md. Reference the concept as [[Концепт]]. Do not include runnable code.
+Follow the 'Архитектура' template in ${CLAUDE_PLUGIN_ROOT}/references/document-templates.md. Reference the concept as [[Концепт]]. Do not include runnable code.
 ")
 ```
 
@@ -221,7 +214,7 @@ Dispatch the **architecture-synthesizer** agent:
 Agent(subagent_type="architecture-synthesizer", prompt="
 Read <DOCROOT>/Концепт.md, the converged shared draft <DOCROOT>/_черновики/Черновик-архитектуры.md, and the discussion log <DOCROOT>/_черновики/Журнал-обсуждения.md in full.
 User's architectural constraints (hard bounds): <paste them verbatim>.
-Start from the converged draft (the council already decided) and polish it into the final document at <DOCROOT>/Архитектура.md following references/document-templates.md section 'Архитектура'. Verify every решён question is consistently reflected; fold anything left open into 'Открытые вопросы'.
+Start from the converged draft (the council already decided) and polish it into the final document at <DOCROOT>/Архитектура.md following ${CLAUDE_PLUGIN_ROOT}/references/document-templates.md section 'Архитектура'. Verify every решён question is consistently reflected; fold anything left open into 'Открытые вопросы'.
 Reference the concept as the wiki-link [[Концепт]] where you cite it.
 For contested decisions, append a short parenthetical rationale so the reader sees the trade-off was deliberate.
 Return: 'Ключевые решения' (3–4 lines) and 'Ключевые споры и как разрешены' (per major contested point: who objected, the worry, and how the council settled it).
@@ -253,7 +246,7 @@ Agent(subagent_type="module-designer", prompt="
 Module (Russian name): <name>.
 Output path: <DOCROOT>/Модули/<name>.md
 Read <DOCROOT>/Концепт.md and <DOCROOT>/Архитектура.md for context.
-Write the module document to the output path following references/document-templates.md section 'Модуль'.
+Write the module document to the output path following ${CLAUDE_PLUGIN_ROOT}/references/document-templates.md section 'Модуль'.
 Reference sibling documents as wiki-links ([[Архитектура]], [[Модули/<other>]]) where you cite them.
 Detail: responsibilities, interfaces/API shape, data model, key flows in prose, dependencies, error cases, chosen stack specifics.
 No runnable code.
@@ -278,7 +271,7 @@ Steps:
    Change request from user: <verbatim description>.
    Scan <DOCROOT>/Концепт.md, <DOCROOT>/Архитектура.md, <DOCROOT>/Модули/*.md, <DOCROOT>/Дорожные карты/*/Дорожная карта.md, <DOCROOT>/Дорожные карты/*/Фазы/*.md.
    Identify every document that is affected by this change and update it consistently.
-   If the change requires a new module, create <DOCROOT>/Модули/<Русское-имя>.md following references/document-templates.md.
+   If the change requires a new module, create <DOCROOT>/Модули/<Русское-имя>.md following ${CLAUDE_PLUGIN_ROOT}/references/document-templates.md.
    Keep Russian file/folder names and wiki-link cross-references.
    Report back: list of files changed and one-line summary per file.
    ")
@@ -311,7 +304,7 @@ Steps:
    Read <DOCROOT>/Архитектура.md and <DOCROOT>/Модули/*.md (if present) and write the roadmap file.
    Scope of this roadmap (verbatim from user, or 'весь продукт' if Основная): <paste>.
    User's preference for the first phase from dialog: <paste verbatim or 'нет предпочтений'>.
-   Follow the structure in references/document-templates.md section 'Дорожная карта'.
+   Follow the structure in ${CLAUDE_PLUGIN_ROOT}/references/document-templates.md section 'Дорожная карта'.
    Reference modules as wiki-links ([[Модули/<имя>]]) and the architecture as [[Архитектура]].
    Each phase = minimal testable end-to-end slice. Each phase depends on previous ones.
    Short descriptions only — no acceptance criteria, no risks, no estimates (a separate tool details phases later).
@@ -347,7 +340,7 @@ Steps:
    Output directory: <DOCROOT>/Дорожные карты/<срез>/Фазы/
    Detail phase(s): <number or list of numbers, or 'all'>.
    Read <DOCROOT>/Дорожные карты/<срез>/Дорожная карта.md, <DOCROOT>/Архитектура.md, <DOCROOT>/Модули/*.md, <DOCROOT>/Концепт.md.
-   For each requested phase, write <DOCROOT>/Дорожные карты/<срез>/Фазы/Фаза-NN-<Русское-имя-фазы>.md following references/document-templates.md section 'Фаза'.
+   For each requested phase, write <DOCROOT>/Дорожные карты/<срез>/Фазы/Фаза-NN-<Русское-имя-фазы>.md following ${CLAUDE_PLUGIN_ROOT}/references/document-templates.md section 'Фаза'.
    Reference modules and the roadmap as wiki-links ([[Модули/<имя>]], [[Дорожная карта]]) where you cite them.
    Target reader: python-dev agent — the document must be concrete enough to implement without follow-up questions.
    ")

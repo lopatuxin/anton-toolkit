@@ -1,16 +1,13 @@
 ---
 name: debug
 description: >
-  IMPORTANT: Invoke this skill via the Skill tool IMMEDIATELY when the user
-  reports a bug, error, slow performance, unexpected behavior, or any
-  problem that needs investigation. Do NOT guess the cause — load this
-  skill to follow a systematic debugging process.
-
-  Trigger phrases: "баг", "ошибка", "не работает", "падает", "500",
-  "NPE", "exception", "тормозит", "медленно", "зависает", "не отвечает",
-  "неправильно работает", "странное поведение", "дебаг", "debug",
-  "почему не работает", "в чём проблема", "найди причину", "/debug",
-  or any report of incorrect behavior, errors, or performance issues.
+  Systematic root-cause analysis of an error, crash, slow or wrong behavior: reproduce it,
+  read logs and stack traces, trace the code and data, escalate to dynamic analysis,
+  profiling, and bisection until the cause is proven — no fix is proposed on a guess. Use
+  on an explicit request to investigate a problem, not on every mention of something not
+  working; the fix itself is handed to the dev agent of the module's language.
+when_to_use: >
+  "найди причину", "разберись почему падает", "дебаг", "/debug"
 ---
 
 # Debug — systematic root cause analysis
@@ -39,7 +36,7 @@ Go from simple to complex. If method N gives no answer — move to N+1.
    # API — send the same request
    curl -v -X POST http://localhost:8080/api/... -H "Content-Type: application/json" -d '{...}'
    
-   # Browser — open the same page via Playwright/Chrome DevTools
+   # Browser — open the same page with the browser tools available in the session (Claude in Chrome / Browser pane)
    ```
 
 3. **Read the logs:**
@@ -51,7 +48,7 @@ Go from simple to complex. If method N gives no answer — move to N+1.
    # File logs
    tail -100 logs/app.log | grep -i "error\|exception"
    
-   # Frontend — console errors via Playwright
+   # Frontend — console errors via the browser tools available in the session
    ```
 
 4. **Find the stack trace.** If there is an exception — read it IN FULL. Find the line in YOUR code (not in the framework) where the error originated.
@@ -154,7 +151,7 @@ Go from simple to complex. If method N gives no answer — move to N+1.
    ```
 
 4. **Frontend performance:**
-   - Chrome DevTools → Performance tab (via MCP)
+   - Browser performance profile via the browser tools available in the session
    - Lighthouse audit
    - Network waterfall — which request is slow?
 
@@ -202,7 +199,7 @@ When the cause is found, report:
 <file:line — exact location>
 
 ## Recommendation
-<what needs to be fixed — hand off to java-dev, test-writer, or frontend-dev>
+<what needs to be fixed — hand off to the dev agent of the module's language (java-dev, kotlin-dev, python-dev, go-dev, frontend-dev) or to test-writer>
 ```
 
 ## Rules

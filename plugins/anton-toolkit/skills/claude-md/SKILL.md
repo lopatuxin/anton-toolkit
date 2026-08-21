@@ -1,17 +1,12 @@
 ---
 name: claude-md
 description: >
-  IMPORTANT: Invoke this skill via the Skill tool IMMEDIATELY when the user
-  asks to create, edit, audit, or clean up a CLAUDE.md file. Do NOT modify
-  CLAUDE.md without loading this skill first — it contains strict formatting
-  rules and size limits in references/.
-
-  Trigger phrases: "claude.md", "CLAUDE.md", "создай claude.md",
-  "обнови claude.md", "почисти claude.md", "аудит claude.md",
-  "приведи в порядок claude.md", "оформи claude.md",
-  "синхронизируй claude.md", "проект изменился обнови claude.md",
-  "освежи claude.md под проект", "/claude-md",
-  or any request to create, refresh, or modify a CLAUDE.md file.
+  Process and rules for a CLAUDE.md file — load this before creating, editing, auditing, or
+  refreshing one: what belongs in it versus in .claude/rules/ or a conventions skill, the
+  section structure, and the size limits live in references/. Covers a new CLAUDE.md, an
+  audit of an existing one, adding a rule, and a resync after the project changed.
+when_to_use: >
+  "создай claude.md", "обнови claude.md", "почисти claude.md", "аудит claude.md", "/claude-md"
 ---
 
 # CLAUDE.md — creation and maintenance

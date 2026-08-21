@@ -1,19 +1,14 @@
 ---
 name: consortium-specialist
 description: >
-  Use this agent autonomously as ONE member of a deliberative architecture consortium for a software system
-  being designed via the system-designer skill. Unlike isolated parallel drafting, this consortium WORKS
-  ON A SHARED, EVOLVING architecture draft and a shared discussion log: each specialist reads what the
-  others wrote, deepens the parts of the draft inside their own domain, and raises questions/objections
-  about the rest for the responsible specialist to answer. The agent is parameterized by a ROLE (a domain
-  of expertise — e.g. lead architect, data, security, integrations/API, infrastructure/operations,
-  performance/reliability, a domain expert) and a MODE (skeleton | contribute | resolve). It edits the
-  shared scratch files in place. It does NOT write the final architecture document (the
-  architecture-synthesizer does that). Runs one-shot (no dialog). Documentation only — no code.
-
-  Invoked by the system-designer orchestrator at Phase 2 (architecture), one invocation per specialist per
-  round, dispatched SEQUENTIALLY so each specialist sees the prior specialists' contributions and the
-  running discussion. Not triggered by user phrases directly — the orchestrator decides.
+  Serves as one member of the deliberative architecture consortium of the system-designer skill,
+  parameterized by a ROLE (lead architect, data, security, integrations/API,
+  infrastructure/operations, performance/reliability, a domain expert) and a MODE (skeleton |
+  contribute | resolve): it edits the shared, evolving architecture draft and discussion log in
+  place, deepening its own domain and raising or answering questions about the rest. The final
+  architecture document is written by architecture-synthesizer. Dispatched sequentially by the
+  system-designer orchestrator, one per specialist per round, not by user phrases. Runs autonomously,
+  one-shot, no dialog. Documentation only, no code.
 model: opus
 ---
 
@@ -36,7 +31,7 @@ All paths are given in the orchestrator prompt. Never assume `docs/` or English 
 - **Architectural constraints** from the orchestrator (stack preferences, service boundaries, storage hints, deployment target). Hard bounds — never violate them, even to serve your domain.
 - The **concept file** (e.g. `Документация/Концепт.md`) — read it first; it is the source of truth for WHAT is being built.
 - The **roster and order** — which specialists are on the council and in what order they act, so you know who owns which domain when you address a question to them.
-- `references/document-templates.md` (from the system-designer plugin) — the shared draft follows its `Архитектура` section structure.
+- `${CLAUDE_PLUGIN_ROOT}/references/document-templates.md` — the shared draft follows its `Архитектура` section structure.
 
 ## The two shared artifacts
 

@@ -1,19 +1,13 @@
 ---
 name: yt-montage
 description: >
-  IMPORTANT: Invoke this skill via the Skill tool IMMEDIATELY when the user
-  asks to plan the editing of a video, turn a finished script into an editing
-  sheet, describe what to show on screen at each moment, or build a b-roll /
-  shot list. Do NOT skip — this skill contains the faceless visual vocabulary,
-  the editing-sheet format, and the preparation summaries below.
-
-  Trigger phrases (Russian): "монтажный лист", "распиши монтаж", "распиши
-  монтаж видео", "монтажный план", "что показывать в видео", "что показать на
-  экране", "раскадровка", "визуал для сценария", "b-roll лист", "план монтажа".
-
-  Output is in Russian. This skill consumes a FINISHED script (from the
-  сценарии/ folder or pasted) and produces an editing sheet — it does NOT
-  write the spoken text.
+  Turns a finished video script into a Russian editing sheet saved to the
+  Obsidian vault: the script is split into beats with a timecode, what is on
+  screen, the shot type, on-screen text and the transition, plus the b-roll,
+  screencasts and graphics to prepare beforehand. The channel is faceless, so
+  no beat is ever a talking head. Consumes the script, never writes the
+  spoken text — that is `yt-script`.
+disable-model-invocation: true
 ---
 
 # yt-montage — turn a script into an editing sheet

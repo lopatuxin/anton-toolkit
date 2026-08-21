@@ -1,30 +1,12 @@
 ---
 name: test-writer
 description: >
-  This agent should be used proactively. After java-dev agent completes
-  implementation of new classes or significant changes, AUTOMATICALLY launch
-  this agent to write tests — do not wait for the user to ask.
-
-  Give it a class or package — it reads the code, finds existing test patterns,
-  and writes tests following the same style.
-
-  <example>
-  Context: java-dev agent just created a new service and controller
-  assistant: "Запускаю test-writer для покрытия нового кода тестами."
-  <commentary>
-  Proactive launch — java-dev finished creating new code, automatically write tests.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User just implemented a new service
-  user: "Напиши тесты для OrderService"
-  assistant: "Запускаю test-writer агента для OrderService."
-  <commentary>
-  Concrete target — a specific class.
-  </commentary>
-  </example>
-
+  Writes tests for a class or package in a Java/Kotlin Spring Boot project in the project's
+  existing test style — reads the code, finds the test patterns already in use, writes the
+  tests, and runs them. Launched after java-dev creates or significantly changes classes, or
+  on request ("напиши тесты для OrderService"); it is also where dev agents hand off any
+  change to test files. Runs autonomously, one-shot, no dialog; it does not modify
+  production code.
 model: opus
 color: cyan
 tools: ["Read", "Write", "Edit", "Glob", "Grep", "Bash"]
