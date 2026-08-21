@@ -1,5 +1,5 @@
 {
-  "description": "anton-toolkit hooks: gofmt after edits of Go files; a review mark when code-reviewer / mr-spec-reviewer finishes; a review gate on `git commit`, active only in repositories that contain .claude/review-gate (bypass: ANTON_SKIP_REVIEW=1).",
+  "description": "anton-toolkit hooks: after every Edit/Write the touched file is recorded in the repo's ledger (and Go files are gofmt-ed); a review mark is written when code-reviewer / mr-spec-reviewer finishes; in repositories that contain .claude/review-gate, Claude cannot finish its turn (Stop) while code files it edited this session are unreviewed, and `git commit` is blocked while the working tree is unreviewed (bypass: ANTON_SKIP_REVIEW=1).",
   "hooks": {
     "PostToolUse": [
       {
@@ -7,9 +7,19 @@
         "hooks": [
           {
             "type": "command",
-            "if": "Edit(**/*.go)",
             "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PLUGIN_ROOT}/hooks/post-edit-format.ps1\"",
             "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PLUGIN_ROOT}/hooks/stop-gate.ps1\"",
+            "timeout": 20
           }
         ]
       }

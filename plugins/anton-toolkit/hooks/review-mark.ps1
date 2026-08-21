@@ -6,8 +6,9 @@
 #       powershell -NoProfile -ExecutionPolicy Bypass -File "<plugin>/hooks/review-mark.ps1" [-Path <dir inside repo>]
 #     Without -Path the current directory is used.
 #
-# The mark (<git-dir>/anton-toolkit-review-mark) stores the fingerprint of the reviewed code changes;
-# review-gate.ps1 compares it with the tree at `git commit` time. See common.ps1 for the fingerprint rules.
+# The mark (<git-dir>/anton-toolkit-review-mark) stores the aggregate fingerprint of the reviewed code changes
+# (compared by review-gate.ps1 at `git commit` time) and one "file=<path>\t<hash>" line per changed code file
+# (compared file by file by stop-gate.ps1 at the end of Claude's turn). See common.ps1 for the rules.
 
 param([Parameter(Position = 0)][string]$Path)
 
@@ -29,7 +30,7 @@ function Invoke-ReviewMark {
   if ($agentType) { $source = "agent:$agentType" }
   elseif ($hookEvent) { $source = "hook:$([string](Get-Prop $hookEvent 'hook_event_name'))" }
 
-  Write-ReviewMark -Repo $repo -Fingerprint $result.Fingerprint -Files $result.Files -Source $source
+  Write-ReviewMark -Repo $repo -Fingerprint $result.Fingerprint -Hashes $result.Hashes -Source $source
 
   $markPath = Get-MarkPath $repo
   if ($result.Files.Count -eq 0) { return "review mark written: $markPath (no code changes in the working tree)" }

@@ -85,7 +85,7 @@ After the memory notes are written, run (the `-Path` argument makes it independe
 powershell -NoProfile -ExecutionPolicy Bypass -File "${CLAUDE_PLUGIN_ROOT}/hooks/review-mark.ps1" -Path "<absolute path of the reviewed repository root>"
 ```
 
-It records a fingerprint of the reviewed working tree so the commit gate knows this state was reviewed. Run it even when the review found blockers — the report carries the verdict, the mark only says "seen". If the script is missing, say so in the report (`Review mark: script missing`) and continue.
+It records a fingerprint of the reviewed working tree so the review gates (end of turn, commit) know this state was reviewed. Run it even when the review found blockers — the report carries the verdict, the mark only says "seen". If the script is missing, say so in the report (`Review mark: script missing`) and continue.
 
 ## Rules
 

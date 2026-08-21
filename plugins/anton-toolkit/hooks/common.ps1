@@ -8,7 +8,14 @@
 #     therefore does not change the fingerprint; editing, adding or deleting a code file does.
 #   * Untracked files under .claude/agent-memory/ and .claude/agent-memory-local/ (reviewer agents' notes)
 #     and the opt-in file .claude/review-gate are ignored.
-#   * The mark lives in <git-dir>/anton-toolkit-review-mark as "key=value" lines (fingerprint=, timestamp=, ...).
+#   * The mark lives in <git-dir>/anton-toolkit-review-mark as "key=value" lines: fingerprint= (aggregate, used
+#     by review-gate.ps1), timestamp=, source=, files=, and one "file=<path>\t<sha256|deleted>" line per changed
+#     code file (used by stop-gate.ps1 to compare file by file).
+#
+# Touched-files ledger (written by post-edit-format.ps1, read by stop-gate.ps1):
+#   * <git-dir>/anton-toolkit-touched, one line per (session, file): "<session_id>\t<ISO timestamp>\t<repo-relative
+#     path with forward slashes>". Rewritten under an exclusive file lock: the (session, path) pair is kept once
+#     with its latest timestamp, lines older than 30 days are dropped.
 #
 # Why external programs go through Invoke-Process instead of `& git`: Windows PowerShell 5.1 pumps its own
 # stdin into every native child. When stdin is an open pipe with no data (a reviewer agent running a script
@@ -26,6 +33,8 @@ $script:CodeExtensions = @(
   'xml', 'yml', 'yaml', 'html', 'vue', 'rs', 'cs', 'swift', 'sh', 'ps1', 'gradle', 'properties', 'toml'
 )
 $script:MarkFileName = 'anton-toolkit-review-mark'
+$script:TouchedFileName = 'anton-toolkit-touched'
+$script:TouchedRetentionDays = 30
 $script:GateFileRelative = '.claude/review-gate'
 $script:UntrackedExcludePrefixes = @('.claude/agent-memory/', '.claude/agent-memory-local/')
 $script:UntrackedExcludeExact = @('.claude/review-gate')
@@ -232,7 +241,7 @@ function Get-SortedUnique {
   foreach ($item in $Items) { if ($item) { $null = $set.Add($item) } }
   $array = [string[]]@($set)
   [Array]::Sort($array, [System.StringComparer]::Ordinal)
-  return ,$array
+  return $array
 }
 
 # Code files whose working-tree content differs from HEAD (tracked, staged or not) plus untracked code files.
@@ -252,7 +261,7 @@ function Get-ChangedCodeFiles {
   $code = @()
   foreach ($p in $tracked) { if (Test-CodeFile $p) { $code += $p } }
   foreach ($p in $untracked) { if (-not (Test-ExcludedUntracked $p) -and (Test-CodeFile $p)) { $code += $p } }
-  return Get-SortedUnique $code
+  return @(Get-SortedUnique $code)
 }
 
 function ConvertTo-Hex {
@@ -270,25 +279,34 @@ function Get-FileSha256Hex {
   }
 }
 
-# Returns @{ Fingerprint = <hex or '' when no code changed>; Files = <string[] of repo-relative paths> }.
+# Current content hash of a repo-relative file: SHA-256 hex, or 'deleted' when the file is gone.
+function Get-WorkTreeFileHash {
+  param($Sha, $Repo, [string]$RelPath)
+  $full = [System.IO.Path]::Combine($Repo.Top, $RelPath)
+  if ([System.IO.File]::Exists($full)) { return (Get-FileSha256Hex -Sha $Sha -FullPath $full) }
+  return 'deleted'
+}
+
+# Returns @{ Fingerprint = <hex or '' when no code changed>; Files = <string[] of repo-relative paths>;
+#            Hashes = <ordered dictionary path -> sha256|deleted> }.
 function Get-TreeFingerprint {
   param($Repo)
-  $files = Get-ChangedCodeFiles $Repo
-  if ($files.Count -eq 0) { return @{ Fingerprint = ''; Files = @() } }
+  $files = @(Get-ChangedCodeFiles $Repo)
+  $hashes = New-Object System.Collections.Specialized.OrderedDictionary
+  if ($files.Count -eq 0) { return @{ Fingerprint = ''; Files = @(); Hashes = $hashes } }
   $sha = [System.Security.Cryptography.SHA256]::Create()
   try {
     $builder = New-Object System.Text.StringBuilder
     foreach ($rel in $files) {
-      $full = [System.IO.Path]::Combine($Repo.Top, $rel)
-      $hash = 'deleted'
-      if ([System.IO.File]::Exists($full)) { $hash = Get-FileSha256Hex -Sha $sha -FullPath $full }
+      $hash = Get-WorkTreeFileHash -Sha $sha -Repo $Repo -RelPath $rel
+      $hashes[$rel] = $hash
       $null = $builder.Append($rel).Append([char]0).Append($hash).Append([char]10)
     }
     $fingerprint = ConvertTo-Hex $sha.ComputeHash($script:Utf8NoBom.GetBytes($builder.ToString()))
   } finally {
     $sha.Dispose()
   }
-  return @{ Fingerprint = $fingerprint; Files = $files }
+  return @{ Fingerprint = $fingerprint; Files = $files; Hashes = $hashes }
 }
 
 function Get-MarkPath {
@@ -296,13 +314,14 @@ function Get-MarkPath {
   return [System.IO.Path]::Combine($Repo.GitDir, $script:MarkFileName)
 }
 
-# Returns @{ Fingerprint; Timestamp } or $null when no mark exists.
+# Returns @{ Fingerprint; Timestamp; Files = <dictionary path -> hash, case-insensitive> } or $null when no mark exists.
 function Read-ReviewMark {
   param($Repo)
   try {
     $path = Get-MarkPath $Repo
     if (-not [System.IO.File]::Exists($path)) { return $null }
-    $mark = @{ Fingerprint = ''; Timestamp = '' }
+    $files = New-Object 'System.Collections.Generic.Dictionary[string,string]' ([System.StringComparer]::OrdinalIgnoreCase)
+    $mark = @{ Fingerprint = ''; Timestamp = ''; Files = $files }
     foreach ($line in [System.IO.File]::ReadAllLines($path, $script:Utf8NoBom)) {
       $eq = $line.IndexOf('=')
       if ($eq -lt 1) { continue }
@@ -310,6 +329,10 @@ function Read-ReviewMark {
       $value = $line.Substring($eq + 1).Trim()
       if ($key -eq 'fingerprint') { $mark.Fingerprint = $value }
       elseif ($key -eq 'timestamp') { $mark.Timestamp = $value }
+      elseif ($key -eq 'file') {
+        $tab = $value.LastIndexOf("`t")
+        if ($tab -gt 0) { $files[$value.Substring(0, $tab)] = $value.Substring($tab + 1).Trim() }
+      }
     }
     return $mark
   } catch {
@@ -318,17 +341,113 @@ function Read-ReviewMark {
 }
 
 function Write-ReviewMark {
-  param($Repo, [string]$Fingerprint, [string[]]$Files, [string]$Source)
+  param($Repo, [string]$Fingerprint, $Hashes, [string]$Source)
   $builder = New-Object System.Text.StringBuilder
   $null = $builder.Append("fingerprint=$Fingerprint`n")
   $null = $builder.Append("timestamp=$([DateTimeOffset]::Now.ToString('o'))`n")
   $null = $builder.Append("source=$Source`n")
-  $null = $builder.Append("files=$($Files.Count)`n")
-  $shown = 0
-  foreach ($f in $Files) {
-    if ($shown -ge 200) { $null = $builder.Append("file=... ($($Files.Count - $shown) more)`n"); break }
-    $null = $builder.Append("file=$f`n")
-    $shown++
+  $null = $builder.Append("files=$($Hashes.Count)`n")
+  foreach ($rel in $Hashes.Keys) {
+    $null = $builder.Append("file=$rel`t$($Hashes[$rel])`n")
   }
   [System.IO.File]::WriteAllText((Get-MarkPath $Repo), $builder.ToString(), $script:Utf8NoBom)
+}
+
+function Get-TouchedPath {
+  param($Repo)
+  return [System.IO.Path]::Combine($Repo.GitDir, $script:TouchedFileName)
+}
+
+# Records that SessionId edited RelPath (repo-relative, forward slashes) in the repo whose git dir is GitDir.
+# Read-modify-write under an exclusive lock with short retries; returns $true when written.
+function Add-TouchedEntry {
+  param([string]$GitDir, [string]$SessionId, [string]$RelPath)
+  $path = [System.IO.Path]::Combine($GitDir, $script:TouchedFileName)
+  $now = [DateTimeOffset]::Now
+  $cutoff = $now.AddDays(-$script:TouchedRetentionDays)
+  $newLine = "$SessionId`t$($now.ToString('o'))`t$RelPath"
+  for ($attempt = 0; $attempt -lt 10; $attempt++) {
+    $stream = $null
+    try {
+      $stream = New-Object System.IO.FileStream($path, [System.IO.FileMode]::OpenOrCreate, [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::None)
+      $length = [int]$stream.Length
+      $existing = ''
+      if ($length -gt 0) {
+        $buffer = New-Object byte[] $length
+        $read = 0
+        while ($read -lt $length) {
+          $n = $stream.Read($buffer, $read, $length - $read)
+          if ($n -le 0) { break }
+          $read += $n
+        }
+        $existing = $script:Utf8NoBom.GetString($buffer, 0, $read)
+      }
+      $kept = New-Object System.Collections.Generic.List[string]
+      foreach ($line in ($existing -split "`r?`n")) {
+        if (-not $line) { continue }
+        $parts = $line.Split("`t")
+        if ($parts.Length -lt 3) { continue }
+        if ($parts[0] -eq $SessionId -and $parts[2] -eq $RelPath) { continue }
+        $stamp = [DateTimeOffset]::MinValue
+        if (-not [DateTimeOffset]::TryParse($parts[1], [System.Globalization.CultureInfo]::InvariantCulture, [System.Globalization.DateTimeStyles]::None, [ref]$stamp)) { continue }
+        if ($stamp -lt $cutoff) { continue }
+        $kept.Add($line)
+      }
+      $kept.Add($newLine)
+      $bytes = $script:Utf8NoBom.GetBytes((($kept -join "`n") + "`n"))
+      $stream.SetLength(0)
+      $stream.Position = 0
+      $stream.Write($bytes, 0, $bytes.Length)
+      $stream.Flush()
+      return $true
+    } catch {
+      Start-Sleep -Milliseconds 30
+    } finally {
+      if ($stream) { try { $stream.Dispose() } catch { } }
+    }
+  }
+  return $false
+}
+
+# Repo-relative paths (forward slashes) recorded in the ledger for SessionId; sorted, unique, may be empty.
+function Get-TouchedPaths {
+  param($Repo, [string]$SessionId)
+  $path = Get-TouchedPath $Repo
+  if (-not [System.IO.File]::Exists($path)) { return @() }
+  $found = @()
+  foreach ($line in [System.IO.File]::ReadAllLines($path, $script:Utf8NoBom)) {
+    if (-not $line) { continue }
+    $parts = $line.Split("`t")
+    if ($parts.Length -lt 3) { continue }
+    if ($parts[0] -ne $SessionId) { continue }
+    $rel = $parts[2].Trim()
+    if ($rel) { $found += $rel }
+  }
+  return @(Get-SortedUnique $found)
+}
+
+# Nearest ancestor of StartDir (inclusive) that contains .claude/review-gate, or $null. No git involved.
+function Find-GateRoot {
+  param([string]$StartDir)
+  try {
+    $dir = [System.IO.Path]::GetFullPath($StartDir)
+    while ($dir) {
+      if ([System.IO.File]::Exists([System.IO.Path]::Combine($dir, $script:GateFileRelative))) { return $dir }
+      $parent = [System.IO.Path]::GetDirectoryName($dir)
+      if (-not $parent -or $parent -eq $dir) { break }
+      $dir = $parent
+    }
+  } catch { }
+  return $null
+}
+
+function Test-SamePath {
+  param([string]$A, [string]$B)
+  try {
+    $x = [System.IO.Path]::GetFullPath($A).Replace('\', '/').TrimEnd('/')
+    $y = [System.IO.Path]::GetFullPath($B).Replace('\', '/').TrimEnd('/')
+    return [string]::Equals($x, $y, [System.StringComparison]::OrdinalIgnoreCase)
+  } catch {
+    return $false
+  }
 }

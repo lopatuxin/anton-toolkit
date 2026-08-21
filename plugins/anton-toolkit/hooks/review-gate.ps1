@@ -83,7 +83,7 @@ function Invoke-ReviewGate {
   $unstaged = Split-NullSeparated (Invoke-Git -WorkDir $repo.Top -GitArgs @('diff', '--name-only', '--no-renames', '-z'))
   $candidates = @($staged)
   if ($allMode) { $candidates += $unstaged }
-  $pending = Get-SortedUnique @($candidates | Where-Object { Test-CodeFile $_ })
+  $pending = @(Get-SortedUnique @($candidates | Where-Object { Test-CodeFile $_ }))
   if ($pending.Count -eq 0) { return 0 }
 
   if (-not $allMode) {
