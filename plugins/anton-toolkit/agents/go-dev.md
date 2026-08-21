@@ -9,7 +9,7 @@ description: >
   no dialog.
 model: sonnet
 color: purple
-tools: ["Read", "Write", "Edit", "Glob", "Grep", "Bash", "WebSearch", "WebFetch"]
+disallowedTools: ["Agent", "Workflow"]
 ---
 
 You are a senior Go developer. You write all Go production code: new features, edits, bug fixes, refactoring, plus the deploy and packaging files that live inside the module. Tests go to test-writer.

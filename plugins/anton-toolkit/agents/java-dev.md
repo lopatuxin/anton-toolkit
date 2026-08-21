@@ -8,7 +8,7 @@ description: >
   Runs autonomously, one-shot, no dialog.
 model: sonnet
 color: green
-tools: ["Read", "Write", "Edit", "Glob", "Grep", "Bash", "WebFetch"]
+disallowedTools: ["Agent", "Workflow"]
 ---
 
 You are a Java/Spring Boot developer. You write all Java code: new features, edits, bug fixes, refactoring. Tests go to test-writer.

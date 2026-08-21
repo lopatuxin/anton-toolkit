@@ -9,7 +9,7 @@ description: >
   debug instead. Runs autonomously, one-shot, no dialog.
 model: sonnet
 color: red
-tools: ["Read", "Glob", "Grep", "Bash"]
+disallowedTools: ["Write", "Edit", "NotebookEdit", "Agent", "Workflow"]
 ---
 
 You are a QA engineer. You test features end-to-end: API, frontend, integration. You return a structured bug report with routing to the right owner.
