@@ -16,7 +16,7 @@ description: >
 
 # CLAUDE.md — creation and maintenance
 
-Create or clean up a CLAUDE.md file following the strict rules from `references/rules.md`.
+Create or clean up a CLAUDE.md file following the strict rules from `${CLAUDE_SKILL_DIR}/references/rules.md`.
 
 ## Process
 
@@ -27,7 +27,7 @@ Create or clean up a CLAUDE.md file following the strict rules from `references/
    - Read existing configs (`application.yml`, `docker-compose.yml`, `.env`)
    - Look at the folder structure
    - Find agents and skills in plugins — do not duplicate their rules
-   - **Check installed plugins** (skills and agents). If java-dev, frontend-dev, or other code-writing agents are present — do NOT create a `# Code Style` section. Style rules live in agents.
+   - **Check installed plugins, conventions skills, and `.claude/rules/`.** Style rules for one area of the code (a language, a module) belong in a path-scoped source — a `.claude/rules/<area>.md` file with `paths:` or a conventions skill — not in CLAUDE.md. Do NOT create a `# Code Style` section for rules such a source already covers.
    - **Check skills** (commit, devops, etc.). If an action is already implemented by a skill — do NOT describe its logic in CLAUDE.md.
 
 2. **Determine what is NOT obvious from the code** — only that goes into CLAUDE.md:
@@ -35,13 +35,13 @@ Create or clean up a CLAUDE.md file following the strict rules from `references/
    - Architectural decisions that cannot be derived from files
    - Mistakes Claude has already made
 
-3. **Write the file using the structure** from `references/rules.md`:
+3. **Write the file using the structure** from `${CLAUDE_SKILL_DIR}/references/rules.md`:
    - `# Project` — 1–3 lines
    - `# Stack & Build` — only non-standard commands
-   - `# Code Style` — ONLY if the project has NO code-writing agents (java-dev, frontend-dev). If agents are present — do NOT create the section, even if the project has conventions. Cross-agent contracts (API format) go into docs/ with a reference link.
+   - `# Code Style` — ONLY for cross-cutting rules that apply to every file and that no agent, conventions skill, or `.claude/rules/` file already states. Area-specific conventions go to `.claude/rules/<area>.md` with `paths:`. Cross-agent contracts (API format) go into docs/ with a reference link.
    - `# Common Mistakes` — placeholder `[Empty]` if no mistakes have occurred yet
 
-4. **Check limits:** 80–120 lines, ≤2500 tokens. Hard cap — 150 lines.
+4. **Check limits:** under 200 lines per file (official guidance); a file near the limit means something should move to a path-scoped rule file, not be compressed.
 
 ### Auditing an existing CLAUDE.md
 
@@ -52,12 +52,12 @@ Create or clean up a CLAUDE.md file following the strict rules from `references/
    - Duplication with plugin agents and skills
    - Vague rules ("write clean code")
    - `@file` embed references — replace with "see docs/..."
-4. **Strengthen:** weak formulations → NEVER/ALWAYS + alternative
+4. **Strengthen:** vague formulations → concrete condition + action + alternative + reason; replace emphasis (caps, IMPORTANT, MUST) with plain statements
 5. **Check limits** after edits
 
 ### Refreshing CLAUDE.md after major project changes
 
-Use this mode when the user says the project has changed significantly and CLAUDE.md is out of sync — new agents/skills added, build commands changed, services renamed, old features removed. Differs from `Auditing`: audit only enforces the `references/rules.md` style guide; refresh re-checks the file against the CURRENT project state and can both remove stale info and add what is now missing. Differs from creating from scratch: refresh PRESERVES user-added rules and existing `# Common Mistakes` entries that are still valid.
+Use this mode when the user says the project has changed significantly and CLAUDE.md is out of sync — new agents/skills added, build commands changed, services renamed, old features removed. Differs from `Auditing`: audit only enforces the `${CLAUDE_SKILL_DIR}/references/rules.md` style guide; refresh re-checks the file against the CURRENT project state and can both remove stale info and add what is now missing. Differs from creating from scratch: refresh PRESERVES user-added rules and existing `# Common Mistakes` entries that are still valid.
 
 1. **Read the current CLAUDE.md** — note every project line, rule, and `# Common Mistakes` entry that is already there
 2. **Re-scan the project as if creating from scratch:**
@@ -70,11 +70,11 @@ Use this mode when the user says the project has changed significantly and CLAUD
    - New agents/skills now installed → REMOVE anything CLAUDE.md duplicates from them
    - User-added rules and existing `# Common Mistakes` entries that are still relevant → KEEP VERBATIM
 4. **Show the user a clear diff** (what is removed, what is added, what is kept) BEFORE writing the file
-5. **Check limits** after edits — target 80–120 lines, hard cap 150
+5. **Check limits** after edits — under 200 lines
 
 ### Adding a rule
 
-1. Check current file size — if ≥120 lines, first find something to DELETE or SHORTEN
+1. Check current file size — if ≥150 lines, first find something to DELETE, SHORTEN, or MOVE to `.claude/rules/<area>.md`
 2. Check whether the rule already exists in agents/skills
 3. Check whether Claude can derive the information from the code
 4. Formulate: condition + action + alternative
@@ -82,9 +82,9 @@ Use this mode when the user says the project has changed significantly and CLAUD
 
 ## Rules
 
-- ALWAYS read `references/rules.md` before any CLAUDE.md change
+- ALWAYS read `${CLAUDE_SKILL_DIR}/references/rules.md` before any CLAUDE.md change
 - ALWAYS show the final file to the user before saving
 - ALWAYS write CLAUDE.md content in English — section bodies, rules, comments, placeholders. CLAUDE.md is model-facing, not user-facing. Russian is allowed ONLY for: (a) direct quotes of user-provided strings that must remain verbatim (project name, brand copy), (b) literal commit-message templates or other user-facing dialogue snippets the file documents. Section headers (`# Project`, `# Stack & Build`, `# Common Mistakes`) are already English — keep them so. Correct: `Backend is only planned in docs/architecture.md — do NOT treat the spec as current code.` Incorrect: `Бэкенд только спроектирован в docs/architecture.md — не считать спецификацию текущей реализацией.`
 - DO NOT duplicate information from code, agents, or skills
-- DO NOT exceed 150 lines / 3000 tokens
+- DO NOT exceed 200 lines
 - When prohibiting something — ALWAYS provide an alternative

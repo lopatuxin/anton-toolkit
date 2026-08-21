@@ -17,26 +17,9 @@ description: >
 
 # Create Plugin — guided plugin creation
 
-**Reference files — resolve the path BEFORE reading (the most frequent failure in this marketplace).**
-Every `references/<file>.md` cited anywhere in this document means `<plugin-root>/references/<file>.md`:
-the reference files live at the PLUGIN ROOT, never inside a skill's own folder. The base directory given to
-this skill at load time is `<plugin-root>/skills/<this-skill>/`, so a bare relative path resolves to
-`<plugin-root>/skills/<this-skill>/references/<file>.md` — that file does not exist and the read fails.
-Resolve it as `<this skill's base directory>/../../references/<file>.md`. If no base directory was given,
-locate the file with Glob (pattern `**/references/<file>.md`, path `<user home>/.claude/plugins`) and take
-the match under `.../plugin-builder/` — either the installed cache
-`.claude/plugins/cache/anton-toolkit-marketplace/plugin-builder/<version>/references/` or the marketplace
-working copy `.claude/plugins/marketplaces/anton-toolkit-marketplace/plugins/plugin-builder/references/`.
-
-- Correct: `C:\Users\<user>\.claude\plugins\cache\anton-toolkit-marketplace\plugin-builder\<version>\references\plugin-authoring.md`
-- Incorrect: `references/plugin-authoring.md` — resolves under the skill folder, which has no `references/`.
-
-Never report a reference file as missing, and never proceed on remembered content, without running that
-Glob first.
-
 Interview the user in Russian to understand the task the plugin should solve, then generate all plugin files (in English) and register the plugin in the marketplace.
 
-**Before starting, read** `references/plugin-authoring.md` from this plugin. It contains language rules, frontmatter schemas, trigger-phrase examples, and the pre-flight validation checklist you will use.
+**Before starting, read** `${CLAUDE_PLUGIN_ROOT}/references/plugin-authoring.md`. It contains the language rules, the Claude 5 writing rules, frontmatter schemas, the component table, description examples, and the pre-flight validation checklist you will use. Every later mention of `plugin-authoring.md` in this document means that file.
 
 ## Phase 1 — Open prompt
 
@@ -87,23 +70,24 @@ If the user corrects something, go back to Phase 3 with the specific delta, not 
 
 ## Phase 5 — Generate files
 
-Decide the component layout from the interview using the **Component types** table in `references/plugin-authoring.md` — a plugin can be a skill, agent, command, hook, MCP server, or a small combination. Do NOT default to "skill" reflexively:
+Decide the component layout from the interview using the **Component types** table in `plugin-authoring.md` — a plugin can be a skill, agent, hook, workflow, MCP server, or a small combination. Do NOT default to "skill" reflexively:
 
 - **Dialog-driven behavior** (multi-turn) → **skill**.
-- **Autonomous one-shot work** (no dialog) → **agent** (use `model: opus` for high-precision text editing).
-- **Explicit user-triggered action with args** (`/<name> ...`, no reasoning) → **command**.
-- **Automatic behavior on a harness event** → **hook** (the model cannot self-trigger on events).
+- **Autonomous one-shot work** (no dialog) → **agent** (set `model` and `effort` per the **Model guidance** section).
+- **Explicit user-triggered action** (`/<name> ...`) → **skill** with `disable-model-invocation: true`.
+- **Automatic behavior on a harness event, or a prohibition that must hold 100% of the time** → **hook** (the model cannot self-trigger on events).
+- **Orchestration of several agents** (pipeline, fan-out, judge panel) → **workflow** plus a thin entry skill.
 - **External tool/data access** → **MCP server**.
 
 Minimal plugin: `plugin.json` + one component. Add more only if the interview clearly requires them.
 
-Generate, following `references/plugin-authoring.md`:
+Generate, following `plugin-authoring.md`:
 
 1. `plugins/<name>/.claude-plugin/plugin.json` — version `0.1.0`, author Anton.
-2. `plugins/<name>/skills/<skill-name>/SKILL.md` — English body, English frontmatter, Russian trigger phrases inside `description`.
-3. `plugins/<name>/agents/<agent-name>.md` if the design needs an agent — include `model: opus` when warranted.
-4. `plugins/<name>/references/<topic>.md` only if the interview revealed a clear need for a shared reference.
-5. `plugins/<name>/commands/<command-name>.md`, `plugins/<name>/hooks/hooks.json`, or `plugins/<name>/.mcp.json` if the chosen layout includes a command, hook, or MCP server. For their exact format, consult the `plugin-dev` skills named in `references/plugin-authoring.md`.
+2. `plugins/<name>/skills/<skill-name>/SKILL.md` — English body, English frontmatter, Russian trigger phrases only inside `when_to_use` / `description`.
+3. `plugins/<name>/agents/<agent-name>.md` if the design needs an agent — with explicit `model`, `effort`, and a `tools:` allowlist that matches the role.
+4. `plugins/<name>/references/<topic>.md` only if the interview revealed a clear need for a shared reference; cite it as `${CLAUDE_PLUGIN_ROOT}/references/<topic>.md`.
+5. `plugins/<name>/hooks/hooks.json` (+ `hooks/<script>.ps1`), `plugins/<name>/workflows/<name>.js`, or `plugins/<name>/.mcp.json` if the chosen layout includes a hook, workflow, or MCP server. For their exact format, use the official docs linked in `plugin-authoring.md`.
 
 User-facing prompts inside the generated skill (e.g. "Что нужно закоммитить?") stay in Russian — include them in the SKILL.md body as literal Russian strings wrapped in code fences or blockquotes, so the model knows to speak them verbatim.
 
@@ -113,21 +97,22 @@ User-facing prompts inside the generated skill (e.g. "Что нужно зако
    ```json
    { "name": "<name>", "description": "<same as plugin.json>", "source": "./plugins/<name>" }
    ```
-2. Run the **pre-flight validation checklist** from `references/plugin-authoring.md`:
-   - All created JSON files parse.
+2. Run the **pre-flight validation checklist** from `plugin-authoring.md`:
+   - All created JSON files parse; workflow scripts pass `node --check`.
    - `marketplace.json` still has no duplicate names.
    - All generated `SKILL.md` / `agent.md` are > 100 bytes.
-   - Each skill `description` has 3+ trigger phrases.
+   - Each `description` (+ `when_to_use`) is ≤ 1,000 characters, opens with the key use case, and has no `<example>` blocks or IMPORTANT/IMMEDIATELY emphasis.
+   - References are cited via `${CLAUDE_PLUGIN_ROOT}`; nothing but agents lives under `agents/`.
 3. If any check fails — abort, report in Russian which file failed which check, do not commit. Leave files on disk for the next pass.
 4. If all pass:
-   - Update the root `README.md` per the **README sync** section in `references/plugin-authoring.md`: add the new plugin's section, a map-diagram box, a plugins-table row (with its version), a TOC entry, a cheatsheet row, and bump the badge counts.
+   - Update the root `README.md` per the **README sync** section in `plugin-authoring.md`: add the new plugin's section, a map-diagram box, a plugins-table row (with its version), a TOC entry, a cheatsheet row, and bump the badge counts.
    ```bash
    git pull origin main
    git add README.md .claude-plugin/marketplace.json plugins/<name>/
    git commit -m "<Russian message: created plugin <name> with N skills / M agents>"
    git push
    ```
-5. A brand-new plugin is registered in `marketplace.json` but NOT yet active — it must be enabled (see the **Activation** section in `references/plugin-authoring.md`). A plain restart is not enough. Report this explicitly to the user in Russian:
+5. A brand-new plugin is registered in `marketplace.json` but NOT yet active — it must be enabled (see the **Activation** section in `plugin-authoring.md`). A plain restart is not enough. Report this explicitly to the user in Russian:
    ```
    Создал плагин `<name>`. Состав: <список компонентов>. Коммит <hash>.
    Плагин зарегистрирован, но ещё не активен. Чтобы включить: запусти `/plugin`, найди `<name>` в маркетплейсе `anton-toolkit-marketplace` и включи его — простой перезагрузки для нового плагина недостаточно.

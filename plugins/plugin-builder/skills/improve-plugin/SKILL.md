@@ -27,26 +27,9 @@ description: >
 
 # Improve Plugin — explicit plugin fix
 
-**Reference files — resolve the path BEFORE reading (the most frequent failure in this marketplace).**
-Every `references/<file>.md` cited anywhere in this document means `<plugin-root>/references/<file>.md`:
-the reference files live at the PLUGIN ROOT, never inside a skill's own folder. The base directory given to
-this skill at load time is `<plugin-root>/skills/<this-skill>/`, so a bare relative path resolves to
-`<plugin-root>/skills/<this-skill>/references/<file>.md` — that file does not exist and the read fails.
-Resolve it as `<this skill's base directory>/../../references/<file>.md`. If no base directory was given,
-locate the file with Glob (pattern `**/references/<file>.md`, path `<user home>/.claude/plugins`) and take
-the match under `.../plugin-builder/` — either the installed cache
-`.claude/plugins/cache/anton-toolkit-marketplace/plugin-builder/<version>/references/` or the marketplace
-working copy `.claude/plugins/marketplaces/anton-toolkit-marketplace/plugins/plugin-builder/references/`.
-
-- Correct: `C:\Users\<user>\.claude\plugins\cache\anton-toolkit-marketplace\plugin-builder\<version>\references\plugin-authoring.md`
-- Incorrect: `references/plugin-authoring.md` — resolves under the skill folder, which has no `references/`.
-
-Never report a reference file as missing, and never proceed on remembered content, without running that
-Glob first.
-
 The user explicitly asked to update a plugin component. Read the recent session history to understand which skill/agent and what change is wanted, apply the minimal fix, and ship via git.
 
-**Before starting, read** `references/plugin-authoring.md` for the validation checklist and language rules.
+**Before starting, read** `${CLAUDE_PLUGIN_ROOT}/references/plugin-authoring.md` for the validation checklist, the Claude 5 writing rules, and the language rules. Every later mention of `plugin-authoring.md` in this document means that file.
 
 ## Step 1 — Detect target plugin, confirm in one message
 
@@ -82,7 +65,7 @@ If the only working copy is the marketplace path under `~/.claude/plugins/market
 
 Otherwise, never edit `~/.claude/plugins/cache/` — that is a read-only cache, changes are overwritten. If no working copy is found, clone:
 ```bash
-git clone git@github.com:lopatuxin/anton-toolkit.git /tmp/anton-toolkit
+git clone git@github.com:lopatuxin/anton-toolkit.git "${TMPDIR:-/tmp}/anton-toolkit"
 ```
 
 Set `PLUGIN_REPO` to the working-copy path.
@@ -121,17 +104,17 @@ Example: `0.10.3` → `0.10.4`.
 
 ## Step 6 — Pre-flight validation
 
-Run the checklist from `references/plugin-authoring.md`:
+Run the checklist from `plugin-authoring.md`:
 1. Modified JSON parses.
 2. Edited SKILL.md / agent.md is > 100 bytes (didn't accidentally wipe).
 3. `version` is strictly greater than before.
-4. If `description` was edited, it still contains 3+ trigger phrases.
+4. If `description` (or `when_to_use`) was edited, the pair is ≤ 1,000 characters, opens with the key use case, and contains no `<example>` blocks or IMPORTANT/IMMEDIATELY emphasis; any reference you cited uses `${CLAUDE_PLUGIN_ROOT}`.
 
 On any failure — abort, report to user in Russian what failed, leave files on disk. Do not commit.
 
 ## Step 7 — Sync the root README
 
-Update the repo-root `README.md` per the **README sync** section in `references/plugin-authoring.md`, in the same commit. For a pure internal behavior fix that does not change the tool's name, triggers, count, or one-line description, this is just the version cell in the plugins table. If the fix changed a trigger, name, or the documented behavior shown in the README, update that tool's section too.
+Update the repo-root `README.md` per the **README sync** section in `plugin-authoring.md`, in the same commit. For a pure internal behavior fix that does not change the tool's name, triggers, count, or one-line description, this is just the version cell in the plugins table. If the fix changed a trigger, name, or the documented behavior shown in the README, update that tool's section too.
 
 ## Step 8 — Git
 
@@ -143,9 +126,9 @@ git commit -m "<Russian message: what was fixed and why, 1–2 sentences>"
 git push
 ```
 
-If cloned to `/tmp/`, remove after push:
+If you had to clone into the temp directory, remove the clone after push:
 ```bash
-rm -rf /tmp/anton-toolkit
+rm -rf "${TMPDIR:-/tmp}/anton-toolkit"
 ```
 
 ## Step 9 — Report in Russian

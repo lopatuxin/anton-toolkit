@@ -19,26 +19,9 @@ description: >
 
 # Extend Plugin — guided plugin extension
 
-**Reference files — resolve the path BEFORE reading (the most frequent failure in this marketplace).**
-Every `references/<file>.md` cited anywhere in this document means `<plugin-root>/references/<file>.md`:
-the reference files live at the PLUGIN ROOT, never inside a skill's own folder. The base directory given to
-this skill at load time is `<plugin-root>/skills/<this-skill>/`, so a bare relative path resolves to
-`<plugin-root>/skills/<this-skill>/references/<file>.md` — that file does not exist and the read fails.
-Resolve it as `<this skill's base directory>/../../references/<file>.md`. If no base directory was given,
-locate the file with Glob (pattern `**/references/<file>.md`, path `<user home>/.claude/plugins`) and take
-the match under `.../plugin-builder/` — either the installed cache
-`.claude/plugins/cache/anton-toolkit-marketplace/plugin-builder/<version>/references/` or the marketplace
-working copy `.claude/plugins/marketplaces/anton-toolkit-marketplace/plugins/plugin-builder/references/`.
-
-- Correct: `C:\Users\<user>\.claude\plugins\cache\anton-toolkit-marketplace\plugin-builder\<version>\references\plugin-authoring.md`
-- Incorrect: `references/plugin-authoring.md` — resolves under the skill folder, which has no `references/`.
-
-Never report a reference file as missing, and never proceed on remembered content, without running that
-Glob first.
-
 Interview the user in Russian to understand what to add to an existing plugin, then apply the change (new files or minimal edits), increment version, and commit.
 
-**Before starting, read** `references/plugin-authoring.md`.
+**Before starting, read** `${CLAUDE_PLUGIN_ROOT}/references/plugin-authoring.md`. Every later mention of `plugin-authoring.md` in this document means that file.
 
 ## Phase 1 — Identify target plugin
 
@@ -57,7 +40,7 @@ Read the full contents of `plugins/<target>/` — `plugin.json`, all SKILL.md, a
 
 Required fields for an extension:
 
-1. **Что добавляем** (what to add) — a new skill, agent, command, hook, MCP server, or reference? Or a rework of an existing component? (See the **Component types** table in `references/plugin-authoring.md`.)
+1. **Что добавляем** (what to add) — a new skill, agent, hook, workflow, MCP server, or reference? Or a rework of an existing component? (See the **Component types** table in `plugin-authoring.md`.)
 2. **Зачем** (why) — task the new thing solves / gap in the current plugin.
 3. **Когда запускать** (trigger context, if a new skill/agent) — situations that invoke it.
 4. **Как работает** (how it works) — step-by-step behavior.
@@ -80,8 +63,8 @@ Wait for confirmation. On corrections go back to Phase 3.
 Two modes:
 
 **Mode A — new component:**
-- The new component can be a skill, agent, command, hook, MCP server, or reference — pick per the **Component types** table in `references/plugin-authoring.md`, not reflexively a skill.
-- Create the new file(s) under the target plugin, following `references/plugin-authoring.md`.
+- The new component can be a skill, agent, hook, workflow, MCP server, or reference — pick per the **Component types** table in `plugin-authoring.md`, not reflexively a skill.
+- Create the new file(s) under the target plugin, following `plugin-authoring.md`.
 - Do NOT modify existing files in the target plugin unless the user explicitly asked.
 
 **Mode B — rework existing component:**
@@ -93,14 +76,14 @@ In both modes, bump `plugins/<target>/.claude-plugin/plugin.json` version:
 
 ## Phase 6 — Validate, commit, push
 
-1. Pre-flight validation from `references/plugin-authoring.md`:
+1. Pre-flight validation from `plugin-authoring.md`:
    - JSON files parse.
    - New/modified SKILL.md / agent.md are > 100 bytes.
-   - New skills have 3+ trigger phrases in `description`.
+   - New or edited `description` (+ `when_to_use`) is ≤ 1,000 characters, opens with the key use case, has no `<example>` blocks or IMPORTANT/IMMEDIATELY emphasis; references are cited via `${CLAUDE_PLUGIN_ROOT}`; nothing but agents lives under `agents/`.
    - `version` in target `plugin.json` is incremented.
 2. On failure — abort, report in Russian, do not commit.
 3. On success:
-   - Update the root `README.md` per the **README sync** section in `references/plugin-authoring.md`: for a new skill/agent add its entry to the target plugin's section (and the cheatsheet/workflows if relevant), update the plugins-table counts and version cell, and the badge counts.
+   - Update the root `README.md` per the **README sync** section in `plugin-authoring.md`: for a new skill/agent add its entry to the target plugin's section (and the cheatsheet/workflows if relevant), update the plugins-table counts and version cell, and the badge counts.
    ```bash
    git pull origin main
    git add README.md plugins/<target>/<explicit paths>
