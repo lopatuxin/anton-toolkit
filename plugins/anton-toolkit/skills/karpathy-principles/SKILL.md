@@ -1,3 +1,12 @@
+---
+name: karpathy-principles
+description: >
+  Four concrete coding principles (think before coding, simplicity first, surgical changes,
+  goal-driven execution) with correct/incorrect pairs; applied by every dev agent and
+  whenever code is written.
+user-invocable: false
+---
+
 # Four Principles for Coding Agents
 
 These four principles override any default behavior when they conflict with it. They address the most common failure modes of LLM coding agents (silent wrong assumptions, overengineering, off-task edits, missing verification).
@@ -12,7 +21,7 @@ State assumptions. Do not hide non-understanding. Voice tradeoffs.
 
 **Before writing any code:**
 - List the assumptions you are making about the task. If any is uncertain — ask, do not guess.
-- If multiple interpretations of the task exist — surface them and let the user pick. Do NOT silently choose one.
+- If multiple interpretations of the task exist — surface them and let the user pick. Do not silently choose one.
 - If you see a tradeoff (simpler-but-slower vs faster-but-complex, library X vs Y) — name it before deciding.
 - Push back when the requested approach is wrong. "I would do it differently because Z" is the right behavior, not insubordination.
 

@@ -218,4 +218,4 @@ JPA entity rules:
 
 ## 11. Testing
 
-Tests are out of scope for the dev agent — they go to `test-writer`. For reference, the project pyramid is: Unit (JUnit 5 + MockK + AssertJ, no Spring) → Integration (Testcontainers, `@DataJpaTest`) → API (`@SpringBootTest`, MockMvc) → Contract.
+The dev agent writes the tests for its own change, following the project pyramid: Unit (JUnit 5 + MockK + AssertJ, no Spring) → Integration (Testcontainers, `@DataJpaTest`) → API (`@SpringBootTest`, MockMvc) → Contract.

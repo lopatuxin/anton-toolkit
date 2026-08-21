@@ -5,210 +5,89 @@ description: >
   read logs and stack traces, trace the code and data, escalate to dynamic analysis,
   profiling, and bisection until the cause is proven — no fix is proposed on a guess. Use
   on an explicit request to investigate a problem, not on every mention of something not
-  working; the fix itself is handed to the dev agent of the module's language.
+  working; a sizeable fix is handed to the dev agent of the module's language, a small
+  well-understood one is applied directly.
 when_to_use: >
   "найди причину", "разберись почему падает", "дебаг", "/debug"
 ---
 
-# Debug — systematic root cause analysis
+# Debug — systematic root-cause analysis
 
-Find the TRUE cause of the problem, not a hypothetical one. Never propose a solution until the cause is proven.
+Find the real cause, not a plausible one. A fix built on a guess buys a second round of debugging, so no fix is proposed until the cause is proven.
 
 ## Core rule
 
-**PROOF > ASSUMPTION.** Do not say "the problem is probably in X". Instead — prove it is X through logs, traces, reproduction, or elimination of alternatives.
+Proof beats assumption. "The problem is probably in X" is not a result. Prove it is X — with a log line, a stack trace, a reproduced request, a data row, or by eliminating the alternatives — or say plainly "not found yet, moving to level N".
 
-## Process — Method escalation
+Reading the code first is fine and often the fastest way in. What is not fine is stopping at a theory that nothing has confirmed.
 
-Go from simple to complex. If method N gives no answer — move to N+1.
+## Escalation ladder
 
-### Level 1: Reproduction and logs
+Go from cheap to expensive. When a level gives no answer, say so and move to the next. When the cause is proven at any level, stop there and report — the remaining levels are not a checklist to complete.
 
-**Goal: see the error with your own eyes.**
+Stack specifics — JVM tooling, Spring Actuator, Docker log and exec commands, Hibernate SQL logging, Gradle — live in `${CLAUDE_SKILL_DIR}/references/jvm-and-docker.md`; read it when the stack is JVM or Docker. The levels below say what to collect and how to prove a cause on any stack.
 
-1. **Clarify the symptom.** Ask the user:
-   - What exactly happens? (exact error, response code, behavior)
-   - When? (always, sometimes, after a specific action)
-   - Where? (which endpoint, which page, which service)
+### Level 1 — reproduce and read the evidence
 
-2. **Reproduce the error:**
-   ```bash
-   # API — send the same request
-   curl -v -X POST http://localhost:8080/api/... -H "Content-Type: application/json" -d '{...}'
-   
-   # Browser — open the same page with the browser tools available in the session (Claude in Chrome / Browser pane)
-   ```
+Goal: see the failure yourself.
 
-3. **Read the logs:**
-   ```bash
-   # Docker containers
-   docker compose logs --tail=100 <service>
-   docker compose logs --tail=100 <service> | grep -i "error\|exception\|warn"
-   
-   # File logs
-   tail -100 logs/app.log | grep -i "error\|exception"
-   
-   # Frontend — console errors via the browser tools available in the session
-   ```
+1. Pin the symptom. If the report is vague, ask the user in Russian: what exactly happens (the exact error text, response code, or wrong value), when (always, sometimes, after a specific action), where (which endpoint, page, service). Do not ask what the report already states.
+2. Reproduce it. For an API, send the same request again (`curl -v ...`). For a UI, open the same page with the browser tools available in the session and watch the console and the network panel.
+3. Read the logs around the moment of failure — application logs, container logs, browser console — filtered for errors and warnings.
+4. Read the stack trace in full, down to the last `Caused by`. The first frame in the project's own code, not in the framework, is where the investigation starts.
 
-4. **Find the stack trace.** If there is an exception — read it IN FULL. Find the line in YOUR code (not in the framework) where the error originated.
+Stop when the exact line and cause are found.
 
-**If you found the exact line and cause → STOP. Report the cause.**
+### Level 2 — code and data
 
-### Level 2: Code and data analysis
+Goal: understand the logic that led to the failure.
 
-**Goal: understand the logic that led to the error.**
+1. Read the code around the failure point — the whole method and its callers, not one line.
+2. Trace the data path from input to failure (request → handler → service → storage). At each step: what comes in, what goes out, where does it stop matching expectations.
+3. Look at the actual data: query the database or cache for the record involved. A bug that "cannot happen" is usually data the code never expected.
+4. Check the configuration the process really runs with — environment variables inside the container, the active profile, the config file that is actually loaded — not the one in the repo.
 
-1. **Read the code** around the error point. Not just the line, but the full method and calling code.
+Stop when the cause is found.
 
-2. **Trace the call chain.** Track the data path from input to error:
-   ```
-   Controller → Service → Repository → DB
-   ```
-   For each step: what comes in? what is returned? where does the data get corrupted?
+### Level 3 — dynamic analysis
 
-3. **Check the data:**
-   ```bash
-   # SQL — what is actually in the database?
-   docker compose exec postgres psql -U app -d appdb -c "SELECT * FROM orders WHERE id = ..."
-   
-   # Redis — what is in the cache?
-   docker compose exec redis redis-cli GET "key"
-   ```
+Goal: observe the running system.
 
-4. **Check the configuration:**
-   ```bash
-   # Env variables inside the container
-   docker compose exec <service> env | grep -i "spring\|db\|redis"
-   
-   # Application config
-   cat src/main/resources/application.yml
-   ```
+1. Add temporary logging at the suspicious points (inputs, state, which branch was taken), reproduce, read. Remove it when done — a debug log left behind is the next incident's noise.
+2. Ask the runtime what it actually loaded: which components are registered, which configuration is active, which routes exist.
+3. Check the network path: is the port listening, does service A resolve and reach service B from inside its own container, does the proxy forward the header.
 
-**If you found the cause → STOP. Report it.**
+Stop when the cause is found.
 
-### Level 3: Dynamic analysis
+### Level 4 — profiling (slow or hanging)
 
-**Goal: observe the application in real time.**
+Goal: a measured bottleneck, not "it's slow".
 
-1. **Add temporary logging** to suspicious code:
-   ```java
-   log.debug(">>> Input: {}, State: {}", input, state);
-   ```
-   Then reproduce the error and read the logs. MANDATORY remove temporary logs after debugging.
+1. Measure first: time the request end to end and split it (`curl -w` with connect, first-byte, and total times). The number is the proof later and the baseline for the fix.
+2. Enable query logging temporarily and count what one request executes — an N+1 shows up as the same query repeated per row.
+3. Take a thread dump or a CPU profile while the slow request runs — what are the threads actually doing?
+4. Frontend: record a performance profile and the network waterfall with the browser tools available in the session — which request or render is slow?
 
-2. **Spring Boot Actuator:**
-   ```bash
-   # Health check
-   curl http://localhost:8080/actuator/health
-   
-   # Beans — is the needed component loaded?
-   curl http://localhost:8080/actuator/beans | jq '.contexts[].beans | keys[]' | grep -i "order"
-   
-   # HTTP traces (if enabled)
-   curl http://localhost:8080/actuator/httpexchanges
-   ```
+Stop when the bottleneck is measured.
 
-3. **Network analysis:**
-   ```bash
-   # Check that the port is listening
-   curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health
-   
-   # DNS/connection issues between containers
-   docker compose exec <service> curl -v http://other-service:8080/health
-   ```
+### Level 5 — bisection and isolation
 
-**If you found the cause → STOP. Report it.**
+Goal: shrink the search space when everything else failed.
 
-### Level 4: Profiling (slow performance)
+1. If it worked before: `git bisect` between the last known good commit and now, testing each step with the reproduction from level 1.
+2. Minimal reproduction: strip optional fields from the request — does it still fail? Swap the data — is it data-dependent? Call the service directly, bypassing the controller — which layer fails?
+3. If it works in one environment and not another: diff the environments — variables, config, dependency versions — before diffing the code.
 
-**Goal: find the specific bottleneck.**
+## Report
 
-1. **Measure response time:**
-   ```bash
-   curl -w "\n  DNS: %{time_namelookup}s\n  Connect: %{time_connect}s\n  TTFB: %{time_starttransfer}s\n  Total: %{time_total}s\n" \
-     http://localhost:8080/api/...
-   ```
+Report in Russian, in this order: the cause (what exactly produces the problem), the proof (the log line, trace, request, or data row that shows it), the location (`file:line`), and what to do next with who does it. A cause without its proof goes back to the ladder, not into the report.
 
-2. **SQL queries — enable logging:**
-   ```yaml
-   # application.yml — temporary!
-   logging.level.org.hibernate.SQL: DEBUG
-   logging.level.org.hibernate.type.descriptor.sql: TRACE
-   ```
-   Reproduce the slow request → see which SQL queries execute (N+1?).
+## Hand-off
 
-3. **JVM profiling:**
-   ```bash
-   # Thread dump — what are threads doing right now?
-   docker compose exec <service> jcmd 1 Thread.print
-   
-   # GC statistics
-   docker compose exec <service> jcmd 1 GC.heap_info
-   
-   # If async-profiler is available
-   docker compose exec <service> jcmd 1 jfr.start duration=30s filename=/tmp/profile.jfr
-   ```
-
-4. **Frontend performance:**
-   - Browser performance profile via the browser tools available in the session
-   - Lighthouse audit
-   - Network waterfall — which request is slow?
-
-**If you found the bottleneck → STOP. Report it.**
-
-### Level 5: Bisection and isolation
-
-**Goal: narrow the area down to the minimum when everything else has failed.**
-
-1. **Git bisect** — if "it worked before":
-   ```bash
-   git log --oneline -20  # find the approximate commit
-   git bisect start
-   git bisect bad
-   git bisect good <commit-hash>
-   # Test each commit
-   ```
-
-2. **Minimal reproducible example:**
-   - Remove all optional fields from the request — does the error persist?
-   - Substitute different data — is the error data-dependent?
-   - Call the service directly (without the controller) — is the error in the service or the controller?
-
-3. **Comparison** — if it works in one environment but not another:
-   ```bash
-   # Compare configs
-   diff <(docker compose exec service1 env | sort) <(docker compose exec service2 env | sort)
-   
-   # Compare dependency versions
-   ./gradlew dependencies | diff - expected-deps.txt
-   ```
-
-## Report format
-
-When the cause is found, report:
-
-```
-## Root cause
-<what specifically causes the problem>
-
-## Proof
-<how you proved it — log, trace, request, data>
-
-## Location in code
-<file:line — exact location>
-
-## Recommendation
-<what needs to be fixed — hand off to the dev agent of the module's language (java-dev, kotlin-dev, python-dev, go-dev, frontend-dev) or to test-writer>
-```
+The fix goes to the dev agent of the module's language (java-dev, kotlin-dev, python-dev, go-dev, frontend-dev) when it is sizeable; a small, well-understood fix is applied directly in the main session. A problem in tests or test configuration goes to test-writer. When the problem is in the data rather than the code, or in the infrastructure (network, DNS, containers), say so explicitly — there is nothing to hand to a dev agent.
 
 ## Rules
 
-- NEVER propose a solution without a proven cause
-- NEVER say "probably" or "the cause might be" — prove it or say "haven't found it yet, moving to level N"
-- If a level gives no result — explicitly say so and move to the next
-- Remove temporary logging after debugging
-- Do not fix code yourself — your job is to find the cause. Fixing is the responsibility of java-dev/test-writer/frontend-dev
-- If the problem is in tests or test configs (application-test.yml etc.) — hand off to test-writer, not java-dev
-- If the problem is in data (not in code) — say so explicitly
-- If the problem is in infrastructure (network, DNS, Docker) — say so explicitly
+- No fix is proposed without a proven cause; "probably" is replaced by either proof or "not found yet, moving to level N".
+- A level that gave nothing is named as exhausted before moving on, so the reader can follow the elimination.
+- Temporary logging and temporary config changes are removed before the report.

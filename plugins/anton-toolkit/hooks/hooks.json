@@ -1,0 +1,66 @@
+{
+  "description": "anton-toolkit hooks: gofmt after edits of Go files; a review mark when code-reviewer / mr-spec-reviewer finishes; a review gate on `git commit`, active only in repositories that contain .claude/review-gate (bypass: ANTON_SKIP_REVIEW=1).",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Edit(**/*.go)",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PLUGIN_ROOT}/hooks/post-edit-format.ps1\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "^(anton-toolkit:)?(code-reviewer|mr-spec-reviewer)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PLUGIN_ROOT}/hooks/review-mark.ps1\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(git commit*)",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PLUGIN_ROOT}/hooks/review-gate.ps1\"",
+            "timeout": 20
+          },
+          {
+            "type": "command",
+            "if": "Bash(git -C *)",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PLUGIN_ROOT}/hooks/review-gate.ps1\"",
+            "timeout": 20
+          }
+        ]
+      },
+      {
+        "matcher": "PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "PowerShell(git commit*)",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PLUGIN_ROOT}/hooks/review-gate.ps1\"",
+            "timeout": 20
+          },
+          {
+            "type": "command",
+            "if": "PowerShell(git -C *)",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PLUGIN_ROOT}/hooks/review-gate.ps1\"",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  }
+}
