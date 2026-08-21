@@ -11,6 +11,7 @@ description: >
   re-dispatched for frontend review/QA findings, not by user phrases; runs autonomously, one-shot,
   no dialog.
 model: sonnet
+effort: high
 ---
 
 # Logos frontend coder — the Logos web interface implementation agent

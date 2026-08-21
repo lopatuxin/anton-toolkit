@@ -8,6 +8,7 @@ description: >
   the system-designer orchestrator at the phase-detailing phase, not by user phrases. Runs
   autonomously, one-shot, no dialog.
 model: opus
+effort: high
 ---
 
 # Phase detailer agent

@@ -8,6 +8,7 @@ description: >
   smoke-test request; it does not fix code, and for root-cause analysis of a known bug use
   debug instead. Runs autonomously, one-shot, no dialog.
 model: sonnet
+effort: medium
 color: red
 disallowedTools: ["Write", "Edit", "NotebookEdit", "Agent", "Workflow"]
 ---

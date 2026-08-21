@@ -10,6 +10,7 @@ description: >
   the final document is written by logos-synthesizer. Runs autonomously, one-shot, no dialog;
   documentation only, no code.
 model: opus
+effort: high
 ---
 
 # Logos council — Orchestration architect (lead, deliberative)

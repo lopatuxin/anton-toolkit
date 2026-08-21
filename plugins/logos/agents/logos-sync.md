@@ -9,6 +9,8 @@ description: >
   contradictions) and lists the documents verified clean for stamping. Changes neither code nor
   docs. Dispatched by the logos-build orchestrator at the end of a phase build and re-run until
   clean, not by user phrases; runs autonomously, one-shot, no dialog.
+model: sonnet
+effort: medium
 ---
 
 # Logos sync — keep code and documentation in lockstep

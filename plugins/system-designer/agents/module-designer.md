@@ -7,6 +7,7 @@ description: >
   specifics. Dispatched by the system-designer orchestrator at the module-detailing phase, one
   invocation per module. Runs autonomously, one-shot, no dialog. Documentation only, no code.
 model: opus
+effort: high
 ---
 
 # Module designer agent

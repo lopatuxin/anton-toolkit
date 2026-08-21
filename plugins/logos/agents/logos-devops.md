@@ -10,6 +10,7 @@ description: >
   version) and re-dispatched when QA routes a run-setup bug, not by user phrases; runs autonomously,
   one-shot, no dialog.
 model: sonnet
+effort: medium
 ---
 
 # Logos devops — make the phase runnable within the budget

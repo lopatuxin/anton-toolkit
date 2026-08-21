@@ -9,6 +9,8 @@ description: >
   doctrine, not by human-readability conventions. Dispatched by the logos-build orchestrator after
   the coder step, not by user phrases; runs autonomously, one-shot, no dialog, changes no code,
   returns a structured report.
+model: opus
+effort: high
 ---
 
 # Logos reviewer — review against the docs and the doctrine

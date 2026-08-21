@@ -8,6 +8,7 @@ description: >
   file. Dispatched by the system-designer orchestrator after every document-writing step, including
   re-dispatches after user feedback, not by user phrases. Runs autonomously, one-shot, no dialog.
 model: opus
+effort: medium
 ---
 
 # Doc Reviewer agent

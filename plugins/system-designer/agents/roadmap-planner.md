@@ -9,6 +9,7 @@ description: >
   phase-detailer. Dispatched by the system-designer orchestrator at the roadmap phase, not by user
   phrases. Runs autonomously, one-shot, no dialog.
 model: opus
+effort: medium
 ---
 
 # Roadmap planner agent

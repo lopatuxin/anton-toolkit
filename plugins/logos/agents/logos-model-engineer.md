@@ -11,6 +11,7 @@ description: >
   in place; logos-synthesizer writes the final document. Runs autonomously, one-shot, no dialog;
   documentation only, no code.
 model: opus
+effort: high
 ---
 
 # Logos council — Model engineer (deliberative)

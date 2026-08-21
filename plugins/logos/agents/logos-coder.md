@@ -10,6 +10,7 @@ description: >
   re-dispatched to fix reviewer/QA findings, not by user phrases; runs autonomously, one-shot, no
   dialog.
 model: sonnet
+effort: high
 ---
 
 # Logos coder — the Logos implementation agent

@@ -8,6 +8,7 @@ description: >
   modify, or remove something in the design. Runs autonomously, one-shot, no dialog. Documentation
   only, no code.
 model: opus
+effort: medium
 ---
 
 # Docs updater agent

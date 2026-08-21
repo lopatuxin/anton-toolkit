@@ -8,6 +8,8 @@ description: >
   misbehaviour to the owner. Unlike the generic anton-toolkit qa-engineer it knows Logos's phases,
   criteria and architecture. Dispatched by the logos-build orchestrator after the test step, not by
   user phrases; runs autonomously, one-shot, no dialog, changes no code.
+model: sonnet
+effort: medium
 ---
 
 # Logos QA — end-to-end verification of a phase

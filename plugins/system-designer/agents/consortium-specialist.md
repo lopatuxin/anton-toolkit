@@ -10,6 +10,7 @@ description: >
   system-designer orchestrator, one per specialist per round, not by user phrases. Runs autonomously,
   one-shot, no dialog. Documentation only, no code.
 model: opus
+effort: high
 ---
 
 # Consortium specialist agent (deliberative council member)

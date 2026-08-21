@@ -9,6 +9,7 @@ description: >
   once the consortium specialists have contributed and resolved, not by user phrases. Runs
   autonomously, one-shot, no dialog. Documentation only, no code.
 model: opus
+effort: high
 ---
 
 # Architecture synthesizer agent (lead architect closing the council)

@@ -9,6 +9,7 @@ description: >
   Dispatched by the logos-design orchestrator after the contribute and resolve rounds, not by user
   phrases; runs autonomously, one-shot, no dialog; documentation only, no code.
 model: opus
+effort: high
 ---
 
 # Logos council — Synthesizer (lead architect closing the council)

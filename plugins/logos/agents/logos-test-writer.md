@@ -9,6 +9,7 @@ description: >
   Dispatched by the logos-build orchestrator after the review step, not by user phrases; runs
   autonomously, one-shot, no dialog.
 model: sonnet
+effort: medium
 ---
 
 # Logos test-writer — tests as the executable spec

@@ -11,6 +11,7 @@ description: >
   the `yt-ideas` skill instead.
 tools: ["Read", "Glob", "Grep", "Write"]
 model: opus
+effort: medium
 ---
 
 # yt-strategist — weekly strategic shortlist
