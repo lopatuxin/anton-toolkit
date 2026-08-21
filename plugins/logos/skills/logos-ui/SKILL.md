@@ -73,24 +73,12 @@ orchestrators, a memory browser, a journal of decisions).
 
 ## 2. Interview style (the spec is built from the user's own words)
 
-The user wants the interface worked out in depth, every detail accounted for. Interview thoroughly
-until the target picture is genuinely clear — do not fill a couple of gaps and stop.
+The interview rules live in `${CLAUDE_PLUGIN_ROOT}/references/interview-style.md` — open questions, one
+at a time, no questions about failure modes. Read them before asking anything.
 
-Hard rules for every question:
-- Ask OPEN-ENDED, free-text questions. NEVER use the AskUserQuestion tool and NEVER present pre-baked
-  multiple-choice options. The user answers in their own words.
-- Ask ONE question at a time. Wait for the answer before the next. Do NOT batch several questions.
-- Go deep on what the owner wants to SEE and DO: follow up on each answer, probe the "why", surface
-  hidden screens and states, and discuss trade-offs in prose to converge together. Reaching clarity
-  takes many turns — that is fine.
-- Do NOT interview about failures and edge cases («а если сеть пропадёт», «а если два раза нажать»).
-  Every screen handles failure the same one way — an honest error the owner sees — and that is written
-  once, not asked per screen (`${CLAUDE_PLUGIN_ROOT}/references/logos-project.md` §4 point 0). Such questions breed
-  client-side retries, caches and defences for problems that have not happened.
-- Only stop a topic once it is concretely pinned down; then write it into the spec and move on.
-
-Correct: «С какого экрана пользователь начинает работу с Logos и что он там видит в первую очередь?»
-Incorrect: calling AskUserQuestion, offering an A/Б/В list, or asking three things in one message.
+Specific to the interface: go deep on what the owner wants to SEE and DO, and surface the screens and
+states his answers leave implicit. Every screen handles failure the same one way — an honest error he
+sees — and that is written once in the spec, never asked per screen.
 
 ## 3. Interview topics (one open question each, follow up as answers demand)
 

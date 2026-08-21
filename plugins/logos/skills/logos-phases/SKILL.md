@@ -124,28 +124,15 @@ exercise.
 
 ## 2. Interview style (phases are carved from the user's own words)
 
-The user wants the phasing worked out in depth — every phase a genuinely shippable, testable slice.
-Interview thoroughly until each phase is concretely pinned down — do not dump a generic phase list and
-stop.
+The interview rules live in `${CLAUDE_PLUGIN_ROOT}/references/interview-style.md` — open questions, one
+at a time, no questions about failure modes. Read them before asking anything.
 
-Hard rules for every question:
-- Ask OPEN-ENDED, free-text questions. NEVER use the AskUserQuestion tool and NEVER present pre-baked
-  multiple-choice options. The user answers in their own words.
-- Ask ONE question at a time. Wait for the answer before the next. Do NOT batch several questions.
-- Go deep on WHAT the owner wants to touch and WHY: follow up on each answer, probe the "why", surface
-  hidden scope, and discuss trade-offs in prose to converge together. Reaching clarity takes many
-  turns — that is fine.
-- Do NOT interview about failure modes or edge cases («а что если модель…», «а если провайдер упадёт»).
-  Such questions turn into criteria like «должно корректно переживать X», and those criteria turn into
-  mechanisms for problems that have not happened (`${CLAUDE_PLUGIN_ROOT}/references/logos-project.md` §4 point 0). The only
-  failure criterion a phase ever carries is the standing one: a failure is shown to the owner honestly
-  in the feed. Anything beyond that enters a phase ONLY if the owner himself asks for it in his own
-  words.
-- Carve ONE phase at a time. Pin a phase down fully, write it, then move to the next phase.
-- Only stop a phase once it is concretely pinned down; then write it and move on.
-
-Correct: «С какого самого первого, минимального куска хочешь стартовать MVP-ноль и что именно ты должен в нём пощупать?»
-Incorrect: calling AskUserQuestion, offering an А/Б/В list, or asking three things in one message.
+Specific to phasing: the owner wants every phase to be a genuinely shippable, testable slice, so
+interview until each one is concretely pinned down instead of dumping a generic phase list. Go deep on
+WHAT he wants to touch in the phase and WHY. Carve ONE phase at a time — pin it down fully, write it,
+then move to the next. The only failure criterion a phase ever carries is the standing one: a failure
+is shown to the owner honestly in the feed; anything beyond that enters a phase only if he asks for it
+in his own words.
 
 ## 3. Interview topics — per phase (one open question each, follow up as answers demand)
 

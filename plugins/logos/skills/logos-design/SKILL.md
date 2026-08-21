@@ -34,31 +34,13 @@ skill only produces the documentation those builders implement.
 
 ## Interview style (applies to EVERY dialog phase: concept, architectural constraints, change management)
 
-The user wants the documentation worked out in depth. Your job in every dialog phase is to interview
-the user thoroughly until the target picture is genuinely clear — not to fill a couple of gaps and
-move on. The design is built from the user's own words.
+The interview rules live in `${CLAUDE_PLUGIN_ROOT}/references/interview-style.md` — open questions, one
+at a time, no questions about failure modes. Read them before asking anything.
 
-Hard rules for every question you ask the user:
-- Ask OPEN-ENDED, free-text questions. NEVER use the AskUserQuestion tool and NEVER present pre-baked
-  multiple-choice answer options (no "вариант А / Б / В" lists). The user answers in their own words.
-- Ask ONE question at a time. Wait for the answer before asking the next. Do NOT batch several
-  questions into a single message.
-- Go deep on WHAT the user wants and WHY: follow up on each answer, probe for the "why", surface hidden
-  assumptions, and where the right path is unclear, discuss the trade-offs WITH the user in prose to
-  converge on the target picture together. It is expected and encouraged that reaching clarity takes
-  many turns.
-- Do NOT go deep on what could go wrong. Never interview the user about failure modes, edge cases or
-  "what if the model…" — those questions breed mechanisms for problems that have not happened
-  (`${CLAUDE_PLUGIN_ROOT}/references/design-templates.md`, «Simplicity requirement»). Failure handling in the design is one
-  sentence: the owner sees the failure honestly and decides. Depth belongs to the intent, not to the
-  defences.
-- Only stop interviewing a topic once the user's intent on it is concretely pinned down — then write
-  it into the document and move to the next topic.
-
-Correct: «С какого первого сценария хочешь стартовать и почему именно с него?» (open, single
-question, invites the user's own framing).
-Incorrect: calling AskUserQuestion, presenting a list of pre-written options for the user to pick
-from, or asking three questions in one message.
+Specific to design: the owner wants the documentation worked out in depth, so interview each topic
+until his intent is genuinely pinned down rather than filling a couple of gaps and moving on. Depth
+belongs to the intent, not to the defences — failure handling in the design is one sentence: the owner
+sees the failure honestly and decides.
 
 ## Locate the vault and resolve paths (once per session)
 

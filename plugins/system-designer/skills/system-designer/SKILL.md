@@ -109,7 +109,7 @@ When you have enough, write `<DOCROOT>/Концепт.md` yourself (this is shor
 ## Что сознательно вне scope
 ```
 
-Then run the **doc-reviewer** agent on the new file (see "Mandatory review step" below). Fold its findings into your summary to the user. Then ask in Russian: `Концепт записал в <DOCROOT>/Концепт.md. Посмотри — всё верно? Что-то уточнить перед архитектурой?`
+Then run the **doc-reviewer** agent on the new file (see «Review step» below). Fold its findings into your summary to the user. Then ask in Russian: `Концепт записал в <DOCROOT>/Концепт.md. Посмотри — всё верно? Что-то уточнить перед архитектурой?`
 
 Iterate on concept until the user confirms. Commit Концепт.md with a Russian message before moving on (quote the path — it may contain spaces or Cyrillic):
 ```
@@ -149,88 +149,47 @@ Rules for assembling the council:
 - **Order them the way a real team would.** Sensible default: lead (structure) → data → integrations/API → security → performance/reliability → infrastructure/operations → domain expert. Reorder when the project demands it (e.g. security early for a system whose whole point is data protection).
 - Each role keeps its Russian name verbatim — you pass it into the agent and use it consistently in the discussion log so questions are addressed to the right specialist.
 
-### Step 2.2 — Lay down the skeleton (lead architect)
+### Step 2.2 — Run the council (skeleton → contribution → resolution)
 
-Create the scratch directory and an empty discussion log first:
+Create the scratch directory, and initialize `<DOCROOT>/_черновики/Журнал-обсуждения.md` with the
+single heading line `# Журнал обсуждения архитектуры`:
 ```
 mkdir -p "<DOCROOT>/_черновики"
 ```
-Initialize `<DOCROOT>/_черновики/Журнал-обсуждения.md` with a single heading line `# Журнал обсуждения архитектуры` (you may write it inline).
 
-Then dispatch the **consortium-specialist** agent as the lead architect in `skeleton` mode. Pass resolved paths verbatim — never let the agent assume `docs/`:
-```
-Agent(subagent_type="consortium-specialist", prompt="
-Your role: Ведущий архитектор — overall structure, component boundaries, how pieces fit.
-Your mode: skeleton.
-Read <DOCROOT>/Концепт.md (source of truth for WHAT is built).
-Write the baseline architecture skeleton to the shared draft <DOCROOT>/_черновики/Черновик-архитектуры.md, filling every section of the 'Архитектура' template in ${CLAUDE_PLUGIN_ROOT}/references/document-templates.md at a high level. Keep domain-deep decisions (detailed data model, security model, scaling) high-level and list them in 'Открытые вопросы' for the specialists.
-Discussion log path (do not touch it in skeleton mode): <DOCROOT>/_черновики/Журнал-обсуждения.md.
-Council roster and order: <list the selected roles in order>.
-User's architectural constraints (hard bounds — never violate): <paste them verbatim>.
-Reference the concept as the wiki-link [[Концепт]] where you cite it. Do not include runnable code.
-")
-```
+Then dispatch `consortium-specialist` once per specialist per round, SEQUENTIALLY — each has to read
+what the previous ones wrote before it acts:
 
-### Step 2.3 — Contribution round (specialists, SEQUENTIAL — one at a time)
+1. **skeleton** — the Ведущий архитектор alone, writing the baseline draft to
+   `<DOCROOT>/_черновики/Черновик-архитектуры.md` and leaving the domain-deep decisions as открытые
+   вопросы for the specialists.
+2. **contribute** — every other specialist in the order you chose, one at a time: it deepens its own
+   domain in the draft and opens discussion-log entries at the roles that own the weak spots.
+3. **resolve** — only the specialists with an open question addressed to their role (`Кому: <роль>`),
+   one at a time. Read the discussion log yourself after the contribution round to see who that is.
+   One bounded round, never looped — whatever stays contested the synthesizer folds into
+   `Открытые вопросы`.
 
-For each specialist AFTER the lead, in the order you chose, dispatch the **consortium-specialist** agent in `contribute` mode. **Dispatch them one at a time, sequentially — NOT in parallel** — because each specialist must read the prior specialists' contributions and the running discussion log before acting. Wait for each to finish before dispatching the next.
+Every dispatch carries five things and nothing more — the agent's own instructions already hold the
+mechanics (the modes, the two shared files, the entry format, the template, the no-code rule): the
+**role** with its one-line domain from the registry, the **mode**, the resolved **paths** (concept,
+draft, discussion log — never let an agent assume `docs/`), the **roster and order**, and the user's
+**architectural constraints** verbatim as hard bounds.
 
-```
-Agent(subagent_type="consortium-specialist", prompt="
-Your role: <Russian role name> — <one-line domain description from the registry>.
-Your mode: contribute.
-Read <DOCROOT>/Концепт.md, the shared draft <DOCROOT>/_черновики/Черновик-архитектуры.md, and the discussion log <DOCROOT>/_черновики/Журнал-обсуждения.md in full.
-(1) Deepen the parts of the draft inside your domain with concrete, opinionated decisions; edit them in place, leave other domains intact.
-(2) Critically review the rest of the draft and open NEW discussion-log entries (status открыт) addressed at the role that owns each weak spot.
-Council roster and order: <list the selected roles in order>.
-User's architectural constraints (hard bounds — never violate): <paste them verbatim>.
-Follow the 'Архитектура' template in ${CLAUDE_PLUGIN_ROOT}/references/document-templates.md. Reference the concept as [[Концепт]]. Do not include runnable code.
-")
-```
+### Step 2.3 — Synthesize, then clean up
 
-After the contribution round, read `<DOCROOT>/_черновики/Журнал-обсуждения.md` yourself to see which specialists have open questions addressed to them — that determines who acts in the resolution round.
+Dispatch `architecture-synthesizer` with the same paths and constraints. It starts from the converged
+draft (the council already decided), writes `<DOCROOT>/Архитектура.md` per the `Архитектура` template,
+and returns «Ключевые решения» and «Ключевые споры и как разрешены» — the material you show the user.
 
-### Step 2.4 — Resolution round (addressed specialists, SEQUENTIAL)
+Then delete the scratch directory (`rm -rf "<DOCROOT>/_черновики"`) so the draft and the discussion log
+are never committed. Only `Архитектура.md` survives.
 
-For each specialist who has at least one OPEN question addressed to their role (`Кому: <role>`), dispatch the **consortium-specialist** agent in `resolve` mode — again SEQUENTIALLY, one at a time, so each sees the latest state. Skip specialists with no open questions directed at them.
+### Step 2.4 — Review, present, iterate
 
-```
-Agent(subagent_type="consortium-specialist", prompt="
-Your role: <Russian role name> — <one-line domain description>.
-Your mode: resolve.
-Read the shared draft <DOCROOT>/_черновики/Черновик-архитектуры.md and the discussion log <DOCROOT>/_черновики/Журнал-обсуждения.md in full.
-For every open question whose 'Кому' is your role: either fix the draft and mark the entry решён with a one-line Резолюция, or defend the choice and mark it решён with the justification. Do NOT open new questions. If something genuinely needs the user, mark it решён with Резолюция 'вынести в Открытые вопросы' and add it to the draft's 'Открытые вопросы'.
-User's architectural constraints (hard bounds — never violate): <paste them verbatim>.
-Do not include runnable code.
-")
-```
+Run the **doc-reviewer** agent on `<DOCROOT>/Архитектура.md` (see «Review step» below). Then read `<DOCROOT>/Архитектура.md`, the synthesizer's report, and the reviewer's report. Summarize to the user in Russian: 2–4 key decisions, the **debate summary** (short — straight from the synthesizer's "Ключевые споры и как разрешены"), and any blockers/warnings from the review. Ask: `Посмотри архитектуру. Что поправить перед тем как разбивать на модули?`
 
-This is a single bounded resolution round — do NOT loop it. Any question still genuinely contested after this round is folded into `Открытые вопросы` by the synthesizer in the next step and surfaced to the user.
-
-### Step 2.5 — Synthesize the final document (lead architect closes the council)
-
-Dispatch the **architecture-synthesizer** agent:
-```
-Agent(subagent_type="architecture-synthesizer", prompt="
-Read <DOCROOT>/Концепт.md, the converged shared draft <DOCROOT>/_черновики/Черновик-архитектуры.md, and the discussion log <DOCROOT>/_черновики/Журнал-обсуждения.md in full.
-User's architectural constraints (hard bounds): <paste them verbatim>.
-Start from the converged draft (the council already decided) and polish it into the final document at <DOCROOT>/Архитектура.md following ${CLAUDE_PLUGIN_ROOT}/references/document-templates.md section 'Архитектура'. Verify every решён question is consistently reflected; fold anything left open into 'Открытые вопросы'.
-Reference the concept as the wiki-link [[Концепт]] where you cite it.
-For contested decisions, append a short parenthetical rationale so the reader sees the trade-off was deliberate.
-Return: 'Ключевые решения' (3–4 lines) and 'Ключевые споры и как разрешены' (per major contested point: who objected, the worry, and how the council settled it).
-Do not include runnable code, and do not mention the council/draft/discussion-log inside Архитектура.md itself.
-")
-```
-
-### Step 2.6 — Clean up the scratch files
-
-After the synthesizer returns, delete the scratch directory so the draft and discussion log never get committed: `rm -rf "<DOCROOT>/_черновики"`. Only `<DOCROOT>/Архитектура.md` survives.
-
-### Step 2.7 — Review, present, iterate
-
-Run the **doc-reviewer** agent on `<DOCROOT>/Архитектура.md` (see "Mandatory review step" below). Then read `<DOCROOT>/Архитектура.md`, the synthesizer's report, and the reviewer's report. Summarize to the user in Russian: 2–4 key decisions, the **debate summary** (short — straight from the synthesizer's "Ключевые споры и как разрешены"), and any blockers/warnings from the review. Ask: `Посмотри архитектуру. Что поправить перед тем как разбивать на модули?`
-
-**Iteration is cheap — do NOT re-run the whole council for fixes.** When the user requests changes, re-dispatch the **architecture-synthesizer** with the user's corrections plus the current `<DOCROOT>/Архитектура.md` as input (or fix inline yourself for tiny edits). Only re-run the full council (Steps 2.2–2.5) if the user rejects the whole direction and wants a fresh exploration. After any rewrite, re-run doc-reviewer (mandatory).
+**Iteration is cheap — do NOT re-run the whole council for fixes.** When the user requests changes, re-dispatch the **architecture-synthesizer** with the user's corrections plus the current `<DOCROOT>/Архитектура.md` as input (or fix inline yourself for tiny edits). Only re-run the full council (Step 2.2) if the user rejects the whole direction and wants a fresh exploration. After any rewrite, re-run doc-reviewer (mandatory).
 
 On approval, commit: `git add "<DOCROOT>/Архитектура.md" && git commit -m "добавил архитектурный документ"`.
 
@@ -253,7 +212,7 @@ No runnable code.
 ")
 ```
 
-After the agent returns, run the **doc-reviewer** agent on `<DOCROOT>/Модули/<name>.md` (see "Mandatory review step" below). Summarize the module doc to the user (3–5 bullets) AND any blockers/warnings from the review, ask for feedback. Iterate. Commit each module individually:
+After the agent returns, run the **doc-reviewer** agent on `<DOCROOT>/Модули/<name>.md` (see «Review step» below). Summarize the module doc to the user (3–5 bullets) AND any blockers/warnings from the review, ask for feedback. Iterate. Commit each module individually:
 `git add "<DOCROOT>/Модули/<name>.md" && git commit -m "добавил модуль <name>"`.
 
 Continue until all modules described.
@@ -276,7 +235,7 @@ Steps:
    Report back: list of files changed and one-line summary per file.
    ")
    ```
-3. After the agent returns, run the **doc-reviewer** agent on EACH file the updater touched (see "Mandatory review step" below) — one review call per changed file. Aggregate the verdicts.
+3. After the agent returns, run the **doc-reviewer** agent on EACH file the updater touched (see «Review step» below) — one review call per changed file. Aggregate the verdicts.
 4. Read the agent's report AND the reviewer verdicts, echo to the user in Russian as a diff-summary plus review notes:
    `Обновил: <file1> — <что изменилось>; <file2> — <что>. Создал новый модуль: <name>. Ревью: <blockers/warnings или "чисто">. Ок?`
 5. On approval, commit: `git commit -m "обновил документацию: <краткое описание изменения>"`.
@@ -310,7 +269,7 @@ Steps:
    Short descriptions only — no acceptance criteria, no risks, no estimates (a separate tool details phases later).
    ")
    ```
-6. After the agent returns, run the **doc-reviewer** agent on `<DOCROOT>/Дорожные карты/<срез>/Дорожная карта.md` (see "Mandatory review step" below). Read the file and the reviewer's report, then summarize to the user in Russian as a phase list plus review notes: `Roadmap «<срез>», фазы: 1) <название>; 2) <название>; ... Ревью: <blockers/warnings или "чисто">. Посмотри — порядок и срезы окей?`.
+6. After the agent returns, run the **doc-reviewer** agent on `<DOCROOT>/Дорожные карты/<срез>/Дорожная карта.md` (see «Review step» below). Read the file and the reviewer's report, then summarize to the user in Russian as a phase list plus review notes: `Roadmap «<срез>», фазы: 1) <название>; 2) <название>; ... Ревью: <blockers/warnings или "чисто">. Посмотри — порядок и срезы окей?`.
 7. Iterate (the user may ask to re-split, merge, or reorder phases — re-dispatch the agent with the corrections in the prompt, preserving the same slice name and output path).
 8. On approval, commit: `git add "<DOCROOT>/Дорожные карты/<срез>" && git commit -m "добавил roadmap <срез>"`.
 
@@ -345,33 +304,26 @@ Steps:
    Target reader: python-dev agent — the document must be concrete enough to implement without follow-up questions.
    ")
    ```
-5. After the agent returns, run **doc-reviewer** on EACH created `<DOCROOT>/Дорожные карты/<срез>/Фазы/Фаза-NN-<Русское-имя-фазы>.md` file (see "Mandatory review step" below). Echo to the user in Russian: `Детализировал в «<срез>»/Фазы: Фаза-01-<имя>.md, Фаза-02-<имя>.md, ... Открытые вопросы: <если есть>. Ревью: <blockers/warnings по файлам или "чисто">. Посмотри — ок?`
+5. After the agent returns, run **doc-reviewer** on EACH created `<DOCROOT>/Дорожные карты/<срез>/Фазы/Фаза-NN-<Русское-имя-фазы>.md` file (see «Review step» below). Echo to the user in Russian: `Детализировал в «<срез>»/Фазы: Фаза-01-<имя>.md, Фаза-02-<имя>.md, ... Открытые вопросы: <если есть>. Ревью: <blockers/warnings по файлам или "чисто">. Посмотри — ок?`
 6. Iterate (the user may ask to re-detail a specific phase — re-dispatch with that phase number and the same slice name).
 7. On approval, commit: `git commit -m "детализировал фазы roadmap <срез>: <numbers>"` (or "все фазы").
 
 If the user later edits the roadmap (via Phase 4 / change management), the `docs-updater` agent synchronizes the existing `<DOCROOT>/Дорожные карты/<срез>/Фазы/*.md` automatically.
 
-## Mandatory review step (used by Phases 1–6)
+## Review step (used by Phases 1–6)
 
-After ANY agent (or you yourself, for inline-written `Концепт.md`) finishes writing or updating a documentation file under `<DOCROOT>`, you MUST dispatch the **doc-reviewer** agent on that file BEFORE asking the user for approval. One review per file. Skipping the review is not allowed — even for small change-management edits. **This applies on every iteration:** if the user requests fixes and you re-dispatch the writer agent (architect, module-designer, roadmap-planner, phase-detailer, docs-updater) or rewrite the inline concept yourself, run doc-reviewer again on the produced file. No re-write goes to user approval without a fresh review.
+Every documentation file written or updated under `<DOCROOT>` — by an agent or by you inline — goes
+through the `doc-reviewer` agent before you show it to the user, on every iteration, including small
+change-management edits. One review call per file. Pass the resolved `<DOCROOT>`, the file path, what
+just happened to it (created / updated by docs-updater / detailed by phase-detailer) and the change
+summary from the previous step; the agent's own instructions say which sibling documents it reads and
+what report it returns.
 
-Template prompt for the review call (pass the resolved `<DOCROOT>` and full path):
-```
-Agent(subagent_type="doc-reviewer", prompt="
-Documentation root: <DOCROOT>.
-Review <DOCROOT>/<path>.
-Context: this document was just <created | updated by docs-updater | detailed by phase-detailer>.
-Change summary from previous step (if any): <verbatim or 'N/A'>.
-Read related sibling documents under <DOCROOT> as defined in the doc-reviewer instructions.
-Return the structured review report.
-")
-```
-
-How to use the report:
-- If the report has **blockers**: do NOT ask for approval yet. Tell the user in Russian what is broken (1–3 sentences), and either fix inline yourself (for Концепт.md) or re-dispatch the original writer agent with the blocker list pasted into the prompt. Then re-review.
-- If only **warnings**: still surface them to the user as part of your summary (`Ревью отметило: <2–3 ключевых пункта>`). The user decides if it is worth a fix.
-- If the report is clean (or only nitpicks): mention it briefly (`Ревью: чисто` or `Ревью: пара мелочей, по желанию`) and proceed.
-- Never paste the full review report into the chat. Distil it: blockers + top 2–3 warnings. The user can ask for full report if they want.
+What to do with the report: blockers mean the document is not ready — say in one or two Russian
+sentences what is broken, fix it inline (`Концепт.md`) or re-dispatch the writer agent with the blocker
+list, then review again. Warnings go into your summary to the user, who decides whether they are worth
+a fix. A clean report is one line («Ревью: чисто»). Never paste the report into the chat — distil it to
+the blockers and the two or three warnings that matter.
 
 ## General rules
 

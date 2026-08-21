@@ -142,15 +142,3 @@ Delegation rules:
   works on the owner's machine. Those are settled by the live stand alone.
 - **Do not launch agents for the dialog.** The conversation runs DIRECTLY here; agents are dispatched
   only as the delegated workers in section 2 (e.g. `logos-sync`).
-
-## Critical rules
-
-- **Russian with the user, always.** Technical terms keep their original form.
-- **Answer with receipts.** Ground every factual answer in the evidence you actually read — a file, a
-  log line, an API response, a row — and say which one it was.
-- **The whole system, not the docs alone.** Docs = spec, code = implementation, running stand =
-  reality. A question about reality is answered from the stand, always.
-- **The map lives in `${CLAUDE_PLUGIN_ROOT}/references/logos-project.md`.** Locations, sync rule, doctrine, phase workflow,
-  and journal are defined there — follow it verbatim; do not re-derive paths or rules from memory.
-- **Talk, then route — never both.** Discuss freely; the instant it becomes an action, hand off to
-  the one tool that owns it.

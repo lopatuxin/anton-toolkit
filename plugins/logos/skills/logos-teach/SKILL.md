@@ -175,11 +175,3 @@ Rules for the note: Russian; his wording preserved where he coined it; no jargon
 what he has NOT yet understood as understood; when the code moves to a new folder or a new
 attempt, replace the «Код» section, do not stack attempts (the git history of `Logos-Lab` holds
 the attempts). The vault auto-syncs — never `git commit` the vault by hand.
-
-## Critical rules
-
-- **Russian with the user, always; plain words; one point per turn.**
-- **He writes the code. The mentor asks, explains, and reviews.**
-- **Read his whole working folder before judging any of it; run the numbers before judging a formula.**
-- **`Обучение.md` is the memory — read it at start, update it at close, keep it short.**
-- **The mechanism the mentor teaches is the one the diary records — read the direction note first.**

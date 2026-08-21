@@ -13,23 +13,11 @@ disable-model-invocation: true
 The user dictates raw thoughts; you clean them into a readable Obsidian note and save
 it under today's date. Faithful, well-formatted capture only — no analysis, no advice.
 
-## 0. Locate the Obsidian vault
+## 0. Locate the vault
 
-Find the vault root (the directory that contains `.obsidian/`). Walk up from the current
-directory, with a fallback to the known path:
-
-```bash
-VAULT=""
-DIR="$(pwd)"
-while [ "$DIR" != "/" ] && [ -n "$DIR" ]; do
-  if [ -d "$DIR/.obsidian" ]; then VAULT="$DIR"; break; fi
-  DIR="$(dirname "$DIR")"
-done
-[ -z "$VAULT" ] && [ -d "/c/projects/Claude/.obsidian" ] && VAULT="/c/projects/Claude"
-echo "VAULT=$VAULT"
-```
-
-If `$VAULT` is empty, tell the user in Russian: «Не нашёл хранилище Obsidian (папку `.obsidian`). Запусти скилл из папки хранилища.» — then stop.
+Resolve `VAULT` with the search in `${CLAUDE_PLUGIN_ROOT}/references/vault.md`; never hard-code the
+path. That file also carries the folder layout, the folder-note rule and the auto-sync rule this skill
+relies on.
 
 The diary folder is `$VAULT/Личная/Дневник`.
 
@@ -147,10 +135,3 @@ Reply in one or two lines, e.g.:
 
 `obsidian-git` auto-syncs the vault, so no manual git commit is needed here.
 
-## Critical rules
-
-- **Capture only — never analyse or advise.** No interpretation, no recommendations.
-- **Never overwrite an existing entry** — append a new timestamped section instead.
-- **Never invent content** the user did not say.
-- **Russian stays Russian** — never translate the diary text.
-- **No agents, single-shot** — format and write directly in the conversation.

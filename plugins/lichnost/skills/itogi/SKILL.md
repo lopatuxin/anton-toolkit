@@ -34,27 +34,14 @@ The month level MUST NOT read raw daily entries; the year level MUST NOT read we
 daily entries. This keeps each higher level a meta-analysis of compact lower-level analyses
 instead of one giant wall of raw text.
 
-## 0. Locate the Obsidian vault
+## 0. Locate the vault
 
-Find the vault root (the directory that contains `.obsidian/`). Walk up from the current
-directory, with a fallback to the known path:
+Resolve `VAULT` with the search in `${CLAUDE_PLUGIN_ROOT}/references/vault.md`; never hard-code the
+path. That file also carries the folder layout, the folder-note rule and the auto-sync rule this skill
+relies on.
 
-```bash
-VAULT=""
-DIR="$(pwd)"
-while [ "$DIR" != "/" ] && [ -n "$DIR" ]; do
-  if [ -d "$DIR/.obsidian" ]; then VAULT="$DIR"; break; fi
-  DIR="$(dirname "$DIR")"
-done
-[ -z "$VAULT" ] && [ -d "/c/projects/Claude/.obsidian" ] && VAULT="/c/projects/Claude"
-echo "VAULT=$VAULT"
-```
-
-If `$VAULT` is empty, tell the user in Russian: «Не нашёл хранилище Obsidian (папку `.obsidian`). Запусти скилл из папки хранилища.» — then stop.
-
-Paths used by this skill:
-- Diary (source for week level): `$VAULT/Личная/Дневник`
-- Итоги root: `$VAULT/Личная/Итоги`, with subfolders `Недели`, `Месяцы`, `Годы`.
+Paths used here: the diary `$VAULT/Личная/Дневник` (source for the week level) and the итоги root
+`$VAULT/Личная/Итоги` with its subfolders `Недели`, `Месяцы`, `Годы`.
 
 ## 1. Parse the period argument
 
@@ -301,15 +288,3 @@ Reply in one or two lines naming the file and what was analysed, e.g.:
 
 `obsidian-git` auto-syncs the vault, so no manual git commit is needed here.
 
-## Critical rules
-
-- **Respect the cascade.** Week reads daily entries; month reads weekly итоги; year reads
-  monthly итоги. Never read raw daily entries for a month or year итог.
-- **Analysis, not a summary.** Interpret and find patterns; do not paste back or merely
-  compress the source entries.
-- **Never invent content** the sources do not support; ground claims in linked entries.
-- **Russian stays Russian** — write the итог in the user's language; never translate.
-- **Never overwrite silently** — an existing итог is regenerated only after the user confirms.
-- **No advice/coaching** — this skill describes the period, it does not
-  prescribe what to do about it.
-- **Single-shot** — gather and write directly in the conversation; no subagents.

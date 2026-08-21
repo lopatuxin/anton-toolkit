@@ -32,28 +32,15 @@ All live under `<vault>/Личная/Фильмы/`:
 A folder note `Фильмы.md` is a simple hub linking the three (the vault uses the `folder-notes`
 plugin, so opening the folder opens this note).
 
-## 0. Locate the Obsidian vault
+## 0. Locate the vault
 
-Find the vault root (the directory that contains `.obsidian/`). Walk up from the current
-directory, with a fallback to the known path:
+Resolve `VAULT` with the search in `${CLAUDE_PLUGIN_ROOT}/references/vault.md`; never hard-code the
+path. That file also carries the folder layout, the folder-note rule and the auto-sync rule this skill
+relies on.
 
-```bash
-VAULT=""
-DIR="$(pwd)"
-while [ "$DIR" != "/" ] && [ -n "$DIR" ]; do
-  if [ -d "$DIR/.obsidian" ]; then VAULT="$DIR"; break; fi
-  DIR="$(dirname "$DIR")"
-done
-[ -z "$VAULT" ] && [ -d "/c/projects/Claude/.obsidian" ] && VAULT="/c/projects/Claude"
-echo "VAULT=$VAULT"
-```
-
-If `$VAULT` is empty, tell the user in Russian: «Не нашёл хранилище Obsidian (папку `.obsidian`). Запусти скилл из папки хранилища.» — then stop.
-
-Paths used by this skill:
-- Film folder: `$VAULT/Личная/Фильмы`
-- Notes: `Вкус.md`, `Просмотрено.md`, `Рекомендации.md`, folder note `Фильмы.md`
-- Legacy source note (read once, on first run): `$VAULT/films.md`
+Paths used here: the film folder `$VAULT/Личная/Фильмы` (`Вкус.md`, `Просмотрено.md`,
+`Рекомендации.md`, folder note `Фильмы.md`) and the legacy note `$VAULT/films.md`, read once on the
+first run.
 
 ## 1. Idempotent setup (run these checks EVERY time)
 
@@ -273,21 +260,3 @@ Reply in one or two lines naming what changed, e.g.:
 
 `obsidian-git` auto-syncs the vault, so no manual git commit is needed here.
 
-## Critical rules
-
-- **Command-only.** This skill runs only on the explicit `/film` invocation — no auto-trigger on
-  casual mentions of movies.
-- **The recommendation file never exceeds 10 films**, and each film always carries a short
-  description. A long, undescribed list is a failure of this skill.
-- **Never recommend a film that is already in `Просмотрено.md`.**
-- **Reviews feed the taste profile** — the learning loop. A logged film with new signal updates
-  `Вкус.md`; without it, leave the profile alone.
-- **Faithful capture** — format and keep the user's words and verdict; never invent films,
-  ratings, or opinions they did not give.
-- **Russian stays Russian** — all note content and chat replies are in Russian; never translate.
-  This is about prose (reviews, blurbs, chat), NOT film titles: never invent or translate a Russian
-  title for a film — use its real official title with the original-language title + year (see §7).
-- **Merge, don't clobber** — append reviews and taste lines; never overwrite the watched log or
-  the taste profile wholesale.
-- **Do not delete `films.md`** — migration leaves it on disk for the user to remove.
-- **Single-shot, no agents** — read and write directly in the conversation.

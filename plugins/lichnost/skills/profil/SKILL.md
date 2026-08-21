@@ -36,28 +36,15 @@ The **only** evidence sources are inside `Личная/`: `Дневник/`, `И
 interview sessions. Do NOT pull from other vault folders (work notes, interview prep, etc.) — the
 profile is built from the user's personal material, as the user requested.
 
-## 0. Locate the Obsidian vault
+## 0. Locate the vault
 
-Find the vault root (the directory that contains `.obsidian/`). Walk up from the current directory,
-with a fallback to the known path:
+Resolve `VAULT` with the search in `${CLAUDE_PLUGIN_ROOT}/references/vault.md`; never hard-code the
+path. That file also carries the folder layout, the folder-note rule and the auto-sync rule this skill
+relies on.
 
-```bash
-VAULT=""
-DIR="$(pwd)"
-while [ "$DIR" != "/" ] && [ -n "$DIR" ]; do
-  if [ -d "$DIR/.obsidian" ]; then VAULT="$DIR"; break; fi
-  DIR="$(dirname "$DIR")"
-done
-[ -z "$VAULT" ] && [ -d "/c/projects/Claude/.obsidian" ] && VAULT="/c/projects/Claude"
-echo "VAULT=$VAULT"
-```
-
-If `$VAULT` is empty, tell the user in Russian: «Не нашёл хранилище Obsidian (папку `.obsidian`). Запусти скилл из папки хранилища.» — then stop.
-
-Paths used by this skill:
-- Profile folder: `$VAULT/Личная/Портрет`
-- Notes: `Профиль.md`, interview sessions `Интервью/<date>.md`, registry `Состояние.md`, folder note `Портрет.md`
-- Evidence sources: `$VAULT/Личная/Дневник`, `$VAULT/Личная/Итоги`, `$VAULT/Личная/Идеи`
+Paths used here: the profile folder `$VAULT/Личная/Портрет` (`Профиль.md`, sessions
+`Интервью/<date>.md`, registry `Состояние.md`, folder note `Портрет.md`); evidence in
+`$VAULT/Личная/Дневник`, `$VAULT/Личная/Итоги`, `$VAULT/Личная/Идеи`.
 
 ## 1. Idempotent setup (run these checks EVERY time)
 
@@ -342,32 +329,6 @@ tags:
 
 ## 7. Confirm to the user (Russian)
 
-Reply in one or two lines naming what changed, e.g.:
-- Interview: «Провёл интервью по теме «что драйвит» — записал в `Личная/Портрет/Интервью/2026-06-06.md`.»
-- INIT: «Собрал профиль из твоих данных (дневник: 7, итоги: 2, интервью: 1): `Личная/Портрет/Профиль.md`. Открытых вопросов — 5.»
-- REFRESH: «Обновил профиль `Личная/Портрет/Профиль.md` — новых файлов 2, изменённых 1; добавил 3 наблюдения, одну гипотезу подтвердил, открытых вопросов теперь 4.»
-- REFRESH (nothing new): «Профиль уже актуален — новых или изменённых записей нет.»
-- Show: a tight digest + the path.
-
-`obsidian-git` auto-syncs the vault, so no manual git commit is needed here. The Dataview index in
-`Портрет.md` picks up new interview sessions automatically.
-
-## Critical rules
-
-- **Command-only.** Runs only on the explicit `/профиль` invocation — no auto-trigger.
-- **Interview is dialog, in conversation.** One theme per session, one question at a time, build on
-  known data, let the user stop anytime. NEVER delegate the interview to an agent.
-- **Capture (interview) vs analysis (обнови) stay separate.** The interview saves raw Q&A faithfully;
-  only ОБНОВИ interprets. Do not analyse inside the interview note.
-- **Ground everything, mark confidence, never invent.** Every profile claim links to evidence and
-  carries «(гипотеза)»/«(подтверждено)». No evidence → «Открытые вопросы», not a stated trait.
-- **No clinical diagnosis, no coaching.** Describe the person; do not label or prescribe.
-- **REFRESH merges, never clobbers.** Strengthen, add, or revise-with-note; never wipe prior
-  substance. A changing person is recorded as change.
-- **Track processed sources by content hash, not by date.** What has been folded in lives in
-  `Состояние.md` as `<hash> <path>` per file. REFRESH reads only files that are NEW (path absent) or
-  CHANGED (hash differs), then rewrites the full registry. Never rely on a date cutoff — it misses
-  same-day edits, late-written итоги, and refined ideas.
-- **Source is only `Личная/`.** Diary, итоги, ideas, interviews. Nothing else.
-- **Russian stays Russian** — all note content and chat replies in Russian; never translate.
-- **Single-shot, no agents** — read, converse, and write directly in the conversation.
+One or two lines: what changed and where. For an interview — the theme and the session path. For an
+update — how many sources were new or changed, what moved in the profile, how many open questions are
+left. For show mode — the digest and the path. If nothing was new, say the profile is already current.
