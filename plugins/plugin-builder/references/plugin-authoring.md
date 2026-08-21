@@ -153,6 +153,7 @@ Exact file formats: https://code.claude.com/docs/en/plugins-reference, plus `/do
 - `workflows/<name>.js` starts with `export const meta = { name, description, phases }` and uses `agent()`, `pipeline()`, `parallel()`. Intermediate results stay in the script, not in the session context.
 - Use `pipeline()` by default; a barrier (`parallel()` followed by another stage) only when a stage needs all prior results (dedup, judge panel, synthesis).
 - The entry skill gathers inputs, runs the workflow, and does the post-steps (commit, status, journal). A workflow started by a skill the user invoked counts as the user's opt-in to multi-agent orchestration.
+- A skill launches its plugin's workflow by path — `Workflow({scriptPath: "${CLAUDE_PLUGIN_ROOT}/workflows/<name>.js", args: {…}})` — and passes every path it resolved inside `args`; the script itself has no filesystem access, so anything it must route on (questions, findings, drift) comes back from the agents through a `schema`. The run is backgrounded: the skill waits for the completion notification instead of polling.
 
 ## Descriptions — good vs bad
 
@@ -170,7 +171,7 @@ Exact file formats: https://code.claude.com/docs/en/plugins-reference, plus `/do
 
 Run before every commit that touches plugin files:
 
-1. All modified/created `*.json` parse as valid JSON; modified `workflows/*.js` pass `node --check`.
+1. All modified/created `*.json` parse as valid JSON; modified `workflows/*.js` pass `node --check` where node is installed — on a machine without it, re-read the script for balanced braces and for a `${…}` left inside a template literal by mistake.
 2. `.claude-plugin/marketplace.json` has no duplicate plugin names.
 3. All created/modified `SKILL.md` and `agents/*.md` files are non-empty (> 100 bytes).
 4. Every created/modified `description` (together with `when_to_use`) is ≤ 1,000 characters, opens with the key use case, and contains no `<example>` block and no IMPORTANT/IMMEDIATELY/MUST emphasis.

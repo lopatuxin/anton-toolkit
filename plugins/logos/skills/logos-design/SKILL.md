@@ -2,8 +2,8 @@
 name: logos-design
 description: >
   Designs the Logos system through a fixed deliberative council of six domain architects
-  (orchestration, memory, models, autonomy, frontend, resource realism) who shape one shared draft and
-  debate it in a discussion log before a synthesizer writes the canonical Архитектура.md; the same
+  (orchestration, memory, models, autonomy, frontend, resource realism) who write their own parts in parallel and
+  answer each other's questions before a synthesizer assembles the canonical Архитектура.md; the same
   council details single elements into build-ready module documents, and oversized documents get
   split; requirements come from a user interview first, key decisions go to the journal; documentation
   only, under Logos/Дизайн/. Runs in the main conversation; the interview is not delegated to agents.
@@ -79,7 +79,7 @@ Canonical layout (Russian names):
 | Architecture (final) | `$VAULT/Logos/Дизайн/Архитектура.md` — today a hub; the domain sections are pages in `$VAULT/Logos/Дизайн/Архитектура/` (layout in `${CLAUDE_PLUGIN_ROOT}/references/design-templates.md`, «Архитектура») |
 | Modules folder | `$VAULT/Logos/Дизайн/Модули/` |
 | One module | `$VAULT/Logos/Дизайн/Модули/<Русское-имя>.md` |
-| Council scratch (shared draft + discussion log) | `$VAULT/Logos/Дизайн/_черновики/` (deleted before the phase ends) |
+| Council scratch (skeleton + one file per role) | `$VAULT/Logos/Дизайн/_черновики/` (deleted before the phase ends) |
 
 Cross-references between documents use Obsidian wiki-links (`[[Концепт]]`, `[[Архитектура]]`,
 `[[Модули/Память]]`), never relative markdown paths.
@@ -118,17 +118,19 @@ user in Russian and ask: «Концепт записал в Logos/Дизайн/�
 
 Iterate until the user confirms. The vault auto-syncs via `obsidian-git` — no manual git commit.
 
-## Phase 2 — Architecture (deliberative council → synthesis → review → journal)
+## Phase 2 — Architecture (deliberative council → synthesis → journal)
 
-Goal: produce `$VAULT/Logos/Дизайн/Архитектура.md`. This phase runs a **fixed deliberative council**
-that imitates a real design meeting — NOT six isolated monologues. The six members work on ONE
-shared draft IN TURN: the orchestration architect (the lead) lays down a skeleton, then each of the
-other five deepens their own domain section and raises questions/objections about the others' parts
-in a shared discussion log; a resolution round answers those questions; finally the synthesizer
-consolidates the converged draft into the canonical document. The members communicate through two
-shared scratch files — the evolving draft and the discussion log — never in isolation. The user sees
-only the final document plus a short summary of the key decisions and the debates behind them; the
-council machinery is internal.
+Goal: produce `$VAULT/Logos/Дизайн/Архитектура.md`. This phase runs a **fixed deliberative council** of
+six roles — `оркестрация` (the lead), `память`, `модели`, `автономность`, `фронтенд`, `ресурсы`. The
+lead lays down a skeleton over all sections; the other five deepen their own domain **in parallel**,
+each writing its own file, and question the frame; a resolution round lets every role read every other
+role's work and settle the questions addressed at it; the synthesizer assembles the parts into the
+canonical document. The user sees only the final document plus a short summary of the key decisions and
+the debates behind them — the council machinery is internal.
+
+**You do not dispatch the members yourself.** The council is one workflow run
+(`${CLAUDE_PLUGIN_ROOT}/workflows/logos-council.js`): it fans out the rounds, routes each question to
+the role that owns the decision, and keeps the intermediate reports out of this conversation.
 
 ### Step 2.1 — Collect architectural constraints (short dialog, Russian)
 
@@ -140,118 +142,52 @@ ask only what the concept/idea note does not pin down. Topics to cover (one open
 - «Что критичнее на старте — автономность или стабильность под контролем?»
 - «Как ты хочешь общаться с Logos через веб-интерфейс — что для тебя важно в этом взаимодействии, или решаем в совете?»
 
-Capture the answers verbatim — you will paste them into every agent prompt as hard bounds.
+Capture the answers verbatim — they go into the workflow as hard bounds, and every role gets them.
 
-The council roster is FIXED, and so is the role each member plays in the deliberation. The
-**orchestration architect is the lead** — it always goes first and writes the skeleton. The other
-four act in a deliberate order; the resource realist always acts LAST in the contribution round so it
-can react to every other member's ambitions:
+The roster is fixed. Which role owns which architecture section, and the lens each argues from, live in
+`${CLAUDE_PLUGIN_ROOT}/references/council-roles.md` — the members read it; you do not need to.
 
-| Member (`subagent_type`) | Owned section | Acts in |
-|---|---|---|
-| `logos-orchestration-architect` | `Иерархия оркестрации` | skeleton (1st), then resolve |
-| `logos-memory-engineer` | `Подсистема памяти` | contribute, then resolve |
-| `logos-model-engineer` | `Модельный слой` | contribute, then resolve |
-| `logos-autonomy-architect` | `Автономность и самомодификация` | contribute, then resolve |
-| `logos-frontend-architect` | `Слой взаимодействия и веб-интерфейс` | contribute, then resolve |
-| `logos-resource-realist` | `Ресурсный бюджет` | contribute (LAST), then resolve |
+### Step 2.2 — Run the council (one workflow call)
 
-Contribution order: `logos-orchestration-architect` (skeleton) → `logos-memory-engineer` →
-`logos-model-engineer` → `logos-autonomy-architect` → `logos-frontend-architect` →
-`logos-resource-realist`. Pass this roster + order verbatim into every agent prompt so each member
-addresses questions to the right role. The frontend architect owns how the web frontend integrates
-into the system (the client↔brain contract); the detailed page/UX spec stays with the `logos-ui`
-skill (`[[Веб-интерфейс]]`) — the two must stay consistent.
-
-### Step 2.2 — Lay down the skeleton (lead architect)
-
-Create the scratch directory and an empty discussion log first:
-```
+Create the scratch directory first:
+```bash
 mkdir -p "$VAULT/Logos/Дизайн/_черновики"
 ```
-Initialize `$VAULT/Logos/Дизайн/_черновики/Журнал-обсуждения.md` with a single heading line
-`# Журнал обсуждения архитектуры` (write it inline).
 
-Then dispatch the **logos-orchestration-architect** in `skeleton` mode (fill paths + constraints
-verbatim):
+Then start the workflow, filling the paths you resolved and the constraints verbatim:
 ```
-Agent(subagent_type="logos-orchestration-architect", prompt="
-Your mode: skeleton.
-Read <VAULT>/Logos/Дизайн/Концепт.md (source of truth for WHAT is built).
-Write the baseline architecture skeleton to the shared draft <VAULT>/Logos/Дизайн/_черновики/Черновик-архитектуры.md, filling all eleven sections of the 'Архитектура' template in ${CLAUDE_PLUGIN_ROOT}/references/design-templates.md at a high level — make Иерархия оркестрации deep, keep the other domains high-level and park their deep decisions in 'Риски и открытые вопросы' for the specialists.
-Discussion-log path (do not touch it in skeleton mode): <VAULT>/Logos/Дизайн/_черновики/Журнал-обсуждения.md.
-Council roster and order: оркестрация (lead, skeleton) → память → модели → автономность → фронтенд → ресурсы (last).
-User's architectural constraints (hard bounds — never violate): <paste verbatim>.
-Reference the concept as [[Концепт]]. Do not include runnable code.
-")
-```
-
-### Step 2.3 — Contribution round (the other five, SEQUENTIAL — one at a time)
-
-For each member AFTER the lead, in the order above, dispatch it in `contribute` mode. **Dispatch them
-one at a time, sequentially — NOT in parallel** — because each must read the prior members'
-contributions and the running discussion log before acting. Wait for each to finish before
-dispatching the next.
-
-```
-Agent(subagent_type="<member>", prompt="
-Your mode: contribute.
-Read <VAULT>/Logos/Дизайн/Концепт.md, the shared draft <VAULT>/Logos/Дизайн/_черновики/Черновик-архитектуры.md, and the discussion log <VAULT>/Logos/Дизайн/_черновики/Журнал-обсуждения.md in full.
-(1) Deepen your owned section of the draft with concrete, opinionated decisions; edit it in place, leave other domains intact.
-(2) Critically review the rest of the draft and open NEW discussion-log entries (status открыт) addressed at the role that owns each weak spot.
-SIMPLICITY IS BINDING (${CLAUDE_PLUGIN_ROOT}/references/design-templates.md «Simplicity requirement», and the simplicity rule of the code doctrine in ${CLAUDE_PLUGIN_ROOT}/skills/logos-doctrine/SKILL.md): design the SMALLEST set of mechanisms that delivers the concept. Before you add any mechanism, answer two questions in the draft's own words — which present need it serves, and what the owner would see if it were not built. A mechanism for a problem that has not happened is not designed. Failure handling is one sentence (the owner sees the failure honestly and decides), never retries/fallbacks/guards/thresholds. When you review others, a mechanism you find unnecessary is a legitimate concern to raise («зачем это, что будет без этого?») — cutting is as much your job as deepening.
-Council roster and order: оркестрация (lead) → память → модели → автономность → фронтенд → ресурсы (last).
-User's architectural constraints (hard bounds — never violate): <paste verbatim>.
-Follow the 'Архитектура' template in ${CLAUDE_PLUGIN_ROOT}/references/design-templates.md. Reference the concept as [[Концепт]]. Do not include runnable code.
-")
+Workflow({
+  scriptPath: "${CLAUDE_PLUGIN_ROOT}/workflows/logos-council.js",
+  args: {
+    target: "architecture",
+    roles: ["память", "модели", "автономность", "фронтенд", "ресурсы"],
+    constraints: "<ответы хозяина из шага 2.1, дословно>",
+    paths: {
+      source:   "<VAULT>/Logos/Дизайн/Концепт.md",
+      scratch:  "<VAULT>/Logos/Дизайн/_черновики",
+      skeleton: "<VAULT>/Logos/Дизайн/_черновики/Черновик-архитектуры.md",
+      final:    "<VAULT>/Logos/Дизайн/Архитектура.md"
+    },
+    refs: {
+      roles:     "${CLAUDE_PLUGIN_ROOT}/references/council-roles.md",
+      templates: "${CLAUDE_PLUGIN_ROOT}/references/design-templates.md"
+    }
+  }
+})
 ```
 
-After the contribution round, read `$VAULT/Logos/Дизайн/_черновики/Журнал-обсуждения.md` yourself to
-see which roles have open questions addressed to them — that determines who acts in the resolution
-round.
+Tell the user in one short Russian line that the council is sitting and it takes a while. The workflow
+runs in the background and notifies you when it finishes — wait for that notification, do not poll it
+and do not start a second run. Its result carries the key decisions, the debates and anything left open;
+that is what you use in Step 2.4. If it returns `ok: false`, say what failed in Russian and stop — the
+scratch files stay on disk for the next attempt.
 
-### Step 2.4 — Resolution round (addressed members, SEQUENTIAL)
+### Step 2.3 — Clean up the scratch files
 
-For each member who has at least one OPEN question addressed to their role (`Кому: <role>`), dispatch
-it in `resolve` mode — again SEQUENTIALLY, one at a time, so each sees the latest state. This may
-include the orchestration architect if questions were raised against the orchestration layer. Skip
-members with no open questions directed at them.
+After the workflow returns, delete the scratch directory so the drafts never get committed:
+`rm -rf "$VAULT/Logos/Дизайн/_черновики"`. Only `Архитектура.md` survives.
 
-```
-Agent(subagent_type="<member>", prompt="
-Your mode: resolve.
-Read the shared draft <VAULT>/Logos/Дизайн/_черновики/Черновик-архитектуры.md and the discussion log <VAULT>/Logos/Дизайн/_черновики/Журнал-обсуждения.md in full.
-For every open question whose 'Кому' is your role: fix the draft and mark the entry решён with a one-line Резолюция; or defend the choice and mark it решён with the justification; or DROP the mechanism the question is about and mark it решён with Резолюция 'не строим — хозяин увидит сбой и решит сам'. Dropping is the DEFAULT answer to a worry about a failure nobody has seen; adding a mechanism to appease a worry is the answer of last resort. Do NOT open new questions. If something genuinely needs the user, mark it решён with Резолюция 'вынести в Открытые вопросы' and add it to the draft's 'Риски и открытые вопросы'.
-User's architectural constraints (hard bounds — never violate): <paste verbatim>.
-Do not include runnable code.
-")
-```
-
-This is a single bounded resolution round — do NOT loop it. Any question still genuinely contested
-after this round is folded into `Риски и открытые вопросы` by the synthesizer in the next step and
-surfaced to the user.
-
-### Step 2.5 — Synthesize the final document (lead architect closes the council)
-
-Dispatch the **logos-synthesizer** agent:
-```
-Agent(subagent_type="logos-synthesizer", prompt="
-Read <VAULT>/Logos/Дизайн/Концепт.md, the converged shared draft <VAULT>/Logos/Дизайн/_черновики/Черновик-архитектуры.md, and the discussion log <VAULT>/Logos/Дизайн/_черновики/Журнал-обсуждения.md in full.
-User's architectural constraints (hard bounds): <paste verbatim>.
-Start from the converged draft (the council already decided) and polish it into the final document at <VAULT>/Logos/Дизайн/Архитектура.md following ${CLAUDE_PLUGIN_ROOT}/references/design-templates.md section 'Архитектура'. Verify every решён question is consistently reflected; fold anything left open into 'Риски и открытые вопросы'.
-Reference the concept as [[Концепт]].
-For contested decisions, append a short parenthetical rationale so the reader sees the trade-off was deliberate.
-Return: 'Ключевые решения' (3–4 lines) and 'Ключевые споры и как разрешены' (per major contested point: which lens objected, the worry, and how the council settled it).
-Do not include runnable code, and do not mention the council/draft/discussion-log inside Архитектура.md itself.
-")
-```
-
-### Step 2.6 — Clean up the scratch files
-
-After the synthesizer returns, delete the scratch directory so the draft and discussion log never get
-committed: `rm -rf "$VAULT/Logos/Дизайн/_черновики"`. Only `Архитектура.md` survives.
-
-### Step 2.7 — Present and record in the journal
+### Step 2.4 — Present and record in the journal
 
 This step records every key decision and shows the user the result. The journal is the project's
 decision log, written for the model — do NOT ask the user to "review", accept/reject, or weigh entries,
@@ -274,11 +210,11 @@ and do NOT leave anything waiting on the user.
 
 The vault auto-syncs via `obsidian-git` — no manual git commit for the documents or journal.
 
-### Step 2.8 — Iteration (cheap — do NOT re-run the whole council for fixes)
+### Step 2.5 — Iteration (cheap — do NOT re-run the whole council for fixes)
 
 When the user requests changes, re-dispatch ONLY the **logos-synthesizer** with the user's
 corrections plus the current `Архитектура.md` as input (or fix inline yourself for tiny edits).
-Re-run the full deliberative council (Steps 2.2–2.5) ONLY if the user rejects the whole direction and
+Re-run the full deliberative council (Step 2.2) ONLY if the user rejects the whole direction and
 wants a fresh exploration. After any rewrite, refresh the affected journal entries.
 
 ## Phase 3 — Change management (iterative)
@@ -294,7 +230,7 @@ Triggered by "давай добавим в дизайн", "а что если", 
    producing `$VAULT/Logos/Дизайн/Модули/<Русское-имя>.md`.
 3. **Record the change in the journal** per `${CLAUDE_PLUGIN_ROOT}/references/diary-format.md`: a `тип: решение` (or
    `тип: откат` if it reverses a prior decision) entry, `статус: принято`. No review gate; if the
-   user later asks to change it, keep the entry consistent exactly as in Phase 2.7.
+   user later asks to change it, keep the entry consistent exactly as in Step 2.4.
 4. Echo a short diff-summary to the user in Russian and iterate.
 
 ## Phase 4 — Module detailing (element deep-dive through the council)
@@ -302,11 +238,11 @@ Triggered by "давай добавим в дизайн", "а что если", 
 Triggered when the user wants one system element worked out in depth: "детализируй элемент",
 "проработай модуль X", "распиши элемент системы", "у архитектуры пробелы по <элементу>". The
 architecture is deliberately the broad system picture and leaves gaps inside each element; this phase
-closes those gaps for ONE element by running the SAME deliberative council, scoped to that element,
-and produces a single deep, build-ready document at `$VAULT/Logos/Дизайн/Модули/<Русское-имя>.md`. It
-reuses the council agents in their **`module-detailing`** mode, following the «Детализация модуля»
-protocol in `${CLAUDE_PLUGIN_ROOT}/references/design-templates.md`. Run it once per element; the user can ask for several
-elements in turn.
+closes those gaps for ONE element by running the SAME council, scoped to that element, and produces a
+single deep, build-ready document at `$VAULT/Logos/Дизайн/Модули/<Русское-имя>.md`. It is the same
+workflow as Phase 2 with `target: "module"`, following the «Детализация модуля» protocol in
+`${CLAUDE_PLUGIN_ROOT}/references/design-templates.md`. Run it once per element; the user can ask for
+several elements in turn.
 
 **Precondition:** `Архитектура.md` must exist (the module is detailed *against* it). If it does not,
 tell the user in Russian that the architecture comes first, and offer Phase 2.
@@ -316,82 +252,52 @@ tell the user in Russian that the architecture comes first, and offer Phase 2.
 Following the **Interview style** rules (open-ended, one question at a time), pin down: WHICH element
 (name it as it appears in `Архитектура.md`, e.g. `Память`, `Оркестрация`, `Модельный слой`,
 `Веб-интерфейс`), and what specifically is under-specified that this document must nail down. Keep
-this short — the depth is the council's job. Then resolve the paths yourself (Russian element name):
-- module draft: `$VAULT/Logos/Дизайн/_черновики/Черновик-модуля-<имя>.md`
-- module discussion log: `$VAULT/Logos/Дизайн/_черновики/Журнал-обсуждения-модуля-<имя>.md`
-- final document: `$VAULT/Logos/Дизайн/Модули/<имя>.md`
+this short — the depth is the council's job.
 
 ### Step 4.2 — Decide which lenses are relevant
 
-The orchestration architect ALWAYS leads (writes the module skeleton). Then include only the lenses
-the element actually touches — a member whose lens does not touch the element is not dispatched (it
-would contribute nothing). Judge from the architecture: e.g. `Память` → memory (+ resources, +
-orchestration); `Веб-интерфейс` → frontend (+ orchestration, + resources); `Модельный слой` → models
-(+ resources). When unsure, include the lens — silence is a valid result for it. The resource realist,
-when included, always acts LAST in the contribution round.
+The lead (`оркестрация`) ALWAYS writes the module skeleton. Then include only the roles the element
+actually touches — a role whose lens does not touch the element contributes nothing. Judge from the
+architecture: `Память` → `память` (+ `ресурсы`); `Веб-интерфейс` → `фронтенд` (+ `ресурсы`);
+`Модельный слой` → `модели` (+ `ресурсы`). When unsure, include the role — silence is a valid result
+for it.
 
-### Step 4.3 — Module skeleton (lead architect)
+### Step 4.3 — Run the council on the element (one workflow call)
 
-Create the scratch dir if missing and initialize the module discussion log with a single heading line
-`# Журнал обсуждения модуля — <имя>` (write it inline). Then dispatch the lead in `module-detailing`
-mode:
+Create the scratch directory if missing (`mkdir -p "$VAULT/Logos/Дизайн/_черновики"`), then:
 ```
-Agent(subagent_type="logos-orchestration-architect", prompt="
-Your mode: module-detailing.
-Lead the deep-dive on the system element '<имя>'. Read <VAULT>/Logos/Дизайн/Концепт.md and <VAULT>/Logos/Дизайн/Архитектура.md (source of truth) in full.
-Create the module draft at <VAULT>/Logos/Дизайн/_черновики/Черновик-модуля-<имя>.md from the 'Модуль' template in ${CLAUDE_PLUGIN_ROOT}/references/design-templates.md, following the «Детализация модуля» protocol there. Fill every Модуль section at a high level from the architecture, make the orchestration/control aspects of this element deep, and park the deep per-lens decisions in 'Открытые вопросы' for the specialists.
-SIMPLICITY IS BINDING (${CLAUDE_PLUGIN_ROOT}/references/design-templates.md «Simplicity requirement»): the module is the SMALLEST set of mechanisms that delivers this element's purpose; every mechanism names its present need; «Как ведёт себя при сбое» is one sentence (the owner sees the failure honestly), never a catalogue of cases with a mechanism each.
-Module discussion-log path (do not touch it in skeleton mode): <VAULT>/Logos/Дизайн/_черновики/Журнал-обсуждения-модуля-<имя>.md.
-Council roster and order for this element: оркестрация (lead) → <only the relevant lenses, resource last>.
-User's architectural constraints (hard bounds — never violate): <paste verbatim>.
-Reference the architecture as [[Архитектура]]. Do not include runnable code.
-")
-```
-
-### Step 4.4 — Contribution round (relevant lenses, SEQUENTIAL — one at a time)
-
-For each relevant lens after the lead, in order (resource realist last), dispatch it in
-`module-detailing` mode, ONE AT A TIME (each must read the prior contributions). Same prompt shape as
-Step 2.3 (INCLUDING its «SIMPLICITY IS BINDING» paragraph verbatim), but: `Your mode: module-detailing.`,
-the target is the module draft + module discussion log, the structure is the `Модуль` template, and the
-task is to deepen the parts of element '<имя>' under that lens. Pass the element name, both module paths,
-the roster of relevant lenses, and the constraints verbatim. Tell each member to reference
-`[[Архитектура]]`.
-
-After the round, read the module discussion log to see which lenses have open questions addressed to
-them — that determines the resolution round.
-
-### Step 4.5 — Resolution round (addressed lenses, SEQUENTIAL)
-
-For each lens with at least one OPEN question addressed to it, dispatch it in `module-detailing` mode
-with the same resolve instructions as Step 2.4 (fix, defend, or DROP the mechanism — dropping is the
-default answer to a worry about an unseen failure; no new questions, one bounded round), pointed at the
-module draft and module discussion log. Skip lenses with no open questions.
-
-### Step 4.6 — Synthesize the module document
-
-Dispatch the **logos-synthesizer** in its module variant:
-```
-Agent(subagent_type="logos-synthesizer", prompt="
-Close a module-detailing round for the element '<имя>'.
-Read <VAULT>/Logos/Дизайн/Архитектура.md, the converged module draft <VAULT>/Logos/Дизайн/_черновики/Черновик-модуля-<имя>.md, and the module discussion log <VAULT>/Logos/Дизайн/_черновики/Журнал-обсуждения-модуля-<имя>.md in full.
-User's architectural constraints (hard bounds): <paste verbatim>.
-Polish the converged draft into the final module document at <VAULT>/Logos/Дизайн/Модули/<имя>.md following the 'Модуль' template and the «Детализация модуля» protocol in ${CLAUDE_PLUGIN_ROOT}/references/design-templates.md. Verify every решён question is reflected; fold anything left open into 'Открытые вопросы'.
-Reference the architecture as [[Архитектура]] and sibling modules as [[Модули/<имя>]].
-Return: 'Ключевые решения' (3–4 lines) and 'Ключевые споры и как разрешены', scoped to this element.
-Do not include runnable code, and do not mention the council/draft/discussion-log inside the document.
-")
+Workflow({
+  scriptPath: "${CLAUDE_PLUGIN_ROOT}/workflows/logos-council.js",
+  args: {
+    target: "module",
+    element: "<Русское-имя элемента>",
+    roles: ["<только релевантные роли, без оркестрации>"],
+    constraints: "<ограничения хозяина, дословно>",
+    paths: {
+      source:   "<VAULT>/Logos/Дизайн/Архитектура.md",
+      scratch:  "<VAULT>/Logos/Дизайн/_черновики",
+      skeleton: "<VAULT>/Logos/Дизайн/_черновики/Черновик-модуля-<имя>.md",
+      final:    "<VAULT>/Logos/Дизайн/Модули/<имя>.md"
+    },
+    refs: {
+      roles:     "${CLAUDE_PLUGIN_ROOT}/references/council-roles.md",
+      templates: "${CLAUDE_PLUGIN_ROOT}/references/design-templates.md"
+    }
+  }
+})
 ```
 
-### Step 4.7 — Clean up and record
+Wait for the completion notification as in Step 2.2. Then delete the module scratch files
+(`Черновик-модуля-<имя>.md` and every `Вклад-модуля-<имя>-*.md`); only `Модули/<имя>.md` survives.
 
-Delete the module scratch files (`Черновик-модуля-<имя>.md` and `Журнал-обсуждения-модуля-<имя>.md`);
-only `Модули/<имя>.md` survives. Then present and record exactly as in Step 2.7: summarize the key
-decisions to the user in Russian and invite corrections («Что поправить?»), and write one journal entry
-per key decision (`тип: решение`, `область` matching the element, `статус: принято`,
-`вес: 5`) plus the contested points as `тип: наблюдение`/`тупик`. No review gate — if the user asks for
-changes, keep the entries consistent. For small
-fixes, re-dispatch ONLY the synthesizer (or edit inline) — do NOT re-run the whole module council.
+### Step 4.4 — Present and record
+
+Present and record exactly as in Step 2.4: summarize the key decisions to the user in Russian and
+invite corrections («Что поправить?»), and write one journal entry per key decision (`тип: решение`,
+`область` matching the element, `статус: принято`, `вес: 5`) plus the contested points as
+`тип: наблюдение`/`тупик`. No review gate — if the user asks for changes, keep the entries consistent.
+For small fixes, re-dispatch ONLY `logos-synthesizer` (or edit inline) — do NOT re-run the whole module
+council.
 
 ## Phase 5 — Decomposition of an oversized document (mechanical split, no council)
 

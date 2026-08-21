@@ -1,7 +1,7 @@
 # Logos design document templates
 
-Canonical structure for the Logos design documents. The council members (shaping the shared
-draft), the synthesizer (writing the final), and the `logos-design` orchestrator (writing the
+Canonical structure for the Logos design documents. The council members (each writing its own part), the
+synthesizer (writing the final), and the `logos-design` orchestrator (writing the
 concept inline) all follow these templates. Documents live under `$VAULT/Logos/Дизайн/` with
 Russian file names and Russian headings.
 
@@ -157,10 +157,10 @@ Two notes share the name `Архитектура`; the vault links the hub with 
 everywhere, and `[[Дизайн/Архитектура]]` is the unambiguous form when a link must not be mistaken for the
 folder note.
 
-The council's shared working draft (`_черновики/Черновик-архитектуры.md`) uses this SAME section list:
-the lead writes the skeleton over all sections, then each member deepens the one section matching their
-role and reviews the rest. The sections map onto the council's areas of expertise — that is deliberate,
-so each member owns exactly one section and addresses questions to whoever owns the section they object
+The council's skeleton draft (`_черновики/Черновик-архитектуры.md`) uses this SAME section list:
+the lead writes the skeleton over all sections, then each role writes its own section into its own file
+(`_черновики/Вклад-<роль>.md`), in parallel, and questions the frame. The sections map onto the council's areas of expertise — that is deliberate,
+so each role owns exactly one section and addresses questions to whoever owns the section they object
 to.
 
 Sections — the required content whatever the file layout — strictly in this order, with exactly these
@@ -186,13 +186,13 @@ The eleven sections map onto the council's areas of expertise: six are **owned**
 
 ### Scratch-draft-only header
 
-The council's shared working draft (not the final) carries one line at the very top, before
+The council's skeleton draft (not the final) carries one line at the very top, before
 **Обзор**, written by the lead in skeleton mode, to mark it as scratch:
 
 `> Черновик совета — общий рабочий документ`
 
 The FINAL `Архитектура.md` does NOT carry this line and never mentions "draft", "council", or
-"discussion log" — that machinery is invisible to the document's reader.
+the roles' own files — that machinery is invisible to the document's reader.
 
 ---
 
@@ -237,14 +237,14 @@ document is read under the same rule: only what a present need demands survives,
 The architecture document is the SYSTEM-wide picture: deliberately broad, with gaps left in each
 element. A module document closes those gaps for ONE element — it is the deep, build-ready
 specification of that single element. The `logos-design` skill produces it the SAME deliberative way
-it produces the architecture: through the council, on a shared draft, with a discussion log — never as
-one agent's monologue. This protocol defines that module-detailing round; the council agents and the
-synthesizer follow it when the orchestrator dispatches them with **mode `module-detailing`**.
+it produces the architecture: through the council, on a skeleton the roles extend in their own files — never as
+one agent's monologue. This protocol defines that module-detailing round; the council member agent and the
+synthesizer follow it when the `logos-council` workflow runs with `target: "module"`.
 
 **Target element.** The orchestrator names ONE system element to detail (e.g. `Память`, `Оркестрация`,
 `Модельный слой`, `Веб-интерфейс`) and resolves all paths:
 - module draft: `$VAULT/Logos/Дизайн/_черновики/Черновик-модуля-<имя>.md`
-- module discussion log: `$VAULT/Logos/Дизайн/_черновики/Журнал-обсуждения-модуля-<имя>.md`
+- one file per relevant role: `$VAULT/Logos/Дизайн/_черновики/Вклад-модуля-<имя>-<роль>.md`
 - final module document: `$VAULT/Logos/Дизайн/Модули/<имя>.md` (the `Модуль` template above).
 
 **The draft uses the `Модуль` template, NOT the eleven-section architecture structure.** In a module
@@ -262,15 +262,16 @@ questions — silence is correct. The orchestrator only dispatches the members w
 to the named element.
 
 **Round shape (same machinery as the architecture phase, scoped to one element):**
-1. **Skeleton** — the orchestration architect creates the module draft from the `Модуль` template,
+1. **Skeleton** — the lead role (`оркестрация`) creates the module draft from the `Модуль` template,
    filling each section at a high level from the architecture, and parking the deep per-lens
    decisions in `Открытые вопросы` for the specialists.
-2. **Contribute** — each relevant member, SEQUENTIALLY, deepens the parts of the `Модуль` document
-   under its lens and opens cross-lens questions in the module discussion log (same numbered-entry
-   format as the architecture log).
-3. **Resolve** — each member with open questions addressed to it answers them (fix, defend, or drop the
-   mechanism — dropping is the default answer to a worry about an unseen failure), one bounded round.
-4. **Synthesize** — the synthesizer consolidates the converged module draft into the final
+2. **Contribute** — each relevant role, IN PARALLEL, writes the parts of the `Модуль` document under its
+   lens into its own file and questions the skeleton. The questions go back to the workflow, which routes
+   each one to the role that owns the decision.
+3. **Resolve** — every role that was asked something reads every other role's file and answers (fix,
+   defend, or drop the mechanism — dropping is the default answer to a worry about an unseen failure),
+   one bounded round. What stays contested goes to the synthesizer, not to another round.
+4. **Synthesize** — the synthesizer assembles the skeleton and the role files into the final
    `Модули/<имя>.md`, references the architecture as `[[Архитектура]]`, and folds anything STILL genuinely
    open into `Открытые вопросы` (resolved items and drift flags are dropped from the document, not
    archived — see Documentation hygiene).

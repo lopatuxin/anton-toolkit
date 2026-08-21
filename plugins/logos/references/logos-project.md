@@ -116,7 +116,7 @@ throughout this plugin.
 Logos is built one **delivery phase** at a time. Phases are defined by the `logos-phases` skill in
 `$DOCS/Дизайн/Фазы/`; each is a finished, end-to-end, hand-testable slice (Фаза-00 is the MVP-zero:
 a text web-chat over one hard-wired model with a diagnostic log panel). The build pipeline for one
-phase, orchestrated by `logos-build`:
+phase, run by `logos-build` as the `logos-phase-build` workflow:
 
 1. **Read the spec** — the phase file + the architecture sections it touches. The phase's «Критерии
    готовности» are the acceptance tests; «Что НЕ входит» are hard scope boundaries.
