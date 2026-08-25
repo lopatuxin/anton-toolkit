@@ -1,7 +1,8 @@
 # The ladder — the mentor's curriculum
 
 Ten steps from a counting table to a small transformer. The owner implements EVERY step himself,
-in plain Java, in his own study folder of `Logos-Lab`. The mentor never writes these classes.
+in plain Java, in his own study repo `Logos-Study` — a project of its own, separate from the lab repo
+`Logos-Lab`, which is read-only for the mentor. The mentor never writes these classes.
 
 Read this file at the start of every session. The owner's position on the ladder is recorded in
 `$LAB_DOCS/Обучение.md`; this file says what each step is, when it is done, and what it is FOR.
@@ -10,7 +11,7 @@ Read this file at the start of every session. The owner's position on the ladder
 
 - **One step at a time.** A step is finished when its «работает» criterion produces a number he ran
   himself, not when he says he understands it. Understanding without a running number is step-not-done.
-- **Each step gets its own package** inside his study folder (`шаг-01-таблица`, `шаг-02-прямая`, …).
+- **Each step gets its own package** under `$STUDY/src/main/java/lab/study/` (`step01`, `step02`, …).
   Later steps may copy code from earlier ones — copying is correct here, shared abstractions are not.
   He is learning the mechanisms, not building a library.
 - **Steps are not equal.** Steps 1–3 are an evening each; 4, 7, 8 are the hard ones and may take a
@@ -25,7 +26,8 @@ Read this file at the start of every session. The owner's position on the ladder
 
 - **Plain JDK 21, no dependencies.** Matrices are `float[]` / `double[]`. He builds his own tiny
   matrix multiply and his own gradient computation. That is the point: nothing is a black box.
-- **Tiny data, minutes per run.** One book (~1 MB) of the corpus already in `Logos-Lab/data/`,
+- **Tiny data, minutes per run.** One book (~1 MB) in `$STUDY/data/` — copied out of the lab corpus
+  (`$LAB_CODE/корпус/data`, read-only) or downloaded by him —
   characters not words, lowercased, a fixed alphabet of ~35 symbols. A step whose training run takes
   a night is mis-sized — cut the model or the data, never the understanding.
 - **Same corpus, same split, all ten steps.** Fixed 90/10 train/held-out split written once in step 1
