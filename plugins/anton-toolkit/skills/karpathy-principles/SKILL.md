@@ -1,15 +1,15 @@
 ---
 name: karpathy-principles
 description: >
-  Four concrete coding principles (think before coding, simplicity first, surgical changes,
-  goal-driven execution) with correct/incorrect pairs; applied by every dev agent and
-  whenever code is written.
+  Five concrete coding principles (think before coding, simplicity first, surgical changes,
+  goal-driven execution, reuse before writing) with correct/incorrect pairs; applied by
+  every dev agent and whenever code is written.
 user-invocable: false
 ---
 
-# Four Principles for Coding Agents
+# Five Principles for Coding Agents
 
-These four principles override any default behavior when they conflict with it. They address the most common failure modes of LLM coding agents (silent wrong assumptions, overengineering, off-task edits, missing verification).
+These five principles override any default behavior when they conflict with it. They address the most common failure modes of LLM coding agents (silent wrong assumptions, overengineering, off-task edits, missing verification, re-implementing what the codebase already has).
 
 Apply them in order. Each principle is concrete — vague intent ("be thorough", "think step by step") is not a substitute.
 
@@ -90,3 +90,23 @@ Define the done-criteria up front. Loop until they hold. Do not return half-done
 
 **Incorrect:**
 > "Done. The code looks right." (no command run, no output shown)
+
+---
+
+## 5. Reuse before writing
+
+Use what the codebase already provides. Do not re-implement it, and do not repeat yourself inside your own change.
+
+**Before writing any code:**
+- Find the module every other module depends on (the shared, common or base layer) and list what it already provides: base classes, error and response helpers, request-context holders, extension functions, test fixtures. Reading one sibling file shows you a local pattern; it does not show you this layer, so open it explicitly.
+- Before writing any helper, grep the repository for its name and for the operation it performs. An existing copy means reuse it; several existing copies mean extract one, not add another.
+- A convention the project applies everywhere — a shared base class, a meta-annotation bundling per-endpoint boilerplate, a framework annotation that fills a field, a repository extension used instead of the raw API — is part of the contract, not a matter of taste. Follow it even when your own version would work.
+
+**Before reporting:**
+- Re-read your own change as a whole, not file by file. A constant, a helper or a block repeated in three or more places is extracted before you report, not left for the reviewer.
+
+**Correct:**
+> A new entity needs created/updated timestamps. Greps the shared module, finds the audited base entity that fills them, extends it.
+
+**Incorrect:**
+> Declares the timestamp fields by hand in four new entities and assigns `Instant.now()` in each, while the shared module has a base class that fills them.

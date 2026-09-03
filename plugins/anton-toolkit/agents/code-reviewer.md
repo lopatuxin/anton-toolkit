@@ -43,6 +43,7 @@ Patterns that caused real incidents — check them on every run:
 - Dead or speculative public API: a new member of a public interface, facade, or port with no caller anywhere. Grep for callers; when only the declaration, its override, and test mocks reference it, recommend removing it until a caller exists.
 - Suppressing a smell instead of fixing it: `@Suppress("TooManyFunctions")` or a similar lint suppression on a class that genuinely has several responsibilities (a constructor past ~6 dependencies corroborates). Recommend extracting a collaborator. A justified, irreducible suppression is not a finding.
 - One endpoint — one page: one endpoint serving several pages means a change for one page breaks another. Grep all usages to confirm.
+- Re-implemented infrastructure and repetition inside one change. A diff read hunk by hunk hides both, so read outside it: open the shared, common or base module the project depends on, and check whether the change hand-writes what that module already provides — a base class, an error response, a context holder, a repository extension, an exception handler. Then grep each new private helper and each new constant by name and by the operation it performs: three or more copies across the change is a finding, and so is a fourth copy of something that already exists.
 
 ## Coverage
 
