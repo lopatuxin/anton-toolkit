@@ -46,6 +46,7 @@ Decide which modules the plan touches and which agent owns each one. The build m
 | `build.gradle.kts` with Kotlin sources | `anton-toolkit:kotlin-dev` |
 | `pyproject.toml`, `setup.py`, `requirements.txt` | `anton-toolkit:python-dev` |
 | `go.mod` | `anton-toolkit:go-dev` |
+| `Cargo.toml` | `anton-toolkit:rust-dev` |
 | `package.json` of a frontend package | `anton-toolkit:frontend-dev` |
 
 List only the modules the plan actually changes — a module nobody touches gets no agent. For a service written from scratch, take the stack from the plan and pass the directory it will live in.
