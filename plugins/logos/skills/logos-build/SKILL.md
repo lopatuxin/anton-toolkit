@@ -189,9 +189,24 @@ decides otherwise and you journal his decision.
 
 ## 7. Report to the user (Russian, brief)
 
-Summarize: which phase, what was built (a few lines), test/QA result, sync status, the code commit
-hash, the new phase `статус`, and the journal entries recorded. Then ask whether to continue
-with the next phase.
+The owner did not watch the run and does not know the names the code and the design documents use.
+Write the report as his first look at the phase. The first sentence says what Logos does now that it
+did not do before, in terms of what he sees in the chat or the panel — or that the phase did not pass
+and what that means for him. Then only what needs him: an open question, a failed criterion, the push
+to confirm — each explained as if new, with one concrete example when the point is not obvious. End
+by asking whether to continue with the next phase.
+
+Leave the process out unless he asks or a step failed: the commit hash, test counts, review rounds,
+which agents ran, the sync status and the journal entries are already recorded in git and in the
+journal. Never use an internal name — a module, a file, a field, or a label the design documents
+coined — without saying in the same sentence what that part does for him. This applies to every
+message to the owner in this skill, the step-5 questions included; the owner's measured confusion
+comes mostly from exactly these reports.
+
+- Correct: «Фаза собрана: теперь Логос помнит, о чём вы говорили в прошлых разговорах, и сам
+  вспоминает это, когда ты возвращаешься к теме. От тебя одно: запушить в репозиторий?»
+- Incorrect: «Фаза-12 собрана, коммит 4f2a91c, 2894 теста зелёные, sync чистый, ревью в два круга,
+  в журнал записаны три решения; дверь памяти теперь отдаёт эпизоды складу.»
 
 ## General rules
 

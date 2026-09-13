@@ -100,7 +100,10 @@ The run returns what it could not decide alone. Work through it in this order:
 
 ## 6. Report and stop before the commit
 
-Report in Russian, briefly: what was built (a line per module), what the verification runs returned, whether the stand came up and where, the QA verdict, and then the two lists the user acts on — blockers left and the non-blocking findings.
+Report in Russian, briefly, to a reader who did not watch the run. The first sentence says whether the task works now and how he can see it — where the stand is and what to try there. Then the two lists the user acts on — blockers left and the non-blocking findings — each item saying in plain words what goes wrong and where to look. Leave out which agents ran, the fix rounds, and per-module or per-check narration unless he asks; a failed or skipped check is always named, with what it means for the task. The user's measured confusion comes mostly from process narration in build reports.
+
+- Correct: «Выгрузка сделок в CSV работает, стенд поднят на localhost:8080, проверить можно кнопкой «Экспорт» на странице сделок. Блокеров нет. Одно замечание: при пустом фильтре выгружаются все сделки за всё время, это может быть долго.»
+- Incorrect: «kotlin-dev реализовал модуль, code-reviewer дал 2 Critical, второй круг правок закрыл, devops поднял стенд, qa-engineer прогнал 14 сценариев, вердикт PASS.»
 
 **You do not commit.** The user looks at the changed-files tree himself; the commit is his call, through `/commit`. Offer it in one line and stop there. Never push.
 
