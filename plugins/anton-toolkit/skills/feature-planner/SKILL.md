@@ -2,7 +2,8 @@
 name: feature-planner
 description: >
   Interview-driven feature planning: turns a vague idea, ticket, or brief into a confirmed,
-  actionable spec saved to docs/plans/ before any code is written, then offers handoff to
+  actionable spec saved to docs/plans/ (or the phase folder the project's CLAUDE.md names)
+  before any code is written, then offers handoff to
   a dev agent. Use when the user wants to plan, refine, or clarify a feature before
   implementation; skip it when the spec is already confirmed or the change fits in one
   sentence (delegate straight to java-dev, kotlin-dev, python-dev, go-dev, or frontend-dev,
@@ -96,7 +97,18 @@ No placeholders like «TODO: уточнить» — an open point goes back to t
 
 ## 4. Plan file
 
-Write the confirmed plan to `docs/plans/<feature-slug>.md`, creating the directory if needed. Chat context gets compacted; the file survives and is what the dev agent reads. Slug: a ticket ID lowercased as the prefix when there is one (`tradex-69-<short-name>.md`), otherwise kebab-case of the feature name (`user-export-csv.md`). Prepend a short header:
+Chat context gets compacted; the plan file survives and is what the dev agent reads. Where it goes depends on the project's CLAUDE.md.
+
+**The project's CLAUDE.md names a folder for feature plans or phases** — personal projects keep them in the Obsidian vault, e.g. `C:\projects\obsidian\Проекты\Кузня Миров\Фазы Кузни\`. Write the plan there as a phase note. First read the note template the CLAUDE.md points to (`C:\projects\obsidian\Проекты\Шаблон проекта.md`) and one existing phase note in that folder, and follow them:
+
+- File `Фаза-NN-<короткое-имя>.md`: the next free two-digit number in the folder, a lowercase hyphenated Russian name (`Фаза-04-сохранение-партии.md`).
+- Frontmatter `фаза: <N>`, `статус: планируется`, and `tags` with the project tag the sibling notes use plus `фаза`.
+- Heading `# Фаза NN — <название>`, then the recap body with every heading in Russian: `Цель`, `Что входит и что не входит`, `Функциональные требования`, `Крайние случаи и ошибки`, `Технические детали`, `Нефункциональные требования`, `План реализации`, `Критерии готовности (тесты)`.
+- Vault notes are linked as wiki-links by note name (`[[Звук]]`), not by absolute path. No `# Plan:` header block.
+
+Then tell the user: «План сохранён фазой `<путь к заметке>`.»
+
+**Otherwise** (the CLAUDE.md names no such folder — the usual case for work repositories) write the confirmed plan to `docs/plans/<feature-slug>.md`, creating the directory if needed. Slug: a ticket ID lowercased as the prefix when there is one (`tradex-69-<short-name>.md`), otherwise kebab-case of the feature name (`user-export-csv.md`). Prepend a short header:
 
 ```markdown
 # Plan: <feature name>
