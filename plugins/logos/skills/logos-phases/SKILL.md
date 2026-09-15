@@ -207,7 +207,7 @@ Because there is no roadmap document, the journal IS the phase overview. After w
 record it as its own journal entry per `${CLAUDE_PLUGIN_ROOT}/references/diary-format.md`:
 - One note under `$VAULT/Проекты/Logos/Журнал/<YYYY-MM-DD>-фаза-NN-<краткое-имя>.md`.
 - Frontmatter: today's `дата`, `тип: решение`, `область: общее`, `вес: 5`, `статус: принято`,
-  the `теги` from the reference.
+  the `tags` from the reference.
 - Body: state which phase it is, its goal, what becomes touchable, and wiki-link the phase document
   (`[[Фаза-NN-<имя>]]`) and the architecture (`[[Архитектура]]`).
 - Confirm in Russian, one line, as `logos-log` does.

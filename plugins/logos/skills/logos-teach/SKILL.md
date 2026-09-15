@@ -143,7 +143,7 @@ current, `—` not started. Never renumber or reword the steps; they are fixed b
 ```markdown
 ---
 дата: <YYYY-MM-DD of last update>
-теги:
+tags:
   - logos
   - исследования
   - обучение

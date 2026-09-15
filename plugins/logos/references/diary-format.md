@@ -108,7 +108,7 @@ and values are Russian on purpose (they are vault content the user reads and que
 область: <оркестрация | память | модели | автономность | ресурсы | общее>
 вес: <1–10>
 статус: <принято | отвергнуто | проверяется | сработало | провал>
-теги:
+tags:
   - logos
   - журнал
 ---
