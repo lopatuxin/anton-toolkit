@@ -17,7 +17,7 @@ produces the documentation; this build half turns that documentation into runnin
 | Thing | Location | Git |
 |---|---|---|
 | **Code** | `<code-repo>` — the Logos source repository | remote `git@github.com:lopatuxin/Logos.git`, committed manually by the build tools |
-| **Documentation** | `<vault>/Logos/` in the Obsidian vault (design, phases, journal) | auto-synced by `obsidian-git` — never `git commit` the vault by hand |
+| **Documentation** | `<vault>/Проекты/Logos/` in the Obsidian vault (design, phases, journal) | auto-synced by `obsidian-git` — never `git commit` the vault by hand |
 
 **The binding rule — documentation is the source of truth.** Code implements what the design
 documents specify. Code never silently diverges from the docs: if the code must do something the
@@ -43,12 +43,12 @@ while [ "$DIR" != "/" ] && [ -n "$DIR" ]; do
 done
 # 2. Scan every level one directory deep. REQUIRED, not a nicety: the code repo is the vault's
 #    SIBLING, never its child, so walking up from the code repo can never reach the vault. A
-#    candidate must hold BOTH `.obsidian/` and `Logos/`, so an unrelated vault is not picked up.
+#    candidate must hold BOTH `.obsidian/` and `Проекты/Logos/`, so an unrelated vault is not picked up.
 if [ -z "$VAULT" ]; then
   DIR="$(pwd)"
   while [ "$DIR" != "/" ] && [ -n "$DIR" ]; do
     for CANDIDATE in "$DIR"/*/; do
-      if [ -d "$CANDIDATE/.obsidian" ] && [ -d "$CANDIDATE/Logos" ]; then VAULT="${CANDIDATE%/}"; break; fi
+      if [ -d "$CANDIDATE/.obsidian" ] && [ -d "$CANDIDATE/Проекты/Logos" ]; then VAULT="${CANDIDATE%/}"; break; fi
     done
     [ -n "$VAULT" ] && break
     DIR="$(dirname "$DIR")"
@@ -58,11 +58,11 @@ fi
 #    content). Renaming or moving the vault inside these roots keeps working.
 if [ -z "$VAULT" ]; then
   for CANDIDATE in /c/projects/*/ "$HOME"/*/; do
-    if [ -d "$CANDIDATE/.obsidian" ] && [ -d "$CANDIDATE/Logos" ]; then VAULT="${CANDIDATE%/}"; break; fi
+    if [ -d "$CANDIDATE/.obsidian" ] && [ -d "$CANDIDATE/Проекты/Logos" ]; then VAULT="${CANDIDATE%/}"; break; fi
   done
 fi
 
-DOCS="$VAULT/Logos"                 # design docs, phases, journal (vault, auto-synced)
+DOCS="$VAULT/Проекты/Logos"                 # design docs, phases, journal (vault, auto-synced)
 CODE="$(dirname "$VAULT")/Logos"    # code repo, e.g. /c/projects/Logos
 echo "VAULT=$VAULT  DOCS=$DOCS  CODE=$CODE"
 ```

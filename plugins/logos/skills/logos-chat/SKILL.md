@@ -38,10 +38,10 @@ databases — every mutation is delegated to the tool that owns it.
 
 1. Read `${CLAUDE_PLUGIN_ROOT}/references/logos-project.md` fully — it defines the locations, the
    binding sync rule, the doctrine, the phase workflow, and the journal. Everything below depends on it.
-2. Resolve `VAULT` (the folder holding both `.obsidian/` and `Logos/`) and `CODE`
+2. Resolve `VAULT` (the folder holding both `.obsidian/` and `Проекты/Logos/`) and `CODE`
    (`$(dirname "$VAULT")/Logos`) with the search procedure in the paths section of
    `${CLAUDE_PLUGIN_ROOT}/references/logos-project.md`; never hard-code the path. `$DOCS` is
-   `$VAULT/Logos`. If the vault is not found, tell the user in Russian as that reference instructs,
+   `$VAULT/Проекты/Logos`. If the vault is not found, tell the user in Russian as that reference instructs,
    then stop.
 3. Do NOT eagerly read every document. Hold the MAP (which file answers which kind of question, from
    the reference's path table) and read the specific source on demand when a question needs it.

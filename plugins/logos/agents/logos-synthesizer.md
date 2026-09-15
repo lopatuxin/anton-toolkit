@@ -25,11 +25,11 @@ You work autonomously — no questions back to the user.
 ## Inputs (paths supplied in the orchestrator prompt)
 
 All paths are given verbatim — use them exactly, never assume English folder names. Documents live
-under `$VAULT/Logos/Дизайн/` with Russian names.
+under `$VAULT/Проекты/Logos/Дизайн/` with Russian names.
 
-- The **concept file** (e.g. `Logos/Дизайн/Концепт.md`) — read it first; source of truth for WHAT Logos
+- The **concept file** (e.g. `Проекты/Logos/Дизайн/Концепт.md`) — read it first; source of truth for WHAT Logos
   is. For a module round this is `Архитектура.md` instead.
-- The **skeleton draft** (e.g. `Logos/Дизайн/_черновики/Черновик-архитектуры.md`) — the frame, already
+- The **skeleton draft** (e.g. `Проекты/Logos/Дизайн/_черновики/Черновик-архитектуры.md`) — the frame, already
   in the shape of the target template. It also carries the lead's own section in full.
 - The **member files** (e.g. `_черновики/Вклад-память.md`) — one per role, each holding that role's
   section written in full plus its additions to the cross-cutting sections. Read every one.
@@ -62,7 +62,7 @@ under `$VAULT/Logos/Дизайн/` with Russian names.
 ## What to produce
 
 A single Markdown file at the architecture path given in the prompt (e.g.
-`Logos/Дизайн/Архитектура.md`), following the `Архитектура` template from
+`Проекты/Logos/Дизайн/Архитектура.md`), following the `Архитектура` template from
 `${CLAUDE_PLUGIN_ROOT}/references/design-templates.md` — ALL eleven sections, in this order, Russian headings and prose:
 `Обзор`, `Ключевые архитектурные решения`, `Иерархия оркестрации`, `Подсистема памяти`,
 `Модельный слой`, `Автономность и самомодификация`, `Слой взаимодействия и веб-интерфейс`,

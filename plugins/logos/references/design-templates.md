@@ -2,7 +2,7 @@
 
 Canonical structure for the Logos design documents. The council members (each writing its own part), the
 synthesizer (writing the final), and the `logos-design` orchestrator (writing the
-concept inline) all follow these templates. Documents live under `$VAULT/Logos/Дизайн/` with
+concept inline) all follow these templates. Documents live under `$VAULT/Проекты/Logos/Дизайн/` with
 Russian file names and Russian headings.
 
 All design documents are **Russian** in headings and prose. Technical terms (LLM, VRAM, RAG,
@@ -116,7 +116,7 @@ two frontmatter fields recording when it was last confirmed to agree with the co
 
 ## Концепт
 
-Path: `$VAULT/Logos/Дизайн/Концепт.md`. Short — captures WHAT Logos is and WHY, no technical
+Path: `$VAULT/Проекты/Logos/Дизайн/Концепт.md`. Short — captures WHAT Logos is and WHY, no technical
 depth. Written inline by the orchestrator, seeded from the user's idea note.
 
 ```markdown
@@ -142,7 +142,7 @@ tags:
 
 ## Архитектура
 
-Path of the final: `$VAULT/Logos/Дизайн/Архитектура.md`. In the vault today this is a **hub plus a
+Path of the final: `$VAULT/Проекты/Logos/Дизайн/Архитектура.md`. In the vault today this is a **hub plus a
 folder of pages**, the decomposition layout described above: `Дизайн/Архитектура.md` is the hub and
 holds the cross-cutting sections (`Обзор`, `Ключевые архитектурные решения`, a page map «Карта
 архитектуры», `Потоки данных`, `Стек и инфраструктура`, `Риски и открытые вопросы`); each domain-owned
@@ -199,7 +199,7 @@ the roles' own files — that machinery is invisible to the document's reader.
 ## Модуль (optional, later)
 
 Once the architecture is stable, a single subsystem can be detailed into its own module
-document at `$VAULT/Logos/Дизайн/Модули/<Русское-имя>.md` (e.g. `Память.md`, `Оркестрация.md`).
+document at `$VAULT/Проекты/Logos/Дизайн/Модули/<Русское-имя>.md` (e.g. `Память.md`, `Оркестрация.md`).
 
 ```markdown
 ---
@@ -243,9 +243,9 @@ synthesizer follow it when the `logos-council` workflow runs with `target: "modu
 
 **Target element.** The orchestrator names ONE system element to detail (e.g. `Память`, `Оркестрация`,
 `Модельный слой`, `Веб-интерфейс`) and resolves all paths:
-- module draft: `$VAULT/Logos/Дизайн/_черновики/Черновик-модуля-<имя>.md`
-- one file per relevant role: `$VAULT/Logos/Дизайн/_черновики/Вклад-модуля-<имя>-<роль>.md`
-- final module document: `$VAULT/Logos/Дизайн/Модули/<имя>.md` (the `Модуль` template above).
+- module draft: `$VAULT/Проекты/Logos/Дизайн/_черновики/Черновик-модуля-<имя>.md`
+- one file per relevant role: `$VAULT/Проекты/Logos/Дизайн/_черновики/Вклад-модуля-<имя>-<роль>.md`
+- final module document: `$VAULT/Проекты/Logos/Дизайн/Модули/<имя>.md` (the `Модуль` template above).
 
 **The draft uses the `Модуль` template, NOT the eleven-section architecture structure.** In a module
 round there is no per-member "owned section"; instead every member contributes the parts of THIS

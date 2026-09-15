@@ -1,14 +1,14 @@
 # Logos research branch — storage format (Исследования + Logos-Lab)
 
 This reference defines the on-disk format of the Logos RESEARCH BRANCH: the documentation
-folder `Logos/Исследования/` in the Obsidian vault and the lab code repository `Logos-Lab`.
+folder `Проекты/Logos/Исследования/` in the Obsidian vault and the lab code repository `Logos-Lab`.
 The `logos-lab` skill reads this file and follows it verbatim, so every experiment and
 direction note is uniform and searchable.
 
 The research branch is a SEPARATE line of Logos development: moving away from big LLMs toward
 a swarm of small specialized self-learning models on cheap hardware. It deliberately does NOT
 mix with the production system's development. The experiment diary here is DISTINCT from the
-decision journal (`Logos/Журнал/`, format in `${CLAUDE_PLUGIN_ROOT}/references/diary-format.md`): the journal records
+decision journal (`Проекты/Logos/Журнал/`, format in `${CLAUDE_PLUGIN_ROOT}/references/diary-format.md`): the journal records
 project decisions; the diary records research-branch experiments. A cross-cutting decision
 (e.g. "the branch exists", "a matured conclusion enters the main design") still goes to the
 journal; the day-to-day hypothesis→result loop lives here.
@@ -23,7 +23,7 @@ instructs, then stop.
 Derived paths:
 
 ```
-$LAB_DOCS = $VAULT/Logos/Исследования          # branch documentation (vault, auto-synced)
+$LAB_DOCS = $VAULT/Проекты/Logos/Исследования          # branch documentation (vault, auto-synced)
 $LAB_CODE = $(dirname $VAULT)/Logos-Lab        # lab code repo, sibling of the main code repo
 ```
 
@@ -33,7 +33,7 @@ exist, clone it; if the remote is empty, `git init -b main` + add the remote.
 ## 2. Layout
 
 ```
-Logos/Исследования/
+Проекты/Logos/Исследования/
   Исследования.md            — folder note: entry map + Dataview indexes (auto-updating)
   Концепт-исследований.md    — why the branch exists, hypotheses, constraints, process
   Направления/
@@ -65,9 +65,9 @@ folder notes ARE the searchable index — never maintained by hand.
 If `Исследования.md` is missing or empty, create it with: an H1, a two-to-three-sentence Russian
 intro naming the branch's goal and the lab repo, wiki-links to [[Концепт-исследований]],
 [[Направления/Направления|Направления]], [[Эксперименты/Эксперименты|Эксперименты]] and
-[[Анализ/Анализ|Анализ]], and Dataview tables over `"Logos/Исследования/Направления"` (columns:
-file.link, статус, дата), `"Logos/Исследования/Анализ"` (columns: file.link, охват, дата) and
-`"Logos/Исследования/Эксперименты"` (tables: `статус = "проверяется"`; provals/dead ends via
+[[Анализ/Анализ|Анализ]], and Dataview tables over `"Проекты/Logos/Исследования/Направления"` (columns:
+file.link, статус, дата), `"Проекты/Logos/Исследования/Анализ"` (columns: file.link, охват, дата) and
+`"Проекты/Logos/Исследования/Эксперименты"` (tables: `статус = "проверяется"`; provals/dead ends via
 `статус = "провал" OR тип = "тупик"`; all entries with область/статус/вес/дата). Frontmatter
 tags: `logos`, `исследования`. Every `WHERE` clause excludes the folder note itself
 (`file.name != this.file.name`).

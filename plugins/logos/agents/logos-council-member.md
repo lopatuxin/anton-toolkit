@@ -35,7 +35,7 @@ you write differs (see «Target»).
 ## Inputs (all supplied in the prompt)
 
 All paths are given verbatim — use them exactly, never assume English folder names. Documents live
-under `$VAULT/Logos/Дизайн/` with Russian names.
+under `$VAULT/Проекты/Logos/Дизайн/` with Russian names.
 
 - The **source of truth to design against** — `Концепт.md` for the architecture, `Архитектура.md` for a
   module. Read it first, in full.

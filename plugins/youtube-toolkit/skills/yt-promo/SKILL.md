@@ -127,7 +127,7 @@ Design and refine the on-channel lead-gen system: pinned comments, end-screens, 
 
 After producing the artefact in chat, persist it to the Obsidian vault following `${CLAUDE_PLUGIN_ROOT}/references/vault.md`.
 
-- Target folder: `C:\projects\obsidian\youtube\продвижение\`.
+- Target folder: `C:\projects\obsidian\Проекты\youtube\продвижение\`.
 - Filename depends on the request type (Russian, Cyrillic, kebab-case):
   - Audit → `YYYY-MM-DD-аудит.md`
   - Pinned comment → `закреп-<video-slug>.md` (reuse the same Cyrillic slug as the video's script in `сценарии/`)
@@ -147,7 +147,7 @@ After producing the artefact in chat, persist it to the Obsidian vault following
     - youtube/promo
     - youtube/promo/<audit|pinned|endscreen|funnel>
   related:
-    - "[[youtube/сценарии/<slug>]]"          # only for per-video artefacts
+    - "[[Проекты/youtube/сценарии/<slug>]]"          # only for per-video artefacts
   ---
   ```
 

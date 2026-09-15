@@ -1,7 +1,7 @@
 ---
 name: logos-ui
 description: >
-  Writes the build-ready structural spec of the Logos web interface to the folder Logos/Дизайн/Веб-интерфейс/ (hub note plus one page per screen)
+  Writes the build-ready structural spec of the Logos web interface to the folder Проекты/Logos/Дизайн/Веб-интерфейс/ (hub note plus one page per screen)
   for the logos-frontend-coder agent — screens, the blocks and elements of each, navigation, behaviour
   and states — with no visual design: colours, typography and theme come from the established Logos
   style; built through an interview (open questions, one at a time), then synchronized with
@@ -45,7 +45,7 @@ interface spec stays build-ready and consistent with the code.
 
 ## 0. Locate the vault and resolve paths (once per session)
 
-Resolve `VAULT` (the folder holding both `.obsidian/` and `Logos/`) and `CODE`
+Resolve `VAULT` (the folder holding both `.obsidian/` and `Проекты/Logos/`) and `CODE`
 (`$(dirname "$VAULT")/Logos`) with the search procedure in the paths section of
 `${CLAUDE_PLUGIN_ROOT}/references/logos-project.md`; never hard-code the path. If the vault is not
 found, tell the user in Russian as that reference instructs, then stop.
@@ -54,10 +54,10 @@ Paths (Russian names — you own all path construction):
 
 | Document | Path |
 |---|---|
-| Web interface spec | folder `$VAULT/Logos/Дизайн/Веб-интерфейс/` — hub `Веб-интерфейс.md` inside it, one page per screen, `Контракты-с-системой.md` (see `${CLAUDE_PLUGIN_ROOT}/references/web-ui-spec-template.md`) |
-| Concept (read) | `$VAULT/Logos/Дизайн/Концепт.md` |
-| Architecture (read + sync target) | `$VAULT/Logos/Дизайн/Архитектура.md` |
-| Decision journal | `$VAULT/Logos/Журнал/` |
+| Web interface spec | folder `$VAULT/Проекты/Logos/Дизайн/Веб-интерфейс/` — hub `Веб-интерфейс.md` inside it, one page per screen, `Контракты-с-системой.md` (see `${CLAUDE_PLUGIN_ROOT}/references/web-ui-spec-template.md`) |
+| Concept (read) | `$VAULT/Проекты/Logos/Дизайн/Концепт.md` |
+| Architecture (read + sync target) | `$VAULT/Проекты/Logos/Дизайн/Архитектура.md` |
+| Decision journal | `$VAULT/Проекты/Logos/Журнал/` |
 
 Cross-references use Obsidian wiki-links (`[[Концепт]]`, `[[Архитектура]]`), never relative paths.
 
@@ -99,7 +99,7 @@ Cover at least these, anchored to what Logos does (from the architecture). Skip 
 
 ## 4. Write the spec
 
-When a topic is pinned down, write/extend the pages of `$VAULT/Logos/Дизайн/Веб-интерфейс/` (hub + screen pages) following the
+When a topic is pinned down, write/extend the pages of `$VAULT/Проекты/Logos/Дизайн/Веб-интерфейс/` (hub + screen pages) following the
 structure in `${CLAUDE_PLUGIN_ROOT}/references/web-ui-spec-template.md` (read it and follow it) — including its YAML
 frontmatter (`tags: [logos, дизайн, интерфейс]`) and the `[[Концепт]] · [[Архитектура]]` link line.
 Russian headings, all details captured, **no colours or visual styling**. Be exhaustive at the
@@ -108,7 +108,7 @@ element level — every button and field named, its purpose, behaviour, and stat
 The vault auto-syncs via `obsidian-git` — no manual git commit for vault files.
 
 After writing, summarize to the user in Russian and ask what to refine:
-«Спеку интерфейса записал в `Logos/Дизайн/Веб-интерфейс/` (хаб и страницы экранов). Посмотри — что добавить или поправить?»
+«Спеку интерфейса записал в `Проекты/Logos/Дизайн/Веб-интерфейс/` (хаб и страницы экранов). Посмотри — что добавить или поправить?»
 
 ## 5. Synchronize the design (mandatory after any spec change)
 
@@ -128,7 +128,7 @@ propagated across the whole design.** After writing or changing the spec:
    открытые вопросы».
 3. **Record significant changes in the journal.** For each non-trivial sync edit to the architecture,
    write a journal entry per `${CLAUDE_PLUGIN_ROOT}/references/diary-format.md` — one note under
-   `$VAULT/Logos/Журнал/`,
+   `$VAULT/Проекты/Logos/Журнал/`,
    `тип: решение` (or `тип: наблюдение` for a noted gap), `область: общее` (the interface is
    cross-cutting and the journal's `область` taxonomy has no UI value — never write `область: интерфейс`),
    `статус: принято`, `вес: 5` (the assistant's importance estimate). Trivial wording

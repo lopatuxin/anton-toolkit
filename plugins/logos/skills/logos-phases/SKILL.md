@@ -4,7 +4,7 @@ description: >
   Carves the Logos system defined in Архитектура.md into incremental delivery phases — each an
   end-to-end slice the user can touch and test, starting from an MVP-zero — through an interview that
   pins down each phase's goal, scope, architecture surface, dependencies and hand-verifiable done
-  criteria; writes one file per phase to Logos/Дизайн/Фазы/, records it in the journal and fixes
+  criteria; writes one file per phase to Проекты/Logos/Дизайн/Фазы/, records it in the journal and fixes
   Архитектура.md immediately when a phase needs something it lacks; documentation only. Runs in the
   main conversation; the interview is not delegated to agents. For the architecture use logos-design,
   for the web-interface spec logos-ui, for the journal logos-log, for building a phase logos-build,
@@ -44,7 +44,7 @@ a deep interview, write each as its own document, and keep the whole design cons
     the owner never requested. This is срезание углов and is exactly what the owner has rejected.
 - **Command-only.** Act only when the user runs `/logos-phases`.
 - **No roadmap document.** There is deliberately NO overview/roadmap file — the development journal
-  (`Logos/Журнал/`) is the overview. Each phase is one standalone file plus one journal entry.
+  (`Проекты/Logos/Журнал/`) is the overview. Each phase is one standalone file plus one journal entry.
 - **Russian output.** Phase documents, headings, and all chat dialogue are Russian. Technical terms
   (LLM, MVP, API, VRAM, OpenRouter, GPU, etc.) keep their original form.
 - **Synchronization is mandatory and immediate.** A phase that silently needs something the
@@ -60,7 +60,7 @@ Read it so your phase documents and their `статус`/«Критерии го
 
 ## 0. Locate the vault and resolve paths (once per session)
 
-Resolve `VAULT` (the folder holding both `.obsidian/` and `Logos/`) and `CODE`
+Resolve `VAULT` (the folder holding both `.obsidian/` and `Проекты/Logos/`) and `CODE`
 (`$(dirname "$VAULT")/Logos`) with the search procedure in the paths section of
 `${CLAUDE_PLUGIN_ROOT}/references/logos-project.md`; never hard-code the path. If the vault is not
 found, tell the user in Russian as that reference instructs, then stop.
@@ -69,20 +69,20 @@ Paths (Russian names — you own all path construction):
 
 | Document | Path |
 |---|---|
-| Phases folder | `$VAULT/Logos/Дизайн/Фазы/` |
-| One phase | `$VAULT/Logos/Дизайн/Фазы/Фаза-NN-<краткое-русское-имя>.md` |
-| Concept (read + sync target) | `$VAULT/Logos/Дизайн/Концепт.md` |
-| Architecture (read + sync target) | `$VAULT/Logos/Дизайн/Архитектура.md` |
-| Decision journal | `$VAULT/Logos/Журнал/` |
+| Phases folder | `$VAULT/Проекты/Logos/Дизайн/Фазы/` |
+| One phase | `$VAULT/Проекты/Logos/Дизайн/Фазы/Фаза-NN-<краткое-русское-имя>.md` |
+| Concept (read + sync target) | `$VAULT/Проекты/Logos/Дизайн/Концепт.md` |
+| Architecture (read + sync target) | `$VAULT/Проекты/Logos/Дизайн/Архитектура.md` |
+| Decision journal | `$VAULT/Проекты/Logos/Журнал/` |
 
 **The `Logos` folder name is a LITERAL Latin-script identifier — NEVER transliterate it to Cyrillic.**
 Everything *inside* the folder is Russian (file names, headings, slugs like `Дизайн`, `Фазы`, `Журнал`),
 but the top-level folder is always spelled `Logos` (Latin letters L-o-g-o-s), exactly as written in the
-`$VAULT/Logos/…` paths above. While producing Russian prose you may reflexively type the folder as
-Cyrillic `Логос` — do NOT. Build every path from the `$VAULT/Logos/…` prefix verbatim; never retype the
+`$VAULT/Проекты/Logos/…` paths above. While producing Russian prose you may reflexively type the folder as
+Cyrillic `Логос` — do NOT. Build every path from the `$VAULT/Проекты/Logos/…` prefix verbatim; never retype the
 folder name from memory. This applies to EVERY write in every step (phase files, architecture/concept
 sync, journal entries).
-- Correct: `$VAULT/Logos/Журнал/2026-07-04-имя.md`
+- Correct: `$VAULT/Проекты/Logos/Журнал/2026-07-04-имя.md`
 - Incorrect: `$VAULT/Логос/Журнал/2026-07-04-имя.md` — Cyrillic `Логос` silently creates a second, wrong
   folder next to the real `Logos` one, scattering the vault.
 
@@ -93,19 +93,19 @@ yourself to type it right.** Two mandatory guards:
    (`…/Журнал/2026-…`, `…/Дизайн/…`) — that Russian flow is exactly where the folder gets mistyped as
    Cyrillic `Логос`. Before you submit ANY Write/Edit whose path is in the vault, verify the segment
    directly after the vault root reads `Logos` in Latin (L-o-g-o-s). Build the path by copying the
-   `$VAULT/Logos/` prefix; never re-type the folder name from memory mid-Russian-sentence.
+   `$VAULT/Проекты/Logos/` prefix; never re-type the folder name from memory mid-Russian-sentence.
 2. **Verify after all writes for the phase are done, before reporting done.** Run this stray-directory
    check and fix any hit:
    ```bash
    ls -d "$VAULT/Логос" 2>/dev/null && echo "STRAY CYRILLIC 'Логос' DIRECTORY — a path was mistyped"
    ```
    If it prints anything, at least one file went into the wrong Cyrillic `Логос` folder: re-write each
-   such file to the correct `$VAULT/Logos/…` path, then remove the stray directory with
+   such file to the correct `$VAULT/Проекты/Logos/…` path, then remove the stray directory with
    `rm -rf "$VAULT/Логос"`. If tooling denies the delete, do NOT leave it silently — tell the user in
    Russian exactly which folder to remove by hand: «Удали, пожалуйста, папку `Логос` рядом с `Logos` в
    хранилище — я записал туда файл по ошибке и не смог удалить сам.»
 
-Create the phases folder if missing: `mkdir -p "$VAULT/Logos/Дизайн/Фазы"`.
+Create the phases folder if missing: `mkdir -p "$VAULT/Проекты/Logos/Дизайн/Фазы"`.
 
 Cross-references use Obsidian wiki-links (`[[Концепт]]`, `[[Архитектура]]`, `[[Фаза-00-чат-в-вебе]]`),
 never relative markdown paths.
@@ -118,7 +118,7 @@ subsystems (orchestration, memory, models, autonomy, the web interface) each can
 exercise.
 
 - If `Архитектура.md` does NOT exist, tell the user in Russian: «Архитектуры ещё нет — фазы будут нарезаться вслепую. Сначала прогоним `logos-design`? Если хочешь, можем всё равно набросать первые фазы по концепту.» and let them decide (do not hard-stop).
-- Read the existing phase files in `$VAULT/Logos/Дизайн/Фазы/` (if any). They tell you which phases
+- Read the existing phase files in `$VAULT/Проекты/Logos/Дизайн/Фазы/` (if any). They tell you which phases
   are already carved and what the next phase number is. This may be an EXTEND run (carve the next
   phase) or a REVISE run (the user wants to reshape an existing phase). Determine which from the user.
 
@@ -159,7 +159,7 @@ For each phase, pin down at least these, anchored to what the architecture says 
 ## 4. Write the phase document
 
 When a phase is pinned down, write it as its OWN file
-`$VAULT/Logos/Дизайн/Фазы/Фаза-NN-<краткое-русское-имя>.md` following the structure in
+`$VAULT/Проекты/Logos/Дизайн/Фазы/Фаза-NN-<краткое-русское-имя>.md` following the structure in
 `${CLAUDE_PLUGIN_ROOT}/references/phase-template.md` (read it and follow it) — including its YAML frontmatter and the
 `[[Концепт]] · [[Архитектура]]` link line. Russian headings, all details captured, **no runnable
 code**.
@@ -190,7 +190,7 @@ After writing or changing any phase:
    открытые вопросы».
 3. **Record significant changes in the journal.** For each non-trivial sync edit to the architecture,
    write a journal entry per `${CLAUDE_PLUGIN_ROOT}/references/diary-format.md` — one note under
-   `$VAULT/Logos/Журнал/`,
+   `$VAULT/Проекты/Logos/Журнал/`,
    `тип: решение` (or `тип: наблюдение` for a noted gap), `область: общее` (phases are cross-cutting;
    the journal's `область` taxonomy has no phase value — never invent one), `статус: принято`,
    `вес: 5` (the assistant's importance estimate). Trivial wording fixes need no entry.
@@ -205,7 +205,7 @@ phase, note it and let the next interview turn resolve it.
 
 Because there is no roadmap document, the journal IS the phase overview. After writing each phase,
 record it as its own journal entry per `${CLAUDE_PLUGIN_ROOT}/references/diary-format.md`:
-- One note under `$VAULT/Logos/Журнал/<YYYY-MM-DD>-фаза-NN-<краткое-имя>.md`.
+- One note under `$VAULT/Проекты/Logos/Журнал/<YYYY-MM-DD>-фаза-NN-<краткое-имя>.md`.
 - Frontmatter: today's `дата`, `тип: решение`, `область: общее`, `вес: 5`, `статус: принято`,
   the `теги` from the reference.
 - Body: state which phase it is, its goal, what becomes touchable, and wiki-link the phase document

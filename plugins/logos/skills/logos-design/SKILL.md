@@ -6,7 +6,7 @@ description: >
   answer each other's questions before a synthesizer assembles the canonical Архитектура.md; the same
   council details single elements into build-ready module documents, and oversized documents get
   split; requirements come from a user interview first, key decisions go to the journal; documentation
-  only, under Logos/Дизайн/. Runs in the main conversation; the interview is not delegated to agents.
+  only, under Проекты/Logos/Дизайн/. Runs in the main conversation; the interview is not delegated to agents.
   For slicing into phases use logos-phases, for the web-interface spec logos-ui, for writing code
   logos-build, for a non-Logos system system-designer.
 when_to_use: >
@@ -19,7 +19,7 @@ You are the lead designer of the Logos project. Logos is the user's vision of an
 assistant ("a Jarvis"): a central brain governing block orchestrators governing agent swarms, an
 evolving memory with importance weights, autonomous self-construction of its own tools, and a swarm
 of small specialized models running on modest hardware. You run an iterative design process with the
-user, producing Russian Markdown documentation under `$VAULT/Logos/Дизайн/`. You gather requirements
+user, producing Russian Markdown documentation under `$VAULT/Проекты/Logos/Дизайн/`. You gather requirements
 in dialog yourself, and you dispatch a **fixed council** of specialized agents for the autonomous
 architecture-writing step.
 
@@ -44,12 +44,12 @@ sees the failure honestly and decides.
 
 ## Locate the vault and resolve paths (once per session)
 
-Resolve `VAULT` (the folder holding both `.obsidian/` and `Logos/`) and `CODE`
+Resolve `VAULT` (the folder holding both `.obsidian/` and `Проекты/Logos/`) and `CODE`
 (`$(dirname "$VAULT")/Logos`) with the search procedure in the paths section of
 `${CLAUDE_PLUGIN_ROOT}/references/logos-project.md`; never hard-code the path. If the vault is not
 found, tell the user in Russian as that reference instructs, then stop.
 
-The design root is `$VAULT/Logos/Дизайн`. Create it if missing: `mkdir -p "$VAULT/Logos/Дизайн"`.
+The design root is `$VAULT/Проекты/Logos/Дизайн`. Create it if missing: `mkdir -p "$VAULT/Проекты/Logos/Дизайн"`.
 You (the orchestrator) own all path construction — resolve concrete paths yourself and pass them
 verbatim into every agent prompt. Agents never assume English folder names.
 
@@ -57,18 +57,18 @@ Canonical layout (Russian names):
 
 | Document | Path |
 |---|---|
-| Concept | `$VAULT/Logos/Дизайн/Концепт.md` |
-| Architecture (final) | `$VAULT/Logos/Дизайн/Архитектура.md` — today a hub; the domain sections are pages in `$VAULT/Logos/Дизайн/Архитектура/` (layout in `${CLAUDE_PLUGIN_ROOT}/references/design-templates.md`, «Архитектура») |
-| Modules folder | `$VAULT/Logos/Дизайн/Модули/` |
-| One module | `$VAULT/Logos/Дизайн/Модули/<Русское-имя>.md` |
-| Council scratch (skeleton + one file per role) | `$VAULT/Logos/Дизайн/_черновики/` (deleted before the phase ends) |
+| Concept | `$VAULT/Проекты/Logos/Дизайн/Концепт.md` |
+| Architecture (final) | `$VAULT/Проекты/Logos/Дизайн/Архитектура.md` — today a hub; the domain sections are pages in `$VAULT/Проекты/Logos/Дизайн/Архитектура/` (layout in `${CLAUDE_PLUGIN_ROOT}/references/design-templates.md`, «Архитектура») |
+| Modules folder | `$VAULT/Проекты/Logos/Дизайн/Модули/` |
+| One module | `$VAULT/Проекты/Logos/Дизайн/Модули/<Русское-имя>.md` |
+| Council scratch (skeleton + one file per role) | `$VAULT/Проекты/Logos/Дизайн/_черновики/` (deleted before the phase ends) |
 
 Cross-references between documents use Obsidian wiki-links (`[[Концепт]]`, `[[Архитектура]]`,
 `[[Модули/Память]]`), never relative markdown paths.
 
 ## Determine the mode on the first turn
 
-- If `$VAULT/Logos/Дизайн/Концепт.md` does NOT exist → start at **Phase 1 — Concept**.
+- If `$VAULT/Проекты/Logos/Дизайн/Концепт.md` does NOT exist → start at **Phase 1 — Concept**.
 - If it exists but `Архитектура.md` does NOT → go to **Phase 2 — Architecture**.
 - If both exist → ask the user in Russian what they want to do, and route: a change/addition to the
   design → **Phase 3 — Change management**; a deep per-element document → **Phase 4 — Module detailing**
@@ -78,7 +78,7 @@ Cross-references between documents use Obsidian wiki-links (`[[Концепт]]`
 
 ## Phase 1 — Concept (dialog, written inline)
 
-Goal: produce `$VAULT/Logos/Дизайн/Концепт.md` — WHAT Logos is and WHY, no technical depth.
+Goal: produce `$VAULT/Проекты/Logos/Дизайн/Концепт.md` — WHAT Logos is and WHY, no technical depth.
 
 **Seed from the idea note.** The user already has an idea note at
 `$VAULT/Личная/Идеи/Logos — автономный ИИ-ассистент.md`. Read it first — it covers the vision,
@@ -96,13 +96,13 @@ couple of quick gap-fillers, and do NOT ask about tech stack — that is Phase 2
 
 When you have enough, write `Концепт.md` yourself (it is short — inline, no agent) following the
 `Концепт` template in `${CLAUDE_PLUGIN_ROOT}/references/design-templates.md`, all Russian headings. Then summarize to the
-user in Russian and ask: «Концепт записал в Logos/Дизайн/Концепт.md. Посмотри — всё верно? Что уточнить перед тем, как созывать совет?»
+user in Russian and ask: «Концепт записал в Проекты/Logos/Дизайн/Концепт.md. Посмотри — всё верно? Что уточнить перед тем, как созывать совет?»
 
 Iterate until the user confirms. The vault auto-syncs via `obsidian-git` — no manual git commit.
 
 ## Phase 2 — Architecture (deliberative council → synthesis → journal)
 
-Goal: produce `$VAULT/Logos/Дизайн/Архитектура.md`. This phase runs a **fixed deliberative council** of
+Goal: produce `$VAULT/Проекты/Logos/Дизайн/Архитектура.md`. This phase runs a **fixed deliberative council** of
 six roles — `оркестрация` (the lead), `память`, `модели`, `автономность`, `фронтенд`, `ресурсы`. The
 lead lays down a skeleton over all sections; the other five deepen their own domain **in parallel**,
 each writing its own file, and question the frame; a resolution round lets every role read every other
@@ -133,7 +133,7 @@ The roster is fixed. Which role owns which architecture section, and the lens ea
 
 Create the scratch directory first:
 ```bash
-mkdir -p "$VAULT/Logos/Дизайн/_черновики"
+mkdir -p "$VAULT/Проекты/Logos/Дизайн/_черновики"
 ```
 
 Then start the workflow, filling the paths you resolved and the constraints verbatim:
@@ -145,10 +145,10 @@ Workflow({
     roles: ["память", "модели", "автономность", "фронтенд", "ресурсы"],
     constraints: "<ответы хозяина из шага 2.1, дословно>",
     paths: {
-      source:   "<VAULT>/Logos/Дизайн/Концепт.md",
-      scratch:  "<VAULT>/Logos/Дизайн/_черновики",
-      skeleton: "<VAULT>/Logos/Дизайн/_черновики/Черновик-архитектуры.md",
-      final:    "<VAULT>/Logos/Дизайн/Архитектура.md"
+      source:   "<VAULT>/Проекты/Logos/Дизайн/Концепт.md",
+      scratch:  "<VAULT>/Проекты/Logos/Дизайн/_черновики",
+      skeleton: "<VAULT>/Проекты/Logos/Дизайн/_черновики/Черновик-архитектуры.md",
+      final:    "<VAULT>/Проекты/Logos/Дизайн/Архитектура.md"
     },
     refs: {
       roles:     "${CLAUDE_PLUGIN_ROOT}/references/council-roles.md",
@@ -167,7 +167,7 @@ scratch files stay on disk for the next attempt.
 ### Step 2.3 — Clean up the scratch files
 
 After the workflow returns, delete the scratch directory so the drafts never get committed:
-`rm -rf "$VAULT/Logos/Дизайн/_черновики"`. Only `Архитектура.md` survives.
+`rm -rf "$VAULT/Проекты/Logos/Дизайн/_черновики"`. Only `Архитектура.md` survives.
 
 ### Step 2.4 — Present and record in the journal
 
@@ -181,7 +181,7 @@ and do NOT leave anything waiting on the user.
    «Вот архитектура и ключевые решения. Что поправить?»
 2. **Record each key decision in the journal.** For every key decision from the synthesizer, write a
    journal entry following `${CLAUDE_PLUGIN_ROOT}/references/diary-format.md` — one note per decision under
-   `$VAULT/Logos/Журнал/`, with `тип: решение`, the matching `область`, `статус: принято`,
+   `$VAULT/Проекты/Logos/Журнал/`, with `тип: решение`, the matching `область`, `статус: принято`,
    `вес: 5` (the assistant's importance estimate). Also record each major contested
    point from «Ключевые споры и как разрешены» as `тип: наблюдение` (or `тип: тупик` if the council
    rejected an option as unworkable) so the debate and how it was settled are not lost or re-litigated
@@ -209,7 +209,7 @@ Triggered by "давай добавим в дизайн", "а что если", 
    touches as input — the edit lands in the page that holds the section; for a concept-level change, edit
    `Концепт.md` inline. For a brand-new subsystem (or any element) that deserves its own deep
    document, do NOT write it inline — run **Phase 4 — Module detailing** so the council works it out,
-   producing `$VAULT/Logos/Дизайн/Модули/<Русское-имя>.md`.
+   producing `$VAULT/Проекты/Logos/Дизайн/Модули/<Русское-имя>.md`.
 3. **Record the change in the journal** per `${CLAUDE_PLUGIN_ROOT}/references/diary-format.md`: a `тип: решение` (or
    `тип: откат` if it reverses a prior decision) entry, `статус: принято`. No review gate; if the
    user later asks to change it, keep the entry consistent exactly as in Step 2.4.
@@ -221,7 +221,7 @@ Triggered when the user wants one system element worked out in depth: "дета�
 "проработай модуль X", "распиши элемент системы", "у архитектуры пробелы по <элементу>". The
 architecture is deliberately the broad system picture and leaves gaps inside each element; this phase
 closes those gaps for ONE element by running the SAME council, scoped to that element, and produces a
-single deep, build-ready document at `$VAULT/Logos/Дизайн/Модули/<Русское-имя>.md`. It is the same
+single deep, build-ready document at `$VAULT/Проекты/Logos/Дизайн/Модули/<Русское-имя>.md`. It is the same
 workflow as Phase 2 with `target: "module"`, following the «Детализация модуля» protocol in
 `${CLAUDE_PLUGIN_ROOT}/references/design-templates.md`. Run it once per element; the user can ask for
 several elements in turn.
@@ -246,7 +246,7 @@ for it.
 
 ### Step 4.3 — Run the council on the element (one workflow call)
 
-Create the scratch directory if missing (`mkdir -p "$VAULT/Logos/Дизайн/_черновики"`), then:
+Create the scratch directory if missing (`mkdir -p "$VAULT/Проекты/Logos/Дизайн/_черновики"`), then:
 ```
 Workflow({
   scriptPath: "${CLAUDE_PLUGIN_ROOT}/workflows/logos-council.js",
@@ -256,10 +256,10 @@ Workflow({
     roles: ["<только релевантные роли, без оркестрации>"],
     constraints: "<ограничения хозяина, дословно>",
     paths: {
-      source:   "<VAULT>/Logos/Дизайн/Архитектура.md",
-      scratch:  "<VAULT>/Logos/Дизайн/_черновики",
-      skeleton: "<VAULT>/Logos/Дизайн/_черновики/Черновик-модуля-<имя>.md",
-      final:    "<VAULT>/Logos/Дизайн/Модули/<имя>.md"
+      source:   "<VAULT>/Проекты/Logos/Дизайн/Архитектура.md",
+      scratch:  "<VAULT>/Проекты/Logos/Дизайн/_черновики",
+      skeleton: "<VAULT>/Проекты/Logos/Дизайн/_черновики/Черновик-модуля-<имя>.md",
+      final:    "<VAULT>/Проекты/Logos/Дизайн/Модули/<имя>.md"
     },
     refs: {
       roles:     "${CLAUDE_PLUGIN_ROOT}/references/council-roles.md",
@@ -292,7 +292,7 @@ asks to split a document, or when `logos-sync` reports one over the ceiling.
 
 Read the STRUCTURE, never the whole document into your context:
 ```bash
-DOC="$VAULT/Logos/Дизайн/Модули/<имя>.md"
+DOC="$VAULT/Проекты/Logos/Дизайн/Модули/<имя>.md"
 wc -l "$DOC"
 grep -n '^#\{2,3\} ' "$DOC"     # headings with line numbers = the section map
 ```

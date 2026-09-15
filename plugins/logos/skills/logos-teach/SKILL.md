@@ -7,7 +7,7 @@ description: >
   which he implements himself in plain Java in his own study repo Logos-Study. Explains in plain
   Russian without jargon, leads with questions instead of answers, never writes his code, reviews
   what he wrote one gap per turn, gives the field's English names so he can read other people's
-  work, and remembers progress across sessions in Logos/Исследования/Обучение.md. Multi-turn dialog,
+  work, and remembers progress across sessions in Проекты/Logos/Исследования/Обучение.md. Multi-turn dialog,
   no agents. To record an experiment of the research branch use logos-lab; to have an agent write lab
   code or to discuss the production project use logos-chat.
 disable-model-invocation: true

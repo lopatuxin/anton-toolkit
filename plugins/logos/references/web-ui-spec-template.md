@@ -1,7 +1,7 @@
 # Logos web interface — specification template
 
 Canonical structure for the Logos web-interface spec written by the `logos-ui` skill. The spec is the
-folder `$VAULT/Logos/Дизайн/Веб-интерфейс/` with Russian file names and Russian headings: the hub note
+folder `$VAULT/Проекты/Logos/Дизайн/Веб-интерфейс/` with Russian file names and Russian headings: the hub note
 `Веб-интерфейс/Веб-интерфейс.md` holds the shell and the cross-cutting sections (1–4, 6–12 below), every
 screen is its own page in the same folder (`Чат.md`, `Метрики.md`, `Память.md`, `Уведомления.md`,
 `Панель-управления.md` — section 5 in the hub is only the map of these pages), and section 11's body

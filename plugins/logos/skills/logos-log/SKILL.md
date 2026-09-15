@@ -1,12 +1,12 @@
 ---
 name: logos-log
 description: >
-  The Logos project decision journal in Logos/Журнал/: records a design decision, an experiment or a
+  The Logos project decision journal in Проекты/Logos/Журнал/: records a design decision, an experiment or a
   dead end as its own note with Dataview-indexed frontmatter, searches the journal by area / type /
   weight / status / date, and marks an experiment's outcome (worked / failed) adjusting its weight;
   written for the model, no user sign-off; single-shot, no agents. For a personal diary use dnevnik,
   for designing the architecture logos-design, for experiments of the research branch
-  (Logos/Исследования/, repo Logos-Lab) logos-lab — this skill only records, searches and updates
+  (Проекты/Logos/Исследования/, repo Logos-Lab) logos-lab — this skill only records, searches and updates
   entries.
 when_to_use: >
   "/logos-log", "запиши решение logos", "найди в журнале logos", "покажи тупики logos"
@@ -25,7 +25,7 @@ outcome.
 **Project context:** the journal records both DESIGN decisions and BUILD decisions. Where the Logos
 code lives, where the docs live, and how they stay in sync is described in
 `${CLAUDE_PLUGIN_ROOT}/references/logos-project.md` — read it so build-related entries use the right `область` and link to
-the right artifacts. An experiment of the RESEARCH BRANCH (`Logos/Исследования/`, repo `Logos-Lab` —
+the right artifacts. An experiment of the RESEARCH BRANCH (`Проекты/Logos/Исследования/`, repo `Logos-Lab` —
 see that reference's §10) is NOT a journal entry — route it to the `logos-lab` skill; the journal
 keeps only cross-cutting project decisions about the branch (e.g. a matured conclusion entering the
 main design).
@@ -55,19 +55,19 @@ If ambiguous, ask the user in Russian which they want, in one short question.
 3. Set initial frontmatter per `${CLAUDE_PLUGIN_ROOT}/references/diary-format.md` section 4: today's `дата`, the `тип` and
    `область`, `вес: 5` (default), `статус` (`принято` for a decision, `проверяется` for an
    experiment, `тупик`/`откат` for those).
-4. Write the entry as a NEW note at `$VAULT/Logos/Журнал/<YYYY-MM-DD>-<краткое-русское-имя>.md`
+4. Write the entry as a NEW note at `$VAULT/Проекты/Logos/Журнал/<YYYY-MM-DD>-<краткое-русское-имя>.md`
    using the body template in the reference. Capture faithfully — clean mechanics only, do not invent
    or embellish (it is the user's record).
-5. Confirm in Russian, one line: «Записал в журнал: `Logos/Журнал/<имя>.md` (тип: <тип>, область: <область>, вес: 5).»
+5. Confirm in Russian, one line: «Записал в журнал: `Проекты/Logos/Журнал/<имя>.md` (тип: <тип>, область: <область>, вес: 5).»
 
 ## 3. SEARCH mode
 
 The journal is built to be queried, not scrolled. Two complementary ways:
-1. **In-conversation search:** grep the frontmatter of files in `$VAULT/Logos/Журнал/` by the field
+1. **In-conversation search:** grep the frontmatter of files in `$VAULT/Проекты/Logos/Журнал/` by the field
    the user asked about — `область`, `тип`, `статус`, `вес` (numeric threshold), or `дата` (range) —
    and return the matching entries as a short Russian list (file link + one-line summary), sorted
    sensibly (by `вес` for importance queries, by `дата` otherwise).
-2. **Point to the live index:** remind the user that `Logos/Журнал/Журнал.md` has live Dataview
+2. **Point to the live index:** remind the user that `Проекты/Logos/Журнал/Журнал.md` has live Dataview
    tables (По важности / Тупики и провалы / Все записи) they can open in Obsidian for an
    always-current view. Do NOT hand-maintain that file — Dataview updates it automatically.
 

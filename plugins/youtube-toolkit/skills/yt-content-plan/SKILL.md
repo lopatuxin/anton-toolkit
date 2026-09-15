@@ -17,7 +17,7 @@ Build a calendar that schedules concrete videos against weeks. Balance flagship-
 
 Follow `${CLAUDE_PLUGIN_ROOT}/references/knowledge-base-context.md`. For `yt-content-plan` specifically, when `kb_available: true` read: the full `индекс.md` (every row — titles and `published` dates of all videos on the channel).
 
-Use the index to space topics on the new calendar: do NOT schedule a topic that was published in the last 8 weeks; reduce repetition with topics published in the last 6 months unless the new angle is clearly different. When dropping or warning about a duplicate, cite the existing slug, e.g. "пересекается с [[youtube/база/видео/курсор-выкинул-проект]] от 2026-03-10 — рекомендую сменить угол". If the KB is absent, plan without the duplicate-detection check.
+Use the index to space topics on the new calendar: do NOT schedule a topic that was published in the last 8 weeks; reduce repetition with topics published in the last 6 months unless the new angle is clearly different. When dropping or warning about a duplicate, cite the existing slug, e.g. "пересекается с [[Проекты/youtube/база/видео/курсор-выкинул-проект]] от 2026-03-10 — рекомендую сменить угол". If the KB is absent, plan without the duplicate-detection check.
 
 ## Procedure
 
@@ -46,7 +46,7 @@ Use the index to space topics on the new calendar: do NOT schedule a topic that 
 
 After producing the calendar in chat, persist it to the Obsidian vault following `${CLAUDE_PLUGIN_ROOT}/references/vault.md`.
 
-- Target folder: `C:\projects\obsidian\youtube\контент-план\`.
+- Target folder: `C:\projects\obsidian\Проекты\youtube\контент-план\`.
 - Filename: `YYYY-MM-DD-контент-план-<N>нед.md` where `<N>` is the period in weeks (e.g., `2026-05-12-контент-план-8нед.md`). Russian, Cyrillic, kebab-case. Use the current session date. If the file exists, append `-v2`, `-v3`…
 - Frontmatter:
 
@@ -62,7 +62,7 @@ After producing the calendar in chat, persist it to the Obsidian vault following
   tags:
     - youtube/content-plan
   related:
-    - "[[youtube/идеи/<ideas-file>]]"   # the idea batch the plan draws from
+    - "[[Проекты/youtube/идеи/<ideas-file>]]"   # the idea batch the plan draws from
   ---
   ```
 

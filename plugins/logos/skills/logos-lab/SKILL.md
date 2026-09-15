@@ -2,11 +2,11 @@
 name: logos-lab
 description: >
   The experiment diary of the Logos research branch (small self-learning models on cheap hardware)
-  in Logos/Исследования/: records a new experiment with the hypothesis written before the code,
+  in Проекты/Logos/Исследования/: records a new experiment with the hypothesis written before the code,
   appends its outcome (сработало / провал) adjusting the weight, searches experiments by area /
   status / weight / date, shows past failures and dead ends, and maintains the research direction
   notes; knows the rules of the lab repo Logos-Lab; single-shot, no agents. For decisions of the
-  production Logos project use logos-log (Logos/Журнал/), for talking about the project logos-chat,
+  production Logos project use logos-log (Проекты/Logos/Журнал/), for talking about the project logos-chat,
   for learning the science behind the branch logos-teach.
 disable-model-invocation: true
 ---
@@ -15,7 +15,7 @@ disable-model-invocation: true
 
 The research branch is a SEPARATE line of Logos development: away from big LLMs toward a swarm
 of small specialized self-learning models on cheap hardware. Its documentation lives in
-`Logos/Исследования/` in the vault; its code lives in the separate repo `Logos-Lab`. The
+`Проекты/Logos/Исследования/` in the vault; its code lives in the separate repo `Logos-Lab`. The
 storage format — folder layout, frontmatter fields, note templates, Dataview folder notes, and
 the lab repo rules — is defined in `${CLAUDE_PLUGIN_ROOT}/references/lab-format.md`: **read it and
 follow it verbatim**. The project-wide picture (where the branch sits relative to the production
@@ -23,7 +23,7 @@ system) is in `${CLAUDE_PLUGIN_ROOT}/references/logos-project.md`.
 
 This skill is the user-facing interface over that format: record an experiment, append its
 outcome, search the diary, maintain direction notes. It writes ONLY inside
-`Logos/Исследования/` (and reads `Logos-Lab`); it never touches the production code repo, the
+`Проекты/Logos/Исследования/` (and reads `Logos-Lab`); it never touches the production code repo, the
 design docs, or the journal — a cross-cutting project decision still goes through `logos-log`.
 The diary in the vault is the single place of record for an experiment: Claude Code auto-memory
 keeps at most a one-line pointer per experiment (name, status), never a second copy of the write-up.
@@ -56,7 +56,7 @@ If ambiguous, ask the user in Russian which they want, in one short question.
 2. Classify (ask briefly only if you cannot infer): `область` (модели / память / железо /
    алгоритмы / общее) and the target direction note (must exist in `Направления/` — offer to
    create it via DIRECTION mode if it does not).
-3. Write a NEW note at `$VAULT/Logos/Исследования/Эксперименты/<YYYY-MM-DD>-<слаг>.md` using
+3. Write a NEW note at `$VAULT/Проекты/Logos/Исследования/Эксперименты/<YYYY-MM-DD>-<слаг>.md` using
    the template in `${CLAUDE_PLUGIN_ROOT}/references/lab-format.md` section 4: today's `дата`, `тип: эксперимент`,
    `вес: 5`, `статус: проверяется`, the `направление` wiki-link, and `код:
    "Logos-Lab/<слаг>"` (the folder may not exist yet — the field states where the code will
@@ -86,7 +86,7 @@ If ambiguous, ask the user in Russian which they want, in one short question.
 
 The diary is built to be queried, not scrolled:
 1. **In-conversation search:** grep the frontmatter of files in
-   `$VAULT/Logos/Исследования/Эксперименты/` by the field asked about — `область`, `статус`,
+   `$VAULT/Проекты/Logos/Исследования/Эксперименты/` by the field asked about — `область`, `статус`,
    `тип`, `вес` (threshold), `дата` (range), `направление` — and return matches as a short
    Russian list (file link + one-line summary), sorted by `дата` (or `вес` for importance
    queries). «покажи провалы» → `статус: провал` plus `тип: тупик`.
@@ -117,5 +117,5 @@ The diary is built to be queried, not scrolled:
 - **No manual git for the vault** (obsidian-git auto-syncs). The `Logos-Lab` repo IS committed
   manually — Russian messages, never force-push, no data/weights/secrets in git
   (`${CLAUDE_PLUGIN_ROOT}/references/lab-format.md` section 6).
-- **Stay in the branch.** This skill writes only under `Logos/Исследования/`; production
+- **Stay in the branch.** This skill writes only under `Проекты/Logos/Исследования/`; production
   decisions go to `logos-log`, production code to `logos-build`.

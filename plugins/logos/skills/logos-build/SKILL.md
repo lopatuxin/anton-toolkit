@@ -1,7 +1,7 @@
 ---
 name: logos-build
 description: >
-  Builds the Logos system from its design documentation: takes a delivery phase from Logos/Дизайн/Фазы/
+  Builds the Logos system from its design documentation: takes a delivery phase from Проекты/Logos/Дизайн/Фазы/
   as the spec and drives it through the dedicated Logos agents (never the generic anton-toolkit dev
   agents) — separate backend and web-frontend coders, then review, tests, devops (local deploy), QA and
   a code-vs-docs sync — then updates the phase status and journals the work. The only Logos skill that

@@ -1,9 +1,9 @@
 # Logos phase document template
 
 Canonical structure for a single Logos delivery phase. The `logos-phases` skill writes one file per
-phase following this template. Phases live under `$VAULT/Logos/Дизайн/Фазы/` with Russian file names
+phase following this template. Phases live under `$VAULT/Проекты/Logos/Дизайн/Фазы/` with Russian file names
 and Russian headings. There is deliberately NO roadmap/overview document — the development journal
-(`Logos/Журнал/`) is the overview.
+(`Проекты/Logos/Журнал/`) is the overview.
 
 All phase documents are **Russian** in headings and prose. Technical terms (LLM, MVP, API, VRAM, RAG,
 GPU, OpenRouter, gRPC, etc.) keep their original form. No runnable code in any document — prose,
@@ -21,7 +21,7 @@ Cross-reference sibling documents with Obsidian wiki-links: `[[Концепт]]`
 
 ## File name
 
-`$VAULT/Logos/Дизайн/Фазы/Фаза-NN-<краткое-русское-имя>.md`
+`$VAULT/Проекты/Logos/Дизайн/Фазы/Фаза-NN-<краткое-русское-имя>.md`
 
 - `NN` — two-digit zero-padded number. The MVP-zero is `Фаза-00`; later phases increment
   (`Фаза-01`, `Фаза-02`, …). Zero-padding keeps the folder chronologically sorted.

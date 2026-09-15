@@ -28,17 +28,17 @@ Resolve `$VAULT` with the vault search in `${CLAUDE_PLUGIN_ROOT}/references/logo
 section «2. Paths: locating the vault and the code repo» — that section is the single copy of the
 procedure (including what to tell the user when the vault is not found); never duplicate it here.
 
-The Logos root is `$VAULT/Logos`. The journal lives in `$VAULT/Logos/Журнал`.
+The Logos root is `$VAULT/Проекты/Logos`. The journal lives in `$VAULT/Проекты/Logos/Журнал`.
 
 ## 2. First-run setup (idempotent — run these checks EVERY time)
 
 Create only what is missing; never overwrite an existing file.
 
 ```bash
-mkdir -p "$VAULT/Logos/Журнал"
+mkdir -p "$VAULT/Проекты/Logos/Журнал"
 ```
 
-Ensure the **folder note** `$VAULT/Logos/Журнал/Журнал.md` exists and is non-empty. This
+Ensure the **folder note** `$VAULT/Проекты/Logos/Журнал/Журнал.md` exists and is non-empty. This
 vault uses the `folder-notes` plugin (opening the folder opens this note) and the
 `Dataview` plugin (live queries), so the folder note IS the searchable index — it is never
 maintained by hand. If the file is missing OR empty, create it with the Write tool with
@@ -60,7 +60,7 @@ tags:
 
 ```dataview
 TABLE WITHOUT ID file.link AS "Запись", область AS "Область", вес AS "Вес", статус AS "Статус"
-FROM "Logos/Журнал"
+FROM "Проекты/Logos/Журнал"
 WHERE вес >= 7 AND file.name != this.file.name
 SORT вес DESC
 ```
@@ -69,7 +69,7 @@ SORT вес DESC
 
 ```dataview
 TABLE WITHOUT ID file.link AS "Запись", область AS "Область", дата AS "Дата"
-FROM "Logos/Журнал"
+FROM "Проекты/Logos/Журнал"
 WHERE (тип = "тупик" OR статус = "провал") AND file.name != this.file.name
 SORT дата DESC
 ```
@@ -78,7 +78,7 @@ SORT дата DESC
 
 ```dataview
 TABLE WITHOUT ID file.link AS "Запись", область AS "Область", тип AS "Тип", вес AS "Вес", статус AS "Статус", дата AS "Дата"
-FROM "Logos/Журнал"
+FROM "Проекты/Logos/Журнал"
 WHERE file.name != this.file.name
 SORT дата DESC
 ```
