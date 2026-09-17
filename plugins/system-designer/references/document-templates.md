@@ -1,201 +1,229 @@
-# Document Templates
+# Notes of a development project
 
-Canonical section structure for each document type under the documentation root (`<DOCROOT>` — either `Документация/` or `docs/`, resolved by the orchestrator). All agents and the orchestrator skill follow these templates so documents stay consistent across projects and iterations.
+The documentation of Кузня Миров (`C:\projects\obsidian\Проекты\Кузня Миров\`) is the model every project follows. Before writing a note, read the one model note of the same kind:
 
-**Language rule:** all documents are written in Russian — headings, content, examples. Folder and file names are also Russian (`Концепт.md`, `Архитектура.md`, `Модули/`, `Дорожные карты/`, `Фазы/`). The project and communication are in Russian, and the documentation should match. Technical terms (REST, API, JWT, SLA, etc.) are not translated — leave them in their original form.
+| Writing | Model note |
+|---|---|
+| architecture hub | `Архитектура Кузни/Архитектура Кузни.md` |
+| area or module note about data and behaviour | `Архитектура Кузни/Экраны и состояние.md` |
+| area note about layers and contracts between them | `Архитектура Кузни/Стек и инфраструктура.md` |
+| concept | `Концепт Кузни.md` |
+| journal entry | `Журнал Кузни/2026-09-16-формат-игры-json-по-объекту-без-скриптов-и-наследования.md` |
 
-**Writing style — describe the finished system, not the design process.** The reader has no idea this document was produced by a consortium, by debate, or through iterations — they read it cold to understand how the system works. Every sentence must describe WHAT the system is and HOW it behaves, never HOW the team arrived at it.
-- Cut design-process traces. Forbidden: "выбрано потому что…", "вариант X отклонён…", "отвергнутая альтернатива…", "мы решили…", "ради единообразия…", "новая таблица" / "общая таблица" (new/common relative to a past version the reader never saw). State the decision as a fact, optionally with a one-line *why it works* (not *why we picked it over Y*). Incorrect: `Первичный ключ — составной (выбрано потому, что surrogate id отклонён как лишняя колонка).` Correct: `Первичный ключ — составной (token_id, organization_id): пара уникальна и неизменяема.`
-- No duplicate summaries. State each fact in exactly ONE home section; elsewhere reference it ("см. поток N", "см. «Зависимости»") instead of restating. Do NOT add a "сводка правил/решений" block that repeats what tables or flows already say.
-- Plain language over jargon — hard rule, not a preference. A non-specialist reader must understand every sentence on the first read. This is the most common failure mode of this skill: documents come out unreadable because they are stuffed with implementation jargon, code identifiers, and parenthetical justifications. Three concrete bans:
-  - **No unexplained jargon or acronyms.** Any term of art (`fail-closed`, `fail-soft`, `anti-enumeration`, `opaque session`, `idle/absolute timeout`, `SLO`, `p99`, `CSRF`, `HttpOnly`, `SameSite`, `HSTS`, `STI`, `CHECK-инвариант`, `backoff`, `session fixation`, `round-trip`, `latency budget`) must either be replaced with a plain phrase or glossed in one plain clause on first use, then used sparingly. Default to the plain phrase. Incorrect: `Сессия — opaque, fail-closed; при недоступности Redis вход деградирует.` Correct: `После входа состояние сессии лежит на сервере; если хранилище сессий недоступно, вход не работает — это намеренно, безопаснее отказать.`
-  - **No raw code identifiers, key names, or wire-level API names in prose.** Names like `T_floor`, `PRINCIPAL_NAME_INDEX_NAME`, `HINCRBY`, `PEXPIRE`, `maxmemory-policy noeviction`, `auth:otp:{login_session_id}`, `NotificationPort.sendOtp`, `login_session`, Lua-script, `spring:session:sessions:{id}` belong in a developer-level module document at most, never in architecture prose. Describe the behavior ("Redis сам удаляет запись через 10 минут"), not the command that does it (`PEXPIRE`). If a concrete value matters, name it in words ("ответ отдаётся примерно через 300 мс"), not via a symbol (`T_floor = 300 мс`).
-  - **No parenthetical design-justification clutter.** Drop trailing parentheticals that re-argue a decision or point elsewhere: `(закрыто HA-топологией — см. ниже)`, `(экономия round-trip на горячем пути)`, `(в отличие от fail-closed для Redis)`, `(YAGNI)`, `(anti-fixation)`. If the point matters, it has its own home section; the inline aside is noise. State the fact and stop.
-- Lead with meaning, mechanism second. A flow/step opens with what happens in user/system terms; DB mechanics (atomic conditional UPDATE, affected-row counts, column names) come after as a clause, not as the headline.
+## Readers
 
-**Cross-references:** link to sibling documents with Obsidian wiki-links — `[[Концепт]]`, `[[Архитектура]]`, `[[Модули/Аутентификация]]` — so the documents navigate like an Obsidian vault. Do NOT use relative markdown paths (`../Архитектура.md`).
+The owner — a backend developer who does not know every domain — and later Claude sessions that plan phases from these notes. Both want to see how the system is built in a few minutes. Neither reads the implementation here: that is the phase note and the code.
 
-No runnable code. Pseudo-API shapes and pseudo-types are welcome.
+## What goes where
 
-## Концепт — Концепт.md
+| Content | Home |
+|---|---|
+| what the system must do, for whom, what it does not do | concept |
+| the blocks of the system and how they work together | architecture hub |
+| how one area works: its data (files, fields, keys), commands and calls between blocks, rules of behaviour, what is checked before start, boundaries, open questions | area or module note |
+| why it is built this way, what was rejected | journal entry, linked from the note's link line |
+| what is built, statuses, progress | phase notes and journal |
+| implementation: exact message texts, order of calls inside one function, memory and latency calculations, per-field algorithms, library calls, advice to the system's users | phase note (feature-planner) or code |
+| rules for keeping the documentation | the vault's CLAUDE.md, never a note |
+
+Real case: the old Кузня sound notes carried the weight of a click sound in memory, a defending paragraph for each of seven steps of one engine call, and the text of every warning. A reviewer then found an arithmetic mistake in that weight — a mistake in content that did not belong in the architecture at all. The current note keeps the seven steps as seven one-line bullets and drops the rest.
+
+## Form
+
+- A set of things with the same attributes — fields, commands, calls, layers, files — is a table.
+- How blocks or states interact is a mermaid diagram (`flowchart`, `sequenceDiagram`, `stateDiagram-v2`) of about a dozen nodes at most.
+- Rules and behaviour are bullets: one fact per bullet, one or two lines.
+- Prose appears only as a lead of one to four sentences: per block in the hub, under a heading in a note.
+- Every note starts with frontmatter holding only `tags` (copy them from a sibling note), then `# <имя>`, then a link line to the hub and neighbours that ends with `почему так — [[<запись журнала>]]` when one exists.
+- `Открытые вопросы` is a short bullet list at the end of a note, one line per question. Questions the owner can answer now are asked in the chat instead.
+- Wiki-links by note name only.
+- None of these in the concept, the hub, area or module notes: status fields or progress markers («проработана», «в коде ещё нет»), history («раньше», «теперь», «новая таблица»), sections about how to keep the documents, hard line breaks inside a paragraph (Obsidian shows them as broken lines).
+
+## Size
+
+| Note | Limit |
+|---|---|
+| concept | ~40 lines |
+| architecture hub | ~130 lines |
+| area or module note | ~100 lines, 8 KB |
+| journal entry | ~60 lines |
+| phase outline | ~20 lines |
+
+A note over its limit is cut: the why moves to the journal, the implementation to the phase, repetition is deleted. A note becomes a folder only when it holds two unrelated subjects — never to fit a limit. The whole Кузня architecture is seven notes, 47 KB.
+
+## Words
+
+- Short sentences in plain Russian.
+- Names that are part of a contract — files, fields, keys, commands, calls between blocks, folders — are written as they are, in backticks: `screens.json`, `world_runs`, `["toggle_sound"]`. Internals of the implementation — private fields, database commands, internal key layouts, library functions — do not appear.
+- Do not coin a nickname for a mechanism and build sentences on it. The old Кузня notes said «круг» 51 times and leaned on «сверка», «должное и исполненное», «хозяин проигрывателя»; the owner could not understand them. Say what happens instead. Incorrect: «Сверка сравнивает должное с исполненным.» Correct: «Страница сравнивает трек, который должен играть, с тем, что играет, и переключает.» A new term is allowed only when it names a real thing of the system; define it once where it first appears, in a table row or one sentence.
+- An outside technical term (`WebGPU`, `JSON`) stays as is; one the owner may not know gets a few plain words on first use.
+- No defence of the design inside a note: «и это не экономия слов», «путать это нельзя», «это обязательно». The reasons belong in the journal.
+
+## Templates
+
+Concept — `Концепт <Имя>.md`:
 
 ```markdown
-# Концепт — <название продукта>
+---
+tags:
+  - <тег проекта>
+  - концепт
+---
+
+# Концепт <Имя>
+
+[[<карточка>]] · [[Архитектура <Имя>]] · [[Журнал <Имя>]]
 
 ## Что это
-Один абзац. Простым языком. После этого раздела не-технический читатель должен понимать, что за продукт.
 
-## Для кого
-Типы пользователей. Для каждого — одно предложение: кто это и что ему нужно.
+<одно-два предложения>
 
-## Зачем это нужно (проблема и ценность)
-Какую боль решаем. Чего не хватает сегодня. Почему именно такая форма решения подходит.
+- **<аспект>:** <одна строка>
 
-## Ключевые сценарии
-Нумерованный список 2–5 самых частых сценариев использования. По одному абзацу на каждый, от лица пользователя.
+## Требования
 
-## Ограничения
-Жёсткие рамки: платформы, регуляторика, масштаб, бюджет, сроки. Маркированный список.
-
-## Что сознательно вне scope
-Явные не-цели. Что продукт намеренно НЕ делает. Маркированный список.
+1. **<требование>.** <одно-два предложения; ограничения и то, чего в системе нет, — тоже требования>
 ```
 
-## Архитектура — Архитектура.md
+Architecture hub — `Архитектура <Имя>/Архитектура <Имя>.md`:
+
+````markdown
+---
+tags:
+  - <тег проекта>
+  - архитектура
+---
+
+# Архитектура <Имя>
+
+[[<карточка>]] · [[Концепт <Имя>]] · [[Фазы <Имя>]] · [[Журнал <Имя>]]
+
+<одно предложение: что описано здесь и где подробности>
+
+## Блоки системы
+
+```mermaid
+flowchart LR
+  ...
+```
+
+**<Блок>.** <2–4 предложения: что делает, с кем говорит, чего не знает.> → [[<заметка области>]]
+
+## <Главный поток: запуск, запрос, кадр>
+
+```mermaid
+sequenceDiagram
+  ...
+```
+
+<одно-два предложения о том, что важно в этом потоке>
+
+## Границы между блоками
+
+- <кто о ком не знает, что меняется при переносе на другую платформу>
+
+## Заметки папки
+
+```dataview
+LIST
+FROM "Проекты/<Имя>/Архитектура <Имя>"
+WHERE file.name != this.file.name
+SORT file.name ASC
+```
+````
+
+Area or module note:
 
 ```markdown
-# Архитектура — <название продукта>
+---
+tags:
+  - <тег проекта>
+  - архитектура
+---
 
-## Обзор
-3–5 предложений технического саммари.
+# <Область>
 
-## Ключевые архитектурные решения
-Маркированный список. Каждый пункт: решение + однострочное обоснование.
+[[Архитектура <Имя>]] · [[<соседняя заметка>]] · почему так — [[<запись журнала>]]
 
-## Компоненты
-Для каждого компонента: **Название** — ответственность (1 предложение), какие данные владеет, какие интерфейсы предоставляет, зависимости. Имена компонентов — на русском; они становятся именами файлов модулей в `Модули/`.
+## <Предмет>
 
-## Потоки данных
-2–4 самых важных end-to-end потока, описанных прозой.
+<лид в одно-два предложения>
 
-## Модель данных (верхний уровень)
-Основные сущности и связи между ними. Только форма, не полные схемы.
+| Поле | Обязательно | Что это |
+|---|---|---|
 
-## Стек
-Технологические выборы по слоям, каждый с однострочным обоснованием.
+- <правило поведения>
 
-## Сквозная функциональность
-Аутентификация, логирование, обработка ошибок, конфигурация, observability. По одному короткому разделу на каждое.
+## Проверка перед запуском
 
-## Топология деплоя
-Где запускается каждый компонент. Как они упаковываются и соединяются в проде.
+Ошибки — <что происходит>: <перечень случаев одной строкой каждый>.
+
+## Границы
+
+- <чего в области нет>
 
 ## Открытые вопросы
-Нерешённые моменты, по которым нужно мнение пользователя.
+
+- <вопрос одной строкой>
 ```
 
-## Модуль — Модули/<имя>.md
+Sections are named by the subject of the area; `Проверка перед запуском` appears only where data is checked, `Границы` and `Открытые вопросы` only when they have content.
+
+Journal entry — `Журнал <Имя>/ГГГГ-ММ-ДД-<короткое-имя>.md`, one per design change:
 
 ```markdown
-# Модуль — <название>
+---
+дата: ГГГГ-ММ-ДД
+тип: решение
+область: <часть системы>
+вес: <1–10>
+статус: принято
+tags:
+  - <тег проекта>
+  - журнал
+---
 
-## Назначение
-2–3 предложения. Зачем этот модуль существует.
+# <Решение одной строкой>
 
-## Ответственности
-Маркированный список того, чем владеет этот модуль.
+[[Журнал <Имя>]] · [[<заметка области>]]
 
-### Не-ответственности
-Маркированный список того, что модуль явно НЕ делает.
+## Решение
 
-## Публичный интерфейс
-API, который модуль предоставляет остальной системе. По одной строке на эндпоинт/функцию.
+<одно решение — одна-две строки>
 
-## Модель данных
-Таблицы/коллекции/типы, которыми владеет модуль. Поля с типами, ключевые связи.
+## Почему
 
-## Ключевые потоки
-2–4 сценария, расписанных пошагово прозой.
+<по абзацу в два-три предложения на решение>
 
-## Зависимости
-Другие модули / внешние сервисы, к которым обращается этот модуль. Что нужно от каждого.
+## Отвергнуто
 
-## Обработка ошибок
-Что может пойти не так и как модуль на это реагирует.
-
-## Стек и библиотеки
-Конкретные выборы для этого модуля, по однострочному обоснованию.
-
-## Конфигурация
-Переменные окружения, секреты, настройки. Имя, назначение, значение по умолчанию.
-
-## Открытые вопросы
-Нерешённые моменты.
+<по строке на отвергнутый вариант>
 ```
 
-## Дорожная карта — Дорожные карты/<срез>/Дорожная карта.md
-
-**Folder layout:** each roadmap lives in its own subfolder `<DOCROOT>/Дорожные карты/<срез>/Дорожная карта.md`, together with its phase documents in `<DOCROOT>/Дорожные карты/<срез>/Фазы/`. Roadmaps NEVER go directly into `<DOCROOT>/` (no `<DOCROOT>/Дорожная карта.md` at the root). The "срез" is a human-readable Russian slice name (e.g. `Аутентификация`, `Публичная часть`, `MVP`). For a project with a single overall roadmap, default to `Основная`.
+Phase outline — `Фазы <Имя>/Фаза-NN-<короткое-имя-строчными-через-дефис>.md`:
 
 ```markdown
-# Roadmap — <название продукта или среза>
+---
+фаза: <N>
+статус: планируется
+tags:
+  - <тег проекта>
+  - фаза
+---
 
-## Обзор
-1–2 предложения: как система (или её срез) разбита на фазы и логика разбиения (от какого минимального осязаемого функционала к полному). Если roadmap покрывает не весь продукт, а конкретный срез (модуль, фичу) — назови этот срез прямо здесь.
-
-## Фаза 1 — <короткое название>
-**Что пользователь сможет потрогать:** 1–2 предложения о минимальном законченном функционале этой фазы.
-**Затронутые модули:** [[Модули/<module-a>]], [[Модули/<module-b>]] (имена строго из Архитектура.md).
-**Зависит от:** — (для первой фазы прочерк).
-
-## Фаза 2 — <короткое название>
-**Что пользователь сможет потрогать:** ...
-**Затронутые модули:** ...
-**Зависит от:** Фаза 1.
-
-<!-- и так далее, каждая следующая фаза опирается на одну или несколько предыдущих -->
-```
-
-Правила для roadmap:
-- Каждая фаза — минимальный законченный функционал, который можно запустить и проверить руками.
-- Каждая следующая фаза опирается на предыдущие, не висит в воздухе.
-- В Дорожная карта.md только короткие описания. Детальная разбивка фазы — отдельный документ, создаётся другим инструментом.
-- Имена модулей в `Затронутые модули` — строго из `Архитектура.md`, без выдумок (ссылайся wiki-ссылкой `[[Модули/<имя>]]`).
-- Фаза может затрагивать кусок модуля (срез), не обязательно весь модуль целиком.
-
-## Фаза — Дорожные карты/<срез>/Фазы/Фаза-NN-<имя>.md
-
-**Folder layout:** phase documents live next to their roadmap, in `<DOCROOT>/Дорожные карты/<срез>/Фазы/`, NEVER in a top-level `<DOCROOT>/Фазы/` folder. Each roadmap owns its own `Фазы/` subdirectory so that phases of different scopes (Аутентификация vs Публичная часть vs Платежи) do not mix.
-
-Детальный документ одной фазы. Читает его `python-dev` агент и должен без вопросов реализовать — значит документ должен быть достаточно конкретным: интерфейсы, модели данных, сценарии, границы scope.
-
-```markdown
 # Фаза NN — <название>
 
+[[Фазы <Имя>]] · [[Архитектура <Имя>]]
+
 ## Цель
-1–2 предложения. Что пользователь получает после этой фазы — тот же смысл, что в Дорожная карта.md, можно расширить.
 
-## Что входит в scope
-Маркированный список конкретных возможностей / эндпоинтов / экранов / команд, которые должны работать после фазы. Формулировки пользовательские и проверяемые, не «добавить сервис X».
+<что хозяин сможет потрогать руками после фазы — одно-два предложения>
 
-## Что НЕ входит
-Маркированный список явных границ. Смежные фичи, которые могут показаться частью фазы, но отложены на следующие. Это критично — без этого scope расползается.
+## Что входит
 
-## Затронутые модули (срезы)
-Для каждого модуля из roadmap — отдельный подраздел:
+- <возможность> → [[<заметка области>]]
 
-### <module-name>
-- **Публичный интерфейс этой фазы** — какие конкретно эндпоинты / функции / команды модуль должен выставить в этой фазе. По одной строке на каждый, в форме `METHOD /path → ResponseShape` или `func_name(args) → ReturnShape`.
-- **Модель данных этой фазы** — какие таблицы / коллекции / типы создаются или меняются. Поля с типами и ключевыми ограничениями.
-- **Внутренняя логика** — ключевые шаги обработки прозой. Без кода, но достаточно детально, чтобы не было неоднозначности (валидация, вызовы других модулей, обработка ошибок, побочные эффекты).
-- **Не делаем в этой фазе** — что из полной спеки модуля откладываем.
+## Опирается на
 
-## End-to-end сценарии приёмки
-Нумерованный список 2–5 сценариев, которые проверяются руками после фазы. Каждый сценарий — пошагово от лица пользователя или тестировщика, с ожидаемым результатом на каждом шаге.
-
-## Зависимости
-- **Опирается на:** `Фаза X` — что именно из предыдущих фаз используется.
-- **Разблокирует:** `Фаза Y, Z` — почему следующие фазы без этой невозможны.
-- **Внешние зависимости:** библиотеки, сервисы, API, переменные окружения, которые должны быть доступны. Указать, если что-то новое появляется именно в этой фазе.
-
-## Конфигурация
-Переменные окружения / секреты / фичефлаги, добавляемые в этой фазе. Имя, назначение, пример значения.
-
-## Открытые вопросы
-Всё, что нужно решить до старта реализации. Если список пуст — пиши «нет».
+<Фаза NN или «—»>
 ```
-
-Правила для phase docs:
-- **Целевой читатель — python-dev агент.** Детализация должна быть такой, что агент не задаёт уточняющих вопросов. Если что-то неясно — это `Открытые вопросы`.
-- Имена модулей в подразделах строго совпадают с `Архитектура.md`.
-- Scope в phase-документе — подмножество scope той же фазы в `Дорожная карта.md`. Никаких «забежать в следующую фазу по пути».
-- Никакого runnable кода. Pseudo-API (`POST /auth/login → {token, expiresAt}`) и pseudo-типы (`User { id: uuid, email: str, createdAt: datetime }`) — можно и нужно.
-- Имя файла — `Фаза-NN-<имя>.md`, где `NN` с ведущим нулём (`Фаза-01-Регистрация.md`), `<имя>` — русское название фазы. Полный путь — `<DOCROOT>/Дорожные карты/<срез>/Фазы/Фаза-NN-<имя>.md`.
-
-## Consistency rules across documents
-
-- **Concept** speaks user language. **Architecture** speaks system language. **Modules** speak implementation language (without code).
-- A capability mentioned in Концепт.md must be traceable into Архитектура.md (some component owns it) and into at least one module.
-- Архитектура.md's component list is the source of truth for which modules exist. `<DOCROOT>/Модули/` must match it — no orphan module docs, no missing ones. The module file name equals the Russian component name from Архитектура.md.
-- Cross-document references use Obsidian wiki-links (`[[Архитектура]]`, `[[Модули/<имя>]]`), not relative paths. A wiki-link must resolve to an existing document.
-- When a change affects multiple levels, edit top-down: concept → architecture → modules. This keeps the narrative consistent.

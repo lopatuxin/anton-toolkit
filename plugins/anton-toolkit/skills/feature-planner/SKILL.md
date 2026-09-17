@@ -101,7 +101,7 @@ Chat context gets compacted; the plan file survives and is what the dev agent re
 
 **The project's CLAUDE.md names a folder for feature plans or phases** — personal projects keep them in the Obsidian vault, e.g. `C:\projects\obsidian\Проекты\Кузня Миров\Фазы Кузни\`. Write the plan there as a phase note. First read the note template the CLAUDE.md points to (`C:\projects\obsidian\Проекты\Шаблон проекта.md`) and one existing phase note in that folder, and follow them:
 
-- File `Фаза-NN-<короткое-имя>.md`: the next free two-digit number in the folder, a lowercase hyphenated Russian name (`Фаза-04-сохранение-партии.md`).
+- File `Фаза-NN-<короткое-имя>.md`: the next free two-digit number in the folder, a lowercase hyphenated Russian name (`Фаза-04-сохранение-партии.md`). When the folder already holds an outline note for this feature (`статус: планируется`, a short note system-designer wrote when splitting the design into phases), write the plan into that note instead, keeping its number and name.
 - Frontmatter `фаза: <N>`, `статус: планируется`, and `tags` with the project tag the sibling notes use plus `фаза`.
 - Heading `# Фаза NN — <название>`, then the recap body with every heading in Russian: `Цель`, `Что входит и что не входит`, `Функциональные требования`, `Крайние случаи и ошибки`, `Технические детали`, `Нефункциональные требования`, `План реализации`, `Критерии готовности (тесты)`.
 - Vault notes are linked as wiki-links by note name (`[[Звук]]`), not by absolute path. No `# Plan:` header block.
