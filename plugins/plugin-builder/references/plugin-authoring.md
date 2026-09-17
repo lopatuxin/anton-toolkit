@@ -152,7 +152,7 @@ Exact file formats: https://code.claude.com/docs/en/plugins-reference, plus `/do
 
 - `workflows/<name>.js` starts with `export const meta = { name, description, phases }` and uses `agent()`, `pipeline()`, `parallel()`. Intermediate results stay in the script, not in the session context.
 - Use `pipeline()` by default; a barrier (`parallel()` followed by another stage) only when a stage needs all prior results (dedup, judge panel, synthesis).
-- The entry skill gathers inputs, runs the workflow, and does the post-steps (commit, status, journal). A workflow started by a skill the user invoked counts as the user's opt-in to multi-agent orchestration.
+- The entry skill gathers inputs, runs the workflow, and does the post-steps (commit, status). A workflow started by a skill the user invoked counts as the user's opt-in to multi-agent orchestration.
 - A skill launches its plugin's workflow by path — `Workflow({scriptPath: "${CLAUDE_PLUGIN_ROOT}/workflows/<name>.js", args: {…}})` — and passes every path it resolved inside `args`; the script itself has no filesystem access, so anything it must route on (questions, findings, drift) comes back from the agents through a `schema`. The run is backgrounded: the skill waits for the completion notification instead of polling.
 
 ## Descriptions — good vs bad
@@ -166,6 +166,10 @@ Exact file formats: https://code.claude.com/docs/en/plugins-reference, plus `/do
 - A dozen trigger phrases plus `or any request to …` — fires on ordinary conversation.
 - `<example>` blocks with WRONG/CORRECT reasoning — cost context in every session, no longer improve triggering.
 - Discriminators placed after the first ~1,000 characters — cut off, never read.
+
+## Vault records belong to close-session
+
+Project journal entries (the `Журнал…` folders in the vault) and project cards (`kind: project`: `next`, `updated`) are written only by `anton-toolkit:close-session`, which the owner runs at the end of a session. A new or extended skill, agent, hook or workflow never writes them: the reasons stay in the conversation, and close-session records them. Several writers is how the journals grew into 20 KB entries retelling the architecture.
 
 ## Pre-flight validation checklist
 

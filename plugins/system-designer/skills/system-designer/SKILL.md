@@ -3,8 +3,7 @@ name: system-designer
 description: >
   Designs a personal development project as short reference documentation in the Obsidian vault
   (`C:\projects\obsidian\Проекты\<Имя>\`, laid out by `Шаблон проекта`): concept, architecture hub
-  with block diagrams, one note per area or module, decision entries in the project journal, and
-  phase outlines. Use when the owner wants to design a new system, add or change a part of an
+  with block diagrams, one note per area or module, and phase outlines. Use when the owner wants to design a new system, add or change a part of an
   existing design, or split the design into phases. Detailing one phase into an implementation plan
   is feature-planner; Logos has its own logos-design. Documentation only, no code. Runs in the main
   conversation; the interview is not delegated to agents.
@@ -44,7 +43,6 @@ For «давай добавим звук», «поменяем X на Y»:
 1. Interview until the change is concrete.
 2. Decide which notes change: the area note; the hub when a block or a link between blocks changes (its block description and diagram); the concept when a requirement changes. A subject that fits no existing area gets its own note, linked from the hub's block description — never a paragraph inside an unrelated note.
 3. Edit in place so each note reads as the current design: replace table rows, bullets and diagram nodes rather than appending explanations. A neighbour note that the change makes stale is fixed in the same pass, and a closed list in it (fields, commands, keys) is extended with the new entries.
-4. Write one journal entry for the decisions of this change: what was decided, why, what was rejected.
 
 ## Phases
 
@@ -59,7 +57,7 @@ Apply the findings you agree with yourself, without another review round. Findin
 ## Finish
 
 - Tell the owner in Russian, briefly: which notes were created or changed, the main decisions in plain words, and what he still has to decide. Do not paste note contents into the chat.
-- Update the project card's `next` and `updated`.
+- Do not write journal entries or touch the project card: the reasons and rejected options stay in this conversation, and `/close-session` records them and moves the card when the owner ends the session.
 - Do not commit: obsidian-git commits the vault on its own.
 
 ## Not this skill

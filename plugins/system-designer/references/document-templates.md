@@ -8,7 +8,6 @@ The documentation of Кузня Миров (`C:\projects\obsidian\Проекты
 | area or module note about data and behaviour | `Архитектура Кузни/Экраны и состояние.md` |
 | area note about layers and contracts between them | `Архитектура Кузни/Стек и инфраструктура.md` |
 | concept | `Концепт Кузни.md` |
-| journal entry | `Журнал Кузни/2026-09-16-формат-игры-json-по-объекту-без-скриптов-и-наследования.md` |
 
 ## Readers
 
@@ -21,8 +20,8 @@ The owner — a backend developer who does not know every domain — and later C
 | what the system must do, for whom, what it does not do | concept |
 | the blocks of the system and how they work together | architecture hub |
 | how one area works: its data (files, fields, keys), commands and calls between blocks, rules of behaviour, what is checked before start, boundaries, open questions | area or module note |
-| why it is built this way, what was rejected | journal entry, linked from the note's link line |
-| what is built, statuses, progress | phase notes and journal |
+| why it is built this way, what was rejected | the journal, written by `/close-session` at the end of the session — never a note |
+| what is built, statuses, progress | phase notes and the project card |
 | implementation: exact message texts, order of calls inside one function, memory and latency calculations, per-field algorithms, library calls, advice to the system's users | phase note (feature-planner) or code |
 | rules for keeping the documentation | the vault's CLAUDE.md, never a note |
 
@@ -34,7 +33,7 @@ Real case: the old Кузня sound notes carried the weight of a click sound in
 - How blocks or states interact is a mermaid diagram (`flowchart`, `sequenceDiagram`, `stateDiagram-v2`) of about a dozen nodes at most.
 - Rules and behaviour are bullets: one fact per bullet, one or two lines.
 - Prose appears only as a lead of one to four sentences: per block in the hub, under a heading in a note.
-- Every note starts with frontmatter holding only `tags` (copy them from a sibling note), then `# <имя>`, then a link line to the hub and neighbours that ends with `почему так — [[<запись журнала>]]` when one exists.
+- Every note starts with frontmatter holding only `tags` (copy them from a sibling note), then `# <имя>`, then a link line to the hub and neighbours.
 - `Открытые вопросы` is a short bullet list at the end of a note, one line per question. Questions the owner can answer now are asked in the chat instead.
 - Wiki-links by note name only.
 - None of these in the concept, the hub, area or module notes: status fields or progress markers («проработана», «в коде ещё нет»), history («раньше», «теперь», «новая таблица»), sections about how to keep the documents, hard line breaks inside a paragraph (Obsidian shows them as broken lines).
@@ -46,10 +45,9 @@ Real case: the old Кузня sound notes carried the weight of a click sound in
 | concept | ~40 lines |
 | architecture hub | ~130 lines |
 | area or module note | ~100 lines, 8 KB |
-| journal entry | ~60 lines |
 | phase outline | ~20 lines |
 
-A note over its limit is cut: the why moves to the journal, the implementation to the phase, repetition is deleted. A note becomes a folder only when it holds two unrelated subjects — never to fit a limit. The whole Кузня architecture is seven notes, 47 KB.
+A note over its limit is cut: the why is deleted (the journal gets it from `/close-session`), the implementation moves to the phase, repetition is deleted. A note becomes a folder only when it holds two unrelated subjects — never to fit a limit. The whole Кузня architecture is seven notes, 47 KB.
 
 ## Words
 
@@ -143,7 +141,7 @@ tags:
 
 # <Область>
 
-[[Архитектура <Имя>]] · [[<соседняя заметка>]] · почему так — [[<запись журнала>]]
+[[Архитектура <Имя>]] · [[<соседняя заметка>]]
 
 ## <Предмет>
 
@@ -168,37 +166,6 @@ tags:
 ```
 
 Sections are named by the subject of the area; `Проверка перед запуском` appears only where data is checked, `Границы` and `Открытые вопросы` only when they have content.
-
-Journal entry — `Журнал <Имя>/ГГГГ-ММ-ДД-<короткое-имя>.md`, one per design change:
-
-```markdown
----
-дата: ГГГГ-ММ-ДД
-тип: решение
-область: <часть системы>
-вес: <1–10>
-статус: принято
-tags:
-  - <тег проекта>
-  - журнал
----
-
-# <Решение одной строкой>
-
-[[Журнал <Имя>]] · [[<заметка области>]]
-
-## Решение
-
-<одно решение — одна-две строки>
-
-## Почему
-
-<по абзацу в два-три предложения на решение>
-
-## Отвергнуто
-
-<по строке на отвергнутый вариант>
-```
 
 Phase outline — `Фазы <Имя>/Фаза-NN-<короткое-имя-строчными-через-дефис>.md`:
 
