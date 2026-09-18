@@ -27,7 +27,7 @@ A project card is a vault note with `kind: project` in its frontmatter, under `C
 
 **What stays out.** What was done, fixed, refactored or committed (git). How a part works (code, architecture notes). Progress and status (card, phases). The story of how the session got there. Tool gotchas and ways of working with the owner (memory, profile). A routine session usually has no decisions — then write nothing.
 
-**Where.** The folder whose name starts with `Журнал` inside the card's folder: `Журнал Кузни/`, `Журнал VPN/`, `Журнал/` for Logos. A project without one gets `Журнал <Имя>/` next to its card, with the hub note `Журнал <Имя>.md` copied from `C:\projects\obsidian\Проекты\Кузня Миров\Журнал Кузни\Журнал Кузни.md` (change the `FROM` paths, tags, title and link line). Folder and note names follow the vault's CLAUDE.md: Russian, unique across the whole vault; `Работа/otc_desk` keeps the employer's names.
+**Where.** The folder whose name starts with `Журнал` inside the card's folder: `Журнал Кузни/`, `Журнал VPN/`, `Журнал Logos/`. A project without one gets `Журнал <Имя>/` next to its card, with the hub note `Журнал <Имя>.md` copied from `C:\projects\obsidian\Проекты\Кузня Миров\Журнал Кузни\Журнал Кузни.md` (change the `FROM` paths, tags, title and link line). Folder and note names follow the vault's CLAUDE.md: Russian, unique across the whole vault; `Работа/otc_desk` keeps the employer's names.
 
 **Before writing**, list the journal's entries of the last few days and read any on the same subject: a decision recorded earlier in this session is not written again. A decision that reverses an existing entry gets a new entry; the old one gets `статус: отменено` and a line `Отменено: [[<новая запись>]]`.
 
