@@ -30,9 +30,9 @@ Read the task the user gave: inline text, a ticket, a file, a link. When it name
 
 The plan is the specification the whole pipeline builds against, so it exists before any agent is dispatched.
 
-Skip planning when the task already is one: the user pointed at a `docs/plans/*.md` file or at a phase note in the phase folder the project's CLAUDE.md names, or handed over a ticket detailed enough that nothing would be guessed. Say so in one Russian line and go to step 3.
+Skip planning when the task already is one: the user pointed at a `docs/plans/*.md` file or at a phase or task note in the folder the project's CLAUDE.md names, or handed over a ticket detailed enough that nothing would be guessed. Say so in one Russian line and go to step 3.
 
-Otherwise run the `feature-planner` skill (`anton-toolkit:feature-planner`) in this session — it interviews the user on the gaps, gets the plan confirmed and writes it to `docs/plans/<slug>.md`, or as a phase note into the phase folder the project's CLAUDE.md names. Do not re-implement its interview here and do not duplicate its questions. When it offers to hand off to a dev agent at the end, that hand-off is this pipeline: do not dispatch anything there, continue with step 3.
+Otherwise run the `feature-planner` skill (`anton-toolkit:feature-planner`) in this session — it interviews the user on the gaps, gets the plan confirmed and writes it to `docs/plans/<slug>.md`, or as a phase or task note into the folder the project's CLAUDE.md names. Do not re-implement its interview here and do not duplicate its questions. When it offers to hand off to a dev agent at the end, that hand-off is this pipeline: do not dispatch anything there, continue with step 3.
 
 A task that builds a service from scratch is planned the same way, with one difference to watch for: the plan must pin the stack, the module layout and the entry point, because there is no existing code to imitate. If it does not, ask the user before continuing — that is the one decision a coder cannot infer.
 

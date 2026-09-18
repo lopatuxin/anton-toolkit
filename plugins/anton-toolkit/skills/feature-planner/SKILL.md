@@ -2,7 +2,7 @@
 name: feature-planner
 description: >
   Interview-driven feature planning: turns a vague idea, ticket, or brief into a confirmed,
-  actionable spec saved to docs/plans/ (or the phase folder the project's CLAUDE.md names)
+  actionable spec saved to docs/plans/ (or the phase or task folder the project's CLAUDE.md names)
   before any code is written, then offers handoff to
   a dev agent. Use when the user wants to plan, refine, or clarify a feature before
   implementation; skip it when the spec is already confirmed or the change fits in one
@@ -99,7 +99,7 @@ No placeholders like «TODO: уточнить» — an open point goes back to t
 
 Chat context gets compacted; the plan file survives and is what the dev agent reads. Where it goes depends on the project's CLAUDE.md.
 
-**The project's CLAUDE.md names a folder for feature plans or phases** — personal projects keep them in the Obsidian vault, e.g. `C:\projects\obsidian\Проекты\Кузня Миров\Фазы Кузни\`. Write the plan there as a phase note. First read the note template the CLAUDE.md points to (`C:\projects\obsidian\Проекты\Шаблон проекта.md`) and one existing phase note in that folder, and follow them:
+**The project's CLAUDE.md names a phase folder** — personal projects keep phases in the Obsidian vault, e.g. `C:\projects\obsidian\Проекты\Кузня Миров\Фазы Кузни\`. Write the plan there as a phase note. First read the note template the CLAUDE.md points to (`C:\projects\obsidian\Проекты\Шаблон проекта.md`) and one existing phase note in that folder, and follow them:
 
 - File `Фаза-NN-<короткое-имя>.md`: the next free two-digit number in the folder, a lowercase hyphenated Russian name (`Фаза-04-сохранение-партии.md`). When the folder already holds an outline note for this feature (`статус: планируется`, a short note system-designer wrote when splitting the design into phases), write the plan into that note instead, keeping its number and name.
 - Frontmatter `фаза: <N>`, `статус: планируется`, and `tags` with the project tag the sibling notes use plus `фаза`.
@@ -108,7 +108,15 @@ Chat context gets compacted; the plan file survives and is what the dev agent re
 
 Then tell the user: «План сохранён фазой `<путь к заметке>`.»
 
-**Otherwise** (the CLAUDE.md names no such folder — the usual case for work repositories) write the confirmed plan to `docs/plans/<feature-slug>.md`, creating the directory if needed. Slug: a ticket ID lowercased as the prefix when there is one (`tradex-69-<short-name>.md`), otherwise kebab-case of the feature name (`user-export-csv.md`). Prepend a short header:
+**The project's CLAUDE.md names a task folder of a work project** — work projects keep their plans in the vault too, one note per plan, e.g. `C:\projects\obsidian\Работа\otc_desk\Задачи otc_desk\` (kind «работа» in `C:\projects\obsidian\Проекты\Шаблон проекта.md`). Write the plan there as a task note, not as a phase. Read one existing note in that folder first and follow it:
+
+- File `<TICKET>-<short-name>.md` with a lowercase hyphenated Russian name (`TRADEX-562-единый-вход-в-бэк-офис.md`); a plan without a ticket is `<short-name>.md`. A second plan for the same ticket gets its own short name (`TRADEX-381-правки-по-ревью.md`).
+- Frontmatter `тикет: <TICKET>` (left out when there is no ticket), `дата: <YYYY-MM-DD>`, and `tags` with the project tag the sibling notes use plus `задача`. No status field: the task's status lives in the company tracker.
+- Heading `# <TICKET> — <feature name>`, then the recap body. Vault notes are linked as wiki-links by note name (`[[F7-F8. BO user registration & authorization]]`), not by absolute path. No `# Plan:` header block.
+
+Then tell the user: «План сохранён задачей `<путь к заметке>`.»
+
+**Otherwise** (the CLAUDE.md names neither folder) write the confirmed plan to `docs/plans/<feature-slug>.md`, creating the directory if needed. Slug: a ticket ID lowercased as the prefix when there is one (`tradex-69-<short-name>.md`), otherwise kebab-case of the feature name (`user-export-csv.md`). Prepend a short header:
 
 ```markdown
 # Plan: <feature name>
