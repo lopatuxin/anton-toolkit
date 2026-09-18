@@ -5,7 +5,7 @@ description: >
   (`C:\projects\obsidian\Проекты\<Имя>\`, laid out by `Шаблон проекта`): concept, architecture hub
   with block diagrams, one note per area or module, and phase outlines. Use when the owner wants to design a new system, add or change a part of an
   existing design, or split the design into phases. Detailing one phase into an implementation plan
-  is feature-planner; Logos has its own logos-design. Documentation only, no code. Runs in the main
+  is feature-planner. Documentation only, no code. Runs in the main
   conversation; the interview is not delegated to agents.
 when_to_use: >
   "спроектируй систему", "давай добавим <фичу> в архитектуру", "разбей на фазы"
@@ -64,4 +64,3 @@ Apply the findings you agree with yourself, without another review round. Findin
 
 - Implementing the design in code → task-build or a dev agent.
 - Detailing one phase for implementation → feature-planner.
-- Logos → logos-design and the other logos skills.

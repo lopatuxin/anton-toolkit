@@ -5,7 +5,7 @@ in plain Java, in his own study repo `Logos-Study` — a project of its own, sep
 `Logos-Lab`, which is read-only for the mentor. The mentor never writes these classes.
 
 Read this file at the start of every session. The owner's position on the ladder is recorded in
-`$LAB_DOCS/Обучение.md`; this file says what each step is, when it is done, and what it is FOR.
+`$STUDY_DOCS/Обучение Logos-Study.md`; this file says what each step is, when it is done, and what it is FOR.
 
 ## How the ladder is used
 
@@ -233,4 +233,4 @@ fine-tuning (LoRA, adapters).
 
 Do not invent an eleventh step. When step 10 closes, tell him plainly that the ladder is done and that
 the next thing is his own choice — reproducing a paper that interests him, or bringing what he learned
-back to the research branch's open question. Record the closing in `Обучение.md` and stop.
+back to the research branch's open question. Record the closing in `Обучение Logos-Study.md` and stop.

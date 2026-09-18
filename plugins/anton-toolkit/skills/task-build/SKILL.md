@@ -7,8 +7,8 @@ description: >
   adversarial checking of the blockers, fix rounds, local stand, end-to-end QA, final review
   mark — and hands back what only the user can decide. Use when the user gives a task, a
   ticket or a plan to implement. For planning without building use feature-planner, for an
-  unexplained failure debug, for a whole system's documentation system-designer, and for the
-  Logos project logos-build. Runs in the main conversation; the planning dialog is not
+  unexplained failure debug, and for a whole system's documentation system-designer. Runs in
+  the main conversation; the planning dialog is not
   delegated to agents.
 when_to_use: >
   "/task-build", "реализуй задачу", "собери задачу", "сделай фичу", "вот тикет, реализуй"
@@ -122,4 +122,3 @@ Report in Russian, briefly, to a reader who did not watch the run. The first sen
 - Only a plan is wanted, no code → `feature-planner`.
 - Something fails and the cause is unknown → `debug` first, then bring the proven fix here or apply it directly.
 - Designing a whole system's documentation → `system-designer`.
-- The Logos project → `logos-build` with the Logos agents.
