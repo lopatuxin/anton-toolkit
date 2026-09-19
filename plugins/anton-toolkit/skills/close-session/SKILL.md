@@ -6,7 +6,7 @@ description: >
   code cannot show), the project card's `next` and `updated`, a proposed line for the owner's
   profile `Кто-я.md`, and cleanup of the memory notes this session wrote. Use when the owner ends
   a session. It is the only writer of project journal entries and project cards; the owner's life
-  portrait belongs to /профиль.
+  portrait belongs to the lichnost reviews (/itogi).
 when_to_use: >
   "закрой сессию", "закрываем сессию", "/close-session"
 ---
@@ -72,7 +72,7 @@ Plain short Russian sentences, wiki-links by note name, no code, no numbers that
 
 `C:\projects\obsidian\Claude\Кто-я.md` is loaded into every session of every project, so each of its lines costs context everywhere.
 
-- A candidate is something learned in this session that changes how Claude works with the owner in any project: a working preference, a lasting fact about his environment or his knowledge. Project-specific rules belong to that project's CLAUDE.md or memory. Life, goals and character belong to `Личная/Портрет/Профиль.md`, which the `/профиль` command builds from the diary — never write there.
+- A candidate is something learned in this session that changes how Claude works with the owner in any project: a working preference, a lasting fact about his environment or his knowledge. Project-specific rules belong to that project's CLAUDE.md or memory. Life, goals and character belong to `Личная/Портрет/Профиль.md`, which the lichnost reviews (`/itogi`) build from the diary — never write there.
 - Already covered — nothing to do. Contradicts an existing line — replace that line instead of adding.
 - The file stays within 60 lines: to go past that, merge lines or drop the weakest one.
 - Show the owner the exact line, and the line it replaces or removes, and write only after his yes. This is the only step that waits for approval.

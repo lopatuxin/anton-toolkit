@@ -1,290 +1,172 @@
 ---
 name: itogi
 description: >
-  Writes an analytical period review (итог) of the user's Obsidian diary into the vault: themes,
-  trajectory, blockers, insights — interpretation, not a summary. Three levels chosen by the
-  command argument, built as a cascade: the weekly review reads the daily diary entries, the
-  monthly review reads the weekly reviews (never the daily entries), the yearly review reads the
-  monthly ones. Unlike `dnevnik` (raw capture) it analyses; unlike `profil` it describes a period,
-  not the person.
-disable-model-invocation: true
+  Writes the owner's weekly, monthly or yearly review in the Obsidian vault: what the period really
+  was, a check of the previous review's advice, at most three pieces of advice tied to his goals,
+  and a few questions; it then folds what it learned into his portrait and, monthly, into his goals
+  and finances. Runs on request and automatically every Monday from a scheduled task. For a raw
+  diary entry use `dnevnik`; for an idea or a new goal use `idea`.
+when_to_use: >
+  "подведи итоги недели", "итог месяца", "итоги года", "/itogi", a scheduled run with «авто»
 ---
 
-# Itogi — analytical period review for the Obsidian diary
-
-The user runs `/itogi <period>` to get an **analysis** of a stretch of their diary — what
-happened, what moved, recurring patterns, blockers, insights — written as a clean Obsidian
-note. This is the analytic counterpart to `dnevnik` (which only captures raw entries).
-
-**This is analysis, NOT a summary.** Do not concatenate or compress entries into one long
-read-back. Read the source material, then produce interpretation: themes, trajectory,
-progress, contradictions, blockers, insights, and a focus for the next period.
-
-## The cascade (read this first — it defines what each level reads)
-
-Each level reads the level **below it**, never the raw daily entries beyond the weekly level:
-
-| `/itogi` arg | Reads | Writes |
-|--------------|-------|--------|
-| `неделя` (week)  | daily entries `Личная/Дневник/<date>.md` of the target week | `Личная/Итоги/Недели/<ISO>.md` |
-| `месяц` (month)  | weekly итоги `Личная/Итоги/Недели/*.md` of the target month | `Личная/Итоги/Месяцы/<YYYY-MM>.md` |
-| `год` (year)     | monthly итоги `Личная/Итоги/Месяцы/<YYYY>-*.md` of the target year | `Личная/Итоги/Годы/<YYYY>.md` |
-
-The month level MUST NOT read raw daily entries; the year level MUST NOT read weekly итоги or
-daily entries. This keeps each higher level a meta-analysis of compact lower-level analyses
-instead of one giant wall of raw text.
-
-## 0. Locate the vault
-
-Resolve `VAULT` with the search in `${CLAUDE_PLUGIN_ROOT}/references/vault.md`; never hard-code the
-path. That file also carries the folder layout, the folder-note rule and the auto-sync rule this skill
-relies on.
-
-Paths used here: the diary `$VAULT/Личная/Дневник` (source for the week level) and the итоги root
-`$VAULT/Личная/Итоги` with its subfolders `Недели`, `Месяцы`, `Годы`.
-
-## 1. Parse the period argument
-
-The user passes the period as the argument: `неделя`, `месяц`, or `год` (accept English
-`week`/`month`/`year` and obvious typos too). If no argument is given, ask in Russian:
-«За какой период подвести итог — неделя, месяц или год?» and wait. Do NOT guess.
-
-An optional second argument pins an explicit period instead of the default:
-- `/itogi неделя 2026-W21` → that ISO week
-- `/itogi месяц 2026-04` → that calendar month
-- `/itogi год 2025` → that calendar year
-
-Default target period when no explicit id is given:
-- **неделя** → the **current** ISO week (the week containing today — the user typically runs this at week's end).
-- **месяц** → the **previous** calendar month (the user runs this early in the new month).
-- **год** → the **previous** calendar year.
-
-## 2. First-run setup (idempotent — run these checks EVERY time)
-
-Create only what is missing; never overwrite an existing file.
-
-```bash
-mkdir -p "$VAULT/Личная/Итоги/Недели" "$VAULT/Личная/Итоги/Месяцы" "$VAULT/Личная/Итоги/Годы"
-```
-
-Ensure the **folder note** `$VAULT/Личная/Итоги/Итоги.md` exists and is non-empty (this vault
-uses the `folder-notes` plugin, so opening the folder opens this note; it serves as the
-итоги index, kept current automatically by a **Dataview** query — never maintained by hand).
-If the file is missing OR empty, create it with the Write tool with exactly this content
-(the inner ` ```dataview ` block must be preserved verbatim):
-
-````markdown
----
-tags:
-  - итог
----
-
-# 🧭 Итоги
-
-Аналитические итоги по дневнику. Три уровня: неделя → месяц → год. Каждый уровень строится
-из итогов уровня ниже (месяц — из недельных, год — из месячных), а не из всех записей подряд.
-
-## Недели
-
-```dataview
-TABLE WITHOUT ID file.link AS "Неделя", period_start AS "С", period_end AS "По"
-FROM "Личная/Итоги/Недели"
-WHERE type = "итог"
-SORT date DESC
-```
-
-## Месяцы
-
-```dataview
-TABLE WITHOUT ID file.link AS "Месяц", date AS "Конец"
-FROM "Личная/Итоги/Месяцы"
-WHERE type = "итог"
-SORT date DESC
-```
-
-## Годы
-
-```dataview
-TABLE WITHOUT ID file.link AS "Год", date AS "Конец"
-FROM "Личная/Итоги/Годы"
-WHERE type = "итог"
-SORT date DESC
-```
-````
-
-Leave an existing non-empty folder note untouched — the Dataview queries keep it current.
-
-## 3. Determine the target period and gather sources
-
-Compute dates with GNU `date` (Git Bash). `date +%u` is the ISO weekday (Mon=1 … Sun=7).
-
-### 3a. Week level (`неделя`)
-
-```bash
-# Current ISO week id and its Monday..Sunday range
-WEEK_ID=$(date +%G-W%V)                                   # e.g. 2026-W22
-MON=$(date -d "-$(( $(date +%u) - 1 )) days" +%Y-%m-%d)   # Monday
-SUN=$(date -d "$MON +6 days" +%Y-%m-%d)                   # Sunday
-MONTH_OF_WEEK=$(date -d "$MON +3 days" +%Y-%m)            # Thursday's month — the month this week belongs to
-echo "$WEEK_ID $MON..$SUN month=$MONTH_OF_WEEK"
-```
-
-List which daily entries actually exist in the range, then **Read each existing one** with the
-Read tool (enumerate the 7 dates Mon..Sun; skip dates that have no file):
-
-```bash
-ls "$VAULT/Личная/Дневник/"*.md 2>/dev/null | sort
-```
-
-Keep only files whose date (the `YYYY-MM-DD` filename) falls in `$MON..$SUN`. If **no** daily
-entries exist in the range, tell the user in Russian: «За неделю <WEEK_ID> нет записей в дневнике — нечего анализировать.» and stop.
-
-### 3b. Month level (`месяц`)
-
-Target month = the previous calendar month by default (or the explicit `YYYY-MM`).
-
-```bash
-PREV_MONTH=$(date -d "$(date +%Y-%m-01) -1 day" +%Y-%m)         # e.g. 2026-05
-M_END=$(date -d "$(date +%Y-%m-01) -1 day" +%Y-%m-%d)           # last day of prev month
-echo "month=$PREV_MONTH end=$M_END"
-```
-
-Sources are the **weekly итоги** whose `month:` frontmatter equals the target month. Find them
-with Grep (pattern `^month: <YYYY-MM>` over `Личная/Итоги/Недели`), then Read each match.
-
-If **zero** weekly итоги match, do NOT fall back to raw daily entries (that breaks the
-cascade). Tell the user in Russian: «За <месяц> нет недельных итогов. Месячный анализ строится из недельных — сначала сгенерируй их: `/itogi неделя`. Затем повтори `/itogi месяц`.» and stop. If only **some** weeks are present, proceed with what exists and note the gap in the result.
-
-### 3c. Year level (`год`)
-
-Target year = the previous calendar year by default (or the explicit `YYYY`).
-
-```bash
-PREV_YEAR=$(( $(date +%Y) - 1 ))   # e.g. 2025
-echo "year=$PREV_YEAR"
-```
-
-Sources are the **monthly итоги** of that year — files `Личная/Итоги/Месяцы/<YYYY>-*.md`. List
-and Read each:
-
-```bash
-ls "$VAULT/Личная/Итоги/Месяцы/${PREV_YEAR}-"*.md 2>/dev/null | sort
-```
-
-If **zero** monthly итоги exist, do NOT fall back to weekly or daily. Tell the user in Russian:
-«За <год> нет месячных итогов. Годовой анализ строится из месячных — сначала сгенерируй их: `/itogi месяц`. Затем повтори `/itogi год`.» and stop. If only some months are present, proceed and note the gap.
-
-## 4. Produce the analysis (the core of the skill)
-
-Read the gathered sources, then write **analysis**, not a retelling. Strict rules:
-
-1. **Interpret, don't transcribe.** The reader already has the raw entries. Surface what they
-   do not see at a glance: themes, trajectory, cause-and-effect, contradictions.
-2. **Ground every claim in the sources.** Tie observations to concrete entries via wikilinks
-   (week level → `[[2026-06-01]]`; month level → `[[2026-W22]]`; year level → `[[2026-05]]`).
-   Do NOT invent events, feelings, or progress the sources do not support.
-3. **Keep the user's language (Russian)** and their own framing of events. Do not moralize or
-   give unsolicited advice. A forward-looking "фокус на следующий
-   период" is allowed as a neutral observation of what is unresolved, not as coaching.
-4. **Scale the lens to the level:**
-   - **Week** (from daily entries): main events / what got done, progress on projects and
-     goals, recurring themes across the days, mood & energy pattern, problems and blockers,
-     insights or decisions, and what is carried into next week.
-   - **Month** (from weekly итоги): trends across the weeks, overall trajectory (what advanced
-     vs. what stalled), patterns that persisted all month, the few defining wins or setbacks,
-     and the open focus for next month. This is a meta-analysis of the weekly итоги.
-   - **Year** (from monthly итоги): the arc of the year, major themes and turning points,
-     growth and change over the months, what defined the year, and the direction it points to.
-5. **Be concise and structured.** Use `## ` / `### ` sections. Prefer tight prose and short
-   bullet lists over long paragraphs. The итог should be readable in a minute, not a re-read
-   of the whole period.
-
-Correct vs incorrect:
-- Correct (week): "Три из шести записей — про застрявший рефакторинг бота ([[2026-06-02]], [[2026-06-04]]); к выходным он сдвинулся. Энергия падала к середине недели."
-- Incorrect: pasting the diary entries back verbatim, or "Отличная неделя, так держать!" — that is neither analysis nor something the user wrote.
-
-## 5. Write the итог file
-
-If a file for the target period **already exists**, ask in Russian before touching it:
-«Итог за <период> уже есть (`<path>`). Перегенерировать?» — overwrite only on confirmation;
-otherwise stop. (Unlike `dnevnik`, an итог is a computed artefact, so regeneration is valid —
-but never silently.) If it does not exist, create it with the Write tool.
-
-Use the human-readable Russian heading (weekday/month/year names in Russian).
-
-**Week** — `$VAULT/Личная/Итоги/Недели/<WEEK_ID>.md`:
-
-```markdown
----
-type: итог
-period: неделя
-period_id: <WEEK_ID>          # e.g. 2026-W22
-period_start: <MON>           # YYYY-MM-DD, Monday
-period_end: <SUN>             # YYYY-MM-DD, Sunday
-month: <MONTH_OF_WEEK>        # YYYY-MM — used by the month level to find this week
-date: <SUN>                   # YYYY-MM-DD, for Dataview sorting
-tags:
-  - итог
-  - итог/неделя
----
-
-# Неделя <N> · <D месяц> – <D месяц YYYY>
-
-[[Итоги]]
-
-<analysis sections>
-```
-
-**Month** — `$VAULT/Личная/Итоги/Месяцы/<YYYY-MM>.md`:
-
-```markdown
----
-type: итог
-period: месяц
-period_id: <YYYY-MM>
-year: <YYYY>                  # used by the year level
-date: <M_END>                 # last day of the month, for sorting
-tags:
-  - итог
-  - итог/месяц
----
-
-# <Месяц YYYY> (например, Май 2026)
-
-[[Итоги]]
-
-<analysis sections>
-```
-
-**Year** — `$VAULT/Личная/Итоги/Годы/<YYYY>.md`:
-
-```markdown
----
-type: итог
-period: год
-period_id: <YYYY>
-date: <YYYY>-12-31
-tags:
-  - итог
-  - итог/год
----
-
-# Итоги <YYYY> года
-
-[[Итоги]]
-
-<analysis sections>
-```
-
-The index updates itself — the Dataview queries in `Итоги.md` pick up the new note as long as
-it lives in the right subfolder and carries the `type: итог` and `date:` frontmatter set above.
-Do NOT edit `Итоги.md` per entry.
-
-## 6. Confirm to the user (Russian)
-
-Reply in one or two lines naming the file and what was analysed, e.g.:
-«Подвёл итог недели: `Личная/Итоги/Недели/2026-W22.md` (проанализировано записей: 5).»
-«Подвёл итог месяца: `Личная/Итоги/Месяцы/2026-05.md` (на основе 4 недельных итогов).»
-
-`obsidian-git` auto-syncs the vault, so no manual git commit is needed here.
-
+# Itogi — period reviews that know the owner and give advice that holds up
+
+A review is interpretation, not a retelling: what the period actually was, where time and energy
+went against what he wants, what repeats, what to change. Every review ends with at most three
+pieces of advice and a few questions, and the next review starts by checking that advice. This loop
+— advise, check, drop or rework what did not take — is what keeps the advice to the point.
+
+Read before starting: `${CLAUDE_PLUGIN_ROOT}/references/vault.md` (vault search, conventions),
+`${CLAUDE_PLUGIN_ROOT}/references/portrait.md` and `${CLAUDE_PLUGIN_ROOT}/references/goals.md`; for
+a monthly review also `${CLAUDE_PLUGIN_ROOT}/references/finance.md`.
+
+## 1. Period and mode
+
+The argument names the level: `неделя`, `месяц`, `год` (also `week`/`month`/`year`), optionally with
+an explicit id — `2026-W38`, `2026-09`, `2026`. With no level, ask once which one.
+
+Default ids, computed with GNU `date` in Git Bash (`date +%u` is the ISO weekday, Monday = 1):
+- **week** — the ISO week containing yesterday: run on a Monday it is the week just ended, run on
+  a Sunday evening it is the current one. `MON` = that week's Monday, `SUN` = `MON + 6 days`,
+  `WEEK_ID=$(date -d "$MON" +%G-W%V)`, `MONTH_OF_WEEK=$(date -d "$MON +3 days" +%Y-%m)` (the week
+  belongs to the month of its Thursday).
+- **month** — the previous calendar month. **year** — the previous calendar year.
+
+**Automatic run** — the argument contains `авто` (the scheduled task passes it). It always starts
+with the week level and then cascades:
+1. Write the weekly review for the default week. If it already exists, skip to step 2.
+2. If the next week's Thursday (`$SUN + 4 days`) falls in another month than `MONTH_OF_WEEK`, this
+   was the month's last week — write the monthly review for `MONTH_OF_WEEK` (skip if it exists).
+3. If that month is December, write the yearly review for its year (skip if it exists).
+
+In an automatic run nobody is at the keyboard: never wait for an answer mid-run and never overwrite
+an existing review. The questions go at the end of the final message (§8).
+
+Interactive run on an existing review: ask «Итог за <период> уже есть. Перегенерировать?» and
+overwrite only on «да».
+
+## 2. Sources
+
+Each level reads the level below, never raw material two levels down — that keeps the higher
+reviews an analysis of analyses instead of a wall of raw text.
+
+**Week** (`MON..SUN`):
+- the diary entries `Личная/Дневник/<date>.md` of those seven days;
+- project journal entries dated in the week — files `YYYY-MM-DD-*.md` inside every
+  `Проекты/*/Журнал */` and `Работа/**/Журнал */` folder (one decision or dead end each; they show
+  what he actually worked on when the diary is silent);
+- how much he committed where: for each git repo in `C:/projects/*/` except the vault,
+  `git -C <repo> log --since="$MON 00:00" --until="$SUN 23:59" --oneline | wc -l` — a count per
+  repo, not the messages;
+- the previous weekly review's «Советы» section (to check it), `Цели.md`, `Профиль.md`.
+
+**Month**: the weekly reviews whose `month:` equals the month (Grep `^month: <YYYY-MM>` in
+`Личная/Итоги/Недели`), the finances (finance.md), `Цели.md`, the list of ideas in `Личная/Идеи/`
+with their `status` and `updated`, the previous monthly review's «Советы», `Профиль.md`.
+
+**Year**: the monthly reviews `Личная/Итоги/Месяцы/<YYYY>-*.md`, `Цели.md`, `Профиль.md`.
+
+A missing lower level never stops the review: a week with no diary entries is written from the
+journals and commits, and says the diary was silent; a month or year with missing weeks or months
+works from what exists and names the gap. Silence in the diary is information — he has periods of
+apathy when tired, and the review treats a gap as a possible slump to understand, never as a failure
+to scold.
+
+## 3. The review
+
+Interpret; do not retell. The reader has the raw entries.
+
+- **Проверка прошлых советов** comes first (skip only when there is no previous review): each
+  previous piece of advice — done, not done, partly — and why, from the sources. Advice not done
+  twice in a row is not repeated: either it is dropped, or the review asks why it did not fit.
+- **What the period was**: where time and energy went, what moved and what stalled, the thread that
+  ran through it. Compare deeds with goals: where the time went against what `Цели.md` says matters.
+- **Energy**: rhythm, sleep, sport, slumps — only as the sources show it.
+- **Week**: main events, progress by project, recurring themes, what carries over.
+- **Month**: trends across the weeks, trajectory, the few defining wins and setbacks; the
+  `## Финансы` section per finance.md; each active goal's progress this month; ideas that ripened
+  into a goal or project, and ideas lying untouched.
+- **Year**: starts with two honest lists — what went well and what did not, six to eight points
+  each if the year supports it; then the arc of the year and its turning points; then each goal —
+  reached, alive, or to drop; and a proposed direction for the next year.
+
+Every claim is grounded with wikilinks — diary `[[2026-06-01]]`, week `[[2026-W22]]`, month
+`[[2026-05]]`, journal entries by name. No invented events, feelings or progress. Readable in a
+couple of minutes: `##` sections, tight prose, short lists.
+
+## 4. Advice — at most three, or none
+
+Put it in a `## Советы` section, numbered, each in this shape:
+
+`1. **<what to do, concretely, in the next period>** — <what was noticed, with links> · цель: <the goal from Цели.md it serves, or the portrait pattern it addresses> · проверка: <what the next review will look at to see it worked>`
+
+What makes advice worth giving:
+- It rests on something in the sources and serves one of his goals, or addresses a pattern that
+  costs him something the sources name. «Given X and Y, do Z», not a general tip.
+- It fits his real time: two jobs, several live projects, no days off. One small concrete step
+  beats a plan.
+- **Month and year advice is about direction**: which project to push, which to drop or park, what
+  to learn, where words and deeds diverge.
+- In a slump, advice lowers the load or protects rest; it never pushes harder.
+
+Never give: general wellness advice («больше спи», «найди баланс») unless the sources show what it
+costs him; a new system, ritual, app or tracker; cheerleading or «так держать»; the same advice again
+after it failed twice. Nothing worth advising — write «Советов нет: <why in one line>». No advice is
+better than filler.
+
+Correct: «**Один вечер в неделю без Логоса и Кузни** — три недели без выходного, а в июле после
+такой же полосы дневник замолчал на два месяца [[2026-W37]], [[Профиль#Энергия и спады]] · цель: Кузня
+до 31.10 · проверка: был ли вечер отдыха и как в дневнике с силами.»
+Incorrect: «Старайся больше отдыхать и следи за балансом работы и жизни.»
+
+## 5. Questions — two or three
+
+After the advice, a `## Вопросы` section with two or three questions, one line each. Draw them from
+what the period left unclear (a gap in the diary, an unexplained drop, a decision without a reason),
+from the portrait's «Открытые вопросы», from a goal whose deadline or measure is «не назван», and
+from a candidate new goal («Третью неделю возвращаешься к <X> — сделать это целью?»). No questions
+he already answered.
+
+Interactive run: ask them in chat one at a time and wait. Automatic run: list them at the end of the
+final message. Either way, when he answers:
+- append a `## Ответы` section to the review with his answers, cleaned like a diary entry — his
+  words and meaning, mechanics fixed only;
+- fold what they tell about him into the portrait (§7);
+- a goal he agreed to is written to `Цели.md` per goals.md; a goal he rejected is not proposed again.
+He may never answer — that is fine, the questions stay in the review.
+
+## 6. Files
+
+Create missing folders and the hub `Личная/Итоги/Итоги.md` only if missing (a Dataview hub listing
+the three subfolders, like the other hubs in `Личная/`). Frontmatter, heading `# …` and `[[Итоги]]`
+under it:
+
+- Week — `Личная/Итоги/Недели/<WEEK_ID>.md`, heading `# Неделя <N> · <D месяц> – <D месяц YYYY>`:
+  `type: итог`, `period: неделя`, `period_id: <WEEK_ID>`, `period_start: <MON>`, `period_end: <SUN>`,
+  `month: <MONTH_OF_WEEK>`, `date: <SUN>`, tags `итог`, `итог/неделя`.
+- Month — `Личная/Итоги/Месяцы/<YYYY-MM>.md`, heading `# <Месяц YYYY>`: `type: итог`,
+  `period: месяц`, `period_id`, `year: <YYYY>`, `date: <last day of the month>`, tags `итог`,
+  `итог/месяц`.
+- Year — `Личная/Итоги/Годы/<YYYY>.md`, heading `# Итоги <YYYY> года`: `type: итог`, `period: год`,
+  `period_id`, `date: <YYYY>-12-31`, tags `итог`, `итог/год`.
+
+The section order is: Проверка прошлых советов, the analysis, Советы, Вопросы (and later Ответы).
+
+## 7. After writing
+
+1. **Portrait.** Fold into `Личная/Портрет/Профиль.md` what this review learned about the person —
+   a confirmed or new pattern, a contradiction, an energy or slump signal, an answered open
+   question — per portrait.md, staying within its size. Nothing new — leave it untouched.
+2. **Goals** (month only). One `Ход` line per active goal in `Цели.md` with a link to the month.
+   Changing, reaching or dropping a goal is only proposed, in the questions.
+3. **Owner profile** (month and year only). If the period changed something lasting about his life
+   or goals that Claude should know in every session, propose one line for `Claude/Кто-я.md` in the
+   final message; write it only after his «да», keeping the file under 60 lines.
+
+## 8. Final message (Russian)
+
+Short, plain: which reviews were written, the three things that matter most in them, the advice in
+one line each, then the questions. In an automatic run also send a push notification if the
+`PushNotification` tool is available (load it with ToolSearch): «Итог недели готов — вопросы ждут
+ответа». Never `git commit` the vault — obsidian-git does it.

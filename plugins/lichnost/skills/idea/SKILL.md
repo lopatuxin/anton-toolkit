@@ -1,12 +1,13 @@
 ---
 name: idea
 description: >
-  Captures and develops personal ideas as Obsidian notes, one note per idea under Личная/Идеи,
-  written as light documentation: wording and structure are reworked for clarity, the essence is
-  never changed and nothing the user did not say is added. Two flows, chosen from the command
-  argument: create a new idea note, or refine an existing one by merging new detail into it.
-  Unlike `dnevnik` (raw diary capture, verbatim), this skill may rephrase and reorganize.
-disable-model-invocation: true
+  Captures and develops the owner's ideas and goals in the Obsidian vault: one note per idea under
+  Личная/Идеи written as light documentation, and his goals in Личная/Цели.md. Flows: a new idea, a
+  refined idea (each then linked to the goal it serves, or offered as a new goal), and setting,
+  reaching or dropping a goal. Unlike `dnevnik` (verbatim diary) it may rephrase; period reviews
+  are `itogi`.
+when_to_use: >
+  "запиши идею", "доработай идею", "поставь цель", "цель достигнута", "сними цель", "/idea"
 ---
 
 # Idea — capture and develop ideas in the Obsidian vault
@@ -82,6 +83,8 @@ ls -1 "$VAULT/Личная/Идеи"/*.md 2>/dev/null | grep -v '/Идеи\.md$'
 
 Choose the flow from the argument:
 
+- **GOAL** — he sets, reaches or drops a goal: «поставь цель …», «хочу к весне …», «цель
+  достигнута», «сними цель …». → §7.
 - **REFINE an existing idea** — the argument points at an idea already in the folder, e.g.
   «доработай идею про <X>», «дополни <X>», «к идее <X> добавь …», «по идее <X>: …». Match the
   named idea against the existing note titles (case-insensitive, fuzzy on the key words). → §4.
@@ -176,5 +179,28 @@ Reply in one or two lines naming what changed, e.g.:
 - New: «Записал идею: `Личная/Идеи/Бот-напоминалка для задач.md`.»
 - Refine: «Дополнил идею `Личная/Идеи/Бот-напоминалка для задач.md` — добавил раздел «Детали», статус → в проработке.»
 
+Then link the idea to his goals (`${CLAUDE_PLUGIN_ROOT}/references/goals.md`). Read
+`$VAULT/Личная/Цели.md` and say in one line which active goal the idea serves and why — or, if it
+serves none, ask once: «Это тянет на цель, на отдельный проект или пусть лежит?» On «цель» continue
+into §7 with the idea as its source; on «проект» say that a project is started by the project
+template and `system-designer`; otherwise leave it. When the idea serves a goal, add a line
+`Служит цели: <цель>` under `[[Идеи]]` in the idea note.
+
 `obsidian-git` auto-syncs the vault, so no manual git commit is needed here.
+
+## 7. GOAL flow
+
+Goals live in `$VAULT/Личная/Цели.md`, shaped and ruled by
+`${CLAUDE_PLUGIN_ROOT}/references/goals.md` — read it first. Create the note from the shape there
+if it is missing.
+
+- **Set.** Write the goal in his words. Take the deadline and the measure of progress from what he
+  said; if either is missing, ask once for both in one question («К какому сроку и по чему поймём,
+  что движется?»). If he does not know, write «не назван» — the reviews will come back to it. The
+  source is «сказал сам <date>», the idea note, or the review that proposed it. A sixth active goal
+  — follow the few-goals rule in goals.md.
+- **Reach or drop.** Move the goal to «Достигнутые и снятые» with the date and one line of why,
+  in his words. Ideas that pointed at it keep their `Служит цели` line.
+
+Set `updated:` to today. Confirm in one line: «Записал цель „…“ — срок …, признак …».
 

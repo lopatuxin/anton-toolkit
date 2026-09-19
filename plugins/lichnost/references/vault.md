@@ -1,7 +1,7 @@
 # The vault — shared context for every lichnost skill
 
 Everything this plugin writes lives in the personal area of the user's Obsidian vault. This file is
-the ONE copy of the vault search and of the conventions all five skills share; a skill points here
+the ONE copy of the vault search and of the conventions all four skills share; a skill points here
 instead of repeating them.
 
 ## Finding the vault
@@ -29,12 +29,13 @@ If `$VAULT` is empty, tell the user in Russian: «Не нашёл хранили
 
 ## Where each skill writes
 
-| Folder | Skill | What is in it |
+| Place | Written by | What is in it |
 |---|---|---|
 | `$VAULT/Личная/Дневник/` | `dnevnik` | one note per day, named `ГГГГ-ММ-ДД.md` |
 | `$VAULT/Личная/Итоги/` | `itogi` | period reviews, one subfolder per period type |
+| `$VAULT/Личная/Портрет/Профиль.md` | `itogi` | the portrait → `${CLAUDE_PLUGIN_ROOT}/references/portrait.md` |
+| `$VAULT/Личная/Цели.md` | `idea` (goals), `itogi` (progress) | the goals → `${CLAUDE_PLUGIN_ROOT}/references/goals.md` |
 | `$VAULT/Личная/Идеи/` | `idea` | one note per idea, named by the idea |
-| `$VAULT/Личная/Портрет/` | `profil` | the psychological profile, its interviews and the source registry |
 | `$VAULT/Личная/Фильмы/` | `film` | watched films, the taste profile and recommendations |
 
 ## Conventions that hold for all of them

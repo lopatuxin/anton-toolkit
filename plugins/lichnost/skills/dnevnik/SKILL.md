@@ -3,9 +3,11 @@ name: dnevnik
 description: >
   Records a dictated personal diary entry into the Obsidian vault: cleans the raw speech into a
   readable Markdown note named by today's date, appending a timestamped section when the day's
-  note already exists. Capture and formatting only — no analysis, no advice; for idea notes use
-  `idea`, for a period review of the diary use `itogi`.
-disable-model-invocation: true
+  note already exists; also takes his reply to the evening «как прошёл день?» reminder. Capture
+  and formatting only — no analysis, no advice; for idea notes use `idea`, for a period review
+  use `itogi`.
+when_to_use: >
+  "запиши в дневник", "дневник", "/dnevnik", his answer in the evening reminder session
 ---
 
 # Dnevnik — diary capture for Obsidian
@@ -64,6 +66,10 @@ current automatically, so there is nothing to update there per entry.
 The dictated text is whatever the user just said / passed as arguments. If there is no
 text to record, ask in Russian: «Диктуй — записываю в дневник.» and wait. Do NOT create
 an empty file.
+
+A single phrase is a full entry. He has periods of apathy when tired, and on such days one
+line («устал, ничего не делал») is all there will be — record it as it is, never ask for more
+and never comment on its length. Those short lines are exactly what later shows a slump.
 
 Compute today's date and the current time:
 
@@ -132,6 +138,11 @@ lives in `Личная/Дневник` and carries the `date:` frontmatter field
 
 Reply in one or two lines, e.g.:
 «Записал в дневник: `Личная/Дневник/2026-05-31.md` (запись в 20:55).»
+
+At most one short question may follow the confirmation, and only when a full entry (several
+sentences) says nothing about how he felt — energy and mood are what the reviews need most:
+«Как силы сегодня?» Never after a one-line entry. He may ignore it; if he answers, append the
+answer to the same `## HH:MM` section.
 
 `obsidian-git` auto-syncs the vault, so no manual git commit is needed here.
 
