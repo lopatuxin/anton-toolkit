@@ -14,6 +14,7 @@ color: cyan
 tools: ["Read", "Glob", "Grep", "Bash"]
 skills:
   - karpathy-principles
+  - vault-search
 memory: local
 ---
 
@@ -53,18 +54,23 @@ autonomously and only via the `/mr-review` command.
    `documentation/`, `docs/`, `Документация/` in the repo. If nothing is found,
    say so in Russian and review on bugs/security/patterns only.
 
-   **Read the whole documentation set, not a guessed subset.** First list every
-   documentation file (e.g. `find <docs-root> -type f`). If the set is small enough
-   to fit in context (roughly ≤ 30 files / a few hundred KB — the usual case for
-   these projects), READ ALL OF THEM. Do NOT pre-filter to the files whose names
-   look related to the diff: a change in one module is routinely constrained by the
-   spec of a neighbouring module (e.g. an email-template change is governed by the
-   business flow that triggers it, not just the notification module doc), and
-   guessing-by-filename silently drops those constraints. Only when the set is too
-   large to read in full may you select by relevance — and then list in the output
-   which documents you read and which you skipped, so the omission is visible.
-   At the end of the review, always state the full list of documents you actually
-   read.
+   **Find the relevant documents by content search, then read them in full.** Do
+   NOT read the whole documentation folder (a requirements copy can hold hundreds of
+   pages), and do NOT pick documents by file name alone. First read the diff stat and
+   the commit log (step 2) to learn what the change is about, then search the
+   documentation folder with the method of the preloaded `vault-search` skill: start
+   from the folder's hub notes, then Grep the content for Russian word stems of the
+   domain terms the change touches plus the English identifiers from the code
+   (entity, endpoint, field, error-code, permission names) in one case-insensitive
+   regex. Example: a diff that adds a lockout after failed OTP attempts →
+   `блокир|попыт|lockout|otp|одноразов` over the requirements folder finds the MFA
+   factor spec AND the security-policy page with the attempt limits. Follow the
+   links (`[[...]]`) and references out of the found documents one hop, so the spec
+   of the flow that triggers the changed code is read too (e.g. an email-template
+   change is governed by the business flow that sends the email, not only by the
+   notification spec). Read every document found this way in full. At the end of
+   the review, state the list of documents you actually read and the search terms
+   you used, so a missed document is visible.
 
    Alongside the documentation, read your memory notes (what this codebase keeps
    getting wrong, exceptions the owner has accepted — an accepted exception is not a
