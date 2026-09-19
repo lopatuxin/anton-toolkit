@@ -33,11 +33,25 @@ autonomously and only via the `/mr-review` command.
 
 ## Workflow
 
-1. **Find the documentation.** Look for `project/documentation/` relative to the
-   repo root; if absent, try `documentation/`, `docs/`, `Документация/`. Also check
-   the project's `CLAUDE.md` — the docs may live OUTSIDE the repo at an absolute
-   path stated there. If no documentation folder exists, say so in Russian and
-   review on bugs/security/patterns only.
+1. **Find the documentation — in the owner's Obsidian vault first.** The docs of
+   every project live in the vault `C:\projects\obsidian`, not in the repo. Read
+   the vault's `C:\projects\obsidian\CLAUDE.md`: its list of sibling repos maps
+   each vault project folder to its code repo(s). Find the line naming the repo
+   under review (compare with the repo root path) and take that vault folder.
+   - Work project (`Работа/...`): the documentation is its
+     `Требования <project>/` subfolder — the analysts' requirements. Example: repo
+     `C:\projects\otc_desk` → `Работа/otc_desk/` →
+     `C:\projects\obsidian\Работа\otc_desk\Требования otc_desk\`. The same applies
+     when one vault folder maps to several repos (`Работа/Hoff/CDP/` →
+     `cdp-integrations` and `cdp-backend` both use `Требования CDP/`).
+   - Personal project (`Проекты/...`): the documentation is the concept note and
+     the `Архитектура <project>/` folder.
+   Do NOT start with a `docs/` folder inside the repo — wrong: finding an old
+   `docs/` in the repo and reviewing against it while the vault holds the current
+   requirements. Only when the repo is absent from the vault's list, fall back to
+   the path stated in the repo's own `CLAUDE.md`, then to `project/documentation/`,
+   `documentation/`, `docs/`, `Документация/` in the repo. If nothing is found,
+   say so in Russian and review on bugs/security/patterns only.
 
    **Read the whole documentation set, not a guessed subset.** First list every
    documentation file (e.g. `find <docs-root> -type f`). If the set is small enough
