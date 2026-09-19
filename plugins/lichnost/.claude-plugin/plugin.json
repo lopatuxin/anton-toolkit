@@ -1,6 +1,6 @@
 {
   "name": "lichnost",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Personal development loop in the Obsidian vault: daily diary (dnevnik), ideas and goals (idea), weekly/monthly/yearly reviews with checked advice that also keep the owner's portrait, goals and finances current (itogi), and film curation (film)",
   "author": {
     "name": "Anton"

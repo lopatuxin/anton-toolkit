@@ -62,8 +62,8 @@ reviews an analysis of analyses instead of a wall of raw text.
 - the previous weekly review's «Советы» section (to check it), `Цели.md`, `Профиль.md`.
 
 **Month**: the weekly reviews whose `month:` equals the month (Grep `^month: <YYYY-MM>` in
-`Личная/Итоги/Недели`), the finances (finance.md), `Цели.md`, the list of ideas in `Личная/Идеи/`
-with their `status` and `updated`, the previous monthly review's «Советы», `Профиль.md`.
+`Личная/Итоги/Недели`), the finances (finance.md), `Цели.md`, the alive ideas in `Личная/Идеи/`
+(`status` черновик, в проработке or отложена) with their `updated`, the previous monthly review's «Советы», `Профиль.md`.
 
 **Year**: the monthly reviews `Личная/Итоги/Месяцы/<YYYY>-*.md`, `Цели.md`, `Профиль.md`.
 
@@ -85,8 +85,9 @@ Interpret; do not retell. The reader has the raw entries.
 - **Energy**: rhythm, sleep, sport, slumps — only as the sources show it.
 - **Week**: main events, progress by project, recurring themes, what carries over.
 - **Month**: trends across the weeks, trajectory, the few defining wins and setbacks; the
-  `## Финансы` section per finance.md; each active goal's progress this month; ideas that ripened
-  into a goal or project, and ideas lying untouched.
+  `## Финансы` section per finance.md; each active goal's progress this month; alive ideas that
+  ripened into a goal or project, and ideas lying untouched for months (ask: park, drop or keep?).
+  An idea whose project started this month is proposed to be marked `стала проектом`.
 - **Year**: starts with two honest lists — what went well and what did not, six to eight points
   each if the year supports it; then the arc of the year and its turning points; then each goal —
   reached, alive, or to drop; and a proposed direction for the next year.

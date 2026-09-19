@@ -41,29 +41,9 @@ mkdir -p "$VAULT/Личная/Идеи"
 Ensure the **folder note** `$VAULT/Личная/Идеи/Идеи.md` exists and is non-empty (this vault uses
 the `folder-notes` plugin — opening the folder opens this note, so it serves as the idea index).
 The vault has the **Dataview** plugin, so the index is an auto-updating query — you never maintain
-it by hand. If the file is missing OR empty, create it with the Write tool with exactly this
-content (the inner ` ```dataview ` block must be preserved verbatim):
-
-````markdown
----
-tags:
-  - идеи
----
-
-# 💡 Идеи
-
-Личная копилка идей. Каждая идея — отдельная заметка, оформленная как короткая документация.
-Идеи можно дорабатывать: вызвать `/idea` и дополнить существующую.
-
-## Список
-
-```dataview
-TABLE WITHOUT ID file.link AS "Идея", status AS "Статус", updated AS "Обновлено"
-FROM "Личная/Идеи"
-WHERE file.name != this.file.name
-SORT updated DESC
-```
-````
+it by hand. If the file is missing OR empty, create it with `tags: [идеи]`, the heading
+`# 💡 Идеи` and three Dataview tables over `FROM "Личная/Идеи"` grouped by `status` (§8):
+«Живые», «Ушли в дело» (with the `project` or `goal` field) and «Отброшенные».
 
 Leave an existing non-empty folder note untouched — the Dataview query keeps the index current
 automatically, so there is nothing to update there per idea.
@@ -85,6 +65,7 @@ Choose the flow from the argument:
 
 - **GOAL** — he sets, reaches or drops a goal: «поставь цель …», «хочу к весне …», «цель
   достигнута», «сними цель …». → §7.
+- **STATUS** — an idea's fate changes: «идея ушла в проект <X>», «отложи идею», «выкинь идею». → §8.
 - **REFINE an existing idea** — the argument points at an idea already in the folder, e.g.
   «доработай идею про <X>», «дополни <X>», «к идее <X> добавь …», «по идее <X>: …». Match the
   named idea against the existing note titles (case-insensitive, fuzzy on the key words). → §4.
@@ -95,7 +76,9 @@ Choose the flow from the argument:
   a wrong guess either fragments one idea into two notes or overwrites the wrong note.
 
 If a refine request names an idea that does not exist, say so in Russian and offer to create it
-as a new idea instead; do not silently create a mismatched note.
+as a new idea instead; do not silently create a mismatched note. A refine request on an idea with
+`status: стала проектом` does not edit it: say that the idea now lives in the project and a change
+goes into the project's documents (`system-designer`).
 
 ## 3. NEW idea flow
 
@@ -182,8 +165,9 @@ Reply in one or two lines naming what changed, e.g.:
 Then link the idea to his goals (`${CLAUDE_PLUGIN_ROOT}/references/goals.md`). Read
 `$VAULT/Личная/Цели.md` and say in one line which active goal the idea serves and why — or, if it
 serves none, ask once: «Это тянет на цель, на отдельный проект или пусть лежит?» On «цель» continue
-into §7 with the idea as its source; on «проект» say that a project is started by the project
-template and `system-designer`; otherwise leave it. When the idea serves a goal, add a line
+into §7 with the idea as its source and then mark the idea `стала целью` (§8); on «проект» say
+that a project is started by the project template and `system-designer`, and once the project
+card exists the idea is marked `стала проектом` (§8); otherwise leave it. When the idea serves a goal, add a line
 `Служит цели: <цель>` under `[[Идеи]]` in the idea note.
 
 `obsidian-git` auto-syncs the vault, so no manual git commit is needed here.
@@ -203,4 +187,22 @@ if it is missing.
   in his words. Ideas that pointed at it keep their `Служит цели` line.
 
 Set `updated:` to today. Confirm in one line: «Записал цель „…“ — срок …, признак …».
+
+## 8. Idea statuses
+
+An idea never hangs forever as a draft and is never deleted — it keeps the record of where a
+project or goal came from. Its `status` says what became of it:
+
+| `status` | Meaning | Extra |
+|---|---|---|
+| `черновик`, `в проработке` | alive, being thought over | — |
+| `отложена` | alive, parked on purpose | — |
+| `стала проектом` | went into work as a project | frontmatter `project: "[[<project card>]]"`; under `[[Идеи]]` the line becomes `[[Идеи]] · стала проектом [[<card>]]` |
+| `стала целью` | became a goal in `Цели.md` | frontmatter `goal: "[[Цели#<goal heading>]]"`; the same kind of line |
+| `отброшена` | he decided against it | one line of why at the end of the note, in his words |
+
+The STATUS flow sets the status, the extra fields and `updated:` to today, and changes nothing
+else in the note. Before marking `стала проектом`, check that the project card exists under
+`Проекты/` or `Работа/`; if not, say so instead. The monthly review looks only at the alive
+statuses. Confirm in one line: «Идея „…“ — стала проектом [[…]]».
 
