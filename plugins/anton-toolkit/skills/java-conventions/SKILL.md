@@ -36,6 +36,9 @@ These rules apply to every Java change, a one-line edit included. A concrete pro
 - One endpoint — one page: before creating or changing a service method, Grep its callers; if it serves several pages, split it.
 - MapStruct for every entity→DTO mapping, no manual `.builder().field(...).build()` chains. If the project has no MapStruct yet, add the dependencies and create the mapper in `mapper/`.
 - No comments on obvious code, no abstractions for hypothetical future needs.
+- On Java 21+ take the ends of a list through the `SequencedCollection` methods, in main code and tests alike — IDEA flags the index form and the owner rejects it in review.
+  - Correct: `values.getFirst()`, `values.getLast()`, `queue.removeFirst()`
+  - Incorrect: `values.get(0)`, `values.get(values.size() - 1)`, `queue.remove(0)`
 - Use the libraries already in the project; a new dependency needs a justification in the report.
 - Test identifiers are English camelCase with the Russian description in `@DisplayName` on the class and on each `@Test` method — not Russian in backticks, even where the project already has such names. Cases that differ only in input are one `@ParameterizedTest` with `@MethodSource` or `@CsvSource`.
 
