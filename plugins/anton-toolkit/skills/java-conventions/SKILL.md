@@ -41,6 +41,22 @@ These rules apply to every Java change, a one-line edit included. A concrete pro
   - Incorrect: `values.get(0)`, `values.get(values.size() - 1)`, `queue.remove(0)`
 - Use the libraries already in the project; a new dependency needs a justification in the report.
 - Test identifiers are English camelCase with the Russian description in `@DisplayName` on the class and on each `@Test` method — not Russian in backticks, even where the project already has such names. Cases that differ only in input are one `@ParameterizedTest` with `@MethodSource` or `@CsvSource`.
+- No `var`; write the type. No public fields.
+- Code you create or move into a new class meets every rule here, even when the method body is copied from old code. Old code the task does not touch stays as it is.
+
+## Spring design
+
+The owner rejects hand-made mechanisms and inheritance bent to fit one case. Before writing infrastructure, look for the standard Spring, Boot or library way and use it.
+
+- Ready mechanism first. Shared defaults for several services — `spring.config.import` of a library YAML, not a custom `EnvironmentPostProcessor`. Concurrency and rate limits — resilience4j `Bulkhead` / `RateLimiter` configured in `application.yml`, not a hand-made semaphore or token bucket with a table of property keys. A metric name — an attribute of the annotation on the measured method, not a table of class names held as strings. Mapping — MapStruct or builders, not setter chains.
+- No template method bent by flags. A base class with hooks that return `null`/`true` by default, boolean switches, or stubs that throw because they "must not be called", added so one or two subclasses fit, is a design error. Use composition: one component with the shared loop plus a strategy per variant; take the variant that does not fit out of the shared path.
+- No combinatorial helpers. A helper with `persistX`, `persistWithY`, `persistWithYAndZ` and a profile flag becomes a few plain operations the caller invokes explicitly, in its own order.
+- `@Qualifier` is a smell: it usually patches a bean registered twice or picks one of several implementations. Register each bean once; inject `List<Impl>` where every implementation reports its own key and build an `EnumMap`. The exception is several connections of one type (several `DataSource` / `JdbcTemplate`).
+- `@ConfigurationProperties` classes are immutable `record`s registered once (`@ConfigurationPropertiesScan`), not `@Component` + `@Data` scattered across `@EnableConfigurationProperties` on unrelated classes. Default values live in `application.yml`, not in Java field initializers. Secrets live in neither — only in the stand's secrets.
+- Development settings (limits, pool sizes, timeouts) go to `application.yml`; Helm values carry only what differs per stand (addresses, credentials, topic names).
+- Every Feign call is an explicit `try` with two `catch` blocks — `FeignException` and everything else — each writing one WARN line with context (provider, method, address, HTTP status) and no stack trace; the exception type thrown outward does not change. The stack trace is logged once, at the boundary that handles the error.
+- Delete dead code instead of refactoring it: before touching a chain, check that its entry point is reachable — the event it listens to is published somewhere, the method has a caller.
+- Do not test configuration wiring: no `ApplicationContextRunner` checks of which bean exists or lands in which field, no `ReflectionTestUtils.getField`, no assertions on bound property values, no mock-based tests of three-line helpers. Wiring is checked on a running stand; tests pin behaviour.
 
 ## Done criteria
 
