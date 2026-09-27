@@ -269,6 +269,7 @@ function nonBlockersOf(r) {
 
 let openFindings = nonBlockersOf(review)
 let unclosed = []
+let rejected = []
 
 let pending = blockersOf(review)
 let round = 0
@@ -295,8 +296,11 @@ while (round < FIX_ROUNDS && pending.length) {
       )
     )
     const checked = toVerify.filter((f, i) => verdicts[i] && verdicts[i].real)
-    const dropped = toVerify.length - checked.length
-    if (dropped) log(`Состязательная проверка отсеяла ложных находок: ${dropped}.`)
+    toVerify.forEach((f, i) => {
+      const v = verdicts[i]
+      if (!(v && v.real)) rejected.push(`${f.where} — ${f.summary} (проверка сочла ложной: ${(v && v.why) || 'проверяющий не ответил'})`)
+    })
+    if (rejected.length) log(`Состязательная проверка отсеяла находок: ${rejected.length}; они уйдут в отчёт как спорные.`)
     toFix = checked.concat(pending.slice(toVerify.length))
     if (!toFix.length) {
       pending = []
@@ -437,6 +441,7 @@ return {
   qa: qa ? { verdict: qa.verdict || '', appUp: qa.appUp !== false, bugsLeft: (qa.bugs || []).length } : null,
   qaSkipped: qaSkipped,
   blockersLeft: unclosed,
+  blockersRejected: rejected,
   findings: openFindings.map((f) => `${f.where} [${f.severity}${f.confidence ? ', ' + f.confidence : ''}] — ${f.summary}`),
   openQuestions: openQuestions,
 }

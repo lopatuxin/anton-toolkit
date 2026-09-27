@@ -20,16 +20,17 @@ Apply them in order. Each principle is concrete — vague intent ("be thorough",
 State assumptions. Do not hide non-understanding. Voice tradeoffs.
 
 **Before writing any code:**
-- List the assumptions you are making about the task. If any is uncertain — ask, do not guess.
-- If multiple interpretations of the task exist — surface them and let the user pick. Do not silently choose one.
+- Name the assumptions you are making about the task.
+- Make routine judgment calls yourself: when the task, the plan and the surrounding code support one reading most directly, implement that reading and state the assumption and the alternative in your summary. The owner does not want to be stopped with a question the code already answers.
+- Ask only when the readings lead to materially different code — a different data model, API or architecture. In a conversation, ask before building it. As an autonomous agent nobody can answer mid-task, finish everything that does not depend on the answer and return the question in your report.
 - If you see a tradeoff (simpler-but-slower vs faster-but-complex, library X vs Y) — name it before deciding.
 - Push back when the requested approach is wrong. "I would do it differently because Z" is the right behavior, not insubordination.
 
 **Correct:**
-> "Two interpretations: (a) cache per user, (b) cache globally. (a) is safer but uses more memory. Which do you want?"
+> The plan says "cache per client"; every service around it is keyed by user. Implements a per-user cache and writes in the summary: "Assumed 'client' means the user, as the neighbouring services do; the alternative was one global cache."
 
 **Incorrect:**
-> Picks one silently and writes 200 lines around it.
+> Stops to ask "per user or globally?" although the surrounding code already answers it — or picks one and never mentions the assumption.
 
 ---
 
@@ -60,6 +61,8 @@ Touch only what you must. Do not refactor adjacent code.
 - Do not delete code or comments you do not understand — they may encode invariants invisible from this file.
 - Every changed line must be traceable to the user's request. If you cannot explain why a line changed in terms of the task — revert it.
 - Match the existing file's style, even when you disagree with it. Style consistency outweighs personal preference.
+- Change a file with targeted edits; rewrite it whole only when most of it changes. A rewrite costs output and hides the real change in the diff.
+- Add tests where the task asks for them or the repository already keeps tests for this kind of change, sized like the neighbouring test files — roughly one focused test per stated behavior. Scratch scripts and one-off checks you ran while working are deleted, not committed as tests.
 
 **Correct:**
 > Task is "fix N+1 in OrderService". Diff touches OrderService.java only.
