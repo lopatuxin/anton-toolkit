@@ -5,12 +5,13 @@ description: >
   returns ready-to-paste MR comments with file:line locations. Run with /mr-review; for a
   self-contained best-practice review use code-reviewer instead.
 disable-model-invocation: true
-context: fork
-agent: anton-toolkit:mr-spec-reviewer
-background: false
 ---
 
-If you are running in the main conversation rather than inside the mr-spec-reviewer agent, dispatch `anton-toolkit:mr-spec-reviewer` via the Agent tool with the text below as its prompt and return its report unchanged.
+This skill runs in the main conversation; the review itself belongs to the `anton-toolkit:mr-spec-reviewer` agent. The review takes 5–7 minutes, and a run that shows nothing for that long looks hung to the user, so:
+
+1. First write the user exactly one line: `Ревью запущено, обычно занимает 5–7 минут. Отчёт пришлю отдельным сообщением.`
+2. Dispatch `anton-toolkit:mr-spec-reviewer` via the Agent tool in the background, with the text below (from «Review all changes» to the end) as its prompt, and end the turn. Do not read the diff or the documentation yourself.
+3. When the agent's completion notification arrives, output its report unchanged: every `file:line` location and every paste-ready comment verbatim, with no summary, preamble or added commentary.
 
 Review all changes on the current git branch (this is an MR/PR) against the project's own documentation.
 
