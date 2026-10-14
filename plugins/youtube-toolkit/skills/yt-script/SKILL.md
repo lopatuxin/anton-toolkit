@@ -137,7 +137,7 @@ After producing the script in chat, persist it to the Obsidian vault following `
     - youtube/series/<series>
   related:
     - "[[Проекты/youtube/идеи/<ideas-file>]]"    # the idea this script came from, if any
-    - "[[Проекты/youtube/seo/<slug>]]"           # forward link — SEO file for the same video
+    - "[[Проекты/youtube/seo/seo-<slug>]]"           # forward link — SEO file for the same video
     - "[[Проекты/youtube/превью/<slug>]]"        # forward link — thumbnail file for the same video
   ---
   ```

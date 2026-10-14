@@ -90,13 +90,13 @@ Use Russian (Cyrillic), lowercase, kebab-case, no spaces, `.md` extension. Two p
   `<video-slug>.md`
   Example: `курсор-выкинул-проект.md`
 
-The video slug is derived from the video's working title: keep it in Russian (Cyrillic), do NOT transliterate to Latin. Lowercase, kebab-case (spaces → `-`), strip punctuation, ≤ 60 chars. Example: `Курсор выкинул проект` → `курсор-выкинул-проект`. The SAME slug is reused across skills so that `сценарии/<slug>.md`, `seo/<slug>.md`, `превью/<slug>.md` form a video bundle the user can find by slug in Obsidian.
+The video slug is derived from the video's working title: keep it in Russian (Cyrillic), do NOT transliterate to Latin. Lowercase, kebab-case (spaces → `-`), strip punctuation, ≤ 60 chars. Example: `Курсор выкинул проект` → `курсор-выкинул-проект`. The SAME slug is reused across skills so that `сценарии/<slug>.md`, `seo/seo-<slug>.md`, `превью/<slug>.md` form a video bundle the user can find by slug in Obsidian.
 
 Filename rules (strict):
 - Russian (Cyrillic), lowercase, kebab-case. Do NOT transliterate to Latin (`kursor-vykinul-proekt.md` is WRONG).
 - Do NOT use English words for content type (`niche-batch-scan`, `channel-snapshot`, `ideas-batch`). Use Russian equivalents (`разбор-ниши`, `обзор-канала`, `идеи`).
 - The only ASCII tokens allowed inside a slug are: the ISO date prefix `YYYY-MM-DD`, the `seo` acronym, and proper-noun tool names where the brand itself is Latin (`Cursor`, `Claude`, `Jarvis`) — but Russian wording around them stays Cyrillic.
-- Correct: `2026-05-13-разбор-ниши.md`, `курсор-выкинул-проект.md`, `seo/курсор-выкинул-проект.md`
+- Correct: `2026-05-13-разбор-ниши.md`, `курсор-выкинул-проект.md`, `seo/seo-курсор-выкинул-проект.md`
 - Incorrect: `2026-05-13-niche-batch-scan.md`, `kursor-vykinul-proekt.md`, `10-competitors/scan.md`
 
 If a file with the chosen name already exists, append a `-v2`, `-v3`… suffix. Do not overwrite without asking.
@@ -134,11 +134,11 @@ Cross-reference using Obsidian's `[[wiki-link]]` syntax in both frontmatter `rel
 
 - A script body links to the idea it came from: `> Based on idea: [[Проекты/youtube/идеи/2026-05-12-идеи#Idea-3]]`
 - An SEO file links to the script: `Script: [[Проекты/youtube/сценарии/курсор-выкинул-проект]]`
-- A thumbnail file links to script and SEO: `Pair with [[Проекты/youtube/сценарии/курсор-выкинул-проект]] and [[Проекты/youtube/seo/курсор-выкинул-проект]]`
+- A thumbnail file links to script and SEO: `Pair with [[Проекты/youtube/сценарии/курсор-выкинул-проект]] and [[Проекты/youtube/seo/seo-курсор-выкинул-проект]]`
 
 Path rules (strict):
 - Paths are relative to the Obsidian vault root `C:\projects\obsidian`, so they ALWAYS start with `Проекты/youtube/`. A link that omits the prefix is a bug introduced when this folder was a standalone vault.
-- Never use a bare note name. Per-video artefacts deliberately reuse the SAME slug across folders (`сценарии/<slug>`, `монтаж/<slug>`, `seo/<slug>`, `превью/<slug>`), so `[[<slug>]]` is ambiguous and Obsidian cannot resolve which one is meant.
+- Never use a bare note name. Per-video artefacts deliberately reuse the SAME slug across folders (`сценарии/<slug>`, `монтаж/<slug>`, `seo/seo-<slug>`, `превью/<slug>`), so `[[<slug>]]` is ambiguous and Obsidian cannot resolve which one is meant.
 - Never use a Markdown path link — `[Сценарий](Проекты/youtube/сценарии/slug.md)` is wrong; wiki-links only.
 - Correct: `[[Проекты/youtube/сценарии/курсор-выкинул-проект]]`
 - Incorrect: `[[сценарии/курсор-выкинул-проект]]`, `[[курсор-выкинул-проект]]`, `[Сценарий](Проекты/youtube/сценарии/курсор-выкинул-проект.md)`

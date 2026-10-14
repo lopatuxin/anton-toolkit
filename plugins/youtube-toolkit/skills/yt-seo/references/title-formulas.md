@@ -1,86 +1,26 @@
-# Title formulas (Russian, IT / vibe-coding)
+# Titles (Russian)
 
-Pick 3 formulas per video. One title per formula (or two close variants on one formula). Five total titles.
+For videos where the author makes something — a game, a program, a build — large channels use one scheme: «делаю / сделал / создаю» + the thing + one unusual detail. Taken from 130 such titles on 19 channels, 2026-10-13:
 
-## Formula 1 — Outcome reveal
+- maxter: «Создаю ХОРРОР ИГРУ с МЕМАМИ (#1)» — 12.6M views, first episode of a series; «Создаю ЧЕТЫРЁХМЕРНУЮ игру (это как?)» — 4.1M.
+- Dani: «I Made Among Us, but it's 3D» — 21M; «Adding a Dragon Boss to my Game Because Steam is Mad at me» — 16M.
+- Sebastian Lague: «I Tried Creating a Game Using Real-World Geographic Data» — 6.1M.
+- Хауди Хо: «Я сделал ДРИФТ игру =) (Фильм)».
+- Mikha Zen: «Я создал хоррор-игру, где ИИ печатает монстров».
 
-`<I did X> за <time> с <tool>` or `<built X> на <tool>`
+## Rules
 
-> "Собрал CRM на Cursor за 2 дня — и вот что заработало"
-> "AI-ассистент с памятью на Claude Code за один вечер"
+- The detail is in the video and recognisable: a known character, an odd mechanic, a constraint («за 48 часов»). For the fairy-tale game channel the niche analysis showed viewers click on a recognisable hero — Кощей, Змей Горыныч, Баба-Яга.
+- The title says what the thumbnail shows, without repeating its words: the thumbnail shows a fight with Змей Горыныч, the title says it is a game being made from Russian fairy tales.
+- No «с нуля» / «from scratch»: none of the 130 titles uses it. No teasers in the voice of «Вдумайтесь», no «это не X, а Y».
+- No episode number on the first video of a series: among the 130 titles only maxter numbers episodes, nothing shows the number brings clicks, and the playlist shows the order. From the second episode a number in brackets at the end — «(#2)» — helps a viewer who lands mid-series find the start; use it only if the owner numbers the whole series.
+- Caps on a key word only when the channel's own style already uses caps (maxter and IGM do, the English dev channels do not). Default: no caps.
+- 30-60 characters, digits instead of number words, no exclamation marks, at most one question mark.
+- A hook the video pays off only briefly (the Koschei fight takes one minute of seven) goes to the spare, with that risk named.
 
-CTR lever: tangible outcome + tool anchor. Best for case studies and builds.
+Correct: «Делаю игру по русским сказкам». Spare: «Делаю игру, где Кощея надо победить как в сказке».
+Incorrect: «Делаю игру по русским сказкам с нуля», «Программист без опыта в играх делает игру по сказкам».
 
-## Formula 2 — Sharp opinion
+## Output
 
-`<contrarian claim>` or `Почему я больше не <verb>`
-
-> "Cursor больше не справляется с большими проектами — пересел на это"
-> "Не используй Claude Code в одиночку. Вот связка которая работает"
-
-CTR lever: pattern interrupt against niche consensus. Earns clicks from in-niche viewers.
-
-## Formula 3 — Problem mirror
-
-`<Frustration> — <promise of fix>`
-
-> "Cursor генерит мусор? Это из-за одного промпта в .cursorrules"
-> "AI код-генератор валит проект — что я изменил и как починил"
-
-CTR lever: problem identification. Best for tutorials addressing specific pain.
-
-## Formula 4 — Number teaser
-
-`<surprising number> + <context>`
-
-> "47 коммитов за 3 дня — что я понял про работу с AI на больших проектах"
-> "За 3 часа я переписал backend. Без знаний backend"
-
-CTR lever: curiosity gap + concrete number. Use sparingly — gets old fast.
-
-## Formula 5 — Series episode
-
-For flagship-series videos, the title has two parts: series name + episode promise.
-
-> "Логос #7 — научил ассистента помнить контекст между сессиями"
-> "CRM на vibe coding #4 — модуль клиентской базы за вечер"
-
-CTR lever: signals continuity to subscribers, hookable for new viewers.
-
-## Formula 6 — Beginner-anchor
-
-For wider audience reach, anchor to a beginner mindset (the niche has demand for this).
-
-> "Vibe coding для тех кто не вайбкодил: разбор за 12 минут"
-> "Первый раз пишу проект с Cursor — что пошло не так"
-
-CTR lever: accessible framing brings in viewers from outside the regular niche bubble. Use 1 such title per 4–5 videos to keep the channel from getting too insular.
-
-## Formula 7 — Tool comparison
-
-`<Tool A> vs <Tool B>: <verdict>`
-
-> "Cursor vs Claude Code на реальном проекте: что выбрал и почему"
-> "Codex или Cursor в 2026 — на чём пишу прод"
-
-CTR lever: comparison searches. Be honest in the verdict — clickbait kills retention.
-
-## Length and format rules
-
-- Target visible length on YouTube: **40–60 characters**. Above 60, the tail gets cut on most viewports.
-- Russian language only in titles. English permitted for tool names (Cursor, Claude Code, AI, CRM) — those *are* the search terms.
-- Capitalisation: only first word and proper nouns. No ALL CAPS. No emoji.
-- One question mark max. No exclamation marks.
-- Numbers are good. Use digits, not words ("за 2 дня", not "за два дня").
-
-## Selection rule (5 titles per video)
-
-| Video type | 3 formulas to pick |
-|---|---|
-| Tutorial | 3 (problem) + 1 (outcome) + 6 (beginner) |
-| Case study | 1 (outcome) + 4 (number) + 5 (series, if applicable) |
-| Tool review | 2 (opinion) + 7 (comparison) + 4 (number) |
-| Flagship episode | 5 (series) + 1 (outcome) + 6 (beginner) |
-| Lead-gen anchor | 1 (outcome) + 4 (number) + 2 (opinion if earned) |
-
-If the chosen formulas don't produce a strong title for the specific video, fall back to a different formula but document the substitution in the output.
+One recommended title with the large-channel title it follows, plus one or two spares with when to switch (e.g. «если за неделю просмотров мало»). Not five annotated variants with "hook type" and "CTR lever" — the owner rejected that format.

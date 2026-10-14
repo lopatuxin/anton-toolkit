@@ -1,98 +1,87 @@
 ---
 name: yt-seo
 description: >
-  Produces the YouTube Studio metadata for one video and saves it to the
-  Obsidian vault: 5 annotated title variants with a recommended pick, a full
-  Russian description with timestamps, CTA and links, and 15-30 ordered tags.
-  Prefers the title formulas and tag patterns the channel's top-performing
-  videos already validated. Thumbnails are `yt-thumbnail`, the script itself
-  is `yt-script`.
+  Produces the YouTube Studio packaging for one video and saves it to the
+  Obsidian vault: one recommended title with one or two spares, a short
+  description in the author's own voice with chapters timed from the final
+  cut, 25-36 tags, a one-question pinned comment and the Studio settings to
+  set. Written the way large channels package their videos, not as an SEO
+  template. Thumbnails are `yt-thumbnail`, the script itself is `yt-script`.
 disable-model-invocation: true
 ---
 
 # yt-seo — title, description, tags
 
-Produce: 5 title variants (A/B-style), one full description with timestamps and CTAs, and 15–30 tags. Russian-language channel.
+Produce the text the owner pastes into YouTube Studio — title, description, tags, pinned comment — plus the settings he must not miss. Russian-language channels.
 
-## Step 0 — Load channel knowledge base (if present)
+The owner rejected the earlier output of this skill as AI slop: a selling first paragraph, emoji section headers, a hashtag block, «с нуля» in the title, five annotated title variants. Large channels package videos very differently. The references below are distilled from 19 channels with 0.3-20M subscribers (analysed 2026-10-13); follow them, not generic SEO advice.
 
-Follow `${CLAUDE_PLUGIN_ROOT}/references/knowledge-base-context.md`. For `yt-seo` specifically, when `kb_available: true` read: `индекс.md` and the top 10 `top`-classified cards (frontmatter + description sections — skip the transcript body to keep context light).
+## Step 0 — Load context
 
-Use the loaded cards to mine the channel's working SEO patterns: which title formulas recur in the `top` set, which tag categories appear repeatedly, how descriptions are structured. Prefer formulas that the channel already validated over generic best practice. If the KB is absent, fall back to the generic title formulas in `${CLAUDE_SKILL_DIR}/references/title-formulas.md` unchanged.
+1. Channel knowledge base: follow `${CLAUDE_PLUGIN_ROOT}/references/knowledge-base-context.md`. When `kb_available: true`, read `индекс.md` and the top 10 `top`-classified cards (frontmatter + description, skip the transcript) and prefer the title and description habits the channel's own hits validated.
+2. The newest packaging analysis in `C:\projects\obsidian\Проекты\youtube\конкуренты\` (frontmatter `mode: packaging`) — real titles, descriptions and pinned comments of large channels. When it disagrees with the references, it wins: it is newer.
+3. The video's script (`сценарии/<slug>.md`), editing sheet (`монтаж/<slug>.md`) and the channel's voice note if there is one (e.g. `Подача канала …` in `Проекты/youtube/`). The description must sound like the video.
 
 ## Procedure
 
-1. **Get inputs.** Required:
-   - The video — at minimum a working title and 2–3 sentences of what's in it; ideally the full script or its main payoff.
-   - Video type (tutorial / case / flagship / review / lead-gen).
-   - Series, if applicable (Logos / CRM / standalone).
-   - Estimated length.
-
-   If a `yt-script` output is in the conversation, pull from it. If only an idea exists, work from that but flag less precision in timestamps.
-
-2. **Generate 5 titles** using `${CLAUDE_SKILL_DIR}/references/title-formulas.md`:
-   - Pick 3 different formulas (e.g., outcome-reveal, problem-mirror, sharp-opinion).
-   - For each chosen formula, produce 1–2 variants.
-   - Annotate each variant with: formula name, character count, hook type, predicted CTR lever.
-
-3. **Build the description** using `${CLAUDE_SKILL_DIR}/references/description-template.md`:
-   - Hook line (1–2 sentences in plain prose, repeats the value prop).
-   - Series breadcrumb if flagship.
-   - Timestamps (6–10 entries for 12 min video, scaled by length). If timestamps are placeholders (script not finalised), mark them clearly.
-   - Lead-gen CTA: site placeholder `{{SITE_URL}}` or soft fallback "контакты в закреплённом комментарии".
-   - Useful links section (tools mentioned, repos, related videos).
-   - Hashtag block at the end — 3–5 hashtags max in description.
-
-4. **Generate tags** using `${CLAUDE_SKILL_DIR}/references/tags.md`:
-   - 15–30 tags total.
-   - Mix: brand (channel name + series), niche head terms, long-tail variations, tool names, Russian and selective English terms.
-   - Order: most specific/searched first.
-
-5. **Output everything** in one Markdown block, ready to paste into YouTube Studio.
+1. **Inputs.** The final cut if the video is edited, otherwise the script. Which channel, which series, the length.
+2. **Chapter times from the final cut.** Take them from the transcript of the final voice track plus the film second where the voice starts — the editing sheet names the episode folder. Script timings drift after cuts and retakes: in the first episode the script said 1:50 for a chapter that starts at 1:57. Without a final cut, mark the chapters as a draft.
+3. **Title** per `${CLAUDE_SKILL_DIR}/references/title-formulas.md`.
+4. **Description** per `${CLAUDE_SKILL_DIR}/references/description-template.md`.
+5. **Tags** per `${CLAUDE_SKILL_DIR}/references/tags.md`; count them the way YouTube does and state the number.
+6. **Pinned comment** — one question to viewers on the video's own topic, no links, no request to like or subscribe: «Кем быть герою: Иван-дурак, кто-то из богатырей, Василиса Премудрая или кто-то другой?». БУЛДЖАТь pins exactly this kind of question and gets 50-120 replies under it. A lead-gen pinned comment with links is `yt-promo`.
+7. **Studio settings** — list only the ones that apply:
+   - Значок: the thumbnail file with its size (limit 2 MB, 1280×720).
+   - Плейлист for the series.
+   - Аудитория: «Нет, это видео не для детей» whenever the video asks for comments — YouTube turns comments off on made-for-kids videos, and a fairy-tale or cartoon look invites the wrong choice.
+   - Изменённый или синтетический контент: «Да» only for realistic AI footage (real-looking people, places, events); clearly fantastical or cartoon AI footage is «Нет».
+   - Язык видео: set it explicitly — Studio leaves it at «Нет», and then YouTube makes no automatic subtitles.
+   - Категория.
+   - Конечная заставка: element times from the final cut (the end-screen stretch, at most 20 s); no "next video" element until a next video exists.
+   - The pinned comment can be posted only after the video is public.
 
 ## Output format
 
-```markdown
-# SEO — <working title>
+````markdown
+# SEO — <title>
 
-## Title variants (5)
+## Название
 
-### Variant 1 — <formula name>
-**<title text>**
-- Length: <N chars> (target ≤ 60 visible)
-- Hook type: <curiosity / outcome / opinion / number / problem>
-- CTR lever: <one sentence — why this variant could pull clicks>
+**<title>** — <the large-channel title it follows, with views>.
 
-### Variant 2 — <formula name>
-…
+Запасное: **<title>** — <when to switch to it>.
 
-(Variants 3, 4, 5)
+## Описание
 
-## Recommended pick
-
-Variant <N> — <one-sentence rationale>.
-
-## Description
-
-<Russian description ready to paste; full text including timestamps, links, hashtags>
-
-## Tags (NN total)
-
-<comma-separated list>
-
-## Notes
-
-- Timestamps mode: <real | placeholder — needs script finalisation>
-- Lead-gen CTA mode: <{{SITE_URL}} placeholder | soft fallback>
-- Series breadcrumb included: <yes/no>
 ```
+<ready to paste>
+```
+
+## Теги (<N>)
+
+```
+<comma-separated>
+```
+
+<N> знаков из 500 по счёту YouTube.
+
+## Закреплённый комментарий
+
+```
+<one question>
+```
+
+## Настройки в Творческой студии
+
+- <only the settings that apply>
+````
 
 ## Save to vault
 
-After producing the SEO block in chat, persist it to the Obsidian vault following `${CLAUDE_PLUGIN_ROOT}/references/vault.md`.
+Persist the output following `${CLAUDE_PLUGIN_ROOT}/references/vault.md`.
 
 - Target folder: `C:\projects\obsidian\Проекты\youtube\seo\`.
-- Filename: `<video-slug>.md`. The slug is Russian (Cyrillic) kebab-case, no transliteration. Reuse the same slug as the script for this video (lives in `сценарии/<slug>.md`). If a SEO file with this slug exists, append `-v2`, `-v3`…
+- Filename: `seo-<video-slug>.md`. The `seo-` prefix keeps the note name unique in the vault: the script and the editing sheet already use the bare slug, and Obsidian compares note names across folders. Reuse the slug of the script. If the file exists, append `-v2`, `-v3`…
 - Frontmatter:
 
   ```yaml
@@ -101,28 +90,22 @@ After producing the SEO block in chat, persist it to the Obsidian vault followin
   date: <YYYY-MM-DD>
   video: "<working title in Russian>"
   video_slug: <slug>             # Cyrillic kebab-case
-  video_type: tutorial | case | flagship | review | lead-gen
-  series: logos | crm | standalone
-  recommended_title_variant: <1..5>
-  timestamps_mode: real | placeholder
-  cta_mode: site-url | soft-fallback
+  series: <series slug> | standalone
+  timestamps_mode: real | draft
   tag_count: <N>
   tags:
     - youtube/seo
     - youtube/series/<series>
   related:
     - "[[Проекты/youtube/сценарии/<slug>]]"
-    - "[[Проекты/youtube/превью/<slug>]]"
+    - "[[Проекты/youtube/монтаж/<slug>]]"
   ---
   ```
 
-- Body: the full SEO output (5 title variants, recommended pick, description, tags, notes) — same content as the chat output.
+- Body: the same content as the chat output.
 - After writing, tell the user in Russian where the file landed.
 
 ## Boundaries
 
-- Do NOT generate a thumbnail concept — that is `yt-thumbnail`.
-- Do NOT write the script — that is `yt-script`.
-- Title variants — exactly 5. Not 3, not 10. Five forces variety without dilution.
-- Tags 15–30. Below 15 leaves discovery on the table; above 30 dilutes relevance signal.
-- Russian for titles and descriptions. Tool names and code identifiers stay in their original form.
+- No thumbnail concept — `yt-thumbnail`. No script — `yt-script`. No lead-gen funnel — `yt-promo`.
+- Everything the viewer reads is Russian; tool names keep their original spelling.

@@ -96,7 +96,7 @@ After producing the concept brief in chat, persist it to the Obsidian vault foll
     - youtube/thumbnail
   related:
     - "[[Проекты/youtube/сценарии/<slug>]]"
-    - "[[Проекты/youtube/seo/<slug>]]"
+    - "[[Проекты/youtube/seo/seo-<slug>]]"
   ---
   ```
 

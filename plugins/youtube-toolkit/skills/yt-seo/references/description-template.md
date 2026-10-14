@@ -1,104 +1,57 @@
-# Description template (Russian)
+# Description (Russian)
 
-The full description goes in YouTube Studio. Aim ~800–1200 characters total. The first 2 lines must work as a search snippet.
+On large channels the author's own text is one to three sentences in the same voice as the video, often with self-irony; the rest is links, chapters and a music credit. From 19 channels, 2026-10-13:
+
+- maxter, first episode of a series (12.6M views): «В этом видео я создаю полноценную 3D хоррор игру. Вы играете за грибника, который попадает в лес, населённый мемами. Покажу весь процесс создания + как я запугивал друзей на тестах :)»
+- Хауди Хо: «Целый фильм о разработке дрифт игры. Без рекламы и без перерывов.»
+- Sebastian Lague: one sentence about the small experimental game he has been working on and a request for ideas on how to take it further.
+- Dani: «haha 3d among us go brr».
 
 ## Block order
 
 ```
-<HOOK LINE — 1-2 sentences, repeats value prop, contains a primary keyword>
+<link line — only when the channel has something of its own to link: sponsor, game page, Telegram. Large channels put it first because the first lines show under the video. For the lead-gen channel this is {{SITE_URL}} once the site is live, otherwise no line.>
 
-<SERIES BREADCRUMB — only for flagship episodes>
+<1-3 sentences in the author's voice>
 
-⏱ Тайм-коды:
-0:00 — Хук / интро
-0:15 — <act 1 name>
-N:NN — <act 2 name>
+<the question to viewers, if the video asks one>
+
+0:00 <chapter>
+0:33 <chapter>
 …
 
-📌 <SOFT CTA — one line>
-
-🔗 Полезные ссылки:
-- <Tool name>: <URL or "поиск в Google">
-- Репозиторий проекта: <URL or "ссылка позже">
-- Прошлая серия: <URL or "—">
-- Связанные видео: <URL>
-
-#хэштег1 #хэштег2 #хэштег3
+Музыка: <artist> — <track>, <track>
+<one plain line per asset whose licence requires attribution>
 ```
 
-## Hook line rules
+Usually 400-1100 characters. There is no target length; do not pad.
 
-The first 1–2 lines are visible in search results and on mobile. They must:
+## The author's text
 
-- Contain the primary keyword (tool, series name, outcome).
-- Repeat the title's value prop in plainer language.
-- NOT start with "В этом видео..." — wastes the snippet slot.
+- First person, phrased the way he speaks in this video — take the words from the script or the transcript.
+- Say what he does in the video, not a sales pitch for the product.
+- Correct: «Решил сделать игру по русским сказкам и былинам. Начну с двумерного платформера, а бой и прокачку возьму из ролевых игр. Рассказываю, какой я вижу игру, зачем пишу свой движок и чего ждать дальше.»
+- Incorrect: «Делаю с нуля игру по русским сказкам и былинам. Это будет двумерный платформер с боем и прокачкой как в ролевых играх, а боссов в нём придётся побеждать так, как это описано в сказках.» — a pitch, not a person talking.
 
-Good:
-> Собрал полноценную CRM для автосервиса на Cursor за два дня. Без backend-опыта, по шагам — что сработало, что пришлось переделать.
+## Chapters
 
-Bad:
-> В этом видео я расскажу как я делал CRM. Будет интересно!
+- YouTube shows chapters only when the first is `0:00`, there are at least three, and each lasts at least 10 seconds.
+- Times from the final cut (SKILL step 2), each at the second where the chapter's first phrase starts.
+- Names as the author would say them aloud, short, without em-dash subtitles: «Кто делает игру», «Бой как в World of Warcraft», «Зачем мне свой движок», «Чего ждать». Large channels also joke («Дядя отстаньте», «Покушение на древесину») — use a joke only when it is the author's own from the video.
+- Roughly one chapter per 45-60 seconds of a 5-15-minute video.
+- Plain `0:00 Название` lines with no header line above them.
 
-## Series breadcrumb
+## Credits
 
-For flagship-series episodes only:
+- Music in one plain line «Музыка: …», even when the library does not require attribution — large channels credit it anyway.
+- Every asset whose licence requires attribution (a CC BY logo, a photo) gets one plain line, e.g. «Логотип Godot: Andrea Calabró, CC BY 4.0». Check the editing sheet and the final cut for what actually made it in: do not credit dropped assets.
 
-> 🧠 Логос — серия про сборку Jarvis-подобного ассистента с AI. Это эпизод #7. Все эпизоды: [плейлист].
+## Never in the description
 
-For CRM:
-
-> 🛠 Серия про vibe-coding бизнес-приложений. Это эпизод #N. Плейлист: [URL].
-
-Skip for standalone videos.
-
-## Timestamps
-
-- **6 entries** for 8 min video, **8 entries** for 12 min, **10–12 entries** for 18–20 min.
-- First entry always `0:00 — Хук / интро`.
-- Each entry names the section as the viewer would understand, not as the script labels it. Use Russian.
-- If timestamps are placeholders (script not finalised), prefix the block with `⏱ Тайм-коды (черновик):` and use `0:00`, `0:30`, `2:00` rounded.
-
-## CTA
-
-Use one line. Choose:
-
-**Soft (default — site not live):**
-> 📌 Заказ разработки приложений с AI — контакты в закреплённом комментарии.
-
-**With site (when {{SITE_URL}} replaced):**
-> 📌 Заказ разработки: {{SITE_URL}}
-
-Do not duplicate the CTA in multiple places. One line, one place. The closing pinned comment carries the actual link.
-
-## Links section
-
-Include only links that pay off. Empty link section is fine — do not pad.
-
-- Tools mentioned: link to homepage or search.
-- Repository: if the user has one for this video.
-- Previous series episode: if flagship.
-- 1–2 related videos from this channel: helps watch-time.
-- Avoid: affiliate links unless the user explicitly opts in. Tool homepages without affiliation only.
-
-## Hashtags
-
-3–5 hashtags at the very end. Up to 3 will show above the title on the watch page; YouTube prioritises the first ones.
-
-Order: most channel-specific first.
-
-Examples:
-- `#vibecoding #aiразработка #cursor #логос #разработка`
-- `#aiкодинг #claudecode #crm #python`
-
-Do NOT use:
-- More than 5 hashtags (YouTube ignores the rest and may down-rank).
-- Generic-only hashtags (`#video #youtube`) — wasted slots.
-- Branded hashtags from other channels.
-
-## Length and formatting
-
-- 800–1200 characters total. Above that, viewers stop reading — and the algorithm does not weight extra text proportionally.
-- Use emoji headers (⏱, 📌, 🔗, 🧠, 🛠) only as defined above. Do not festoon the description.
-- No empty links ("ссылка позже" placeholder is fine in draft, must be removed before publish).
-- Russian throughout. Tool names in original form (Cursor, Claude Code, Python, CRM).
+- Emoji section headers — «⏱ Тайм-коды», «📌», «🔗 Полезные ссылки», «🧠», «🛠». None of the 19 channels uses them.
+- A hashtag block. 12 of the 19 channels use none, including every Russian dev-diary channel.
+- A block heading like «Источники и авторы».
+- An opener «В этом видео я расскажу…» that names nothing concrete. maxter's «В этом видео я создаю полноценную 3D хоррор игру» is fine because it names the thing.
+- A lead-gen line («Заказ разработки…») unless the channel actually sells a service and the owner asked for it.
+- Placeholder links («ссылка позже») and padding links to tool homepages.
+- The script slop: «это не X, а Y», drama fragments («С нуля.»), a closing aphorism, triads of adjectives, «Вдумайтесь».

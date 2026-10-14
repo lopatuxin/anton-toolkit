@@ -29,7 +29,7 @@ C:\projects\obsidian\Проекты\youtube\база\
 
 Follow the vault conventions in `${CLAUDE_PLUGIN_ROOT}/references/vault.md` (Cyrillic kebab-case slugs, frontmatter, no overwrites). The `база\` folder is added to the canonical 8-folder layout — see `vault.md`.
 
-The video slug used here is the SAME slug that `сценарии/`, `seo/`, `превью/` use, so a single video forms a cross-folder bundle: `база/видео/<slug>.md` ↔ `сценарии/<slug>.md` ↔ `seo/<slug>.md`.
+The video slug used here is the SAME slug that `сценарии/`, `seo/`, `превью/` use, so a single video forms a cross-folder bundle: `база/видео/<slug>.md` ↔ `сценарии/<slug>.md` ↔ `seo/seo-<slug>.md`.
 
 ## Procedure
 

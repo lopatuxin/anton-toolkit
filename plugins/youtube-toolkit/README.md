@@ -39,7 +39,7 @@ All artefacts live in the Obsidian vault at `C:\projects\obsidian\Проекты
 | `yt-ideas` | Generate 10–20 video ideas. Requires analytical input: a `yt-my-channel` report, a `yt-competitors` report, OR a loaded knowledge base. |
 | `yt-content-plan` | Build a publication calendar at 1 video / week, no Shorts. Reads `индекс.md` to avoid scheduling topics already published recently. |
 | `yt-script` | Write a full video script up to 20 min: hook, structure, CTA placement. Reads top-video transcripts from `база\` to match the user's actual speaking voice. |
-| `yt-seo` | Title (A/B variants) + description with timestamps + tags. Mines working title formulas and tag conventions from top-classified cards. |
+| `yt-seo` | Title with spares, a short description in the author's voice with chapters from the final cut, tags, pinned-comment question, Studio settings — packaged the way large channels do it. |
 | `yt-thumbnail` | Thumbnail concept: text (3–5 words), composition, colour, emotion. Reads top-card titles for tone coherence. |
 | `yt-promo` | On-channel lead generation: pinned comments, end-screens, in-video and in-description CTAs, funnel into the business-card site. |
 
@@ -112,7 +112,7 @@ C:\projects\obsidian\Проекты\youtube\
     └── видео\<slug>.md   # one card per video: metadata + transcript + classification
 ```
 
-Per-video artefacts (`сценарии/<slug>`, `seo/<slug>`, `превью/<slug>`, `база/видео/<slug>`) share the same Cyrillic kebab-case slug so they form a cross-folder bundle per video.
+Per-video artefacts (`сценарии/<slug>`, `seo/seo-<slug>`, `превью/<slug>`, `база/видео/<slug>`) share the same Cyrillic kebab-case slug so they form a cross-folder bundle per video.
 
 See `references/vault.md` for full folder, filename, and frontmatter conventions.
 
