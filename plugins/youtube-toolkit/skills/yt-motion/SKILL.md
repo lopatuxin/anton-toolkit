@@ -84,7 +84,7 @@ npx --yes hyperframes@<version> render --quality delivery --fps 30 --output "<ep
 
 run from each scene's folder. After rendering, confirm with `ffprobe` that every clip exists and lasts its `timing.duration`.
 
-Build `node ${CLAUDE_SKILL_DIR}/scripts/sheet.mjs motion/scenes motion/clips.html --clips <episode>/assets/motion`, give the owner the path, and ask what to change. Sort his notes per scene, run one `fix` batch, re-render the changed scenes, show again.
+Build `node ${CLAUDE_SKILL_DIR}/scripts/sheet.mjs motion/scenes motion/clips.html --clips <episode>/assets/motion`, give the owner the path to open in his own browser — the app's browser pane shows a local page only as a still snapshot under about 1 MB, without the files next to it, so it plays no clips — and ask what to change. Sort his notes per scene, run one `fix` batch, re-render the changed scenes, show again.
 
 ## 7. Mark the sheet
 

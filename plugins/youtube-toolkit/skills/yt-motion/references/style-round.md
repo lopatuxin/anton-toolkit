@@ -30,7 +30,7 @@ One scene from the plan, the one hardest for a style: a drawn character with an 
 
 ## Showing the owner
 
-Build the page with `sheet.mjs` (`motion\styles` → `motion\styles.html`) and look at `styles.png` yourself first, with the checkers' art notes beside it: a candidate that came out broken, lopsided, or indistinguishable from another is re-sketched with your notes as one batch before the owner sees it. Then give the owner the page path and ask one thing — which style, or which mix ("цвета второго, линии третьего"). Describe each in one plain sentence; no font names or hex.
+Build the page with `sheet.mjs` (`motion\styles` → `motion\styles.html`) and look at `styles.png` yourself first, with the checkers' art notes beside it: a candidate that came out broken, lopsided, or indistinguishable from another is re-sketched with your notes as one batch before the owner sees it. Then open the page for the owner in the app's browser pane (`sheet.mjs` embeds the pictures small, because the pane shows a local page only as a snapshot under about 1 MB without the files next to it), give him the path too, and ask one thing — which style, or which mix ("цвета второго, линии третьего"). Describe each in one plain sentence; no font names or hex.
 
 A mix is written as a new `frame.md` and sketched once more on the same scene before the round closes.
 

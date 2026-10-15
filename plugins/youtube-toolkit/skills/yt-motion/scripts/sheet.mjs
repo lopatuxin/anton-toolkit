@@ -36,7 +36,11 @@ const cell = (c, i) => {
     ? `<div class="missing">нет ${clips ? 'клипа' : 'кадра'}</div>`
     : clips
       ? `<video src="${rel(c.media)}" controls preload="metadata"></video>`
-      : `<img src="${rel(c.media)}" alt="">`;
+      // Inlined as a 960px JPEG, not linked: the app's browser pane shows a local page without the files
+      // next to it, and refuses a page of several megabytes.
+      : `<img src="data:image/jpeg;base64,${execFileSync('ffmpeg', ['-loglevel', 'error', '-i', c.media,
+        '-vf', 'scale=960:-2', '-q:v', '5', '-frames:v', '1', '-f', 'image2pipe', '-vcodec', 'mjpeg', '-'],
+      { maxBuffer: 64 * 1024 * 1024 }).toString('base64')}" alt="">`;
   const phrase = (c.meta.phrase || '').replace(/\{[\w-]+\}/g, '').trim();
   return `<figure>${media}<figcaption><b>${i + 1}. ${esc(c.meta.title || c.id)}</b>` +
     (phrase ? `<q>${esc(phrase)}</q>` : '') + (c.meta.note ? `<span>${esc(c.meta.note)}</span>` : '') +
