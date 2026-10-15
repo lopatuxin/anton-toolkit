@@ -32,7 +32,7 @@
     },
     {
       "name": "youtube-toolkit",
-      "description": "Toolkit for running a Russian-language IT/vibe-coding YouTube channel: own-channel analytics, competitor analysis, idea generation, content planning, script writing, SEO, thumbnails, and on-channel lead generation",
+      "description": "Toolkit for running a Russian-language IT/vibe-coding YouTube channel: own-channel analytics, competitor analysis, idea generation, content planning, script writing, editing sheets, motion clips, SEO, thumbnails, and on-channel lead generation",
       "source": "./plugins/youtube-toolkit"
     }
   ]
