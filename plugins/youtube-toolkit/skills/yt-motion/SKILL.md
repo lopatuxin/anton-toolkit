@@ -23,11 +23,11 @@ HyperFrames already has the loop this skill follows: plan → still sketches →
 
 - HyperFrames skills: `C:\projects\youtube-video\.claude\skills\` (`hyperframes`, `hyperframes-core`, `-creative`, `-animation`, `-keyframes`, `-cli`, `media-use`). They are project skills of `C:\projects\youtube-video` and are not loaded in other sessions — read them by path, and pass the path to workers.
 - The episode: `C:\projects\youtube-video\epNN\` — the sheet's «Как монтируется» line names it.
-  - `assets\motion\<id>.mp4` — the delivered clips, 1920×1080, 30 fps, no sound.
+  - `assets\motion\<id>.mp4` — the delivered clips, 1920×1080, 30 fps, with the scene's own sound effects and no voice or music.
   - `motion\` — your working folder: `STORYBOARD.md` (the plan), `frame.md` and `assets\fonts\` (the chosen style), `_template\`, `scenes\<id>\` (one HyperFrames project per scene), `styles\<slug>\` (the style round), and the review pages.
 - The vault: the editing sheet `C:\projects\obsidian\Проекты\youtube\монтаж\<slug>.md`, the script `…\сценарии\<slug>.md`, the channel journal `…\Журнал YouTube\`. Vault conventions: `${CLAUDE_PLUGIN_ROOT}/references/vault.md` — no media files there.
 - The style library: `C:\projects\youtube-video\styles\<slug>\`, listed in `C:\projects\obsidian\Проекты\youtube\Монтаж через Claude.md`, section «Библиотека стилей».
-- This skill: `${CLAUDE_SKILL_DIR}/references/` (plan format, style round, worker and checker roles), `${CLAUDE_SKILL_DIR}/scripts/retime.mjs` (timing by words), `${CLAUDE_SKILL_DIR}/scripts/sheet.mjs` (review pages), `${CLAUDE_SKILL_DIR}/scripts/cyrillic.mjs` (does a font draw Russian), the workflow `${CLAUDE_PLUGIN_ROOT}/workflows/yt-motion-build.js`.
+- This skill: `${CLAUDE_SKILL_DIR}/references/` (plan format, style round, worker and checker roles, `sound.md` — the scene's effects), `${CLAUDE_SKILL_DIR}/scripts/retime.mjs` (timing by words), `${CLAUDE_SKILL_DIR}/scripts/sfx.mjs` (the template that lays a scene's effects on its cues) and `envelope.mjs` (loudness and brightness of a sound file), `${CLAUDE_SKILL_DIR}/scripts/sheet.mjs` (review pages), `${CLAUDE_SKILL_DIR}/scripts/cyrillic.mjs` (does a font draw Russian), the workflow `${CLAUDE_PLUGIN_ROOT}/workflows/yt-motion-build.js`.
 
 Scene ids are `NN-latin-kebab` in the order they play (`02-chronicler`); clips take the same name.
 
@@ -61,7 +61,7 @@ Then copy the chosen fonts into every scene's `assets\fonts\`; every scene now d
 
 ## 4. The full plan
 
-Before writing, read `hyperframes-creative/references/house-style.md`, `video-composition.md` and `beat-direction.md` — they are what keeps a scene from reading as a slide — and the indexes `hyperframes-animation/rules-index.md` and `blueprints-index.md`, so every move in the plan is cited by id. Complete `STORYBOARD.md` in the chosen style: the through-device, the rhythm, the seams, the bans, and every scene's block.
+Before writing, read `hyperframes-creative/references/house-style.md`, `video-composition.md` and `beat-direction.md` — they are what keeps a scene from reading as a slide — and the indexes `hyperframes-animation/rules-index.md` and `blueprints-index.md`, so every move in the plan is cited by id. Complete `STORYBOARD.md` in the chosen style: the through-device, the rhythm, the seams, the bans, and every scene's block with its `sound` line — what the scene's own effects are and on which cue each one sounds (`${CLAUDE_SKILL_DIR}/references/sound.md`).
 
 ## 5. Animate
 
@@ -79,12 +79,12 @@ Two rounds of your own at most; then the owner sees clips.
 Render one scene at a time — each render runs its own browser — in the background, in one shell loop over the scene folders:
 
 ```bash
-npx --yes hyperframes@<version> render --quality delivery --fps 30 --output "<episode>/assets/motion/<id>.mp4"
+npx --yes hyperframes@<version> render --quality delivery --fps 30 --browser-timeout 60 --output "<episode>/assets/motion/<id>.mp4"
 ```
 
-run from each scene's folder. After rendering, confirm with `ffprobe` that every clip exists and lasts its `timing.duration`.
+run from each scene's folder (`--browser-timeout 60`: the page's first load fetches GSAP from the CDN, which sometimes takes longer than the default). After rendering, confirm with `ffprobe` that every clip exists, lasts its `timing.duration` and has an audio stream.
 
-Build `node ${CLAUDE_SKILL_DIR}/scripts/sheet.mjs motion/scenes motion/clips.html --clips <episode>/assets/motion`, give the owner the path to open in his own browser — the app's browser pane shows a local page only as a still snapshot under about 1 MB, without the files next to it, so it plays no clips — and ask what to change. Sort his notes per scene, run one `fix` batch, re-render the changed scenes, show again.
+Send the clips themselves to the chat with the file tool, with each clip's path in the text. Build `node ${CLAUDE_SKILL_DIR}/scripts/sheet.mjs motion/scenes motion/clips.html --clips <episode>/assets/motion`, give the owner the path to open in his own browser — the app's browser pane shows a local page only as a still snapshot under about 1 MB, without the files next to it, so it plays no clips — and ask what to change. Sort his notes per scene, run one `fix` batch, re-render the changed scenes, show again.
 
 ## 7. Mark the sheet
 
@@ -107,7 +107,7 @@ Then `node ${CLAUDE_SKILL_DIR}/scripts/retime.mjs motion/scenes --voice <out>.js
 - cue words interpolated — said differently or misheard: snapshot those beats after rendering and check they still land;
 - a negative `voiceStart` — the phrase starts the recording: lower that scene's `lead` to the time before its first word.
 
-Re-render every scene whose timing changed and update the «Моушен» line in the sheet. Never stretch a clip in the edit to fit the voice — it is re-timed and re-rendered instead, because a stretched clip slows every move with it.
+In every scene folder whose timing changed run `node sfx.mjs` — its effects track was built for the old cues and would play every sound in the old place — then re-render those scenes and update the «Моушен» line in the sheet. Never stretch a clip in the edit to fit the voice — it is re-timed and re-rendered instead, because a stretched clip slows every move with it.
 
 ## Running the workflow
 
@@ -133,6 +133,9 @@ Workflow({
 - Every font must cover Cyrillic, checked on the file with `${CLAUDE_SKILL_DIR}/scripts/cyrillic.mjs`: a Latin-only face renders Russian words in a fallback that the check may not flag.
 - `check`, `snapshot` and `render` each start a headless browser: checks of several scenes in parallel are fine, renders go one at a time.
 - An image you open re-prices the whole context: look at one contact image per phase, not frame by frame.
-- Clips carry no sound and no exit animation unless planned: the edit owns voice, music and the cuts.
+- Clips carry the scene's own sound effects — the quill, the paper, the knock, the room — and no voice, no music and no exit animation unless planned: the edit owns voice, music and the cuts. The owner rejected a silent clip (2026-10-16).
+- The render reads media timing from the HTML before the page script runs: an `<audio>` whose `data-start` the script sets plays at 0. Effects are laid on their cues by the scene's `sfx.mjs` into one track that plays from 0 for the whole scene.
+- Nobody here can hear: sound takes are chosen and checked with `envelope.mjs` — a "quill writing" take with no high frequencies is a thump, not a scratch.
+- `check` and `snapshot` fail with "Navigation timeout" when GSAP loads slowly from the CDN: `check --timeout 30000`, and re-run a snapshot.
 - A scene's timing lives in its CUES line and root `data-duration`; anything placed at a literal second will not follow the voice. The checker flags it — do not wave it through.
 - Workers draw with code; a raster picture appears in a clip only when the sheet names it as the scene's material.

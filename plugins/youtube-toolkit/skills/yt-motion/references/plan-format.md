@@ -42,6 +42,7 @@ A scene is one clip. Consecutive sheet rows that form one continuous motion mome
 - assets: none
 - motion: <named moves by rule / blueprint id from hyperframes-animation, easing, character beats>
 - text: «Игру начинают с прототипа»
+- sound: <what is heard on which cue: a candle crackles under all; {unroll} paper rustle, a knock as the roll lands; {write} the quill scratches on the letters>
 - no: <one explicit ban for this scene>
 
 <narrative: what happens beat by beat, each beat on its cue>
@@ -54,6 +55,7 @@ A scene is one clip. Consecutive sheet rows that form one continuous motion mome
 - `assets` — files from the episode's `assets\` the scene shows, or `none`.
 - `motion` — ids from `hyperframes-animation/rules-index.md` and `blueprints-index.md`, never invented names; the worker reads their bodies.
 - `text` — every on-screen word, verbatim, in Russian.
+- `sound` — the scene's own effects, each tied to the beat that makes it, plus an ambient bed if the place has one; no voice, no music. The worker builds it per `sound.md`. A scene with nothing physical happening (a pure diagram) still gets a sound for each of its reveals.
 
 ## `scene.json` in each scene folder
 
