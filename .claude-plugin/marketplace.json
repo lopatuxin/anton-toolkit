@@ -12,7 +12,7 @@
     },
     {
       "name": "blender-modeling",
-      "description": "Builds game-ready 3D models in Blender from reference images, split into parts that builder agents work out in parallel to measured gates, with a fresh-eyes reviewer against the reference",
+      "description": "Builds game-ready 3D models in Blender from reference images, split into parts that builder agents work out in parallel to measured gates, with a fresh-eyes reviewer against the reference, and bakes layered materials checked against the reference",
       "source": "./plugins/blender-modeling"
     },
     {

@@ -101,7 +101,7 @@ def save_mask(mask, path):
 # REFERENCE PLANES
 
 def add_ref_view(scene, name, image_path, view, real=None, measure="height", anchor="base",
-                 ppm=None, anchor_px=None, depth=None, opacity=0.6, tol=0.12, mask_dir=None):
+                 ppm=None, anchor_px=None, depth=None, opacity=0.6, tol=0.12, mask_dir=None, detail_only=False):
     """Put one orthographic reference image into the scene at true scale.
 
     Scale, one of:
@@ -116,7 +116,9 @@ def add_ref_view(scene, name, image_path, view, real=None, measure="height", anc
       anchor_px (x, y) image pixel of the point that is the world origin.
     The empty stands `depth` metres behind the model so it never hides it. Its custom
     properties hold the frame (bm_w, bm_h, bm_cx/cy/cz) and the mask path, which the
-    silhouette gate and the compare sheet use to see this view exactly as the image."""
+    silhouette gate and the compare sheet use to see this view exactly as the image.
+    detail_only: a view that is not truly orthographic (a "side" view drawn as a 3/4): it stays
+    in the scene for reading details, and whole_gates and material_gates skip it."""
     rot, ex, ey, n = VIEWS[view]
     ex, ey, n = Vector(ex), Vector(ey), Vector(n)
     mask = make_mask(image_path, tol)
@@ -160,6 +162,7 @@ def add_ref_view(scene, name, image_path, view, real=None, measure="height", anc
     e["bm_cx"], e["bm_cy"], e["bm_cz"] = frame_c
     e["bm_image"], e["bm_mask"] = image_path, mask_path
     e["bm_anchor"] = anchor
+    e["bm_detail_only"] = bool(detail_only)
     from_coll = [c for c in e.users_collection]
     ref = coll(scene, "REF")
     if ref not in from_coll:

@@ -37,6 +37,11 @@ wrong shared number is reported back, not patched locally.
 SCENE = "Mill_Post"                       # the asset's scene in Blender
 SIZE = {"x": 10.1, "y": 9.6, "z": 12.7}   # overall extents, metres (optional)
 CAMERA = {"elev": 55, "az": -35, "px_per_m": 6.75}   # the game camera (optional)
+# the game's own light (optional; beauty renders and the game view use it). Transport company:
+# engine sun from azimuth 35 deg at 48 deg = Blender direction _dirv(-35, 48); shadow 0.45 /
+# sin(48) = 0.6055 of white on a surface facing the sun; sky 0.55 on an upward surface
+LIGHT = {"sun_az": -35, "sun_el": 48, "sun": 0.6055, "sky": 0.55,
+         "sun_color": "#fff3e0", "sky_color": "#cfe0f2", "ground": "#7d7a68"}
 BUDGET_TRIS = 20000
 
 # shared measurements: attachment points, pivots, axes, heights several parts meet at

@@ -61,13 +61,18 @@ def aim(scene, objs, dirv, size, lens=0, margin=1.08, center=None):
 def render_objs(scene, objs, cam, size, path, mode="clay"):
     """Render only `objs` from `cam` at `size` into `path` (PNG, transparent background).
     mode: clay (grey, studio light, cavity, outline), material (object colours and textures),
-    silhouette (flat white)."""
-    r, sh = scene.render, scene.display.shading
+    silhouette (flat white), albedo (the active image texture without light: the colour the
+    game gets before lighting), id (each material's viewport colour, flat, no anti-aliasing).
+    material, albedo and id render with the Standard view transform, so pixel values are the
+    colours themselves, not a film look."""
+    r, sh, vs, disp = scene.render, scene.display.shading, scene.view_settings, scene.display
     keep = dict(engine=r.engine, x=r.resolution_x, y=r.resolution_y, pct=r.resolution_percentage,
                 film=r.film_transparent, fp=r.filepath, ff=r.image_settings.file_format,
                 cm=r.image_settings.color_mode, cam=scene.camera, cavt=sh.cavity_type,
                 light=sh.light, ctype=sh.color_type, col=tuple(sh.single_color), cav=sh.show_cavity,
-                sha=sh.show_shadows, out=sh.show_object_outline, xray=sh.show_xray)
+                sha=sh.show_shadows, out=sh.show_object_outline, xray=sh.show_xray,
+                vt=vs.view_transform, look=vs.look, ex=vs.exposure, gam=vs.gamma,
+                curve=vs.use_curve_mapping, aa=disp.render_aa)
     hide = {o.name: o.hide_render for o in scene.objects}
     names = {o.name for o in objs}
     try:
@@ -78,9 +83,17 @@ def render_objs(scene, objs, cam, size, path, mode="clay"):
         r.image_settings.color_mode = 'RGBA'
         r.filepath = path
         sh.show_xray = False
+        if mode in ("material", "albedo", "id"):
+            vs.view_transform, vs.look = 'Standard', 'None'
+            vs.exposure, vs.gamma, vs.use_curve_mapping = 0.0, 1.0, False
         if mode == "silhouette":
             sh.light, sh.color_type, sh.single_color = 'FLAT', 'SINGLE', (1, 1, 1)
             sh.show_cavity = sh.show_shadows = sh.show_object_outline = False
+        elif mode in ("albedo", "id"):
+            sh.light, sh.color_type = 'FLAT', ('TEXTURE' if mode == "albedo" else 'MATERIAL')
+            sh.show_cavity = sh.show_shadows = sh.show_object_outline = False
+            if mode == "id":
+                disp.render_aa = 'OFF'
         else:
             sh.light = 'STUDIO'
             sh.color_type = 'TEXTURE' if mode == "material" else 'SINGLE'
@@ -102,6 +115,8 @@ def render_objs(scene, objs, cam, size, path, mode="clay"):
         sh.show_cavity, sh.show_shadows, sh.show_object_outline = keep["cav"], keep["sha"], keep["out"]
         sh.cavity_type = keep["cavt"]
         sh.show_xray = keep["xray"]
+        vs.view_transform, vs.look, disp.render_aa = keep["vt"], keep["look"], keep["aa"]
+        vs.exposure, vs.gamma, vs.use_curve_mapping = keep["ex"], keep["gam"], keep["curve"]
         for n, v in hide.items():
             o = scene.objects.get(n)
             if o:
@@ -189,25 +204,52 @@ def game_view(scene, names, out_dir, elev=55, az=-35, px_per_m=6.75, upscale=4, 
     return {"actual": small, "enlarged": save_rgba(big, os.path.join(out_dir, "game_enlarged.png")), "px": n}
 
 
+def _tint(h):
+    """A light colour scaled to luminance 1, so a tint changes the hue, not the strength."""
+    c = np.array(hex_linear(h))
+    return c / max(1e-6, float(c @ np.array([0.2126, 0.7152, 0.0722])))
+
+
 def beauty(scene, names, out, az=-35, el=22, px=(1280, 960), lens=50, sun_az=-35, sun_el=48,
-           sky="#c9d3dc", ground="#8f8a80", samples=16):
+           sky="#c9d3dc", ground="#8f8a80", samples=16, light=None, px_per_m=None):
     """The picture for the owner: EEVEE with real materials, a sun and sky light, a ground
     plane for contact shadows. Light settings for a small GPU (few samples, no ray tracing,
-    half-size shadows); all settings and the temporary lights are removed afterwards."""
+    half-size shadows); all settings and the temporary lights are removed afterwards.
+
+    light: the game's own light (LIGHT in dims.py), so the picture shows what the engine shows:
+    {"sun_az", "sun_el" (Blender directions, as _dirv), "sun": the sun's share of white light on
+    a surface facing it, "sky": the sky's share on a surface facing up, "sun_color", "sky_color",
+    "ground"} - a sky hemisphere above, black below, Standard view transform. Without it a
+    studio-like sun of 4 and sky of 0.9, which is far harsher than a soft game light.
+    px_per_m: an orthographic camera at the game's on-screen scale (a game-size picture)."""
     objs = objs_of(names)
-    r, ee = scene.render, scene.eevee
+    r, ee, vs = scene.render, scene.eevee, scene.view_settings
     keep = dict(engine=r.engine, x=r.resolution_x, y=r.resolution_y, pct=r.resolution_percentage,
                 film=r.film_transparent, fp=r.filepath, ff=r.image_settings.file_format, cam=scene.camera,
-                world=scene.world)
+                world=scene.world, vt=vs.view_transform, look=vs.look, ex=vs.exposure, gam=vs.gamma,
+                curve=vs.use_curve_mapping)
     keep_ee = {k: getattr(ee, k) for k in ("taa_render_samples", "use_raytracing", "shadow_resolution_scale") if hasattr(ee, k)}
     hide = {o.name: o.hide_render for o in scene.objects}
     names_set = {o.name for o in objs}
     made, w = [], None
     try:
-        cam = aim(scene, objs, _dirv(az, el), px, lens=lens, margin=1.12)
+        if px_per_m:
+            corners, c = _corners(objs)
+            n = max(16, int(round(max((p - c).length for p in corners) * 2.1 * px_per_m)))
+            px = (n, n)
+            cam = aim(scene, objs, _dirv(az, el), px, lens=0)
+            cam.data.ortho_scale = n / px_per_m
+        else:
+            cam = aim(scene, objs, _dirv(az, el), px, lens=lens, margin=1.12)
         sun = bpy.data.objects.new("BM_SUN", bpy.data.lights.new("BM_SUN", 'SUN'))
         sun.data.energy = 4.0
         sun.data.angle = math.radians(2)
+        if light:
+            sun_az, sun_el = light.get("sun_az", sun_az), light.get("sun_el", sun_el)
+            t = _tint(light.get("sun_color", "#ffffff"))
+            sun.data.color = tuple(t / t.max())
+            sun.data.energy = light.get("sun", 0.6) * math.pi * float(t.max())  # radiance = share x albedo
+            ground = light.get("ground", ground)
         sun.rotation_mode = 'QUATERNION'
         sun.rotation_quaternion = (-_dirv(sun_az, sun_el)).to_track_quat("-Z", "Y")  # shines from (sun_az, sun_el)
         scene.collection.objects.link(sun)
@@ -222,8 +264,34 @@ def beauty(scene, names, out, az=-35, el=22, px=(1280, 960), lens=50, sun_az=-35
         w = bpy.data.worlds.new("BM_SKY")
         w.use_nodes = True
         bg = node_of(w, "ShaderNodeBackground")
-        bg.inputs["Color"].default_value = (*hex_linear(sky), 1.0)
-        bg.inputs["Strength"].default_value = 0.9
+        if light:  # a sky hemisphere: the engine's sky term lights upward faces, not downward ones
+            nt = w.node_tree
+            tc = nt.nodes.new("ShaderNodeTexCoord")
+            sep = nt.nodes.new("ShaderNodeSeparateXYZ")
+            nt.links.new(tc.outputs["Generated"], sep.inputs["Vector"])
+            up = nt.nodes.new("ShaderNodeMapRange")
+            nt.links.new(sep.outputs["Z"], up.inputs["Value"])
+            up.inputs["From Min"].default_value, up.inputs["From Max"].default_value = -0.02, 0.02
+            mx = nt.nodes.new("ShaderNodeMix")
+            mx.data_type = 'RGBA'
+            nt.links.new(up.outputs["Result"], mx.inputs[0])
+            mx.inputs[6].default_value = (0.0, 0.0, 0.0, 1.0)
+            mx.inputs[7].default_value = (*(_tint(light.get("sky_color", "#ffffff")) * light.get("sky", 0.5)), 1.0)
+            # the camera looks down past the ground's edge into the black lower half: it sees the
+            # sky colour instead, while the light stays the engine's hemisphere
+            lp = nt.nodes.new("ShaderNodeLightPath")
+            seen = nt.nodes.new("ShaderNodeMix")
+            seen.data_type = 'RGBA'
+            nt.links.new(lp.outputs["Is Camera Ray"], seen.inputs[0])
+            nt.links.new(mx.outputs[2], seen.inputs[6])
+            seen.inputs[7].default_value = (*hex_linear(sky), 1.0)
+            nt.links.new(seen.outputs[2], bg.inputs["Color"])
+            bg.inputs["Strength"].default_value = 1.0
+            vs.view_transform, vs.look, vs.exposure, vs.gamma = 'Standard', 'None', 0.0, 1.0
+            vs.use_curve_mapping = False
+        else:
+            bg.inputs["Color"].default_value = (*hex_linear(sky), 1.0)
+            bg.inputs["Strength"].default_value = 0.9
         scene.world = w
         for o in scene.objects:
             if o.type in _RENDERABLE:
@@ -245,6 +313,8 @@ def beauty(scene, names, out, az=-35, el=22, px=(1280, 960), lens=50, sun_az=-35
         r.engine, r.resolution_x, r.resolution_y = keep["engine"], keep["x"], keep["y"]
         r.resolution_percentage, r.film_transparent, r.filepath = keep["pct"], keep["film"], keep["fp"]
         r.image_settings.file_format, scene.camera, scene.world = keep["ff"], keep["cam"], keep["world"]
+        vs.view_transform, vs.look, vs.exposure, vs.gamma = keep["vt"], keep["look"], keep["ex"], keep["gam"]
+        vs.use_curve_mapping = keep["curve"]
         for k, v in keep_ee.items():
             setattr(ee, k, v)
         for n, v in hide.items():

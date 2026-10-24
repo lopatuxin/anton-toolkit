@@ -11,7 +11,7 @@
 # colinurbs/claude-modeling-skills and majidmanzarpour/blender-game-skills (both MIT);
 # see LICENSES.md next to this file.
 
-for _f in ("bm_build.py", "bm_ref.py", "bm_gates.py", "bm_review.py", "bm_glb.py", "bm_parts.py"):
+for _f in ("bm_build.py", "bm_ref.py", "bm_gates.py", "bm_review.py", "bm_glb.py", "bm_parts.py", "bm_mat.py"):
     _p = BM + "/" + _f
     exec(compile(open(_p, encoding="utf-8").read(), _p, "exec"), globals())
 del _f, _p

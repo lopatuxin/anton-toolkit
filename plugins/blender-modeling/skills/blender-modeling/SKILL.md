@@ -176,20 +176,22 @@ where six are drawn) has a measured cost: report it as a number. No verdict word
 
 ## Phase 4 — finish and materials
 
-Geometry finish (bevels, shading) is the builders'. Materials are yours, for the whole asset at
-once, so the parts share one palette: replace `M(role)` in dims.py with materials by role in real
-size (`uv_box` + the project's library materials, or `library_material`). A dedicated materials
-step is being designed (research of 2026-10-24); until it lands, every role needs tonal
-variation between neighbouring pieces, and a uniform tint of one texture over every part is the
-known failure — the owner rejected it. Then the mesh gate on the whole: `whole_gates` with the
-budget — fail on floating pieces, anything below the ground, edges shared by three faces,
-flipped faces, over budget; read every warning.
+Geometry finish (bevels, shading) is the builders'. First the mesh gate on the whole:
+`whole_gates` with the budget — fail on floating pieces, anything below the ground, edges shared
+by three faces, flipped faces, over budget; read every warning.
+
+Materials are made for the whole asset at once, so the parts share one palette, by the
+`blender-materials` skill: layered role materials from library photo textures, a tone per piece,
+measured against the reference and baked into the texture set the game reads. The parts' `M(role)`
+names are its roles. A uniform tint of one texture over every part is the known failure — the
+owner rejected it on the mill.
 
 ## Phase 5 — export and what shipped
 
-Export through the project's exporter, then `glb_report` on the file: size matches the brief, the
-lowest point is on the ground, triangles within budget, materials and vertex attributes as the
-project expects. A number that differs from the master is an export bug, not a rounding issue.
+Export the baked copy through the project's exporter (or `export_glb` with `vertex_color="NONE"`),
+then `glb_report` on the file: size matches the brief, the lowest point is on the ground,
+triangles within budget, one baked material and vertex attributes as the project expects. A
+number that differs from the master is an export bug, not a rounding issue.
 
 ## Reviewer before the owner
 
@@ -224,10 +226,9 @@ describe the model as matching the reference where a number says otherwise.
   by close-ups and by `views`, not by IoU.
 - Workbench renders are for form. Material looks are checked with `beauty` and in the project's
   engine — transparency, glossy highlights and sky colour read differently there.
-- Materials must survive the export: `library_material` ships the tint as the glTF base colour
-  factor and the occlusion map in the glTF occlusion slot. Occlusion multiplied into the colour,
-  or any node chain the exporter cannot read, is silently dropped and the game gets another
-  colour — read the materials in `glb_report` after every export.
+- Materials must survive the export: any node chain the exporter cannot read is silently
+  dropped and the game gets another colour, so materials are baked (blender-materials) and read
+  in `glb_report` after every export.
 - The mesh gates find what eyes miss, and every finding in the first test was real: boards with
   gaps need studs behind them, each course of a stacked frame must overlap the course below, a
   shaft must lie on a bearing, log ends of neighbouring courses in one plane flicker. Fix the

@@ -82,12 +82,18 @@ def show_blockout(sc, pid):
 def model_names(sc):
     """Mesh objects that make up the asset now: every built part plus the blockout of the
     parts not built yet. Only the part_ and blk_ collections count: whatever belongs to the
-    asset (a base, a plinth) is a part."""
-    out = []
+    asset (a base, a plinth) is a part. An older asset built by one script into <SCENE>_MODEL
+    (no part or blockout collections) is that collection."""
+    out, split = [], False
     for c in sc.collection.children:
         tag = c.name[len(sc.name) + 1:]
-        if tag.startswith(("part_", "blk_")) and not c.hide_render:
-            out += [o.name for o in c.all_objects if o.type == 'MESH']
+        if tag.startswith(("part_", "blk_")):
+            split = True
+            if not c.hide_render:
+                out += [o.name for o in c.all_objects if o.type == 'MESH']
+    if not split:
+        c = _existing(sc, "MODEL")
+        out = [o.name for o in c.all_objects if o.type == 'MESH'] if c else []
     return out
 
 
@@ -134,7 +140,7 @@ def whole_gates(sc, out_dir, need=0.90, budget_tris=None):
     says which part the next round goes to."""
     names = model_names(sc)
     out = {"views": {}, "fail": [], "size": bounds(names)["size"]}
-    for e in [o for o in sc.objects if o.get("bm_view")]:
+    for e in [o for o in sc.objects if o.get("bm_view") and not o.get("bm_detail_only")]:
         view = e["bm_view"]
         boxes = {pid: s["region"][view] for pid, s in PARTS.items() if view in s.get("region", {})}
         r = silhouette_iou(sc, names, e.name, out_dir, need=need, regions=boxes or None)
@@ -144,6 +150,8 @@ def whole_gates(sc, out_dir, need=0.90, budget_tris=None):
         out["views"][view] = {k: r.get(k) for k in ("iou", "outside_m", "regions", "diff")}
         if r["iou"] < need:
             out["fail"].append(f"{view}: overlap {r['iou']:.3f} below {need}")
+    if not out["views"]:
+        out["fail"].append("no orthographic reference view was checked")
     out["fail"] += _size_fail(out["size"], globals().get("SIZE", {}))
     mesh = check_all(names, budget_tris=budget_tris)
     out["mesh"] = {k: mesh[k] for k in ("tris_total", "floating", "coplanar", "below")}
@@ -247,6 +255,9 @@ def part_gates(sc, pid, out_dir, budget_tris=None):
         out["warn"].append("no region boxes in PARTS: the part has no silhouette gate")
     for view, box in spec.get("region", {}).items():
         e = ref_empty(sc, view)
+        if bpy.data.objects[e].get("bm_detail_only"):
+            out["warn"].append(f"{view}: a detail-only view, its box is not gated")
+            continue
         r = silhouette_iou(sc, names, e, out_dir, need=need, regions={pid: box})
         if "error" in r:
             out["fail"].append(f"{view}: {r['error']}")

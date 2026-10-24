@@ -83,12 +83,10 @@ def _gltf_output():
     return g
 
 
-def library_material(name, folder, tint=None):
-    """Principled material from a folder of downloaded PBR maps (Poly Haven, ambientCG): colour,
-    roughness, metal, normal (OpenGL), occlusion - separate files or a packed arm map (R occlusion,
-    G roughness, B metal). Wired the way the glTF exporter understands, so the game gets the same
-    material: `tint` (hex) multiplies the colour texture and ships as the base colour factor;
-    occlusion goes to the glTF occlusion slot, not into the colour. UVs in real size: uv_box."""
+def lib_maps(folder):
+    """The map files of a downloaded PBR texture folder (Poly Haven, ambientCG): colour, arm
+    (packed R occlusion, G roughness, B metal), ao, rough, metal, normal (OpenGL); None where
+    the folder has no such map."""
     files = [f for f in glob.glob(os.path.join(folder, "*")) if f.lower().endswith((".png", ".jpg", ".jpeg", ".exr"))]
 
     def find(*keys, avoid=()):  # keys in order of preference, then files
@@ -98,6 +96,21 @@ def library_material(name, folder, tint=None):
                 if k in n and not any(a in n for a in avoid):
                     return f
         return None
+    return {"color": find("color", "diff", "albedo", "basecolor", avoid=("normal",)),
+            "arm": find("arm.", "_arm"),
+            "ao": find("_ao", "ambientocclusion", "-ao", "occlusion"),
+            "rough": find("rough"),
+            "metal": find("metal"),
+            "normal": find("normalgl", "nor_gl", "normal_gl", "_nor", "normal", avoid=("normaldx", "nor_dx", "_dx", "directx"))}
+
+
+def library_material(name, folder, tint=None):
+    """Principled material from a folder of downloaded PBR maps (Poly Haven, ambientCG): colour,
+    roughness, metal, normal (OpenGL), occlusion - separate files or a packed arm map (R occlusion,
+    G roughness, B metal). Wired the way the glTF exporter understands, so the game gets the same
+    material: `tint` (hex) multiplies the colour texture and ships as the base colour factor;
+    occlusion goes to the glTF occlusion slot, not into the colour. UVs in real size: uv_box."""
+    maps = lib_maps(folder)
     m = bpy.data.materials.get(name) or bpy.data.materials.new(name)
     m.use_nodes = True
     nt = m.node_tree
@@ -111,12 +124,7 @@ def library_material(name, folder, tint=None):
         if non_color:
             t.image.colorspace_settings.is_data = True
         return t
-    col = find("color", "diff", "albedo", "basecolor", avoid=("normal",))
-    arm = find("arm.", "_arm")
-    ao = find("_ao", "ambientocclusion", "-ao", "occlusion")
-    rough = find("rough")
-    metal = find("metal")
-    nor = find("normalgl", "nor_gl", "normal_gl", "_nor", "normal", avoid=("normaldx", "nor_dx", "_dx", "directx"))
+    col, arm, ao, rough, metal, nor = (maps[k] for k in ("color", "arm", "ao", "rough", "metal", "normal"))
     if col:
         tc = tex(col, False)
         nt.nodes.active = tc  # Workbench texture mode and the viewport show the active image node
@@ -462,9 +470,15 @@ def export_copy(objs, name, collection):
     return obj_from_bm(name, bm, collection, mats)
 
 
-def export_glb(obj, path, scene):
+def export_glb(obj, path, scene, vertex_color="ACTIVE"):
     """GLB of one object through a temporary scene, so selection and other scenes stay
-    untouched. Use the project's own exporter when it has one."""
+    untouched. Use the project's own exporter when it has one.
+
+    vertex_color: 'ACTIVE' (the active colour attribute ships as COLOR_0, nothing when the mesh
+    has none) or 'NONE' (a baked asset: its colour is in the texture). Never the exporter's
+    default 'MATERIAL': unless the
+    material multiplies a Color Attribute node into its colour, it writes a white COLOR_0 and
+    moves the real colours to COLOR_1, which engines that read only COLOR_0 never see."""
     win = bpy.context.window
     shown = win.scene if win else None
     tmp = bpy.data.scenes.new("_bm_export")
@@ -472,7 +486,8 @@ def export_glb(obj, path, scene):
         tmp.collection.objects.link(obj)
         with bpy.context.temp_override(scene=tmp, view_layer=tmp.view_layers[0]):
             bpy.ops.export_scene.gltf(filepath=path, export_format='GLB', use_active_scene=True,
-                                      export_apply=True, export_yup=True)
+                                      export_apply=True, export_yup=True,
+                                      export_vertex_color=vertex_color, export_all_vertex_colors=False)
     finally:
         bpy.data.scenes.remove(tmp)
         if shown is not None:

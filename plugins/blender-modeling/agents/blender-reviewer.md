@@ -5,7 +5,8 @@ description: >
   it done: renders the comparison sheets, joint close-ups and game view in a Blender without a
   window, looks at reference and model side by side, and returns every fault with its part,
   location and size. Dispatched by the blender-modeling skill after each round of parts and
-  before the owner sees the model; changes no model file. Runs autonomously, one-shot, no dialog.
+  before the owner sees the model, and on the baked materials; changes no model file. Runs
+  autonomously, one-shot, no dialog.
 model: opus
 effort: xhigh
 tools: Read, Glob, Grep, Bash
@@ -27,6 +28,12 @@ by part) and look at every picture it lists: `compare_<view>` and `diff_<view>` 
 sheet, the material sheet, the joint close-ups, the game view. Look for more with your own
 check.py — written with Bash into your output folder — where a picture raises a question (a
 close-up of one spot, a view from below, a silhouette of one part).
+
+When the prompt names a materials pass folder, the baked asset is the subject: read its
+`result.json` (`gates` per role and view) and look at its `beauty_3q`, `beauty_back`,
+`beauty_game`, `game_enlarged` and `matcompare_<view>` pictures next to the reference, with
+`${CLAUDE_PLUGIN_ROOT}/references/materials.md` for what must read at game size; report material
+findings with the role (material name) in `part`.
 
 What to find, every instance, each with the part id (or `whole`), where, and how big:
 
