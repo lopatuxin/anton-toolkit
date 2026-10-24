@@ -163,6 +163,15 @@ No verdict words ("looks good", "close", "matches") in your own critique: they a
 gets shipped. A gate that cannot pass because the views contradict each other is recorded as a
 deviation with the reason, not chased forever.
 
+Before explaining why a gate misses, measure it: `silhouette_iou(..., regions={...})` splits the
+missing overlap by part (legs, base, body, roof, sails). In the first test the explanation came
+first — "the sheet mirrors the sails" — and was wrong: the sails had been measured by their tip
+corners instead of their axis (49° instead of 43°) with the lattice on one side instead of
+centred. The breakdown found it, and the front match went from 67% to 85%. Measure the direction
+of long parts (sails, arms, beams, legs) by the principal axis of their pixels, and look at
+which side of the axis the detail lies, before building. An owner's decision that departs from
+the sheet (four legs where six are drawn) has a measured cost: report it as a number.
+
 ## Fresh-eyes critic
 
 Before showing the owner, dispatch a separate critic (Agent tool, general-purpose,

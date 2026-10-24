@@ -85,12 +85,17 @@ def dim_gate(targets, tol=0.05):
 _AXIS = {(1, 0, 0): "+X", (-1, 0, 0): "-X", (0, 1, 0): "+Y", (0, -1, 0): "-Y", (0, 0, 1): "+Z"}
 
 
-def silhouette_iou(scene, names, view_empty, out_dir, need=0.90, bands=12, long_px=1024):
+def silhouette_iou(scene, names, view_empty, out_dir, need=0.90, bands=12, long_px=1024, regions=None):
     """Overlap of the model's silhouette with the reference mask of one view, seen by the
     camera that frames the reference image exactly. Returns the IoU, how far the outline
     leaves the reference on each side (metres, + = model outside the reference) and per
     horizontal band (left and right edge), plus a diff image: red = model only,
-    blue = reference only, white = both."""
+    blue = reference only, white = both.
+
+    regions: {name: (right0, right1, up0, up1)} - boxes in metres along the view's image-right
+    and image-up axes (front view: x and z). For each, the model-only and reference-only
+    pixels as a percentage of the union: where the missing IoU actually is. Use it before
+    explaining a failed gate."""
     e = bpy.data.objects[view_empty]
     view = e["bm_view"]
     _, ex, ey, _ = VIEWS[view]
@@ -128,6 +133,15 @@ def silhouette_iou(scene, names, view_empty, out_dir, need=0.90, bands=12, long_
             row["missing"] = "model" if len(rx) else "reference"
         rows.append(row)
     out["bands"] = rows
+    if regions:
+        u0 = Vector((e["bm_cx"], e["bm_cy"], e["bm_cz"])).dot(Vector(ex))
+        U = u0 + (np.arange(w) - w / 2) / ppm
+        V = v0 + (h / 2 - np.arange(h)) / ppm
+        out["regions"] = {}
+        for name, (a, b, c, d) in regions.items():
+            m = ((V >= c) & (V < d))[:, None] & ((U >= a) & (U < b))[None, :]
+            out["regions"][name] = {"model_only_pct": round(100 * int((mesh & ~ref & m).sum()) / union, 2),
+                                    "ref_only_pct": round(100 * int((ref & ~mesh & m).sum()) / union, 2)}
     base = resize_nearest(load_rgba(e["bm_image"]), w, h)[..., :3].mean(2, keepdims=True) * 0.35
     img = np.concatenate([np.repeat(base, 3, 2), np.ones((h, w, 1), np.float32)], 2)
     img[mesh & ~ref, :3] = (0.9, 0.15, 0.1)
