@@ -1,0 +1,8 @@
+{
+  "name": "blender-modeling",
+  "version": "0.1.0",
+  "description": "Builds game-ready 3D models in Blender from reference images, split into parts that builder agents work out in parallel to measured gates, with a fresh-eyes reviewer against the reference",
+  "author": {
+    "name": "Anton"
+  }
+}

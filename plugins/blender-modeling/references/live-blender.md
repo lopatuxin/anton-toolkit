@@ -28,3 +28,10 @@
   `taa_render_samples` 16 (what `beauty` uses), no ray tracing, `shadow_resolution_scale` 0.5.
 - **bmesh, not edit-mode operators**: `bpy.ops.mesh.*` need an edit-mode context that MCP calls do
   not have; build and edit through `bmesh` and write back with `obj_from_bm`.
+- **Never `bpy.data.libraries.write` a scene**: in Blender 5.2 it crashes Blender
+  (EXCEPTION_ACCESS_VIOLATION) — in the live one, with every session's work. `save_scene_copy`
+  saves a copy of the whole file for the background runners.
+- **Background runners beside the live Blender**: the part agents start `blender.exe --background
+  --factory-startup` on `work/calib.blend` (about 5 s a run, Workbench only); several at once and
+  the live window share the 4 GB GPU fine. The MCP tool `execute_blender_code_for_cli` hangs on
+  this machine — call blender.exe directly.

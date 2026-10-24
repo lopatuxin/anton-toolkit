@@ -94,8 +94,8 @@ def silhouette_iou(scene, names, view_empty, out_dir, need=0.90, bands=12, long_
 
     regions: {name: (right0, right1, up0, up1)} - boxes in metres along the view's image-right
     and image-up axes (front view: x and z). For each, the model-only and reference-only
-    pixels as a percentage of the union: where the missing IoU actually is. Use it before
-    explaining a failed gate."""
+    pixels as a percentage of the union: where the missing IoU actually is, and the IoU inside
+    the box alone (a part's own gate). Use it before explaining a failed gate."""
     e = bpy.data.objects[view_empty]
     view = e["bm_view"]
     _, ex, ey, _ = VIEWS[view]
@@ -140,8 +140,10 @@ def silhouette_iou(scene, names, view_empty, out_dir, need=0.90, bands=12, long_
         out["regions"] = {}
         for name, (a, b, c, d) in regions.items():
             m = ((V >= c) & (V < d))[:, None] & ((U >= a) & (U < b))[None, :]
+            box_union = int(((mesh | ref) & m).sum())
             out["regions"][name] = {"model_only_pct": round(100 * int((mesh & ~ref & m).sum()) / union, 2),
-                                    "ref_only_pct": round(100 * int((ref & ~mesh & m).sum()) / union, 2)}
+                                    "ref_only_pct": round(100 * int((ref & ~mesh & m).sum()) / union, 2),
+                                    "iou": round(int((mesh & ref & m).sum()) / box_union, 4) if box_union else 0.0}
     base = resize_nearest(load_rgba(e["bm_image"]), w, h)[..., :3].mean(2, keepdims=True) * 0.35
     img = np.concatenate([np.repeat(base, 3, 2), np.ones((h, w, 1), np.float32)], 2)
     img[mesh & ~ref, :3] = (0.9, 0.15, 0.1)
@@ -396,11 +398,12 @@ def below_ground(names, tol=1e-4):
     return {"below": rows, "passed": not rows}
 
 
-def check_all(names, budget_tris=None, ground=True, tol=0.003):
+def check_all(names, budget_tris=None, ground=True, tol=0.003, floating=True):
     """Every mesh gate at once. `fail` blocks the phase; `warn` is read and either fixed or
-    explained in the report."""
+    explained in the report. floating=False skips the floating check (a part checked alone,
+    whose pieces rest on its neighbours: the whole model decides)."""
     mr = mesh_report(names, budget_tris)
-    fp = floating_parts(names, tol)
+    fp = floating_parts(names, tol) if floating else {"floating": [], "floating_count": 0}
     cp = coplanar_overlaps(names)
     bg = below_ground(names) if ground else {"below": [], "passed": True}
     fail, warn = [], []

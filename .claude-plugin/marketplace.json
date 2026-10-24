@@ -11,6 +11,11 @@
       "source": "./plugins/anton-toolkit"
     },
     {
+      "name": "blender-modeling",
+      "description": "Builds game-ready 3D models in Blender from reference images, split into parts that builder agents work out in parallel to measured gates, with a fresh-eyes reviewer against the reference",
+      "source": "./plugins/blender-modeling"
+    },
+    {
       "name": "lichnost",
       "description": "Personal life logging in the Obsidian vault: diary capture, film curation, and analytical period reviews",
       "source": "./plugins/lichnost"
