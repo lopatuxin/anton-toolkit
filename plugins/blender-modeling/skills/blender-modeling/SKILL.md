@@ -145,7 +145,7 @@ Run the workflow, one builder per part, all at once:
 ```text
 Workflow({scriptPath: "${CLAUDE_PLUGIN_ROOT}/workflows/blender-parts.js", args: {
   asset, blender, scripts: "${CLAUDE_PLUGIN_ROOT}/scripts", round: 1,
-  parts: [{id, notes}], joints: [{a, b}], review: true }})
+  parts: [{id, notes}], joints: [{a, b}], review: false }})
 ```
 
 `blender` is the newest `C:\Program Files\Blender Foundation\Blender *\blender.exe` (or the
@@ -159,12 +159,12 @@ running agents read:
 1. Assemble in the live Blender: `build("parts")` of the master script builds every part file,
    re-saves calib.blend and returns `whole_gates` — overlap per view with the mismatch split by
    part, size, mesh gates over the whole.
-2. Read the builders' results, the joints and the reviewer's findings. Check each finding
-   against the numbers. Answer the builders' questions (a shared number in dims.py that is
-   wrong is yours to fix, then every part that uses it is rebuilt).
-3. The next round goes only to the parts with a failed gate, an open joint or a high or medium
-   finding, with those notes as measurements. Stop after the round in which nothing high is
-   left, or after three rounds — then the remaining deviations go to the owner as numbers.
+2. Read the builders' results and the joints. Answer the builders' questions (a shared number
+   in dims.py that is wrong is yours to fix, then every part that uses it is rebuilt).
+3. The next round goes only to the parts with a failed gate or an open joint, with those notes
+   as measurements. Stop after the round in which every part passes and every joint holds, or
+   after three rounds. The reviewer is not part of these rounds: it looks once, at the finished
+   model (below).
 
 Before explaining why a gate misses, measure it: `silhouette_iou(..., regions={...})` splits the
 missing overlap by part. In the first test the explanation came first — "the sheet mirrors the
@@ -193,12 +193,19 @@ then `glb_report` on the file: size matches the brief, the lowest point is on th
 triangles within budget, one baked material and vertex attributes as the project expects. A
 number that differs from the master is an export bug, not a rounding issue.
 
-## Reviewer before the owner
+## Reviewer on the finished model
 
-The parts workflow ends with the reviewer. After materials and before showing the owner, dispatch
-it once more on the assembled asset (Agent tool, `subagent_type: "blender-modeling:blender-reviewer"`,
-with the asset folder, blender.exe, the scripts folder and an output folder `work\final\review`).
-Treat its list as the next work queue; check each claim against the numbers before acting.
+The reviewer runs once, when the model is ready — parts through their gates, materials baked —
+and before the owner sees it: Agent tool, `subagent_type: "blender-modeling:blender-reviewer"`,
+with the asset folder, blender.exe, the scripts folder, the materials pass folder and an output
+folder `work\final\review`. Not after every round of parts or materials: on the bench test a
+review per round took 37% of all tokens and about 50 of 90 minutes, re-checking parts that had
+not changed.
+
+Its list is the work queue of one fix round. Check each claim against the numbers, then send the
+geometry findings as notes to the parts workflow for the parts they name (`review: false`) and
+the material findings as notes to one more materials round; assemble, re-bake and re-export.
+What is left after that goes to the owner as numbers.
 
 ## Showing the owner
 

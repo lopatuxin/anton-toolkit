@@ -44,10 +44,13 @@ the scripts folder `${CLAUDE_PLUGIN_ROOT}/scripts`, the library folder, an outpu
 materials are being made. Read its report; check the numbers it quotes in the result.json of its
 folder.
 
-Then the reviewer (`subagent_type: "blender-modeling:blender-reviewer"`) on the same asset, told
-to judge the materials from the material pass's pictures in that output folder (`beauty_*`,
-`matcompare_*`, `game_enlarged`) against the reference. Its high and medium material findings are
-the next round's notes; stop after the round in which nothing high is left, or after three.
+A further round goes only to roles that fail their gates, with those numbers as notes; stop when
+the gates pass, or after three rounds. The reviewer (`subagent_type:
+"blender-modeling:blender-reviewer"`) looks once, at the finished asset, told to judge the
+materials from the material pass's pictures in that output folder (`beauty_*`, `matcompare_*`,
+`game_enlarged`) against the reference; its high and medium material findings are the notes of
+one fix round. Inside blender-modeling that single look is its review of the finished model,
+not an extra one.
 
 ## Showing the owner
 

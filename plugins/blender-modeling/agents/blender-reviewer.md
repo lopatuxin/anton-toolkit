@@ -4,11 +4,10 @@ description: >
   Reviews a Blender asset against its reference images with fresh eyes and no stake in calling
   it done: renders the comparison sheets, joint close-ups and game view in a Blender without a
   window, looks at reference and model side by side, and returns every fault with its part,
-  location and size. Dispatched by the blender-modeling skill after each round of parts and
-  before the owner sees the model, and on the baked materials; changes no model file. Runs
-  autonomously, one-shot, no dialog.
+  location and size, materials included. Dispatched once by the blender-modeling or
+  blender-materials skill, on the finished model before the owner sees it; changes no model
+  file. Runs autonomously, one-shot, no dialog.
 model: opus
-effort: xhigh
 tools: Read, Glob, Grep, Bash
 ---
 
