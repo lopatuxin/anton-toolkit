@@ -63,7 +63,8 @@ runner), `${CLAUDE_PLUGIN_ROOT}/references/live-blender.md` (live-Blender traps)
 
 No reference, no model. Use what the owner gave; otherwise draw one through the image route in
 the global instructions (Codex): an orthographic model sheet — front, side and back of the same
-object at one scale on a plain light background, no labels or shadows on the ground — plus one
+object at one scale on a plain light background, no labels or shadows on the ground, the camera
+level with the object's middle so no top surface shows (say so in the prompt) — plus one
 3/4 concept in the target style. One picture per request; look at it before using it. A generated
 sheet goes to the owner before modelling: an approved picture is the spec. Crop each orthographic
 view into its own file (`ref/front.png`, `ref/right.png`, ...), sharing one ground line. Views are
@@ -120,6 +121,16 @@ right, a part with nothing holding it), build it the real way and record the dev
 brief; the gate is then read on the bands that matter, not on the contradicting part. Measure
 real proportions on the clearest view: a wrong wall height read off a view cluttered by sails
 cost a whole rebuild in the first test.
+
+Before measuring any height, check that each view is seen level, not from slightly above — an
+image model draws "orthographic" sheets as renders from a few degrees up. The signs: a lighter
+band above the front face of every horizontal surface (seat, roof, table top), with cracks or
+grain running along it; far legs or feet ending higher than the near ones; far parts shifted
+inward. That band is the top face, not thickness: measure heights at the near top edge, take the
+thickness from the band below it, record the view angle in the brief, and draw the parts'
+`region` boxes below the band. The whole-view overlap then stays under 0.90 by the band's area —
+report that number, do not chase it. On the first bench the seat's top-face band was read as a
+9 cm plank instead of 5 cm, and a builder carved "wear" into it: one wasted round.
 
 ## Phase 2 — the split and the blockout
 
@@ -202,10 +213,13 @@ folder `work\final\review`. Not after every round of parts or materials: on the 
 review per round took 37% of all tokens and about 50 of 90 minutes, re-checking parts that had
 not changed.
 
-Its list is the work queue of one fix round. Check each claim against the numbers, then send the
-geometry findings as notes to the parts workflow for the parts they name (`review: false`) and
-the material findings as notes to one more materials round; assemble, re-bake and re-export.
-What is left after that goes to the owner as numbers.
+Its high and medium findings are the work queue of one fix round. Check each claim against the
+numbers, then send the geometry findings as notes to the parts workflow for the parts they name
+(`review: false`) and the material findings as notes to one more materials round (the
+blender-materials skill says how); assemble, re-bake and re-export. Low findings are not sent to
+any agent: they go to the owner as a list with their numbers, beside what is left after the fix
+round. On the second bench three low notes in the materials fix round (a dark line on one leg
+seen only in a close-up, a variation ratio) took about half of its 28 minutes.
 
 ## Showing the owner
 
@@ -213,7 +227,9 @@ He judges by eye. Show `beauty` renders (EEVEE, sun and sky, light settings for 
 the front 3/4 and the back 3/4 and one from the game camera's angle, the `compare` sheet of the
 main view, with the remaining measured deviations and everything inferred, in plain Russian.
 Workbench pictures are for checks, not for him. Switch the window to the asset's scene
-(`show(scene)`) only for that, and only when no other session is working in Blender. Do not
+(`show(scene)`) only for that, and only when no other session is working in Blender; then set the
+viewport to the textured view he looks at (live-blender.md, "The owner's view of a finished
+model") — left in Solid shading the model shows grey. Do not
 describe the model as matching the reference where a number says otherwise.
 
 ## Gotchas

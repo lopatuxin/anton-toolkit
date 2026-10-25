@@ -49,8 +49,14 @@ the gates pass, or after three rounds. The reviewer (`subagent_type:
 "blender-modeling:blender-reviewer"`) looks once, at the finished asset, told to judge the
 materials from the material pass's pictures in that output folder (`beauty_*`, `matcompare_*`,
 `game_enlarged`) against the reference; its high and medium material findings are the notes of
-one fix round. Inside blender-modeling that single look is its review of the finished model,
-not an extra one.
+one fix round, and its low ones go to the owner as a list, not to the agent. Inside
+blender-modeling that single look is its review of the finished model, not an extra one.
+
+A later round continues the agent of the previous one: SendMessage to the agentId its dispatch
+returned, with the notes and the next output folder `<asset>\work\mat\r<N>`. It already knows the
+references, the helpers and its own materials.py; a fresh agent on the second bench spent the
+first five minutes of its fix round re-reading them. Dispatch a new agent only when the old one
+cannot be reached.
 
 ## Showing the owner
 
@@ -58,7 +64,9 @@ In the live Blender: `show_baked(sc, r"<out>\<SCENE>_baked.blend", "<SCENE>_bake
 baked copy into the asset's scene and hides the parts; `show_parts(sc)` brings them back — call
 it before any `save_scene_copy`, or calib.blend keeps the parts hidden and the runners see an
 empty model. Switch
-the window to the asset's scene only when no other session is working in Blender. Send him
+the window to the asset's scene only when no other session is working in Blender, and then set
+the textured view of `${CLAUDE_PLUGIN_ROOT}/references/live-blender.md` ("The owner's view of a
+finished model"): left in Solid shading the baked model shows grey. Send him
 `beauty_3q.png`, `beauty_back.png`, `beauty_game.png`, `game_enlarged.png` and the main view's
 `matcompare`, with the remaining deviations as numbers in plain Russian, and how much video memory
 the texture takes in the game. When an earlier version exists, show before and after side by side.

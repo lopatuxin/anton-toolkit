@@ -35,3 +35,42 @@
   --factory-startup` on `work/calib.blend` (about 5 s a run, Workbench only); several at once and
   the live window share the 4 GB GPU fine. The MCP tool `execute_blender_code_for_cli` hangs on
   this machine — call blender.exe directly.
+
+## The owner's view of a finished model
+
+Switching the window to the asset's scene (`show(sc)`) leaves the viewport in Solid shading: the
+owner sees a grey model and the reference planes in front of it, and he has had to ask for the
+textures twice. After `show_baked` and `show(sc)`, set the view he looks at — reference planes
+and ruler hidden, nothing selected, Material Preview at 8 samples (safe on the 4 GB GPU for one
+asset), a front 3/4 perspective on the model — and check it with a screenshot of the window. In
+the same call as the helpers (`bounds`), with the window already on `sc`:
+
+```python
+import math
+from mathutils import Euler, Vector
+
+def find_lc(lc, name):
+    if lc.name == name:
+        return lc
+    for c in lc.children:
+        r = find_lc(c, name)
+        if r:
+            return r
+
+vl = bpy.context.window.view_layer
+find_lc(vl.layer_collection, f"{sc.name}_REF").hide_viewport = True
+for o in sc.objects:
+    o.select_set(False)
+sc.eevee.taa_samples = 8
+b = bounds([o.name for o in sc.objects if o.type == 'MESH' and o.visible_get()])
+centre = Vector([(lo + hi) / 2 for lo, hi in zip(b["min"], b["max"])])
+for area in bpy.context.window.screen.areas:
+    if area.type == 'VIEW_3D':
+        sp = area.spaces.active
+        sp.shading.type = 'MATERIAL'
+        r3 = sp.region_3d
+        r3.view_perspective = 'PERSP'
+        r3.view_rotation = Euler((math.radians(68), 0, math.radians(-35)), 'XYZ').to_quaternion()
+        r3.view_location = centre
+        r3.view_distance = 1.8 * max(b["size"])
+```

@@ -41,6 +41,18 @@ image. The helpers are documented in their docstrings in `${CLAUDE_PLUGIN_ROOT}/
 4. Game size first: part colours, tone between pieces, darker bottom, shade under overhangs,
    dark ends. Then up close: grain along the pieces, roughness, dirt that follows the ground.
 
+## How much to try
+
+Each materials pass is a full bake and costs about a minute plus the pictures you read. Give one
+problem at most three passes; if it is still there, stop and report it as a deviation with its
+numbers. A fault smaller than about two game pixels (CAMERA `px_per_m` in dims.py) or one that
+shows only in a close-up is not chased: name it in the report instead. On the second bench a fix
+round of 15 passes over 28 minutes went mostly to a dark line on one leg and a crack line that
+the game camera does not show.
+
+In a later round you are continued with notes: apply those notes, rerun the gates, and stop.
+Notes are the scope — do not reopen roles and faults the notes do not name.
+
 Choose library textures from the project's folder by measurement (materials.md). A texture the
 asset needs that the folder lacks goes into your report with name, source, licence and size: you
 do not download anything.
