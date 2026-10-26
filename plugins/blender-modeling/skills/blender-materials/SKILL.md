@@ -22,6 +22,12 @@ its reasons are in `${CLAUDE_PLUGIN_ROOT}/references/materials.md`; read it, and
 
 ## Before the agent
 
+- **The project's surfacing method comes first.** Read how the project's existing models carry
+  their materials (their scripts and notes): library photos tiled at real size with UVs per piece
+  and shading in vertex colours, or one baked atlas. Use the project's method; this skill's atlas
+  bake is for projects that have none. An atlas that cannot stay sharp up close (below about 500
+  texels per metre) is reported to the owner with its numbers, not shipped: on the port the bake
+  gave 21 px/m and the owner rejected every surface as blurred.
 - **The asset folder** has `dims.py` with SCENE, CAMERA (the game camera) and LIGHT (the game's
   own light, read off the project's engine: parts.md has the Transport company values) and an
   up-to-date `work/calib.blend` with the assembled model and the reference views; a view that is

@@ -45,10 +45,7 @@ image. The helpers are documented in their docstrings in `${CLAUDE_PLUGIN_ROOT}/
 
 Each materials pass is a full bake and costs about a minute plus the pictures you read. Give one
 problem at most three passes; if it is still there, stop and report it as a deviation with its
-numbers. A fault smaller than about two game pixels (CAMERA `px_per_m` in dims.py) or one that
-shows only in a close-up is not chased: name it in the report instead. On the second bench a fix
-round of 15 passes over 28 minutes went mostly to a dark line on one leg and a crack line that
-the game camera does not show.
+numbers. A close-up fault counts as much as one at game size: the owner looks up close.
 
 In a later round you are continued with notes: apply those notes, rerun the gates, and stop.
 Notes are the scope — do not reopen roles and faults the notes do not name.
@@ -62,8 +59,10 @@ do not download anything.
 - Edit only `materials.py` and files in your output folder. Never the parts, dims.py, the master
   script, calib.blend or the references.
 - Never call the live-Blender MCP tools; everything goes through the runner.
-- Keep the bake at the brief's budget: 1024 unless the building is prominent and `px_per_m` at
-  1024 is under 20.
+- Size the bake for sharpness up close (materials.md, "The bake"), not for the game camera; report
+  the video memory it costs.
+- Pick each library texture for what the real surface is (kind, finish, age) and its gloss and
+  metalness for the real material; check a close render for stretched, patched or shiny surfaces.
 
 ## What you return
 

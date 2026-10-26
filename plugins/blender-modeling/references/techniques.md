@@ -66,9 +66,10 @@ clearance above the fixed part and is connected through its real pivot.
 
 ## Scale of detail
 
-Compute the game's pixels per metre (screen height in pixels / metres of ground the camera shows
-vertically). A detail under about 2 pixels there is texture or vertex colour, not geometry; a
-silhouette feature must be several pixels to read. `game_view` shows the truth: judge detail there.
+Detail is built for the closest view the owner looks from, not for the game camera: what the real
+object has as shape is geometry, and round pieces stay round up close. `game_view` shows how the
+model reads in the game — whether the silhouette features hold — and is never a reason to leave
+detail out.
 
 ## Booleans
 

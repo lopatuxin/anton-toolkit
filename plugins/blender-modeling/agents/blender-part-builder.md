@@ -37,8 +37,8 @@ The helpers are documented in their docstrings in `${CLAUDE_PLUGIN_ROOT}/scripts
    image and convert with the view's pixels per metre; the direction of a long part (a sail, a
    leg, a beam) is the principal axis of its pixels, not the line between its corners.
 3. Detail: openings cut whole, real thickness on every plate and board, gaps where real things
-   have gaps, only what survives the game camera (`game_view` through a check.py when unsure:
-   what is a three-pixel smear there is texture work, not geometry).
+   have gaps, every detail the real object has at the closest view the owner looks from; the
+   game camera is never a reason to leave one out or to cut round segments.
 4. Finish the geometry: `add_bevel` (small, 2-3 segments, angle-limited) and `finish_shading`
    on hard pieces. Materials only by role through `M(role)` from dims.py, with the roles it
    defines — the look of a role is the director's materials step, not yours. A role you need

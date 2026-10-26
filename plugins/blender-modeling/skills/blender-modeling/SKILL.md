@@ -59,6 +59,32 @@ runner), `${CLAUDE_PLUGIN_ROOT}/references/live-blender.md` (live-Blender traps)
   work through the MCP, not background Blender; the agents' background runs are the exception he
   approved on 2026-10-24 for parallel parts.
 
+## Quality bar
+
+The owner judges the model up close in his Blender, not at the game camera. These hold for every
+phase and every agent; the first real asset (a port of four buildings) broke each of them.
+
+- **No cuts for the game camera.** Never simplify geometry, round segments, texture resolution or
+  maps, or leave out a detail because the game camera would not show it: what the game shows is the
+  owner's call. A real limit (video memory, what the engine can load) goes to him as numbers with
+  the options, never applied silently.
+- **Numbers are measured.** Every number in dims.py comes from the reference (silhouette profiles,
+  mask rows and columns, a landmark of known size), with its source in the comment; whatever the
+  references do not show goes to INFERRED in the brief. Most of the port's review findings were
+  numbers set by eye.
+- **Surfaces are what the real thing is.** A texture is chosen for the kind and state of the real
+  surface (material, how it was made and finished, its age), checked against a photograph of the
+  real object — not for a matching name. Gloss, metalness and transparency follow the real
+  material too.
+- **Nothing see-through is empty.** Wherever the eye looks through or into the model (glass, an
+  open door, a gap), modelled depth stands behind it; a dark plate or a hollow shell is the known
+  failure.
+- **An ensemble is one asset per object.** Several objects with their own reference sheets get one
+  asset each plus an assembly scene placed by the concept; roles they share (the same roof iron,
+  the same weathered wood) are defined once for all of them, or parallel agents drift apart.
+- **Close renders before the owner.** Every material is looked at from the distance the owner
+  works at: sharp, not stretched or patched together, no shine the real material lacks.
+
 ## Phase 0 — reference and brief
 
 No reference, no model. Use what the owner gave; otherwise draw one through the image route in

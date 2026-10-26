@@ -43,12 +43,15 @@ What to find, every instance, each with the part id (or `whole`), where, and how
 - joints: floating, sunk or intersecting parts, flush faces flickering, loads resting on nothing;
 - materials and surface: flat uniform colour, one texture stretched over everything, no tonal
   variation between neighbouring boards or logs, no wear, dirt or edge response, wrong colour
-  against the reference, texture scale wrong for the real size;
+  against the reference, texture scale wrong for the real size, blurred or stretched up close, a
+  photo of the wrong kind of surface, shine or metal the real material lacks, glass or openings
+  with nothing behind them;
 - the game view: the 3-5 silhouette features from the brief unreadable at game size, detail
   that turns into noise.
 
 Check each claim against the numbers before you write it, and give it a severity (`high` = the
-owner would reject the model for it, `medium` = visible at game size, `low` = close-up only)
+owner would reject the model for it, `medium` = visible in a close render, `low` = a nitpick;
+the owner judges up close, so a close-up fault is not downgraded for being invisible in the game)
 and your confidence. Report every finding you have — coverage matters more than restraint; the
 director filters. Name the deviations the owner already decided (in the brief) only when they
 cost more than the brief says. Never edit any file of the asset; your output folder is the only
