@@ -30,6 +30,11 @@ Procedure:
 2. Select 1–3 reference scripts, prioritising those **closest in meaning/topic** to the script you are about to write (same series, same `video_type`, overlapping subject). A script from the same flagship series is the strongest reference. If nothing is topically close, pick the 2 most recent scripts as a general style anchor.
 3. Read the selected reference scripts IN FULL and extract the concrete style fingerprint: sentence length and rhythm, paragraph density, level of directness and informality, how the hook is phrased, how arguments are built ("первое… второе…"), recurring connective phrases, how the host addresses the viewer (ты/вы), how sections open and close, the balance of plain talk vs. jargon.
 4. Write the new script so a reader could not tell it apart, by style, from the reference scripts — same voice, same rhythm, same vibe. Match the style; do NOT copy sentences, structure-for-structure, or content verbatim.
+5. If a transcript of the user's recorded voice for a previous episode of the same series exists (the montage pipeline keeps it in the episode's production folder, e.g. `C:\projects\youtube-video\<episode>\transcript\voice.words.json` — join the `word` fields), read it too: it is how the user actually speaks, and it outranks the written scripts when the two differ.
+
+Word order and fillers — the gotchas that made a script read as machine-written:
+- Plain spoken word order, one thought per clause. Correct: «Илья — силач. Он будет биться со щитом и принимать удары на щит». Incorrect: «Он будет биться со щитом, принимать удары на него, а в уровнях проламывать…», «да и в уровнях он лазает по стенам».
+- Hedges and asides («скажем так», «кстати», «если уж на то пошло», «как назло») appear only where the reference scripts or the transcript use them at that kind of spot. Do not sprinkle them to sound conversational — scattered fillers are themselves a machine tell.
 
 This style calibration takes precedence over any generic "good script" instinct. When in doubt about phrasing, mirror how the reference scripts do it.
 
@@ -41,6 +46,19 @@ This style calibration takes precedence over any generic "good script" instinct.
    - Whether this is a flagship series episode (and if yes, which series + previous episode state).
 
    If any input is missing, ask once before writing.
+
+   For a flagship series episode, before writing read what the series already promised for this episode: the next-episode hook of the previous script and the `next` field of the channel hub (`C:\projects\obsidian\Проекты\youtube\youtube.md`). When the user names one topic ("собери эпопею с начальным экраном") and the promise lists several (characteristics, hero choice, enemies), the topic is one part of the episode, not the whole video — ask once which it is and what length the part gets. Incorrect: a 15-minute script entirely about the start screen while the hub said episode 4 covers characteristics, hero choice and enemies.
+
+## What goes into the talk track
+
+The viewer watches to see the game (or product) take shape, not how Claude produced it. When the source material is the project's journals, phases and commits:
+
+- **Include what changes things for the player or user**: a mechanic, a rule, a number they will feel, a decision about what the game will be.
+- **Leave out the production kitchen** unless the user asks for it: how assets were generated, cut out, cleaned, glued, re-encoded; tooling; performance fixes. Incorrect (all cut by the user as "никому не интересны"): the dark rim left by the green-screen cutout, specks from the image model, which video model needed two clips instead of one, GPU load dropping from 23% to 8%.
+- **Do not narrate what the screen already shows** — layout, gestures, what each hero does on hover. The montage shows it. Incorrect: «Слева, как в „Ведьмаке 3", название и меню, а всё остальное место занимает выбор героя…».
+- **Do not turn a journal entry's "why" and "rejected" fields into speech.** State the decision; give its reason only when a viewer would actually ask. Incorrect: «В Diablo 3 и 4 герои стоят в парадных доспехах, но тогда экран обещал бы то, чего нет», «Это я подсмотрел у Diablo 2», «Сначала я хотел подписать имена под ногами героев».
+- **Do not credit ideas to the AI** («название мне подсказала нейросеть») unless the user wants that in the video.
+- **Do not describe what is not built yet** beyond a sentence of plan; where the episode will continue with unbuilt work, leave a placeholder section saying it is written once the work exists. Incorrect: detailing what Vasilisa will turn into and what each form does while the transformation mechanic is undesigned.
 
 2. **Pick the structure** in `${CLAUDE_SKILL_DIR}/references/structure.md` based on type:
    - Tutorial / how-to → 4-act structure

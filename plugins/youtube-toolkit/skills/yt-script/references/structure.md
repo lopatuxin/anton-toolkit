@@ -40,7 +40,7 @@ Target 12–20 min.
 
 - **Hook** — state recap (formula 5).
 - **Goal** — what this episode adds. One line.
-- **Struggle** — the real obstacle. Show 1–3 failed attempts. This is what makes the series rewatchable.
+- **Struggle** — the real obstacle. Show 1–3 failed attempts. This is what makes the series rewatchable. The attempts are at what the viewer gets — a mechanic that felt wrong, a look that did not work — not glitches of the asset or build pipeline.
 - **Resolution** — how it actually got done.
 - **State of the project at end of episode.**
 - **Next-episode hook** — one line teasing what's next.
