@@ -8,7 +8,6 @@ description: >
   channel's top videos. Spoken text only: no b-roll or on-screen directions
   (that is `yt-montage`), no title, description, tags or thumbnail (those are
   `yt-seo` and `yt-thumbnail`).
-disable-model-invocation: true
 ---
 
 # yt-script — write a video script
