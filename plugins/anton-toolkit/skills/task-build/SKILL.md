@@ -30,7 +30,7 @@ Read the task the user gave: inline text, a ticket, a file, a link. When it name
 
 The plan is the specification the whole pipeline builds against, so it exists before any agent is dispatched.
 
-Skip planning when the task already is one: the user pointed at a `docs/plans/*.md` file or at a phase or task note in the folder the project's CLAUDE.md names, or handed over a ticket detailed enough that nothing would be guessed. Say so in one Russian line and go to step 3.
+Skip planning when the task already is one: the user pointed at a `docs/plans/*.md` file or at a phase or task note in the folder the project's CLAUDE.md names, or handed over a ticket detailed enough that nothing would be guessed. Say so in one Russian line and go to step 3. A note that says what the system must do is a specification, not yet a plan: the plan also pins the design — which package each part lives in, which standard mechanism of the framework or library it uses, and the reference code to imitate. When only the design is missing, write it yourself into the plan file without an interview: you design, the dev agents run on a smaller model and copy whatever pattern they meet first.
 
 Otherwise run the `feature-planner` skill (`anton-toolkit:feature-planner`) in this session — it interviews the user on the gaps, gets the plan confirmed and writes it to `docs/plans/<slug>.md`, or as a phase or task note into the folder the project's CLAUDE.md names. Do not re-implement its interview here and do not duplicate its questions. When it offers to hand off to a dev agent at the end, that hand-off is this pipeline: do not dispatch anything there, continue with step 3.
 
@@ -111,6 +111,8 @@ Report in Russian, briefly, to a reader who did not watch the run. The first sen
 ## General rules
 
 - **Never write production code in this skill.** A one-line fix after the run is the exception, and it is followed by a `code-reviewer` dispatch so the review mark covers it.
+- **No escape hatches in agent prompts.** Never write "if the standard way does not work, build your own": the agent takes the exit on a wrong premise. Tell it to stop and return the question.
+- **The owner judges design, not only behaviour.** Before the report, read the whole diff yourself against the design rules of the conventions — the review agents look for bugs first. If the IDE inspections the owner relies on cannot run, ask him to open the IDE before reporting, not after.
 - **Bound what the agents read.** Pass the plan file path and the module path — never "read the codebase" or the plan's body pasted into a prompt. An unbounded read makes the run expensive and the agent worse at its job.
 - **Review happens once the code is complete**, not per file: the reviewer sees the finished diff, including tests. That is what makes cross-file findings possible.
 - **Blockers are fixed, everything else is reported.** Only `Critical` triggers a fix round, and only after an independent check that the finding is real — a fix round costs more than a reported nitpick.

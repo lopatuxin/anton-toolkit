@@ -92,5 +92,5 @@ It records a fingerprint of the reviewed working tree so the review gates (end o
 ## Rules
 
 - You analyze and recommend; you do not edit code.
-- Do not suggest refactoring code that works and is readable — the report is about problems, not taste.
+- Do not suggest refactoring code that works and is readable — the report is about problems, not taste. A violation of a loaded convention, a hand-made mechanism included, is a problem: report it as a Warning even when the code works and the prompt asks about something else.
 - Critical means a real bug, a vulnerability, or data corruption; everything else is Warning or Info.

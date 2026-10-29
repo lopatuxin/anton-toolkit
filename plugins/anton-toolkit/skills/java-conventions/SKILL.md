@@ -12,7 +12,7 @@ paths:
 
 # Java conventions
 
-These rules apply to every Java change, a one-line edit included. A concrete project's existing conventions win over anything here: find the analogue in the repo (an existing Controller, Service, Repository, test) and follow its pattern before writing. Check `pom.xml` or `build.gradle.kts` for the stack, and `application.yml` when configuration is involved.
+These rules apply to every Java change, a one-line edit included. A concrete project's existing conventions win over anything here: find the analogue in the repo (an existing Controller, Service, Repository, test) and follow its pattern before writing. Code written earlier in the same task is not an analogue — it is unreviewed, and copying it spreads its mistakes into every file; when the repo has none, follow the reference project the plan names instead of inventing a pattern. Check `pom.xml` or `build.gradle.kts` for the stack, and `application.yml` when configuration is involved.
 
 ## Hard rules
 
@@ -34,8 +34,10 @@ These rules apply to every Java change, a one-line edit included. A concrete pro
 - No logic duplication: before writing, check the class and its neighbours for an equivalent and reuse it or extract a shared private method.
 - Decompose: private methods stay under ~30 lines; DB access, calculations and DTO assembly are separate methods.
 - One endpoint — one page: before creating or changing a service method, Grep its callers; if it serves several pages, split it.
-- MapStruct for every entity→DTO mapping, no manual `.builder().field(...).build()` chains. If the project has no MapStruct yet, add the dependencies and create the mapper in `mapper/`.
-- No comments on obvious code, no abstractions for hypothetical future needs.
+- Every transfer of fields from one model into another — entity, DTO, request or response body, message, event — is a MapStruct mapper, not a hand-written builder chain or a static `of(...)` factory with a row of arguments. A value that needs computing is prepared before the call and passed as a mapper parameter, or comes from a `@Named` method of a utility class. If the project has no MapStruct yet, add the dependencies and create the mapper in `mapper/`.
+- Boilerplate is Lombok's job: `@RequiredArgsConstructor` instead of a hand-written constructor, `@Builder` where an object is assembled, `@UtilityClass` for a stateless helper, which lives in the `util` package. A model (record, DTO, properties) carries data only — no constants, factories or logic inside. A field that needs building (cache, executor, client) is its own bean or a standard Spring mechanism, not code in a constructor.
+- A `catch` never swallows the failure: it rethrows, returns a result that carries the reason, or logs it.
+- Comments only where the code cannot say why, one line; no Javadoc that retells the code and no comments in `application.yml` or other config. No abstractions for hypothetical future needs.
 - On Java 21+ take the ends of a list through the `SequencedCollection` methods, in main code and tests alike — IDEA flags the index form and the owner rejects it in review.
   - Correct: `values.getFirst()`, `values.getLast()`, `queue.removeFirst()`
   - Incorrect: `values.get(0)`, `values.get(values.size() - 1)`, `queue.remove(0)`
@@ -48,7 +50,7 @@ These rules apply to every Java change, a one-line edit included. A concrete pro
 
 The owner rejects hand-made mechanisms and inheritance bent to fit one case. Before writing infrastructure, look for the standard Spring, Boot or library way and use it.
 
-- Ready mechanism first. Shared defaults for several services — `spring.config.import` of a library YAML, not a custom `EnvironmentPostProcessor`. Concurrency and rate limits — resilience4j `Bulkhead` / `RateLimiter` configured in `application.yml`, not a hand-made semaphore or token bucket with a table of property keys. A metric name — an attribute of the annotation on the measured method, not a table of class names held as strings. Mapping — MapStruct or builders, not setter chains.
+- Ready mechanism first. Shared defaults for several services — `spring.config.import` of a library YAML, not a custom `EnvironmentPostProcessor`. Concurrency and rate limits — resilience4j `Bulkhead` / `RateLimiter` configured in `application.yml`, not a hand-made semaphore or token bucket with a table of property keys. A metric name — an attribute of the annotation on the measured method, not a table of class names held as strings. Mapping — MapStruct or builders, not setter chains. A second Kafka cluster — a second Spring Cloud Stream binder in `application.yml`, not an own `KafkaTemplate`. Keys and auth headers of a Feign client — a `RequestInterceptor` in the client's configuration, not a method parameter. A cache — Spring Cache or a `Cache` bean. When the standard way seems not to fit, check its source or documentation first; if it really does not fit, stop and return it as an open question — never build your own instead.
 - No template method bent by flags. A base class with hooks that return `null`/`true` by default, boolean switches, or stubs that throw because they "must not be called", added so one or two subclasses fit, is a design error. Use composition: one component with the shared loop plus a strategy per variant; take the variant that does not fit out of the shared path.
 - No combinatorial helpers. A helper with `persistX`, `persistWithY`, `persistWithYAndZ` and a profile flag becomes a few plain operations the caller invokes explicitly, in its own order.
 - `@Qualifier` is a smell: it usually patches a bean registered twice or picks one of several implementations. Register each bean once; inject `List<Impl>` where every implementation reports its own key and build an `EnumMap`. The exception is several connections of one type (several `DataSource` / `JdbcTemplate`).
