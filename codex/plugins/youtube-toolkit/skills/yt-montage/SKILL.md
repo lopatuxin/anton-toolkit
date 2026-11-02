@@ -44,7 +44,7 @@ The script is required input. Resolve it in this order:
 3. If the user pasted a script — use the pasted text.
 4. Otherwise — ask the user (in Russian) which video / paste the script. Do NOT invent a script.
 
-Capture the `video_slug` from the script's frontmatter — the editing sheet reuses it to stay in the same video bundle.
+Capture the `video_slug` from the script's frontmatter — the editing sheet reuses it to stay in the same video bundle. Read its production notes and evidence map before assigning visuals. Preserve the distinction between existing assets and material still to capture or create; do not present an illustration or reconstruction as recorded proof of the experiment. Production notes are not spoken beats.
 
 ## Procedure
 

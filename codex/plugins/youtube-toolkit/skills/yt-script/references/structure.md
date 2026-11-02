@@ -1,74 +1,29 @@
 # Script structure and pacing
 
-Pick a structure based on the video type. Stick to it — a clear structure beats a clever one.
+Choose a structure that answers the viewer's question with the available material. These are options, not mandatory act counts or time quotas. An agreed outline takes precedence.
 
-## Structure A — Tutorial / how-to (4 acts)
+## Tutorial
 
-Target 8–14 min.
+Establish the task and useful outcome, explain prerequisites when needed, then demonstrate steps with observable results. Include actual limitations relevant to repeating the method; do not invent a failed attempt. End when the task and practical caveats are covered.
 
-- **Hook (0:00–0:15)** — outcome reveal or problem mirror.
-- **Act 1 — Setup (0:15–1:30)** — what we're building, what you'll know by the end, prerequisites in 30 sec or less.
-- **Act 2 — Core method (1:30–N:NN)** — the actual how-to. Break into 2–4 visible steps. Each step ends with a tiny visible payoff.
-- **Act 3 — Edge case / "where it breaks" (N:NN–N:NN)** — the part nobody else shows. This is where retention spikes.
-- **Act 4 — Wrap (N:NN–end)** — recap in 30 sec, link to next, CTA.
+## Case study / experiment
 
-## Structure B — Case study / build-along
+Show enough of the outcome early to honor the promise. Establish the goal and comparison conditions, then connect real problems, attempts and results. Each explanation earns its place by resolving a question raised by the evidence. A second example should add a new difficulty, not repeat the first example's entire journey. Close with the actual outcome, effort, cost and limits needed to answer the initial question. A retrospective explanation must not fabricate the order in which the method was developed.
 
-Target 10–18 min.
+## Review / opinion
 
-- **Hook** — outcome reveal or stakes setup.
-- **The brief** — what was asked, what the constraint was (time, tools, scope).
-- **The build** — narrative arc. Wins and dead-ends. Use real friction, not curated success.
-- **The reveal** — show the working thing.
-- **What I'd do differently** — credibility move. Always include.
-- **CTA + outro.**
+Connect a clear claim to concrete evidence, relevant counter-evidence and a qualified verdict. Do not manufacture a build story or suspense where an argument is the honest structure.
 
-## Structure C — Tool review / opinion
+## Flagship / devlog
 
-Target 6–12 min.
+Use the prior episode's promise, the new goal, actual work and changes for the player, then the achieved state and a supported next step. Include failed attempts only when they happened and changed something the viewer cares about. Production details belong only when the episode is about that process.
 
-- **Hook** — sharp opinion.
-- **Claim** — state the position clearly in one sentence.
-- **Evidence** — 2–4 concrete examples. Show, do not tell.
-- **Counter-evidence** — where the opinion does not hold. This is the credibility move.
-- **Verdict** — final position, ranged ("в каком случае X, в каком — Y"), not absolute.
-- **CTA + outro.**
+## Pacing and evidence
 
-## Structure D — Flagship-series episode
+- Explain the method after the viewer understands the problem. Keep a section when it advances the answer; cut repetition or a catalogue of visible details.
+- Maintain progress through results, discoveries or useful answers. A payoff every two minutes and exposition under thirty seconds can be editing prompts, not evidence-backed rules or timers.
+- Plan the existing visual evidence at outline stage. Keep asset pointers and missing evidence outside the speech; detailed shots belong to yt-montage.
+- Estimate duration from actual spoken words and the host's tempo. Use 130–140 words/minute only as a labeled fallback when no measurement exists; account for demonstration pauses separately. Do not stretch a nine-minute story to a twelve-minute default.
+- End shortly after the central answer and a relevant next action. Do not require a recap, retrospective or long CTA simply to fill a template.
 
-Target 12–20 min.
-
-- **Hook** — state recap (formula 5).
-- **Goal** — what this episode adds. One line.
-- **Struggle** — the real obstacle. Show 1–3 failed attempts. This is what makes the series rewatchable. The attempts are at what the viewer gets — a mechanic that felt wrong, a look that did not work — not glitches of the asset or build pipeline.
-- **Resolution** — how it actually got done.
-- **State of the project at end of episode.**
-- **Next-episode hook** — one line teasing what's next.
-- **CTA + outro.**
-
-## Pacing rules
-
-- **Payoff every ~2 min.** A payoff = a concrete outcome, a working step, a moment of "ah, that's the trick" delivered in the spoken text. If two minutes pass without one, cut or restructure.
-- **No more than 30 sec of pure exposition** before something happens — vary the talk track so it does not flatten into a lecture.
-- **Words per minute target:** 130–145. So 12 min ≈ 1600–1750 words; 20 min ≈ 2600–2900 words.
-
-(Visual pacing — B-roll, screen capture, what to show on screen — is NOT planned here. That is `yt-montage`'s job, applied to the finished script.)
-
-## Section length anchors (for ~12 min video)
-
-| Section | Time | Words |
-|---|---|---|
-| Hook | 0:00–0:15 | 30–50 |
-| Setup | 0:15–1:30 | 150–200 |
-| Core / build | 1:30–9:00 | 1000–1100 |
-| Edge case / wrap-around | 9:00–11:00 | 250–300 |
-| CTA + outro | 11:00–12:00 | 130–150 |
-
-Adjust for 8 min (compress Core) or 18 min (extend Core). Hook stays 30–50 words at any length.
-
-## What kills retention
-
-- Long intros ("здарова всем, в этом видео мы..."). Move intro after hook.
-- Apology beats ("извините за качество", "я давно не записывал"). Cut.
-- Self-references ("как я говорил в видео три месяца назад..."). Cut unless flagship recap.
-- Tutorials that show success only. Show one real failure.
+Correct: a second model introduces surface wear after the first established shape checks. Incorrect: retell every setup and checking step for both models to fill the runtime.

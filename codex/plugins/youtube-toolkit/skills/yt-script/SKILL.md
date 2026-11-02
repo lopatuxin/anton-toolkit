@@ -1,6 +1,6 @@
 ---
 name: yt-script
-description: "Writes the full Russian talk track of a video — hook, acts, CTA placement, outro — and saves it to the Obsidian vault, capped at 20 minutes. Picks the structure and hook formula by video type, and first calibrates the voice against the user's already-written scripts and the transcripts of the channel's top videos. Spoken text only: no b-roll or on-screen directions (that is `yt-montage`), no title, description, tags or thumbnail (those are `yt-seo` and `yt-thumbnail`)."
+description: Develops a Russian video outline or full spoken script from the viewer's question, documented events and approved voice references. Use for script writing, rewriting or structure requests. Saves completed scripts to Obsidian, capped at 20 minutes. Plans evidence before prose; detailed editing sheets belong to yt-montage and final packaging to yt-seo and yt-thumbnail.
 ---
 
 <!-- Generated from plugins/youtube-toolkit/skills/yt-script/SKILL.md; edit that source, then run npm run build. -->
@@ -11,7 +11,7 @@ Read PLUGIN_ROOT/codex-runtime.md before using this procedure. Shared source liv
 
 # yt-script — write a video script
 
-Produce a full Russian-language script: hook (first 15 sec) → acts → CTA → outro. Length capped at 20 min equivalent (~2400 spoken words).
+Develop the viewer promise, evidence-backed outline, then spoken prose. Honor the requested stage: discussion stays in chat without searches or writes unless requested; an outline request stops at the outline, without a full script or automatic file. For a full-script request, complete both stages without an extra approval checkpoint. Reuse an outline already agreed in the conversation. Keep the final script within 20 minutes; estimate duration from actual spoken words and the host tempo, not a fixed word cap.
 
 ## Step 0 — Load channel knowledge base (if present)
 
@@ -21,14 +21,11 @@ Use the transcripts to match the user's actual speaking voice: sentence rhythm, 
 
 ## Step 0b — Calibrate style from existing written scripts (MANDATORY when any exist)
 
-Before writing, read the already-written scripts in the vault folder `C:\projects\obsidian\Проекты\youtube\сценарии\`. These are the user's PREFERRED, hand-approved style — the gold standard for how a script should read. The user has stated that scripts written without this calibration come out stylistically wrong and have to be rewritten almost entirely. Treat this step as required, not optional.
+Read the relevant channel-style note and 1–3 suitable scripts under `C:\projects\obsidian\Проекты\youtube\сценарии\` (including series subfolders). A file being present does not make it approved. Use `script_status: approved` or explicit owner approval in the current conversation as evidence; otherwise treat it as a draft, not a voice standard. Prioritize approved examples from the same channel and topic. If none exist, use actual recorded speech or channel transcripts; do not silently promote the newest draft.
 
-Procedure:
-1. List the `.md` files in `сценарии/`. If the folder is empty or absent, skip this step.
-2. Select 1–3 reference scripts, prioritising those **closest in meaning/topic** to the script you are about to write (same series, same `video_type`, overlapping subject). A script from the same flagship series is the strongest reference. If nothing is topically close, pick the 2 most recent scripts as a general style anchor.
-3. Read the selected reference scripts IN FULL and extract the concrete style fingerprint: sentence length and rhythm, paragraph density, level of directness and informality, how the hook is phrased, how arguments are built ("первое… второе…"), recurring connective phrases, how the host addresses the viewer (ты/вы), how sections open and close, the balance of plain talk vs. jargon.
-4. Write the new script so a reader could not tell it apart, by style, from the reference scripts — same voice, same rhythm, same vibe. Match the style; do NOT copy sentences, structure-for-structure, or content verbatim.
-5. If a transcript of the user's recorded voice for a previous episode of the same series exists (the montage pipeline keeps it in the episode's production folder, e.g. `C:\projects\youtube-video\<episode>\transcript\voice.words.json` — join the `word` fields), read it too: it is how the user actually speaks, and it outranks the written scripts when the two differ.
+Read selected references in full. Match plain word order, rhythm, transitions, concrete comparisons and the host's form of address, without copying their plot or forcing their structure onto another genre. When available, read the recorded voice transcript for the same series (for example `C:\projects\youtube-video\<episode>\transcript\voice.words.json`; join the actual word field, `word` or `w`). Recorded speech outranks a written draft.
+
+Keep corrections scoped: channel greetings belong to that channel's style note, preferred terminology to its voice, and a correction about one experiment to that experiment. For autonomous AI helpers use the owner's term «агент», explaining it briefly if the audience needs it. Do not replace it with repeated “copies of the neural network.” Do not turn a factual correction about one input photograph into a general rule for other videos.
 
 Word order and fillers — the gotchas that made a script read as machine-written:
 - Plain spoken word order, one thought per clause. Correct: «Илья — силач. Он будет биться со щитом и принимать удары на щит». Incorrect: «Он будет биться со щитом, принимать удары на него, а в уровнях проламывать…», «да и в уровнях он лазает по стенам».
@@ -43,13 +40,13 @@ This style calibration takes precedence over any generic "good script" instinct.
    - Target length in minutes (default: 12 min for tutorial/case, 18 min for flagship episode).
    - Whether this is a flagship series episode (and if yes, which series + previous episode state).
 
-   If any input is missing, ask once before writing.
+   Infer inputs from the conversation and project material first. Ask only about a consequential choice the owner has not made, such as broad audience versus experienced tool users. Do not ask for a hook the script should develop. Default lengths are estimates, not targets to fill.
 
    For a flagship series episode, before writing read what the series already promised for this episode: the next-episode hook of the previous script and the `next` field of the channel hub (`C:\projects\obsidian\Проекты\youtube\youtube.md`). When the user names one topic ("собери эпопею с начальным экраном") and the promise lists several (characteristics, hero choice, enemies), the topic is one part of the episode, not the whole video — ask once which it is and what length the part gets. Incorrect: a 15-minute script entirely about the start screen while the hub said episode 4 covers characteristics, hero choice and enemies.
 
 ## What goes into the talk track
 
-The viewer watches to see the game (or product) take shape, not how Claude produced it. When the source material is the project's journals, phases and commits:
+For a product or game devlog, foreground what changes for its user. For a video explicitly about a tool or production experiment, explain the method where it resolves a concrete viewer question. The following production-detail exclusions apply to devlogs, not a blanket ban on the subject of a tool experiment:
 
 - **Include what changes things for the player or user**: a mechanic, a rule, a number they will feel, a decision about what the game will be.
 - **Leave out the production kitchen** unless the user asks for it: how assets were generated, cut out, cleaned, glued, re-encoded; tooling; performance fixes. Incorrect (all cut by the user as "никому не интересны"): the dark rim left by the green-screen cutout, specks from the image model, which video model needed two clips instead of one, GPU load dropping from 23% to 8%.
@@ -58,49 +55,50 @@ The viewer watches to see the game (or product) take shape, not how Claude produ
 - **Do not credit ideas to the AI** («название мне подсказала нейросеть») unless the user wants that in the video.
 - **Do not describe what is not built yet** beyond a sentence of plan; where the episode will continue with unbuilt work, leave a placeholder section saying it is written once the work exists. Incorrect: detailing what Vasilisa will turn into and what each form does while the transformation mechanic is undesigned.
 
-2. **Pick the structure** in `SKILL_DIR/references/structure.md` based on type:
-   - Tutorial / how-to → 4-act structure
-   - Case study / build-along → narrative arc
-   - Tool review / opinion → claim → evidence → counter-evidence → verdict
-   - Flagship episode → state-recap → goal → struggle → resolution → next-episode hook
+2. **Set the viewer promise and gather evidence.** State who is watching, what they already know, and the one question the video answers. Respect any agreed title/thumbnail promise; final packaging stays with the sibling skills. Read the applicable research note `C:\projects\obsidian\Проекты\youtube\Как писать сценарии для YouTube.md` when available. Keep its evidence distinctions: educational research, creator experience and craft advice are not universal retention laws.
 
-3. **Pick the hook formula** from `SKILL_DIR/references/hook-formulas.md`. The hook is the first 15 seconds — the most important 30–60 spoken words. Test the formula against the idea: it must answer "почему мне смотреть дальше" in one beat.
+   Separate source facts, explicit owner corrections, and inferences. Trace numbers and first-person claims to material; do not invent feelings, failures, personal working time or inability to calculate a price. If an owner correction conflicts with a log, preserve that attribution in production notes rather than silently presenting the log as confirmation. Distinguish elapsed machine work, hands-on time, calculated usage cost and actual payment.
 
-4. **Place the CTA** using `SKILL_DIR/references/cta.md`:
-   - Lead-gen anchor video → CTA mid-roll (40–60% mark) and end-roll. Soft mention in opening.
-   - Flagship series → end-roll CTA only (audience already invested).
-   - Tutorial / tool review → end-roll CTA only.
+3. **Build the outline before prose.** Use `SKILL_DIR/references/structure.md` as options, not compulsory acts. For each section identify the viewer question, concrete event/example, result, reason to continue, and available evidence. For experiments, connect real problems, attempts and consequences; for explanations or reviews, use questions and arguments. Do not invent obstacles to fill an arc or present the order of explanation as the historical order of experiments.
 
-   Use `{{SITE_URL}}` placeholder until the site is live. Soft fallback: "контакты в закреплённом комментарии".
+   Example: references improve the model, but a reference is distorted; measurements help, but a silhouette misses detached parts; review finds defects, but the owner still catches another. Incorrect: explain five plugin rules before the viewer has seen why they matter, or reuse this exact chain for every subject.
 
-5. **Apply pacing rules** from `SKILL_DIR/references/structure.md`:
-   - One concrete payoff every 2 minutes. No "filler" stretches.
-   - Cut a section if it does not pay off.
+   Identify which existing images, recordings or comparisons support key claims, and which are missing. This is evidence planning, not a shot list. Keep the evidence map in separate production notes for `yt-montage`; never insert visual directions into spoken prose or imply a missing recording exists.
 
-6. **Write the script** in the style calibrated in Step 0b (reference scripts from `сценарии/`). Use the output format below.
+4. **Write the talk track.** Explain a method when the problem makes it useful. Use `SKILL_DIR/references/hook-formulas.md` as optional opening patterns; confirm the promise early without a fixed 15-second quota. A visible result may open the video while the remaining question concerns effort, limits or cost. Use the calibrated voice and approved channel greeting, without transferring another channel's introduction.
+
+   Place only the CTA appropriate to the agreed purpose; `SKILL_DIR/references/cta.md` supplies options, not authorization to add a sales pitch. Close the main question, then end briefly without a second recap. Do not pad to a default duration.
+
+5. **Editorial pass.** Cut explanations that precede the viewer's need, lists of visible details, repeated conclusions, canned suspense, sentence fragments for drama and invented first-person claims. Check that each promised answer arrives, each retained number has a source, and user corrections survive. Count spoken words only and estimate timing with the host's measured tempo (or a labeled estimate if absent). Do not claim a read-aloud or audience test took place when it did not.
+
+## Outline-only output
+
+Give the central question and proposed sections with their purpose, concrete evidence, transitions and provisional duration. Stop there when the user asked for structure first. Save it only when requested; do not automatically proceed to a script or montage.
 
 ## Output format
+
+Use Russian section names suited to the agreed outline; the acts below are illustrative, not a required count or order.
 
 ```markdown
 # Сценарий — <working title>
 
 **Тип:** <tutorial/case/flagship/review>
 **Серия:** <Logos/CRM/standalone>
-**Длительность:** ~<N> мин (~<N×130> слов)
-**Hook formula:** <name from references/hook-formulas.md>
+**Длительность:** ~<N> мин (<actual spoken word count> слов; tempo stated as measured or estimated)
+**Начало:** <chosen approach; optional pattern name>
 **CTA placement:** <opening soft / mid-roll / end-roll>
 
 ---
 
-## Hook (0:00–0:15)
+## Начало (<estimated range>)
 
-<Russian text, 30–50 spoken words. The actual opening line.>
+<The actual Russian opening, sized to the promise and host tempo.>
 
-## Act 1 — <name> (0:15–N:NN)
+## <Section name> (<estimated range>)
 
 <text>
 
-## Act 2 — <name> (N:NN–N:NN)
+## <Next section name> (<estimated range>)
 
 …
 
@@ -124,9 +122,10 @@ The viewer watches to see the game (or product) take shape, not how Claude produ
 
 ## Production notes
 
-- Estimated record time: <N min>
+- Estimated record time: <N min; spoken words and tempo; pauses separate>
 - Open questions for the recording: <list anything the script left under-specified about the spoken content, e.g., "confirm the exact tool version mentioned at 4:30">
 - Files / repos needed for the talk track: <list>
+- Evidence for key sections: <existing assets, source facts, owner corrections, missing material; not spoken>
 ```
 
 ## Save to vault
@@ -140,13 +139,14 @@ After producing the script in chat, persist it to the Obsidian vault following `
   ```yaml
   ---
   type: script
+  script_status: draft          # approved only after explicit owner acceptance of this version
   date: <YYYY-MM-DD>
   video: "<working title in Russian>"
   video_slug: <slug>             # Cyrillic kebab-case, same as filename without .md
   video_type: tutorial | case | flagship | review | lead-gen
   series: logos | crm | standalone
   length_min: <N>
-  hook_formula: "<name from references/hook-formulas.md>"
+  hook_formula: "<chosen approach or optional pattern name>"
   cta_placement: opening-soft | mid-roll | end-roll
   tags:
     - youtube/script
@@ -160,13 +160,14 @@ After producing the script in chat, persist it to the Obsidian vault following `
 
   The forward links to `seo/` and `превью/` are intentional even if those files don't exist yet — Obsidian renders them as creatable links.
 
+- When the owner explicitly accepts a version, mark that script `script_status: approved`; a newly rewritten version starts as `draft` until accepted. Never infer approval from silence or file existence.
 - Body: the full script in the format above (Hook, Acts, CTAs, Production notes) — same content as the chat output.
 - After writing, tell the user in Russian where the file landed.
 
 ## Boundaries
 
 - Do not write the title, description, tags, or thumbnail concept here — those are `yt-seo` and `yt-thumbnail`.
-- Do NOT include any editing/visual directions in the script: no B-roll suggestions, no `[B-ROLL: …]` markers, no "show X on screen", no shot/cut/overlay instructions, no descriptions of what the viewer sees. The script is the spoken talk track ONLY (hook, acts, CTAs, outro). All on-screen/visual planning belongs to `yt-montage`, which consumes the finished script. Correct: a script line is something the host says aloud. Incorrect: "[B-ROLL: terminal with error]" or "show the prompt template on screen at 4:30".
+- Do NOT include any editing/visual directions in the script: no B-roll suggestions, no `[B-ROLL: …]` markers, no "show X on screen", no shot/cut/overlay instructions, no descriptions of what the viewer sees. The script is the spoken talk track ONLY (hook, acts, CTAs, outro). Detailed shots and editing belong to `yt-montage`. Keep the earlier evidence map outside the spoken text in production notes so montage can use it. Correct: a script line is something the host says aloud. Incorrect: "[B-ROLL: terminal with error]" or "show the prompt template on screen at 4:30".
 - Do not improvise the idea — if the user did not give one and there is no `yt-ideas` output, ask.
 - Do not exceed 20 min length cap.
 - Russian language for all spoken text. English allowed in code blocks, tool names, and tags.

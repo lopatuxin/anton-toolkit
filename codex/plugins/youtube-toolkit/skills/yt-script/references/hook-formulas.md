@@ -1,83 +1,36 @@
-# Hook formulas — first 15 seconds
+# Opening patterns
 
-The hook is the highest-leverage 30–50 spoken words in the script. Pick one formula deliberately. Do not blend.
+Honor the viewer promise early with concrete evidence and the host's voice. These patterns are options, not compulsory formulas, timing quotas or text to copy. Use the agreed outline over a genre default.
 
-## Formula 1 — Outcome reveal
+## Outcome reveal
 
-Show the finished thing, then promise the path.
+Begin with the result or a meaningful comparison. Leave a genuine question about how it was achieved, effort, cost or limitations for the story to answer. Useful for experiments and tutorials; do not hide the promised result solely to prolong watching.
 
-> "Этот <thing> я собрал за <time> с <tool>. Сейчас покажу как — без воды, по шагам."
+## Problem mirror
 
-When to use: case study, build-along, tutorial. Default choice for vibe-coding builds.
+Name a specific difficulty the intended viewer recognizes, then demonstrate the relevant attempt or solution. Use a complete spoken thought rather than chopped fragments and a rhetorical question-and-answer.
 
-Strength: instant proof. Weakness: requires the outcome to be visually striking.
+## Claim and evidence
 
-## Formula 2 — Sharp opinion
+State a position the author can substantiate and provide an early example. Useful for reviews and opinions. Do not invent a provocative verdict to fit the format.
 
-State a non-obvious opinion that goes against the niche consensus.
+## Real stakes
 
-> "<Tool>, который все хвалят, я выкинул через неделю. Вот почему — и что использую вместо."
+Establish the actual goal, constraint and consequence of failure. Useful for documented experiments. A deadline, wager or feeling must come from the source or the owner, never from a need for drama.
 
-When to use: tool review, opinion video. Strong if the user has earned the opinion.
+## Series continuation
 
-Strength: high CTR for in-niche viewers. Weakness: lands flat without evidence.
+Give only the prior context needed to understand the new goal. Honor the previous episode's promise without a lengthy recap or a second introduction.
 
-## Formula 3 — Problem mirror
+## Meaningful number
 
-Open with the viewer's pain. Make them feel seen in 5 seconds.
+Use a verified number when the viewer can understand what it changes. Distinguish calculated cost from payment and elapsed runtime from hands-on effort. A large count without context is not a reason to watch.
 
-> "Ты пишешь промпт. Cursor генерит 200 строк. Половина — мусор. Знакомо? Сейчас покажу почему так и как починить."
+## Avoid
 
-When to use: tutorial addressing a known frustration.
+- Announcing the lesson at length before delivering anything concrete.
+- Greetings and requests that displace the initial promise. Use the approved channel greeting after the opening has delivered value.
+- Canned suspense, unsupported claims about what everyone believes, and invented quotes or stakes.
+- A fixed opening duration, word count or formula based only on genre.
 
-Strength: immediate identification. Weakness: easy to overuse and sound formulaic.
-
-## Formula 4 — Stakes setup
-
-Frame the video as a mini-bet with a clear stake.
-
-> "Я попробовал собрать CRM на <tool> за один день. Получилось / не получилось — сейчас разберём. Спойлер: <hint>."
-
-When to use: build-along, case study, lead-gen anchor.
-
-Strength: stake = retention bait. Weakness: needs an honest unknown — fake stakes feel cheap.
-
-## Formula 5 — State recap (flagship series only)
-
-Catch up new viewers in 15 seconds while not boring returning ones.
-
-> "В прошлой серии Логоса я подключил голосовой ввод. Сейчас — научим его помнить контекст между сессиями. Кто новенький — короткий рекап в первые 10 секунд."
-
-When to use: flagship-series episode (Logos, CRM).
-
-Strength: respects loyal audience and onboards new ones. Weakness: only works if previous episode actually delivered something concrete.
-
-## Formula 6 — Number teaser
-
-State a counterintuitive number from the journey.
-
-> "Я обновил CRM 47 раз за 3 дня — и закоммитил только 6. Вот что я понял про работу с AI на больших проектах."
-
-When to use: case study, opinion. Use sparingly.
-
-Strength: high curiosity. Weakness: number must be real and earn its place.
-
-## Anti-patterns — do not use
-
-- "В этом видео мы рассмотрим..." — instant skip.
-- "Привет всем, меня зовут..." in the first 15 seconds. Introductions go after the hook delivers value, around 20–40 sec.
-- "Не забудь поставить лайк..." in the first 30 sec. Audience has not earned the right to hear it yet.
-- Listicle openers ("5 вещей которые..."). Saturated in this niche.
-- Long context recaps — keep flagship recaps under 10 seconds.
-
-## Selection rule
-
-For each script, pick the formula that fits the type:
-
-| Video type | Default formula | Backup |
-|---|---|---|
-| Tutorial | 1 (Outcome reveal) | 3 (Problem mirror) |
-| Case study | 1 (Outcome reveal) | 4 (Stakes setup) |
-| Flagship episode | 5 (State recap) | 1 (Outcome reveal) |
-| Tool review | 2 (Sharp opinion) | 6 (Number teaser) |
-| Lead-gen anchor | 4 (Stakes setup) | 1 (Outcome reveal) |
+Correct: show two results and explain the remaining question about effort. Incorrect: promise an unseen disaster that never occurred, or defer every useful answer to the final minute.
