@@ -1,0 +1,10 @@
+{
+  "name": "anton-toolkit",
+  "version": "0.34.2-codex.hb13d2b91f95d",
+  "description": "Personal toolkit with custom skills for Anton",
+  "author": {
+    "name": "Anton"
+  },
+  "skills": "./skills/",
+  "hooks": "./hooks/hooks.json"
+}

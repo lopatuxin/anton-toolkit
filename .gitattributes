@@ -1,3 +1,6 @@
 # Скрипты воркфлоу читает Workflow-инструмент: CR в них отбраковывается проверкой окна
 # подтверждения. core.autocrlf=true на Windows иначе подставляет CRLF при каждом checkout.
 *.js text eol=lf
+*.mjs text eol=lf
+codex/** text eol=lf
+.agents/plugins/marketplace.json text eol=lf

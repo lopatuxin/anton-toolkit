@@ -67,16 +67,19 @@ function Invoke-ReviewGate {
   $hookEvent = Read-HookInput
   if (-not $hookEvent) { return 0 }
   $command = [string](Get-Prop (Get-Prop $hookEvent 'tool_input') 'command')
+  if (-not $command) { $command = [string](Get-Prop (Get-Prop $hookEvent 'tool_input') 'cmd') }
   if (-not $command) { return 0 }
   if ($command -notmatch '\bgit\b[^|;&]*\bcommit\b') { return 0 }
   if ($command -match 'ANTON_SKIP_REVIEW\s*=\s*[''"]?1') { return 0 }
   if (-not (Test-GitAvailable)) { return 0 }
 
   $cwd = ConvertTo-WindowsPath ([string](Get-Prop $hookEvent 'cwd'))
+  $toolWorkDir = [string](Get-Prop (Get-Prop $hookEvent 'tool_input') 'workdir')
+  if ($toolWorkDir) { $cwd = ConvertTo-WindowsPath $toolWorkDir }
   if (-not $cwd) { $cwd = (Get-Location).ProviderPath }
   $repo = Get-RepoInfo (Resolve-CommandDir -Command $command -Cwd $cwd)
   if (-not $repo) { return 0 }
-  if (-not (Test-Path -LiteralPath ([System.IO.Path]::Combine($repo.Top, $script:GateFileRelative)) -PathType Leaf)) { return 0 }
+  if (-not (Test-Path -LiteralPath ([System.IO.Path]::Combine($repo.Top, $script:GateFileRelative)) -PathType Leaf) -and -not (Test-Path -LiteralPath ([System.IO.Path]::Combine($repo.Top, '.codex/review-gate')) -PathType Leaf)) { return 0 }
 
   $allMode = Test-CommitAllFlag $command
   $staged = Split-NullSeparated (Invoke-Git -WorkDir $repo.Top -GitArgs @('diff', '--cached', '--name-only', '--no-renames', '-z'))

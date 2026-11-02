@@ -2,6 +2,14 @@
 
 Shared conventions for all `plugin-builder` components. Read this **before** generating or modifying any plugin file.
 
+## Shared Claude and Codex source
+
+The anton-toolkit Git repository is the single source for both clients. Edit common plugin behavior under `plugins/`; keep Claude agent model/effort frontmatter there. Codex-only adaptations and model allocation live under `adapters/codex/`. Do not edit generated `codex/plugins/` or the old Obsidian marketplace copy.
+
+Before publishing a change, run `npm ci --ignore-scripts`, `npm test`, `npm run build`, and `npm run check` at the repository root. Include generated `codex/` and `.agents/plugins/marketplace.json` changes in the same commit with explicitly named paths. GitHub also rebuilds after source-only pushes to main. Update installed clients with `scripts/sync-marketplace.ps1`; do not overwrite personal rules, memory, or plugin enable/disable choices.
+
+Correct: edit `plugins/anton-toolkit/agents/kotlin-dev.md`, build, and commit both source and generated package. Incorrect: edit a cached SKILL.md or maintain a second independent copy in Obsidian.
+
 ## Language rule (critical)
 
 - **Model-facing instructions** (SKILL.md body, agent body, references, YAML `description` field) — **English**. Only the model reads this text; English keeps it compact and unambiguous.

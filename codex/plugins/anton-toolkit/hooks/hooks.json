@@ -1,0 +1,8 @@
+{
+  "description": "Codex review hooks; native hook trust must be granted separately by the user.",
+  "hooks": {
+    "Stop": [{ "hooks": [{ "type": "command", "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${PLUGIN_ROOT}/hooks/stop-gate.ps1\"", "timeout": 20 }] }],
+    "PostToolUse": [{ "matcher": "^(apply_patch|Edit|Write|MultiEdit)$", "hooks": [{ "type": "command", "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${PLUGIN_ROOT}/hooks/codex-post-edit.ps1\"", "timeout": 30 }] }],
+    "PreToolUse": [{ "matcher": "^(exec_command|Bash|PowerShell)$", "hooks": [{ "type": "command", "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${PLUGIN_ROOT}/hooks/review-gate.ps1\"", "timeout": 20 }] }]
+  }
+}

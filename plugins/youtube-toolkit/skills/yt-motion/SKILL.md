@@ -6,7 +6,8 @@ description: >
   sketches of one scene for the owner to pick, then directs parallel Opus scene workers, has a cheaper
   model fix technical faults, and delivers MP4 clips into the episode's assets\motion, re-timed to the
   recorded voice by its words. Not for writing the editing sheet (yt-montage) or assembling the whole video.
-when_to_use: "сделай моушен", "моушен для ролика", "перенеси моушен на запись голоса"
+when_to_use: >
+  "сделай моушен", "моушен для ролика", "перенеси моушен на запись голоса"
 model: opus
 effort: high
 ---

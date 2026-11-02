@@ -1,0 +1,9 @@
+{
+  "name": "system-designer",
+  "version": "0.7.1-codex.h0e25aee67b5a",
+  "description": "Designs personal development projects as short reference documentation in the Obsidian vault: concept, architecture hub with diagrams, area notes and phase outlines",
+  "author": {
+    "name": "Anton"
+  },
+  "skills": "./skills/"
+}

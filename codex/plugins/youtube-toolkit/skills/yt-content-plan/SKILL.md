@@ -1,0 +1,78 @@
+---
+name: yt-content-plan
+description: Schedules concrete video ideas against weeks and writes the publication calendar to the Obsidian vault, balancing flagship-series episodes, tutorials and lead-gen anchors at 1 video per week, no Shorts. Takes the idea pool from `yt-ideas` (it invents none) and reads the channel knowledge base to avoid re-scheduling recently published topics.
+disable-model-invocation: true
+---
+
+<!-- Generated from plugins/youtube-toolkit/skills/yt-content-plan/SKILL.md; edit that source, then run npm run build. -->
+
+## Codex runtime
+
+Read PLUGIN_ROOT/codex-runtime.md before using this procedure. Shared source lives in the anton-toolkit Git repository; installed packages are generated.
+
+# yt-content-plan — publication calendar
+
+Build a calendar that schedules concrete videos against weeks. Balance flagship-series episodes, tutorials/case studies, and lead-gen anchors. Honour the 1-video/week cap.
+
+## Step 0 — Load channel knowledge base (if present)
+
+Follow `PLUGIN_ROOT/references/knowledge-base-context.md`. For `yt-content-plan` specifically, when `kb_available: true` read: the full `индекс.md` (every row — titles and `published` dates of all videos on the channel).
+
+Use the index to space topics on the new calendar: do NOT schedule a topic that was published in the last 8 weeks; reduce repetition with topics published in the last 6 months unless the new angle is clearly different. When dropping or warning about a duplicate, cite the existing slug, e.g. "пересекается с [[Проекты/youtube/база/видео/курсор-выкинул-проект]] от 2026-03-10 — рекомендую сменить угол". If the KB is absent, plan without the duplicate-detection check.
+
+## Procedure
+
+1. **Get the period.** Default — next **8 weeks**. Accept "месяц" → 4 weeks, "квартал" → 12 weeks. Confirm if ambiguous.
+
+2. **Get the idea pool.** Look in conversation for a `yt-ideas` output. If absent, ask: "Передай список идей от yt-ideas или скажи 'возьми любые из конкурентского анализа'." Do not invent ideas here — that is `yt-ideas`'s job.
+
+3. **Read the start date.** Default — next Monday from today. Confirm if the user has a specific cadence weekday.
+
+4. **Apply the balance** from `SKILL_DIR/references/cadence.md`:
+   - Mix: roughly 1 flagship-series episode every 2 weeks, 1 lead-gen every 3–4 weeks, the rest tutorial / case / tool review.
+   - Never two flagship episodes back-to-back (lock-in risk).
+   - Never two lead-gen back-to-back (audience tunes out the pitch).
+   - Open with a strong (top-funnel friendly) idea, not a niche deep-dive.
+
+5. **Render the calendar** using `SKILL_DIR/references/calendar-template.md`.
+
+6. **Add reservations.** Mark gaps if there are not enough ideas for the period — show the user where they need to source more from `yt-ideas`.
+
+## Inputs and outputs
+
+- **Input:** period (weeks), idea pool, start date.
+- **Output:** calendar table + week-by-week notes (production status, dependencies).
+
+## Save to vault
+
+After producing the calendar in chat, persist it to the Obsidian vault following `PLUGIN_ROOT/references/vault.md`.
+
+- Target folder: `C:\projects\obsidian\Проекты\youtube\контент-план\`.
+- Filename: `YYYY-MM-DD-контент-план-<N>нед.md` where `<N>` is the period in weeks (e.g., `2026-05-12-контент-план-8нед.md`). Russian, Cyrillic, kebab-case. Use the current session date. If the file exists, append `-v2`, `-v3`…
+- Frontmatter:
+
+  ```yaml
+  ---
+  type: content-plan
+  date: <YYYY-MM-DD>
+  period_weeks: <N>
+  start_date: <YYYY-MM-DD>      # first scheduled video
+  end_date: <YYYY-MM-DD>        # last scheduled video
+  videos_planned: <N>
+  reservations: <N>             # gaps marked as "need more ideas"
+  tags:
+    - youtube/content-plan
+  related:
+    - "[[Проекты/youtube/идеи/<ideas-file>]]"   # the idea batch the plan draws from
+  ---
+  ```
+
+- Body: the full calendar table + week-by-week notes — same content as the chat output.
+- After writing, tell the user in Russian where the file landed.
+
+## Boundaries
+
+- Do not generate ideas — request them from the user / direct to `yt-ideas`.
+- Do not write scripts or SEO — those are downstream skills.
+- Do not include Shorts. The channel does not produce them. If the idea pool contains a Shorts idea, drop it and note the drop.
+- The calendar is a working artefact — propose it, then ask the user if they want adjustments.

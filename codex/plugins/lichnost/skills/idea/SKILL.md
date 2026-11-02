@@ -1,0 +1,206 @@
+---
+name: idea
+description: "Captures and develops the owner's ideas and goals in the Obsidian vault: one note per idea under Личная/Идеи written as light documentation, and his goals in Личная/Цели.md. Flows: a new idea, a refined idea (each then linked to the goal it serves, or offered as a new goal), and setting, reaching or dropping a goal. Unlike `dnevnik` (verbatim diary) it may rephrase; period reviews are `itogi`."
+---
+
+<!-- Generated from plugins/lichnost/skills/idea/SKILL.md; edit that source, then run npm run build. -->
+
+## Codex runtime
+
+Read PLUGIN_ROOT/codex-runtime.md before using this procedure. Shared source lives in the anton-toolkit Git repository; installed packages are generated.
+
+# Idea — capture and develop ideas in the Obsidian vault
+
+The user dictates a raw idea; you turn it into a clean, well-organized idea document and save it
+as its own note. Later the user comes back to **develop** that idea — adding detail, sharpening
+it — and you integrate the new material into the same note while keeping it coherent.
+
+Runs DIRECTLY in the conversation, single-shot. No agents.
+
+This is NOT a verbatim transcript skill (that is `dnevnik`). Here you may rework the wording and
+structure to read like documentation. The hard line: **rephrase and organize freely, but never
+change the meaning of the idea and never add substance the user did not express.**
+
+## 0. Locate the vault
+
+Resolve `VAULT` with the search in `PLUGIN_ROOT/references/vault.md`; never hard-code the
+path. That file also carries the folder layout, the folder-note rule and the auto-sync rule this skill
+relies on.
+
+The ideas folder is `$VAULT/Личная/Идеи`.
+
+## 1. First-run setup (idempotent — run these checks EVERY time)
+
+Create only what is missing; never overwrite an existing file.
+
+```bash
+mkdir -p "$VAULT/Личная/Идеи"
+```
+
+Ensure the **folder note** `$VAULT/Личная/Идеи/Идеи.md` exists and is non-empty (this vault uses
+the `folder-notes` plugin — opening the folder opens this note, so it serves as the idea index).
+The vault has the **Dataview** plugin, so the index is an auto-updating query — you never maintain
+it by hand. If the file is missing OR empty, create it with `tags: [идеи]`, the heading
+`# 💡 Идеи` and three Dataview tables over `FROM "Личная/Идеи"` grouped by `status` (§8):
+«Живые», «Ушли в дело» (with the `project` or `goal` field) and «Отброшенные».
+
+Leave an existing non-empty folder note untouched — the Dataview query keeps the index current
+automatically, so there is nothing to update there per idea.
+
+## 2. Get the dictation and decide the flow
+
+The dictated text is whatever the user just said / passed as arguments. If there is no text,
+ask in Russian: «Диктуй идею — запишу. Или скажи, какую идею доработать.» and wait. Do NOT
+create an empty file.
+
+List the existing ideas (everything in the folder except the folder note itself) so you can both
+detect a refine request and avoid creating a near-duplicate:
+
+```bash
+ls -1 "$VAULT/Личная/Идеи"/*.md 2>/dev/null | grep -v '/Идеи\.md$' || echo "(no ideas yet)"
+```
+
+Choose the flow from the argument:
+
+- **GOAL** — he sets, reaches or drops a goal: «поставь цель …», «хочу к весне …», «цель
+  достигнута», «сними цель …». → §7.
+- **STATUS** — an idea's fate changes: «идея ушла в проект <X>», «отложи идею», «выкинь идею». → §8.
+- **REFINE an existing idea** — the argument points at an idea already in the folder, e.g.
+  «доработай идею про <X>», «дополни <X>», «к идее <X> добавь …», «по идее <X>: …». Match the
+  named idea against the existing note titles (case-insensitive, fuzzy on the key words). → §4.
+- **NEW idea** — the argument is a fresh idea with no reference to an existing note. → §3.
+- **Ambiguous** — if the argument could be a new idea OR a development of an existing one (the
+  topic clearly overlaps an existing note), ask ONCE in Russian, listing the candidate:
+  «Это новая идея или дополнение к `<название>`?» and wait. Do NOT guess between new and refine —
+  a wrong guess either fragments one idea into two notes or overwrites the wrong note.
+
+If a refine request names an idea that does not exist, say so in Russian and offer to create it
+as a new idea instead; do not silently create a mismatched note. A refine request on an idea with
+`status: стала проектом` does not edit it: say that the idea now lives in the project and a change
+goes into the project's documents (`system-designer`).
+
+## 3. NEW idea flow
+
+1. **Derive a title.** From the idea, craft a concise, descriptive Russian title (≈3–7 words)
+   that captures what the idea IS — this becomes both the H1 and the file name. Sanitize the file
+   name: no `\ / : * ? " < > |` characters; keep it readable (e.g. `Бот-напоминалка для задач.md`).
+   If a note with that title already exists, you are probably in a refine situation — re-check §2.
+
+2. **Format the idea as light documentation** per §5.
+
+3. **Write the note** with the Write tool at `$VAULT/Личная/Идеи/<title>.md`:
+
+   ```markdown
+   ---
+   created: <YYYY-MM-DD>
+   updated: <YYYY-MM-DD>
+   status: черновик
+   tags:
+     - идея
+   ---
+
+   # <Title>
+
+   [[Идеи]]
+
+   <formatted idea body — adaptive sections per §5>
+   ```
+
+4. Report (§6).
+
+Compute the date with `date +%Y-%m-%d`.
+
+## 4. REFINE / develop flow
+
+1. **Read** the matched idea note in full.
+2. **Integrate** the new dictation into the existing document. This is a MERGE, not an append of
+   a raw blob: weave the new detail into the relevant section, add a new section if the new
+   material opens a new dimension, and re-tighten the prose so the whole note still reads as one
+   coherent document. Apply the formatting discipline in §5.
+3. **Never drop prior substance.** You may reorganize and rephrase existing content, but every
+   point already in the note must survive — unless the user explicitly retracts or replaces it.
+4. **Update the frontmatter:** set `updated:` to today (`date +%Y-%m-%d`). If the idea was
+   `status: черновик` and now has real substance, you MAY bump it to `status: в проработке`. Do
+   not invent a status the user did not imply.
+5. Report (§6).
+
+## 5. Formatting discipline (used by §3 and §4)
+
+Turn the raw dictation into clean, well-organized Obsidian Markdown that reads like short internal
+documentation. Rules, in order of importance:
+
+1. **Never change the essence.** The idea, its purpose, and every concrete decision stay exactly
+   as the user meant them. Do NOT add features, motivations, conclusions, or "improvements" the
+   user did not state. Do NOT moralize or evaluate the idea. Reworking is about *form*, not
+   *content*.
+2. **You MAY rework the form.** Unlike `dnevnik`, here you may rephrase clumsy dictation into
+   clear sentences, reorder points into a logical flow, remove pure speech filler, and merge
+   repetition. The goal is a crisp, readable document — not a transcript.
+3. **Adaptive structure — headings only when earned.** A small idea stays a couple of clean
+   sentences with NO headings. A richer idea gets `## ` sections drawn from what the content
+   actually contains — common ones: `## Суть`, `## Проблема` / `## Зачем`, `## Как это работает`
+   / `## Решение`, `## Детали`, `## Открытые вопросы`, `## Следующие шаги`. Use ONLY the sections
+   the material supports; never emit an empty placeholder section.
+4. **Open questions stay questions.** If the user voiced uncertainty ("не знаю, как лучше — X или
+   Y"), record it faithfully under `## Открытые вопросы` — do NOT resolve it for them.
+5. **Keep the language as dictated** (Russian). Do NOT translate.
+6. **Light Obsidian linking.** You MAY wrap an obviously recurring vault entity (a named project
+   or person) in `[[wikilinks]]` when it is clearly a vault entity. When in doubt, leave plain
+   text. Never link common words.
+
+Correct vs incorrect:
+- Correct: dictation "ну короче бот который сам напоминает про задачи в телеге чтоб я не забывал"
+  → `## Суть` + "Телеграм-бот, который сам напоминает о задачах, чтобы ничего не терялось."
+  (cleaned wording, same meaning).
+- Incorrect: adding "Можно ещё прикрутить ИИ-приоритизацию и монетизировать через подписку." —
+  that is new substance the user never said. Never do this.
+
+## 6. Confirm to the user (Russian)
+
+Reply in one or two lines naming what changed, e.g.:
+- New: «Записал идею: `Личная/Идеи/Бот-напоминалка для задач.md`.»
+- Refine: «Дополнил идею `Личная/Идеи/Бот-напоминалка для задач.md` — добавил раздел «Детали», статус → в проработке.»
+
+Then link the idea to his goals (`PLUGIN_ROOT/references/goals.md`). Read
+`$VAULT/Личная/Цели.md` and say in one line which active goal the idea serves and why — or, if it
+serves none, ask once: «Это тянет на цель, на отдельный проект или пусть лежит?» On «цель» continue
+into §7 with the idea as its source and then mark the idea `стала целью` (§8); on «проект» say
+that a project is started by the project template and `system-designer`, and once the project
+card exists the idea is marked `стала проектом` (§8); otherwise leave it. When the idea serves a goal, add a line
+`Служит цели: <цель>` under `[[Идеи]]` in the idea note.
+
+`obsidian-git` auto-syncs the vault, so no manual git commit is needed here.
+
+## 7. GOAL flow
+
+Goals live in `$VAULT/Личная/Цели.md`, shaped and ruled by
+`PLUGIN_ROOT/references/goals.md` — read it first. Create the note from the shape there
+if it is missing.
+
+- **Set.** Write the goal in his words. Take the deadline and the measure of progress from what he
+  said; if either is missing, ask once for both in one question («К какому сроку и по чему поймём,
+  что движется?»). If he does not know, write «не назван» — the reviews will come back to it. The
+  source is «сказал сам <date>», the idea note, or the review that proposed it. A sixth active goal
+  — follow the few-goals rule in goals.md.
+- **Reach or drop.** Move the goal to «Достигнутые и снятые» with the date and one line of why,
+  in his words. Ideas that pointed at it keep their `Служит цели` line.
+
+Set `updated:` to today. Confirm in one line: «Записал цель „…“ — срок …, признак …».
+
+## 8. Idea statuses
+
+An idea never hangs forever as a draft and is never deleted — it keeps the record of where a
+project or goal came from. Its `status` says what became of it:
+
+| `status` | Meaning | Extra |
+|---|---|---|
+| `черновик`, `в проработке` | alive, being thought over | — |
+| `отложена` | alive, parked on purpose | — |
+| `стала проектом` | went into work as a project | frontmatter `project: "[[<project card>]]"`; under `[[Идеи]]` the line becomes `[[Идеи]] · стала проектом [[<card>]]` |
+| `стала целью` | became a goal in `Цели.md` | frontmatter `goal: "[[Цели#<goal heading>]]"`; the same kind of line |
+| `отброшена` | he decided against it | one line of why at the end of the note, in his words |
+
+The STATUS flow sets the status, the extra fields and `updated:` to today, and changes nothing
+else in the note. Before marking `стала проектом`, check that the project card exists under
+`Проекты/` or `Работа/`; if not, say so instead. The monthly review looks only at the alive
+statuses. Confirm in one line: «Идея „…“ — стала проектом [[…]]».

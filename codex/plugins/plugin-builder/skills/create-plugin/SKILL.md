@@ -1,0 +1,125 @@
+---
+name: create-plugin
+description: Creates a new plugin from scratch in the anton-toolkit-marketplace through a task-centric interview. Use when the plugin the user wants does not yet exist under `plugins/<name>/`; if it already exists, use extend-plugin to add to it or improve-plugin to fix it after an incident. Runs in the main conversation; the interview is not delegated to agents.
+---
+
+<!-- Generated from plugins/plugin-builder/skills/create-plugin/SKILL.md; edit that source, then run npm run build. -->
+
+## Codex runtime
+
+Read PLUGIN_ROOT/codex-runtime.md before using this procedure. Shared source lives in the anton-toolkit Git repository; installed packages are generated.
+
+# Create Plugin — guided plugin creation
+
+Interview the user in Russian to understand the task the plugin should solve, then generate all plugin files (in English) and register the plugin in the marketplace.
+
+**Before starting, read** `PLUGIN_ROOT/references/plugin-authoring.md`. It contains the language rules, the Claude 5 writing rules, frontmatter schemas, the component table, description examples, and the pre-flight validation checklist you will use. Every later mention of `plugin-authoring.md` in this document means that file.
+
+## Phase 1 — Open prompt
+
+Ask one broad Russian question and wait for the full answer. Do not ask anything else in this turn.
+
+```
+Расскажи, что за плагин и какую задачу он должен решать.
+```
+
+## Phase 2 — Parse the 4 required fields
+
+Under the hood (no message to user yet), classify the answer against four fields:
+
+1. **Задача** (task) — what problem is solved. Not "what it does" but "what's missing without it".
+2. **Когда запускать** (trigger context) — in which situations the plugin should activate. Situations, not literal phrases — you'll derive phrases from this.
+3. **Принцип работы** (principle) — how it works step by step, with critical rules ("always X", "never Y").
+4. **Результат** (result) — what the user sees when the task is done.
+
+For each field, grade: `covered` / `partially covered` / `not covered`.
+
+## Phase 3 — Active clarification (one question per turn)
+
+For each `partially covered` or `not covered` field, ask a targeted clarifying question in Russian. **One question per message.** Track progress using an HTML comment at the end of each of your messages — the user does not see it, and it prevents you from losing count:
+
+```html
+<!-- uncovered: [trigger_context, principle] -->
+```
+
+Clarification patterns:
+- **Contradiction in user answers:** quote both conflicting statements, ask which is the real one.
+- **Abstract phrasing:** "Приведи конкретный пример — какой это будет момент в твоей работе?"
+- **Missing edge case:** "А если [situation] — что должно произойти?"
+- **Missing anti-pattern:** "А в какой ситуации плагин НЕ должен срабатывать? Например, если я просто спрашиваю про X, а не прошу сделать?"
+
+Do NOT advance to Phase 4 until all four fields are `covered`.
+
+## Phase 4 — Russian recap, confirmation
+
+Summarize in Russian what you understood, in ~5 sentences. Include a derived kebab-case name (your suggestion, based on the task). Ask for confirmation.
+
+```
+Понял так: задача — <...>. Запускается в ситуациях: <...>. Работает так:
+1) <...>  2) <...>  3) <...>. Результат — <...>. Назвал плагин `<kebab-case>`.
+Всё правильно?
+```
+
+If the user corrects something, go back to Phase 3 with the specific delta, not the whole interview.
+
+## Phase 5 — Generate files
+
+Decide the component layout from the interview using the **Component types** table in `plugin-authoring.md` — a plugin can be a skill, agent, hook, workflow, MCP server, or a small combination. Do NOT default to "skill" reflexively:
+
+- **Dialog-driven behavior** (multi-turn) → **skill**.
+- **Autonomous one-shot work** (no dialog) → **agent** (set `model` and `effort` per the **Model guidance** section).
+- **Explicit user-triggered action** (`/<name> ...`) → **skill** with `disable-model-invocation: true`.
+- **Automatic behavior on a harness event, or a prohibition that must hold 100% of the time** → **hook** (the model cannot self-trigger on events).
+- **Orchestration of several agents** (pipeline, fan-out, judge panel) → **workflow** plus a thin entry skill.
+- **External tool/data access** → **MCP server**.
+
+Minimal plugin: `plugin.json` + one component. Add more only if the interview clearly requires them.
+
+Generate, following `plugin-authoring.md`:
+
+1. `plugins/<name>/.claude-plugin/plugin.json` — version `0.1.0`, author Anton.
+2. `plugins/<name>/skills/<skill-name>/SKILL.md` — English body, English frontmatter, Russian trigger phrases only inside `when_to_use` / `description`.
+3. `plugins/<name>/agents/<agent-name>.md` if the design needs an agent — with explicit `model`, `effort`, and a `tools:` allowlist that matches the role.
+4. `plugins/<name>/references/<topic>.md` only if the interview revealed a clear need for a shared reference; cite it as `PLUGIN_ROOT/references/<topic>.md`.
+5. `plugins/<name>/hooks/hooks.json` (+ `hooks/<script>.ps1`), `plugins/<name>/workflows/<name>.js`, or `plugins/<name>/.mcp.json` if the chosen layout includes a hook, workflow, or MCP server. For their exact format, use the official docs linked in `plugin-authoring.md`.
+
+User-facing prompts inside the generated skill (e.g. "Что нужно закоммитить?") stay in Russian — include them in the SKILL.md body as literal Russian strings wrapped in code fences or blockquotes, so the model knows to speak them verbatim.
+
+## Phase 6 — Register, validate, commit, push
+
+1. Read `.claude-plugin/marketplace.json`, add a new entry:
+   ```json
+   { "name": "<name>", "description": "<same as plugin.json>", "source": "./plugins/<name>" }
+   ```
+2. Run the **pre-flight validation checklist** from `plugin-authoring.md`:
+   - All created JSON files parse; workflow scripts pass `node --check`.
+   - `marketplace.json` still has no duplicate names.
+   - All generated `SKILL.md` / `agent.md` are > 100 bytes.
+   - Each `description` (+ `when_to_use`) is ≤ 1,000 characters, opens with the key use case, and has no `<example>` blocks or IMPORTANT/IMMEDIATELY emphasis.
+   - References are cited via `PLUGIN_ROOT`; nothing but agents lives under `agents/`.
+3. If any check fails — abort, report in Russian which file failed which check, do not commit. Leave files on disk for the next pass.
+4. If all pass:
+   - Update the root `README.md` per the **README sync** section in `plugin-authoring.md`: add the new plugin's section, a map-diagram box, a plugins-table row (with its version), a TOC entry, a cheatsheet row, and bump the badge counts.
+   ```bash
+   git pull origin main
+   git add README.md .claude-plugin/marketplace.json plugins/<name>/
+   git commit -m "<Russian message: created plugin <name> with N skills / M agents>"
+   git push
+   ```
+5. A brand-new plugin is registered in `marketplace.json` but NOT yet active — it must be enabled (see the **Activation** section in `plugin-authoring.md`). A plain restart is not enough. Report this explicitly to the user in Russian:
+   ```
+   Создал плагин `<name>`. Состав: <список компонентов>. Коммит <hash>.
+   Плагин зарегистрирован, но ещё не активен. Чтобы включить: запусти `/plugin`, найди `<name>` в маркетплейсе `anton-toolkit-marketplace` и включи его — простой перезагрузки для нового плагина недостаточно.
+   Если что-то не так — скажи "отмени".
+   ```
+
+## Rollback
+
+If user says "отмени" / "откати" / "верни как было" after commit:
+
+```bash
+git revert <hash> --no-edit
+git push
+```
+
+Report in Russian: `Откатил коммит <hash>, файлы вернул в предыдущее состояние.`

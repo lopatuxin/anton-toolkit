@@ -1,0 +1,92 @@
+{
+  "name": "anton-toolkit-marketplace",
+  "interface": {
+    "displayName": "Антон — Claude и Codex"
+  },
+  "plugins": [
+    {
+      "name": "anton-toolkit",
+      "source": {
+        "source": "local",
+        "path": "./codex/plugins/anton-toolkit"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "blender-modeling",
+      "source": {
+        "source": "local",
+        "path": "./codex/plugins/blender-modeling"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "lichnost",
+      "source": {
+        "source": "local",
+        "path": "./codex/plugins/lichnost"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "plugin-builder",
+      "source": {
+        "source": "local",
+        "path": "./codex/plugins/plugin-builder"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "system-designer",
+      "source": {
+        "source": "local",
+        "path": "./codex/plugins/system-designer"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "vibe-coding-course",
+      "source": {
+        "source": "local",
+        "path": "./codex/plugins/vibe-coding-course"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "youtube-toolkit",
+      "source": {
+        "source": "local",
+        "path": "./codex/plugins/youtube-toolkit"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

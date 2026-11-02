@@ -37,7 +37,7 @@ $script:TouchedFileName = 'anton-toolkit-touched'
 $script:TouchedRetentionDays = 30
 $script:GateFileRelative = '.claude/review-gate'
 $script:UntrackedExcludePrefixes = @('.claude/agent-memory/', '.claude/agent-memory-local/')
-$script:UntrackedExcludeExact = @('.claude/review-gate')
+$script:UntrackedExcludeExact = @('.claude/review-gate', '.codex/review-gate')
 $script:GitExitCode = 0
 $script:GitPath = $null
 
@@ -432,7 +432,7 @@ function Find-GateRoot {
   try {
     $dir = [System.IO.Path]::GetFullPath($StartDir)
     while ($dir) {
-      if ([System.IO.File]::Exists([System.IO.Path]::Combine($dir, $script:GateFileRelative))) { return $dir }
+      if ([System.IO.File]::Exists([System.IO.Path]::Combine($dir, $script:GateFileRelative)) -or [System.IO.File]::Exists([System.IO.Path]::Combine($dir, '.codex/review-gate'))) { return $dir }
       $parent = [System.IO.Path]::GetDirectoryName($dir)
       if (-not $parent -or $parent -eq $dir) { break }
       $dir = $parent

@@ -1,0 +1,112 @@
+---
+name: yt-thumbnail
+description: "Produces 2-3 thumbnail concepts for a video with a recommended pick and saves the brief to the Obsidian vault: a 3-5 word Russian text overlay, the composition layers, a 2-3 colour scheme and one dominant emotion, checked for legibility at mobile size. A brief the user takes to a design tool, not the image itself, and it composes with the title rather than repeating it — the title, description and tags are `yt-seo`."
+disable-model-invocation: true
+---
+
+<!-- Generated from plugins/youtube-toolkit/skills/yt-thumbnail/SKILL.md; edit that source, then run npm run build. -->
+
+## Codex runtime
+
+Read PLUGIN_ROOT/codex-runtime.md before using this procedure. Shared source lives in the anton-toolkit Git repository; installed packages are generated.
+
+# yt-thumbnail — thumbnail concept
+
+Produce a thumbnail concept: 3–5 word text overlay, composition layout, colour scheme, dominant emotion. Output is a brief the user takes to Figma / Photoshop / Canva.
+
+## Step 0 — Load channel knowledge base (if present)
+
+Follow `PLUGIN_ROOT/references/knowledge-base-context.md`. For `yt-thumbnail` specifically, when `kb_available: true` read: `индекс.md` and the top 10 `top`-classified cards (frontmatter only — title field).
+
+Use the loaded titles to keep the new thumbnail text coherent with what the channel already trained the audience on: tone, register, vocabulary, length conventions. The thumbnail text should compose with the channel's existing visual identity, not break from it. If the KB is absent, fall back to the generic composition rules unchanged.
+
+## Procedure
+
+1. **Get inputs.**
+   - Working title and chosen formula (from `yt-seo`, if available).
+   - Video type and series.
+   - The "moment" the video is about — what visual could anchor the thumbnail (working code, IDE, face, screen, output).
+
+   If unclear, ask once: "Какой момент в видео самый визуально яркий — экран IDE с кодом, ты с реакцией, готовый интерфейс приложения, что-то ещё?"
+
+2. **Pick a pattern** from `SKILL_DIR/references/patterns.md`. Patterns are channel-coherent layouts that work for IT content. Pick one that matches the title formula and content type.
+
+3. **Generate the concept** following `SKILL_DIR/references/composition.md`:
+   - Text overlay: 3–5 words. Russian. High-contrast.
+   - Composition: foreground / mid / background layers, with what goes where.
+   - Colour scheme: 2–3 colours max, one dominant.
+   - Dominant emotion: curiosity / triumph / frustration / surprise. Pick one.
+
+4. **Produce 2–3 concept variants** so the user can A/B at the design stage. Each variant uses a different pattern or text angle.
+
+5. **Output** the concept brief in the format below.
+
+## Output format
+
+```markdown
+# Thumbnail concept — <working title>
+
+## Variant 1 — <pattern name>
+
+**Text overlay (3–5 words):** «<TEXT IN RUSSIAN>»
+**Emotion:** <one word>
+**Composition:**
+- Foreground: <element + position — e.g., "лицо автора, левая треть, реакция удивления">
+- Mid: <element>
+- Background: <element + position — e.g., "размытый IDE с кодом">
+**Colour scheme:** dominant <hex or name>, accent <hex or name>, contrast <hex or name>
+**CTR lever:** <one sentence — why this thumbnail might out-click on a feed>
+
+## Variant 2 — <pattern name>
+…
+
+## Variant 3 — <pattern name>
+…
+
+## Recommended pick
+
+Variant <N> — <one-sentence rationale matching the title and series>.
+
+## Production notes
+
+- Aspect ratio: 1280×720 (16:9), max 2 MB JPEG/PNG.
+- Text legibility test: cover the bottom 60% of the canvas — the top must still convey the hook.
+- Mobile test: at 240×135 pixels (mobile feed), the text must still read.
+- Face zone: faces should occupy 30–50% of vertical height when used.
+```
+
+## Save to vault
+
+After producing the concept brief in chat, persist it to the Obsidian vault following `PLUGIN_ROOT/references/vault.md`.
+
+- Target folder: `C:\projects\obsidian\Проекты\youtube\превью\`.
+- Filename: `<video-slug>.md`. The slug is Russian (Cyrillic) kebab-case, no transliteration. Reuse the same slug as the script for this video (lives in `сценарии/<slug>.md`). If a thumbnail file with this slug exists, append `-v2`, `-v3`…
+- Frontmatter:
+
+  ```yaml
+  ---
+  type: thumbnail
+  date: <YYYY-MM-DD>
+  video: "<working title in Russian>"
+  video_slug: <slug>                     # Cyrillic kebab-case
+  variants: <N>                          # number of concept variants in the body
+  recommended_variant: <1..N>
+  emotion: curiosity | triumph | frustration | surprise | <other>
+  tags:
+    - youtube/thumbnail
+  related:
+    - "[[Проекты/youtube/сценарии/<slug>]]"
+    - "[[Проекты/youtube/seo/seo-<slug>]]"
+  ---
+  ```
+
+- Body: the full thumbnail concept brief (2–3 variants, recommended pick, production notes) — same content as the chat output.
+- After writing, tell the user in Russian where the file landed.
+
+## Boundaries
+
+- Do not generate the actual image. The output is a brief.
+- Do not include more than 5 words on the thumbnail. 3 is often best.
+- Avoid stock-photo aesthetics, drop-shadow halos, and red arrows pointing at things — saturated patterns that signal cheapness in the IT niche.
+- Do not duplicate what the title says — thumbnail and title should compose, not repeat. (Title says "Cursor выкинул проект". Thumbnail text could be: "Так нельзя." — different angle, same hook.)
+- Russian-language text on the thumbnail. Tool names allowed in original form (Cursor, Claude Code, AI).

@@ -1,0 +1,85 @@
+---
+name: yt-my-channel
+description: "Analyses the user's OWN YouTube channel and writes a dated report to the Obsidian vault: snapshot, top performers, underperformers, patterns, labelled hypotheses and a few concrete next moves. Works from public API metrics or the channel knowledge base, plus optional YouTube Studio data the user pastes for CTR and retention (never invented otherwise). For competitor channels use `yt-competitors`; for video ideas use `yt-ideas`."
+disable-model-invocation: true
+---
+
+<!-- Generated from plugins/youtube-toolkit/skills/yt-my-channel/SKILL.md; edit that source, then run npm run build. -->
+
+## Codex runtime
+
+Read PLUGIN_ROOT/codex-runtime.md before using this procedure. Shared source lives in the anton-toolkit Git repository; installed packages are generated.
+
+# yt-my-channel — own-channel analytics
+
+Produce a structured analytical report on the user's own YouTube channel using public metrics from the bundled MCP server, plus optional pasted YouTube Studio data for CTR and audience retention.
+
+## Step 0 — Load channel knowledge base (if present)
+
+Follow `PLUGIN_ROOT/references/knowledge-base-context.md`. For `yt-my-channel` specifically, when `kb_available: true` read: `канал.md` and the full `индекс.md`. Then sample full cards for the top 5 `top`-classified videos and top 3 `fail`-classified videos for the Top performers / Underperformers sections.
+
+If the KB is fresh (`last_updated` within 14 days), SKIP the MCP calls in Step 2 entirely and build the Snapshot from `канал.md` directly. If the KB is stale (>14 days) or absent, do the MCP calls as before.
+
+## Procedure
+
+1. **Get the channel handle.** If not already in the conversation, ask once: "Какой handle или ID вашего канала?" Accept `@handle`, channel URL, or channel ID. If the KB is loaded and contains a `channel_handle`, use it without asking.
+
+2. **Pull public metrics via MCP** (skip if KB Step 0 already filled this in). Call in this order:
+   - `getChannelStatistics` — subscribers, total views, video count, creation date.
+   - `getChannelTopVideos` — top videos by views (request 10–20).
+   - For each top video, `getVideoDetails` — duration, publish date, tags, description.
+   - `getVideoEngagementRatio` on the same set — likes/views and comments/views ratios.
+
+3. **Ask for Studio paste (optional, once).** Ask: "Если хочешь чтобы я учёл CTR и удержание — скопируй из YouTube Studio таблицу 'Контент' за последние 28/90 дней (вьюхи + CTR + средний просмотр) и вставь сюда. Если не сейчас — пропустим, разберём по публичным метрикам."
+
+   If the user pastes Studio data, parse it using `SKILL_DIR/references/studio-paste.md`.
+
+4. **Build the report.** Use the template in `SKILL_DIR/references/report-template.md`. Sections:
+   - Snapshot (current state)
+   - Top performers (and why they performed)
+   - Underperformers (and likely cause)
+   - Patterns (length, posting cadence, topic clusters, hook formulas reused)
+   - Hypotheses ("what works / what does not")
+   - Recommendations (3–5 concrete next moves)
+
+5. **Save the report inline in chat** so downstream skills (`yt-ideas`, `yt-content-plan`) can consume it from conversation context.
+
+6. **Persist the report to the Obsidian vault.** Follow `PLUGIN_ROOT/references/vault.md`. Target folder: `C:\projects\obsidian\Проекты\youtube\канал\`. Filename: `YYYY-MM-DD-обзор-канала.md` (Russian, Cyrillic, kebab-case — see `PLUGIN_ROOT/references/vault.md` for the filename rules) (use the current session date; if a snapshot for today already exists, append `-v2`, `-v3`…). Frontmatter:
+
+   ```yaml
+   ---
+   type: channel-analysis
+   date: <YYYY-MM-DD>
+   channel_handle: "<@handle or channel ID>"
+   subscribers: <number>
+   total_views: <number>
+   video_count: <number>
+   studio_data_included: <true|false>
+   tags:
+     - youtube/channel-analysis
+   related: []
+   ---
+   ```
+
+   Body: the full report (Snapshot, Top performers, Underperformers, Patterns, Hypotheses, Recommendations) — same content as the chat output, not a summary.
+
+   After writing, tell the user in Russian where the file landed.
+
+## Interpretation rules
+
+Apply the rules in `SKILL_DIR/references/metrics.md`:
+- Engagement ratio targets for IT/dev niche
+- How to read views skew across videos of different ages
+- When a video is "topical" vs "evergreen"
+- Red flags (sharp retention drops, like-to-view collapse)
+
+## Inputs and outputs
+
+- **Input:** channel handle/URL/ID; optional pasted YouTube Studio CSV/text.
+- **Output:** Markdown report with the sections above. Keep numbers exact, hypotheses labelled as such.
+
+## Boundaries
+
+- Do not generate video ideas here — that is `yt-ideas`.
+- Do not analyse competitors here — that is `yt-competitors`.
+- Do not invent metrics that the API key cannot return (CTR, audience retention) — only report them if the user pasted Studio data.
