@@ -27,14 +27,16 @@ function Find-ClaudeCommand {
 }
 
 if ($Client -in @('All', 'Codex')) {
-    $before = (Invoke-Client $CodexCommand @('plugin', 'list', '--json') | ConvertFrom-Json).installed |
-        Where-Object { $_.marketplaceName -eq $marketplaceName }
-    $markets = (Invoke-Client $CodexCommand @('plugin', 'marketplace', 'list', '--json') | ConvertFrom-Json).marketplaces
-    $current = $markets | Where-Object { $_.name -eq $marketplaceName }
-    if ($current -and $current.root -match '[\\/]obsidian[\\/]\.codex-sync[\\/]marketplace$') {
-        Invoke-Client $CodexCommand @('plugin', 'marketplace', 'remove', $marketplaceName, '--json') | Write-Output
+    if ($CodexCommand -eq 'codex' -and -not (Get-Command codex -ErrorAction SilentlyContinue)) {
+        $bundledCodexRoot = Join-Path $env:LOCALAPPDATA 'OpenAI\Codex\bin'
+        $bundledCodex = Get-ChildItem -LiteralPath $bundledCodexRoot -Filter 'codex.exe' -File -Recurse -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTime -Descending | Select-Object -First 1
+        if (-not $bundledCodex) { throw 'Codex CLI was not found. Pass -CodexCommand with the full path to codex.exe.' }
+        $CodexCommand = $bundledCodex.FullName
     }
     Invoke-Client $CodexCommand @('plugin', 'marketplace', 'add', $repositoryUrl, '--ref', 'main', '--json') | Write-Output
+    $before = (Invoke-Client $CodexCommand @('plugin', 'list', '--json') | ConvertFrom-Json).installed |
+        Where-Object { $_.marketplaceName -eq $marketplaceName }
     $upgrade = Invoke-Client $CodexCommand @('plugin', 'marketplace', 'upgrade', $marketplaceName, '--json') | ConvertFrom-Json
     if (@($upgrade.errors | Where-Object { $_ }).Count -gt 0) { throw ($upgrade.errors | ConvertTo-Json -Depth 6) }
     $selected = @($before | Where-Object { $_.enabled } | ForEach-Object { $_.name })
