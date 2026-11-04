@@ -36,10 +36,10 @@ const CHECK_SCHEMA = {
   required: ['id', 'ok', 'fixed', 'unfixed', 'artNotes'],
   properties: {
     id: { type: 'string' },
-    ok: { type: 'boolean', description: 'hyperframes check passes and the scene matches its plan block after your fixes' },
+    ok: { type: 'boolean', description: 'hyperframes check passes, the scene matches its plan, and no technical or explanatory blockers remain; false whenever unfixed is non-empty' },
     fixed: { type: 'array', items: { type: 'string' }, description: 'technical faults found and fixed, one line each' },
-    unfixed: { type: 'array', items: { type: 'string' }, description: 'technical faults you could not fix, with the reason' },
-    artNotes: { type: 'array', items: { type: 'string' }, description: 'taste and storytelling remarks for the director, not acted on' },
+    unfixed: { type: 'array', items: { type: 'string' }, description: 'technical or explanatory blockers, including misleading plans, with phrase/cue, observation and reason; these block finished delivery' },
+    artNotes: { type: 'array', items: { type: 'string' }, description: 'optional aesthetic preferences for the director, not acted on; failed explanations belong in unfixed' },
   },
 }
 

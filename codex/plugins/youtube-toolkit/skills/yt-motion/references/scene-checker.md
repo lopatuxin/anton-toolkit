@@ -1,4 +1,4 @@
-# Scene checker — technical faults of one motion scene
+# Scene checker — technical and explanatory faults of one motion scene
 
 A scene worker (Opus) just wrote `index.html` in the scene folder your dispatch names. You find and fix its technical faults, so the director spends its attention on the look. You never change a taste decision: colors, drawing, composition, pacing and wording are the director's — what you think of them goes back as art notes.
 
@@ -14,7 +14,7 @@ From the scene folder, with the HyperFrames version pinned in the folder's `pack
   - `sketch` (the style round): one at the middle of the scene. Copy it to `keyframe.png` in the scene folder — the owner's style page is built from that file.
   - `animate` / `fix`: at `0`, at `key_at`, between the cues, and at `DURATION − 0.04`. Copy the `key_at` one to `keyframe.png` in the scene folder, replacing the old one — the director's contact image of the whole film is built from these files.
 
-Fix, re-run, until `check` passes and the pictures show no technical fault.
+Fix local technical faults and rerun the affected checks. A passing CLI check is necessary, not sufficient: apply the explanatory checks below too. Return `ok: false` while any technical or explanatory blocker remains in `unfixed`.
 
 ## Technical faults — fix them
 
@@ -29,9 +29,17 @@ Fix, re-run, until `check` passes and the pictures show no technical fault.
 
 Keep each fix minimal and inside the folder's `index.html` and `sfx.mjs`. When a fault needs redrawing or rethinking a beat, do not attempt it: list it under `unfixed` with what you saw.
 
+## Explanatory failures — block delivery, return to the director
+
+Compare the spoken `phrase`, `takeaway`, `action`, `reuse` and `acceptance` against frames at the action's start, an intermediate point and its result; inspect a sequence when the movement itself matters. A keyframe alone cannot prove alignment, disassembly or inspection occurred. In sketch mode, assess only the proposed states and composition; mark temporal checks pending until animate/fix.
+
+The following are failures, even when the implementation follows a flawed plan: a static object instead of the promised operation; markers pointing at the wrong feature; a magnifier enlarging pixels unrelated to its location; a comparison whose mismatched view/scale conceals the claimed difference; an analogy without the claimed property; generated imagery presented as experiment evidence; replacing an approved detailed assembly with a less faithful cutout; an action landing on the wrong phrase. Inseparable comparison panels or illegible labels fail when the viewer cannot identify the sides.
+
+Report each under `unfixed` with the phrase/cue, observed state and missing or misleading explanation; set `ok: false`. Do not redesign the scene or rewrite its claim yourself. The director corrects the plan and dispatches the fix. Optional aesthetic preferences remain `artNotes`.
+
 ## Art notes — report, do not fix
 
-Drawing quality, a figure that reads poorly, colors that clash, weak composition, motion that feels mechanical or too busy, a beat that does not land, wording on screen, a source take whose brightness does not fit its action (a "scratch" with Z 0–2). One line each, concrete: what, where, when (“at 3.2 s the scroll covers the chronicler's face”).
+Drawing quality, a figure that reads poorly, colors that clash, weak composition, motion that feels mechanical or too busy, a beat whose emphasis could be stronger without breaking its explanation, wording preferences on screen, a source take whose brightness does not fit its action (a "scratch" with Z 0–2). One line each, concrete: what, where, when (“at 3.2 s the scroll covers the chronicler's face”).
 
 ## Seam check
 

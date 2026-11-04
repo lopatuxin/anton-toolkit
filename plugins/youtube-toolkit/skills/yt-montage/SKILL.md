@@ -1,18 +1,18 @@
 ---
 name: yt-montage
 description: >
-  Turns a finished video script into a Russian editing sheet saved to the
-  Obsidian vault: the script is split into beats with a timecode, what is on
-  screen, the shot type, on-screen text and the transition, plus the b-roll,
-  screencasts and graphics to prepare beforehand. The channel is faceless, so
-  no beat is ever a talking head. Consumes the script, never writes the
-  spoken text — that is `yt-script`.
-disable-model-invocation: true
+  Plans or assembles a faceless YouTube video from a finished script. For an editing-sheet
+  request, saves a Russian beat sheet to Obsidian. For "собери ролик" or "смонтируй видео",
+  cleans the recorded voice, reuses existing assets, directs motion through yt-motion,
+  assembles and checks the final video. Every beat pairs a viewer takeaway with a visible
+  action tied to speech. Does not write spoken text (yt-script) or publish to YouTube.
+when_to_use: >
+  "монтажный лист", "распиши монтаж", "собери ролик", "смонтируй видео"
 ---
 
-# yt-montage — turn a script into an editing sheet
+# yt-montage — plan and assemble a faceless video
 
-Take a finished video script and lay it out as a montage / editing sheet: for every beat of the script, decide WHAT IS ON SCREEN. The spoken text already exists (that is `yt-script`); this skill only maps speech → visuals.
+Use the request to select the deliverable: **sheet mode** plans speech → visuals and saves the editing sheet; **assembly mode** delivers the edited video as well. An editing-sheet request alone does not authorize rendering a whole video. A request to assemble the video does: continue through the assembly procedure in `SKILL_DIR/references/assembly.md` instead of stopping after the sheet. The spoken script already exists (`yt-script`); removing failed takes is editing, not rewriting its claims.
 
 ## HARD CONSTRAINT — faceless channel
 
@@ -46,17 +46,25 @@ The script is required input. Resolve it in this order:
 
 Capture the `video_slug` from the script's frontmatter — the editing sheet reuses it to stay in the same video bundle. Read its production notes and evidence map before assigning visuals. Preserve the distinction between existing assets and material still to capture or create; do not present an illustration or reconstruction as recorded proof of the experiment. Production notes are not spoken beats.
 
+## Inputs before timing
+
+Inspect the episode's source assets, previous exports and approved animations before commissioning replacements. Record each relevant asset's path, what it demonstrates, and whether to reuse, retime, annotate or create a replacement. Compare the actual old and proposed shots; a new illustration is not automatically an improvement. Preserve approved geometry, camera and motion unless the requested correction needs them changed.
+
+When a voice recording exists, use its cleaned transcript with word timestamps as the timing authority. In assembly mode, clean it first per `SKILL_DIR/references/assembly.md`; in sheet mode, use an existing cleaned recording or mark timings provisional if cleanup is outside the request. Do not schedule recorded speech from word-count estimates. If there is no recording, estimated timing is allowed and must stay labelled as such.
+
 ## Procedure
 
-1. **Segment the script.** Split the spoken text into beats of roughly 5–20 seconds each (≈ one to three sentences). A beat boundary is where the visual would naturally change.
+1. **Segment the speech.** Split the cleaned transcript when available, otherwise the script, into beats of roughly 5–20 seconds each (≈ one to three sentences). A beat boundary is where the visual would naturally change.
 
-2. **Assign a visual to every beat.** For each beat fill: what is on screen (from the vocabulary above), a short shot note, any on-screen text/graphic, and the transition into the next beat. NEVER leave a beat without a visual (see the faceless constraint).
+2. **Explain every beat visually.** Fill the viewer takeaway, visible action, asset decision, on-screen text and transition. Name what changes or is inspected, at which spoken phrase. For proportions, align silhouettes and mark the actual discrepancies; for division of work, separate components from the whole; for hidden defects, move from overview to close-up and point at the defect. A car still under a heading about checks does not demonstrate a check. A purposeful hold is valid; arbitrary motion is not a substitute for meaning.
 
-3. **Estimate timecodes.** Use ~130 spoken words/min to convert word count into running time. Produce ranges like `0:00–0:08`. These are estimates to guide editing, not frame-accurate cuts.
+   Use HyperFrames for diagrams, labels and timed overlays; image generation for planned illustrations; Blender for real geometry and part separation; a screencast for actual editor actions. Load the relevant skill when using a tool. Keep documentary assets separate from illustrative ones. An analogy must match the claimed feature: an angular car needs an angular example, not merely any cartoon car. Comparisons need distinct panels, readable labels and comparable views/scales; do not erase a real proportion difference by stretching the images. Store source/license/attribution requirements in an asset ledger; put credits in the description or end credits where permitted, not automatically over the explanatory shot. If a source requires in-frame attribution, meet it or choose another source.
+
+3. **Set timecodes.** Use the cleaned recording and its word timestamps when available. Only without recorded timing, estimate at ~130 spoken words/min and label ranges such as `0:00–0:08` provisional. Each action gets a phrase anchor, not just a scene start.
 
 4. **Default detail level: medium.** A visual change roughly every 15–25 seconds, with finer beats inside the hook (first 15 sec) where retention is most fragile. If the user asks for "подробно" — go to 5–15 sec beats with explicit zooms/transitions per beat. If "покрупнее"/"средне" — oporny changes only. This is a starting default; adjust on user feedback.
 
-5. **Collect preparation summaries.** While filling the sheet, accumulate three lists for the user to prep BEFORE editing (see output format).
+5. **Collect preparation summaries.** List existing reusable assets separately from missing b-roll, screencasts and graphics. In assembly mode, prepare what the available tools can produce; ask only for genuinely missing source material or owner decisions.
 
 6. **Write the sheet** in the output format below.
 
@@ -74,15 +82,18 @@ Capture the `video_slug` from the script's frontmatter — the editing sheet reu
 
 ## Монтаж по таймкодам
 
-| Таймкод | Реплика (опорная фраза) | Что на экране | Тип кадра | Текст/графика | Переход |
-|---------|------------------------|---------------|-----------|---------------|---------|
-| 0:00–0:08 | «<первая фраза хука>» | Скринкаст: ошибка в IDE | Скринкаст | Заголовок-хук крупно | Hard cut |
-| 0:08–0:20 | «<следующая фраза>» | Перебивка: абстрактный код | B-roll | — | Whip-pan |
-| … | … | … | … | … | … |
+| Таймкод | Реплика (опорная фраза) | Что зритель поймёт | Что на экране и что меняется | Тип кадра | Текст/графика | Откуда | Переход |
+|---------|------------------------|-------------------|-----------------------------|-----------|---------------|------------------|---------|
+| 0:00–0:08 | «<фраза об ошибке>» | Где ломается запуск | Скринкаст: запускаем команду, на слове «ошибка» выделяем строку сбоя | Скринкаст | Короткая подпись к сбою | <файл>; аннотировать | Hard cut |
+| 0:08–0:20 | «<фраза о пропорциях>» | Чем форма отличается от образца | Совмещаем силуэты, показываем расхождения крыши и багажника на соответствующих словах | Графика / motion | Крыша · Багажник | Claude, моушен; <исходники>; аннотировать | Переход к детали |
+| … | … | … | … | … | … | … | … |
 
 ---
 
 ## Подготовить заранее
+
+### Уже есть — использовать или подогнать
+- <путь, что доказывает материал, решение: использовать / подогнать / аннотировать>
 
 ### 🎬 B-roll / перебивки доснять или найти
 - <короткий список перебивок: что именно нужно снять/скачать>
@@ -101,7 +112,7 @@ Capture the `video_slug` from the script's frontmatter — the editing sheet reu
 
 ## Save to vault
 
-After producing the sheet in chat, persist it to the Obsidian vault following `${CLAUDE_PLUGIN_ROOT}/references/vault.md`.
+After producing the sheet in chat, persist it to the Obsidian vault following `PLUGIN_ROOT/references/vault.md`.
 
 - Target folder: `C:\projects\obsidian\Проекты\youtube\монтаж\`.
 - Filename: `<video-slug>.md` — the SAME Cyrillic kebab-case slug as the script, so `сценарии/<slug>.md` and `монтаж/<slug>.md` form one bundle. If a sheet with this slug exists, append `-v2`, `-v3`…
