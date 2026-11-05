@@ -16,6 +16,11 @@
       "source": "./plugins/blender-modeling"
     },
     {
+      "name": "character-animation",
+      "description": "Finds real motion references for owner approval, measures the chosen video and transfers the movement to a rigged 3D character in the game engine animation stand",
+      "source": "./plugins/character-animation"
+    },
+    {
       "name": "lichnost",
       "description": "Personal life logging in the Obsidian vault: diary capture, film curation, and analytical period reviews",
       "source": "./plugins/lichnost"

@@ -29,6 +29,18 @@
       "category": "Productivity"
     },
     {
+      "name": "character-animation",
+      "source": {
+        "source": "local",
+        "path": "./codex/plugins/character-animation"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "lichnost",
       "source": {
         "source": "local",

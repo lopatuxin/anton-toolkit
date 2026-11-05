@@ -1,0 +1,9 @@
+{
+  "name": "character-animation",
+  "version": "0.1.0-codex.h1d6e5cedfaed",
+  "description": "Finds real motion references for owner approval, measures the chosen video and transfers the movement to a rigged 3D character in the game engine animation stand",
+  "author": {
+    "name": "Anton"
+  },
+  "skills": "./skills/"
+}

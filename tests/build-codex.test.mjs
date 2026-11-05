@@ -5,10 +5,10 @@ import { join, resolve, sep } from 'node:path';
 import test from 'node:test';
 import { buildFiles, repositoryRoot, writeBuild } from '../scripts/build-codex.mjs';
 
-test('all seven plugins and source agents are packaged with preserved launch requirements', () => {
+test('all eight plugins and source agents are packaged with preserved launch requirements', () => {
   const output = buildFiles(repositoryRoot);
   const catalog = JSON.parse(output.get('.agents/plugins/marketplace.json'));
-  assert.equal(catalog.plugins.length, 7);
+  assert.equal(catalog.plugins.length, 8);
   const kotlin = output.get('codex/plugins/anton-toolkit/skills/kotlin-dev/SKILL.md');
   assert.match(kotlin, /model="gpt-6\.1-sol", reasoning_effort="high", fork_turns="none"/);
   assert.match(kotlin, /skills\/kotlin-conventions\/SKILL\.md/);

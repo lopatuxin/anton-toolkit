@@ -1,0 +1,46 @@
+{
+  "anton-toolkit:java-dev": {
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "high"
+  },
+  "anton-toolkit:kotlin-dev": {
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "high"
+  },
+  "anton-toolkit:python-dev": {
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "high"
+  },
+  "anton-toolkit:go-dev": {
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "high"
+  },
+  "anton-toolkit:rust-dev": {
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "high"
+  },
+  "anton-toolkit:frontend-dev": {
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "high"
+  },
+  "anton-toolkit:devops": {
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "high"
+  },
+  "anton-toolkit:qa-engineer": {
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "medium"
+  },
+  "anton-toolkit:test-writer": {
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "medium"
+  },
+  "anton-toolkit:code-reviewer": {
+    "model": "gpt-6-astra",
+    "reasoning_effort": "medium"
+  },
+  "anton-toolkit:mr-spec-reviewer": {
+    "model": "gpt-6-astra",
+    "reasoning_effort": "xhigh"
+  }
+}
