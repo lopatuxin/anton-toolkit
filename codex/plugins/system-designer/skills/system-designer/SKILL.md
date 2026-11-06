@@ -18,7 +18,7 @@ Why it works this way: the previous version of this skill ran a council of five 
 ## Before anything
 
 1. **Find the project folder.** The code repo of a personal project names it in its CLAUDE.md (`C:\projects\obsidian\Проекты\Кузня Миров\`); in a vault session the owner names the project. A project without a folder yet: agree on its name with the owner, then create the folder, the card and the section hub notes by `C:\projects\obsidian\Проекты\Шаблон проекта.md` (вид: разработка) and the folder rules of `C:\projects\obsidian\CLAUDE.md`.
-2. **Read `PLUGIN_ROOT/references/document-templates.md`** — what goes into which note, form, size limits, words, and which Кузня note to copy for each kind.
+2. **Read `PLUGIN_ROOT/references/document-templates.md`** — what goes into which note, form, size limits, words, and which Кузня note to copy for each kind. Read Note Conventions in `C:/projects/obsidian/CLAUDE.md` before writing or updating project notes.
 3. **Read only what the task touches:** the project card, the concept, the architecture hub, and the notes of the areas the change affects. Not the whole project folder, not the journal, not old phases.
 4. **If the system already has code, read how the affected part works now** — the files of that part in the code repo, found by search, not the whole repository. The design extends what exists; a note that describes a different system than the code is a bug.
 

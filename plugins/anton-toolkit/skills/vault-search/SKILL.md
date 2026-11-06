@@ -41,4 +41,4 @@ First find which files match (`files_with_matches`, or `count`), then read only 
 
 ## 5. Answer
 
-Name the note the answer came from, by note name. When nothing was found, say so plainly and list the stems and folders that were searched, so the owner can point elsewhere. The vault is documentation and plans: for how a system behaves now, read its repository (the card's `repo:` field names it) and call out any mismatch with the notes.
+Name the note the answer came from, by note name. When nothing was found, say so plainly and list the stems and folders that were searched, so the owner can point elsewhere. The vault is documentation and plans: for how a system behaves now, read its repository (the card's `repo:` field names it) and call out any mismatch with the notes. Use code and test links in the relevant note to find the files in the current checkout. If a file moved, search for the linked method or class.

@@ -99,6 +99,8 @@ No placeholders like «TODO: уточнить» — an open point goes back to t
 
 Chat context gets compacted; the plan file survives and is what the dev agent reads. Where it goes depends on the project's CLAUDE.md.
 
+For plans in Obsidian, follow Note Conventions in `C:/projects/obsidian/CLAUDE.md` for links to existing code and tests.
+
 **The project's CLAUDE.md names a phase folder** — personal projects keep phases in the Obsidian vault, e.g. `C:\projects\obsidian\Проекты\Кузня Миров\Фазы Кузни\`. Write the plan there as a phase note. First read the note template the CLAUDE.md points to (`C:\projects\obsidian\Проекты\Шаблон проекта.md`) and one existing phase note in that folder, and follow them:
 
 - File `Фаза-NN-<короткое-имя>.md`: the next free two-digit number in the folder, a lowercase hyphenated Russian name (`Фаза-04-сохранение-партии.md`). When the folder already holds an outline note for this feature (`статус: планируется`, a short note system-designer wrote when splitting the design into phases), write the plan into that note instead, keeping its number and name.

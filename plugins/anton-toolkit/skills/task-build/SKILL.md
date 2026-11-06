@@ -103,6 +103,8 @@ The run returns what it could not decide alone. Work through it in this order:
 
 ## 6. Report and stop before the commit
 
+Once the implementation is complete and blocking findings are resolved, add or refresh links to the verified code and tests in the affected sections of the Obsidian plan and any project-owned vault notes explicitly identified by the task or plan. Follow Note Conventions in `C:/projects/obsidian/CLAUDE.md`.
+
 Report in Russian, briefly, to a reader who did not watch the run. The first sentence says whether the task works now and how he can see it — where the stand is and what to try there. Then the lists the user acts on — blockers left, blockers the check rejected, and the non-blocking findings — each item saying in plain words what goes wrong and where to look. Leave out which agents ran, the fix rounds, and per-module or per-check narration unless he asks; a failed or skipped check is always named, with what it means for the task. The user's measured confusion comes mostly from process narration in build reports.
 
 - Correct: «Выгрузка сделок в CSV работает, стенд поднят на localhost:8080, проверить можно кнопкой «Экспорт» на странице сделок. Блокеров нет. Одно замечание: при пустом фильтре выгружаются все сделки за всё время, это может быть долго.»

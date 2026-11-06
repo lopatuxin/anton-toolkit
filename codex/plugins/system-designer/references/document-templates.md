@@ -35,7 +35,7 @@ Real case: the old Кузня sound notes carried the weight of a click sound in
 - Prose appears only as a lead of one to four sentences: per block in the hub, under a heading in a note.
 - Every note starts with frontmatter holding only `tags` (copy them from a sibling note), then `# <имя>`, then a link line to the hub and neighbours.
 - `Открытые вопросы` is a short bullet list at the end of a note, one line per question. Questions the owner can answer now are asked in the chat instead.
-- Wiki-links by note name only.
+- Use wiki-links by note name for links between vault notes. Follow the vault's Note Conventions for links to source files and tests.
 - None of these in the concept, the hub, area or module notes: status fields or progress markers («проработана», «в коде ещё нет»), history («раньше», «теперь», «новая таблица»), sections about how to keep the documents, hard line breaks inside a paragraph (Obsidian shows them as broken lines).
 
 ## Size
