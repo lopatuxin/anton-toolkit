@@ -43,7 +43,8 @@ function Mock-Claude {
     }
 }
 try {
-    & (Join-Path $PSScriptRoot '..\scripts\sync-marketplace.ps1') -CodexCommand Mock-Codex -ClaudeCommand Mock-Claude | Out-Null
+    & (Join-Path $PSScriptRoot '..\scripts\sync-marketplace.ps1') -Client Codex -CodexCommand Mock-Codex | Out-Null
+    & (Join-Path $PSScriptRoot '..\scripts\sync-marketplace.ps1') -Client Claude -ClaudeCommand Mock-Claude | Out-Null
     $events = $global:marketplaceSyncEvents.ToArray()
     if ($events -contains 'codex plugin marketplace remove anton-toolkit-marketplace --json') { throw 'Source should be replaced directly without deleting it first' }
     if ($events -notcontains 'codex plugin marketplace add https://github.com/lopatuxin/anton-toolkit.git --ref main --json') { throw 'Codex did not connect to Git' }

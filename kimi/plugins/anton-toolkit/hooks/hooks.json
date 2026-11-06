@@ -1,0 +1,76 @@
+{
+  "description": "anton-toolkit hooks: after every Edit/Write the touched file is recorded in the repo's ledger (and Go files are gofmt-ed); a review mark is written when code-reviewer / mr-spec-reviewer finishes; in repositories that contain .claude/review-gate, Claude cannot finish its turn (Stop) while code files it edited this session are unreviewed, and `git commit` is blocked while the working tree is unreviewed (bypass: ANTON_SKIP_REVIEW=1).",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"PLUGIN_ROOT/hooks/post-edit-format.ps1\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"PLUGIN_ROOT/hooks/stop-gate.ps1\"",
+            "timeout": 20
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "^((anton-toolkit:)?(code-reviewer|mr-spec-reviewer))$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"PLUGIN_ROOT/hooks/review-mark.ps1\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(git commit*)",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"PLUGIN_ROOT/hooks/review-gate.ps1\"",
+            "timeout": 20
+          },
+          {
+            "type": "command",
+            "if": "Bash(git -C *)",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"PLUGIN_ROOT/hooks/review-gate.ps1\"",
+            "timeout": 20
+          }
+        ]
+      },
+      {
+        "matcher": "PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "PowerShell(git commit*)",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"PLUGIN_ROOT/hooks/review-gate.ps1\"",
+            "timeout": 20
+          },
+          {
+            "type": "command",
+            "if": "PowerShell(git -C *)",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"PLUGIN_ROOT/hooks/review-gate.ps1\"",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  }
+}

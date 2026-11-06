@@ -1,0 +1,262 @@
+---
+name: film
+description: "Personal film curator in the Obsidian vault: keeps a taste profile (the user's viewing personality), a watched-films log with reviews, and a shortlist of at most 10 recommendations, each with a one-line what-it-is / why-it-fits blurb. Three flows, chosen from the command argument: recommend what to watch next, log a watched film with a review, or (first run) migrate the legacy `films.md` note into the vault folder. Reviews feed the taste profile, which drives the next recommendations."
+disable-model-invocation: true
+---
+
+<!-- Generated from plugins/lichnost/skills/film/SKILL.md; edit that source, then run npm run build. -->
+
+## Kimi runtime
+
+Read PLUGIN_ROOT/kimi-runtime.md before using this procedure.
+
+
+# Film — personal film curator for the Obsidian vault
+
+A standing, evolving film system for one user. It keeps a **taste profile** (their "viewing
+personality"), a **watched log** with reviews, and a **short recommendation shortlist** — and it
+gets smarter every time the user logs a film, because each review feeds the taste profile, which
+in turn drives the next recommendations.
+
+Runs DIRECTLY in the conversation, single-shot. No agents.
+
+## The three notes (this is the whole data model)
+
+All live under `<vault>/Личная/Фильмы/`:
+
+| Note | Role |
+|------|------|
+| `Вкус.md` | Taste profile — likes, dislikes, patterns. The source of truth recommendations read. |
+| `Просмотрено.md` | Watched log — detailed reviews going forward, plus the imported rating backlog. |
+| `Рекомендации.md` | Curated shortlist, **≤10 films**, each with a short clear description. |
+
+A folder note `Фильмы.md` is a simple hub linking the three (the vault uses the `folder-notes`
+plugin, so opening the folder opens this note).
+
+## 0. Locate the vault
+
+Resolve `VAULT` with the search in `PLUGIN_ROOT/references/vault.md`; never hard-code the
+path. That file also carries the folder layout, the folder-note rule and the auto-sync rule this skill
+relies on.
+
+Paths used here: the film folder `$VAULT/Личная/Фильмы` (`Вкус.md`, `Просмотрено.md`,
+`Рекомендации.md`, folder note `Фильмы.md`) and the legacy note `$VAULT/films.md`, read once on the
+first run.
+
+## 1. Idempotent setup (run these checks EVERY time)
+
+Create only what is missing; never overwrite an existing non-empty file.
+
+```bash
+mkdir -p "$VAULT/Личная/Фильмы"
+```
+
+Ensure the **folder note** `$VAULT/Личная/Фильмы/Фильмы.md` exists and is non-empty. If it is
+missing OR empty, create it with the Write tool with exactly this content:
+
+```markdown
+---
+tags:
+  - фильмы
+---
+
+# 🎬 Фильмы
+
+Личная киносистема. Три заметки:
+
+- [[Вкус]] — профиль вкуса: что люблю, что нет, закономерности.
+- [[Просмотрено]] — что посмотрел, с обзорами.
+- [[Рекомендации]] — короткий список того, что стоит глянуть (не больше 10).
+
+Управляется командой `/film`.
+```
+
+Leave an existing non-empty folder note untouched.
+
+## 2. Decide: first run (bootstrap) or normal run
+
+Check whether all three data notes exist and are non-empty (`Вкус.md`, `Просмотрено.md`,
+`Рекомендации.md`):
+
+```bash
+F="$VAULT/Личная/Фильмы"
+for n in Вкус Просмотрено Рекомендации; do
+  if [ -s "$F/$n.md" ]; then echo "$n: ok"; else echo "$n: MISSING"; fi
+done
+```
+
+- If any of the three is missing or empty → **FIRST RUN** → go to §3 (bootstrap), then stop
+  after reporting (unless the command argument carries an explicit intent — then continue to §4).
+- Otherwise → **NORMAL RUN** → go to §4.
+
+## 3. First run — migrate `films.md` into the structured folder
+
+Goal: take the user's existing free-form `films.md` and rework it into the three clean notes.
+This is a one-time transformation; be faithful to the data, do not invent ratings or films.
+
+1. **Read** `$VAULT/films.md`. If it does NOT exist, do not block: create the three notes from
+   the empty templates below (taste = placeholder, watched = empty, recommendations = empty),
+   tell the user in Russian that there was nothing to import and to dictate their taste / paste a
+   list, then stop.
+
+2. **Build `Вкус.md`** — the taste profile / "viewing personality". Synthesize, don't just copy:
+   start from any explicit likes/dislikes in `films.md`, then enrich with **patterns inferred
+   from the watched ratings** (recurring directors, actors, franchises, tones the user rates high
+   🔥/❤️ versus low 😐/👎). Structure it as:
+
+   ```markdown
+   ---
+   tags:
+     - фильмы
+     - вкус
+   ---
+
+   # 🎯 Профиль вкуса
+
+   [[Фильмы]]
+
+   ## Люблю
+   <bullet list: genres, styles, directors, actors, tones — concrete>
+
+   ## Не люблю
+   <bullet list: concrete dislikes>
+
+   ## Закономерности
+   <a few sharp observations the raw lists don't state outright, e.g. "герой-одиночка с
+   харизмой заходит почти всегда", "чистая комедия — да, но тупой юмор внутри экшна — нет",
+   "старое кино почти всегда мимо">
+   ```
+
+3. **Build `Просмотрено.md`** — the watched log. The migrated backlog goes into an import table
+   (compact: title + verdict, exactly as it was). Detailed reviews accumulate above it going
+   forward. Use this layout:
+
+   ```markdown
+   ---
+   tags:
+     - фильмы
+     - просмотрено
+   ---
+
+   # 👁️ Просмотрено
+
+   [[Фильмы]]
+
+   ## Обзоры
+   _Подробные обзоры новых просмотров — самые свежие сверху. Добавляются командой `/film`._
+
+   ## Оценки (импорт)
+   <the full watched table migrated verbatim from films.md: | Фильм | Оценка |>
+   ```
+
+4. **Build `Рекомендации.md`** — curate the legacy recommendations down to a tight shortlist per
+   §7. **≤10 films**, each with a short clear description, and **never a film already in the
+   watched table**. Use the layout in §7.
+
+5. **Do NOT delete `films.md`.** Leave it in place. In the confirmation, tell the user it has been
+   migrated and they may delete it themselves now that the data lives in `Личная/Фильмы/`.
+
+Then report (§8). On a pure first run with no other intent in the argument, stop here.
+
+## 4. Normal run — pick the flow from the command argument
+
+Read the command argument and choose:
+
+- **LOG a watched film** — the argument names a film together with an opinion/review
+  (e.g. «посмотрел Переводчик — огонь, Стэйтем как в Гневе человеческом», «досмотрел Silo,
+  затянуто», «<название> — <мнение>»). → §6.
+- **RECOMMEND** — the argument is empty, or asks for something to watch
+  (e.g. «что посмотреть», «посоветуй», «подбери военное», «что-то типа Джона Уика»). → §5.
+- **Ambiguous** — if you cannot tell, ask once in Russian: «Что сделать — порекомендовать фильм
+  или записать просмотренный?» and wait. Do NOT guess between the two.
+
+## 5. Recommend flow
+
+1. Read `Вкус.md`, the watched titles from `Просмотрено.md` (both the `## Обзоры` headings and
+   the import table — these are the exclusion set), and the current `Рекомендации.md`.
+2. If the argument narrows the request (a lane like «военное», «комедию», «sci-fi», or «типа X»),
+   bias the selection to that lane while still honoring the taste profile.
+3. Refresh the shortlist per §7: drop anything now watched, top up toward ≤10, keep variety.
+   Write the refreshed `Рекомендации.md`.
+4. Present the shortlist to the user in chat (Russian) — the titles with their one-line blurbs —
+   so they can pick without opening the file.
+
+## 6. Log-watched flow
+
+1. **Parse** the title (and year if given) and the user's opinion/review from the argument.
+2. **Detail.** The user wants richer reviews than the old one-emoji ratings. If the argument is
+   only a bare verdict with no substance (e.g. just «огонь» / «фигня» with nothing else), ask ONE
+   short Russian follow-up to get a couple of sentences: «Пару слов почему — что зашло или нет?»
+   If the user gives nothing more, store what there is. Do not interrogate beyond one question.
+3. **Format the review** faithfully (same discipline as `dnevnik`: fix mechanics, keep the user's
+   voice and meaning, do not embellish or invent). Pick a verdict emoji consistent with the
+   existing scale (🔥 огонь · ❤️ понравился · 😐 нормально · 👎 не зашёл).
+4. **Prepend** a review entry at the TOP of the `## Обзоры` section in `Просмотрено.md` (newest
+   first). Do NOT touch the import table. Entry shape:
+
+   ```markdown
+   ### <emoji> <Название> (<Original Title>, <Год>) — <короткий вердикт>
+   <formatted review prose>
+   ```
+
+5. **Remove from recommendations.** If the film is in `Рекомендации.md`, delete that entry.
+6. **Feed the taste profile.** If the review reveals a new like, dislike, or pattern, append a
+   concise line to the matching section of `Вкус.md`. Merge, do NOT rewrite the whole profile.
+   Skip if the review adds nothing new.
+7. **Top up** `Рекомендации.md` toward ≤10 per §7 (the freed slot + the sharpened taste may
+   surface a better fit).
+8. Report (§8).
+
+## 7. Recommendation curation rules (used by §3 and §5)
+
+The recommendation note is deliberately SHORT — a wall of films is useless to the user.
+
+- **Hard cap: 10 films. Never more.** If a top-up would exceed 10, drop the weakest fit.
+- **Never recommend a watched film.** Cross-check every candidate against `Просмотрено.md`
+  (the import table AND the `## Обзоры` headings).
+- **Real, findable titles only — never invent or literally translate a title.** Give each film
+  its actual title so the user can search it and land on the exact film. Prefer the film's real
+  official Russian release title; if you are NOT certain of it, do not translate the English
+  title word-for-word into Russian — verify it (web search) or use the original title instead.
+  ALWAYS put the original-language title and year in parentheses. If a candidate's real title is
+  uncertain, verify before writing it — never guess.
+  - Correct: `Манкимэн (Monkey Man, 2024)`, `Форпост (The Outpost, 2020)`, `Ночь идёт за нами (The Night Comes for Us, 2018)`.
+  - Incorrect: a bare invented Russian name like «Обезьяна» for *Monkey Man* (that name is actually
+    a different 2025 horror film, *The Monkey*), «Человек-война» for *The Outpost*, or «Апостол» for
+    *The Night Comes for Us* — the user searches these and finds the wrong film or nothing.
+- **Every entry has a short, concrete description** — one or two sentences: what the film is
+  (director/actor/hook) AND why it fits this user's taste, specific enough to recognize at a
+  glance. No bare titles.
+- **Spread across the user's liked lanes** (do not stack 10 of one kind). Pull from the lanes the
+  taste profile marks as liked.
+- **Prefer modern over old** — this user dislikes old films.
+- File layout:
+
+  ```markdown
+  ---
+  tags:
+    - фильмы
+    - рекомендации
+  ---
+
+  # 🍿 Рекомендации
+
+  [[Фильмы]]
+
+  > Не больше 10 фильмов. Каждый — с коротким описанием: что это и почему зайдёт.
+  > Посмотренное убирается отсюда автоматически.
+
+  ### <Название> (<Original Title>, <Год>) — <режиссёр / актёр / жанр-якорь>
+  <one–two sentence description: what it is + why it fits>
+
+  ### ...
+  ```
+
+## 8. Confirm to the user (Russian)
+
+Reply in one or two lines naming what changed, e.g.:
+- First run: «Перенёс `films.md` в `Личная/Фильмы/`: профиль вкуса, просмотренное и 10 рекомендаций. Старый `films.md` можешь удалить.»
+- Recommend: «Обновил рекомендации (`Личная/Фильмы/Рекомендации.md`) — сейчас 9 фильмов.»
+- Log: «Записал обзор: `Никто 2` (❤️) в `Личная/Фильмы/Просмотрено.md`; убрал из рекомендаций, добавил 1 новый.»
+
+`obsidian-git` auto-syncs the vault, so no manual git commit is needed here.

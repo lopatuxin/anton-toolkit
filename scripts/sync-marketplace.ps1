@@ -1,18 +1,68 @@
 param(
-    [ValidateSet('All', 'Claude', 'Codex')][string]$Client = 'All',
+    [ValidateSet('All', 'Claude', 'Codex', 'Kimi')][string]$Client = 'All',
     [string]$ClaudeCommand,
     [string]$CodexCommand = 'codex',
-    [switch]$InstallDefaults
+    [string]$RepositoryRoot = (Join-Path $PSScriptRoot '..'),
+    [string[]]$KimiHomes = @(),
+    [string]$GitCommand = 'git',
+    [string]$NpmCommand = 'npm',
+    [switch]$InstallDefaults,
+    [switch]$SkipRepositoryUpdate
 )
 $ErrorActionPreference = 'Stop'
 $marketplaceName = 'anton-toolkit-marketplace'
 $repositoryUrl = 'https://github.com/lopatuxin/anton-toolkit.git'
 $defaults = @('anton-toolkit', 'blender-modeling', 'lichnost', 'plugin-builder', 'system-designer', 'youtube-toolkit')
+$Utf8 = New-Object System.Text.UTF8Encoding($false)
 
 function Invoke-Client([string]$Command, [string[]]$Arguments) {
     $result = & $Command @Arguments
     if ($LASTEXITCODE -ne 0) { throw "$Command $($Arguments -join ' ') failed with exit code $LASTEXITCODE" }
     return $result
+}
+
+function Write-Text([string]$Path, [string]$Text) {
+    $parent = Split-Path $Path
+    if (-not (Test-Path -LiteralPath $parent)) { New-Item -ItemType Directory -Force -Path $parent | Out-Null }
+    [IO.File]::WriteAllText($Path, $Text, $Utf8)
+}
+
+function Set-JsonProperty([psobject]$Object, [string]$Name, $Value) {
+    if ($Object.PSObject.Properties.Name -contains $Name) { $Object.$Name = $Value }
+    else { $Object | Add-Member -NotePropertyName $Name -NotePropertyValue $Value }
+}
+
+function Install-KimiPackage([string]$Name, [string]$Source, [string]$KimiHome, [string]$Backup, [psobject]$Installed, [psobject]$Existing) {
+    $pluginsRoot = Join-Path $KimiHome 'plugins'
+    $managed = Join-Path $pluginsRoot "managed\$Name"
+    $staging = Join-Path $pluginsRoot ('.staging\' + $Name + '-' + [guid]::NewGuid().ToString('N'))
+    try {
+        New-Item -ItemType Directory -Force -Path (Split-Path $staging) | Out-Null
+        Copy-Item -LiteralPath $Source -Destination $staging -Recurse
+        if (Test-Path -LiteralPath $managed) {
+            $backupManaged = Join-Path $Backup "managed\$Name"
+            New-Item -ItemType Directory -Force -Path (Split-Path $backupManaged) | Out-Null
+            Copy-Item -LiteralPath $managed -Destination $backupManaged -Recurse
+            Remove-Item -LiteralPath $managed -Recurse -Force
+        }
+        New-Item -ItemType Directory -Force -Path (Split-Path $managed) | Out-Null
+        Move-Item -LiteralPath $staging -Destination $managed
+    } finally {
+        if (Test-Path -LiteralPath $staging) { Remove-Item -LiteralPath $staging -Recurse -Force }
+    }
+
+    $now = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ss.fffZ')
+    $record = if ($Existing) { $Existing } else {
+        $new = [pscustomobject]@{ id = $Name; enabled = $true; installedAt = $now }
+        $Installed.plugins += $new
+        $new
+    }
+    Set-JsonProperty $record 'root' $managed
+    Set-JsonProperty $record 'source' 'local-path'
+    Set-JsonProperty $record 'originalSource' $Source
+    Set-JsonProperty $record 'updatedAt' $now
+    Write-Text (Join-Path $pluginsRoot 'installed.json') ($Installed | ConvertTo-Json -Depth 20)
+    Write-Output "Kimi ${Name}: installed from $Source"
 }
 
 function Find-ClaudeCommand {
@@ -52,6 +102,60 @@ if ($Client -in @('All', 'Codex')) {
     }
 }
 
+if ($Client -in @('All', 'Kimi')) {
+    if (-not $KimiHomes -or $KimiHomes.Count -eq 0) {
+        $KimiHomes = @(
+            (Join-Path $env:APPDATA 'kimi-desktop\daimon-share\daimon\runtime\kimi-code\home'),
+            (Join-Path $env:USERPROFILE '.kimi-code')
+        ) | Where-Object { Test-Path -LiteralPath $_ }
+    }
+    if (-not $KimiHomes -or $KimiHomes.Count -eq 0) {
+        if ($Client -eq 'Kimi') { throw 'No Kimi home found. Start Kimi Code once or pass -KimiHomes.' }
+        Write-Output 'Kimi Code is not installed; skipped Kimi synchronization.'
+    } else {
+        $RepositoryRoot = (Resolve-Path -LiteralPath $RepositoryRoot).Path
+        if (-not $SkipRepositoryUpdate) {
+            $pending = (Invoke-Client $GitCommand @('-C', $RepositoryRoot, 'status', '--porcelain') | Out-String).Trim()
+            if ($pending) { throw "Marketplace repository has uncommitted changes. Commit or reconcile them before Git synchronization: $RepositoryRoot" }
+            Invoke-Client $GitCommand @('-C', $RepositoryRoot, 'pull', '--ff-only', 'origin', 'main') | Write-Output
+            if ($NpmCommand -eq 'npm') {
+                $systemNpm = Join-Path $env:ProgramFiles 'nodejs\npm.cmd'
+                if (Test-Path -LiteralPath $systemNpm) { $NpmCommand = $systemNpm }
+            }
+            Invoke-Client $NpmCommand @('run', 'build', '--prefix', $RepositoryRoot) | Write-Output
+        }
+        $catalog = Get-Content -LiteralPath (Join-Path $RepositoryRoot '.claude-plugin\marketplace.json') -Raw | ConvertFrom-Json
+        $catalogNames = @($catalog.plugins | ForEach-Object { $_.name })
+        foreach ($kimiHome in @($KimiHomes | Sort-Object -Unique)) {
+            $kimiHome = (Resolve-Path -LiteralPath $kimiHome).Path
+            $installedPath = Join-Path $kimiHome 'plugins\installed.json'
+            $installed = if (Test-Path -LiteralPath $installedPath) {
+                Get-Content -LiteralPath $installedPath -Raw | ConvertFrom-Json
+            } else { [pscustomobject]@{ version = 1; plugins = @() } }
+            $before = @($installed.plugins | Where-Object { $catalogNames -contains $_.id })
+            $selected = @($before | ForEach-Object { $_.id })
+            if ($InstallDefaults) { $selected += $defaults }
+            $backup = Join-Path $kimiHome ('backups\marketplace-sync-' + (Get-Date -Format 'yyyyMMdd-HHmmss-fff'))
+            if (Test-Path -LiteralPath $installedPath) {
+                New-Item -ItemType Directory -Force -Path $backup | Out-Null
+                Copy-Item -LiteralPath $installedPath -Destination (Join-Path $backup 'installed.json')
+            }
+            foreach ($name in @($selected | Sort-Object -Unique)) {
+                $source = Join-Path $RepositoryRoot "kimi\plugins\$name"
+                if (-not (Test-Path -LiteralPath (Join-Path $source 'kimi.plugin.json'))) { throw "Kimi package is missing: $source" }
+                $existing = @($before | Where-Object { $_.id -eq $name }) | Select-Object -First 1
+                Install-KimiPackage $name $source $kimiHome $backup $installed $existing
+            }
+            $after = Get-Content -LiteralPath $installedPath -Raw | ConvertFrom-Json
+            foreach ($plugin in $before) {
+                $updated = @($after.plugins | Where-Object { $_.id -eq $plugin.id }) | Select-Object -First 1
+                if (-not $updated -or $updated.enabled -ne $plugin.enabled) { throw "Kimi plugin selection changed unexpectedly: $($plugin.id)" }
+            }
+            Write-Output "Kimi marketplace synchronized in $kimiHome. Backups: $backup"
+        }
+    }
+}
+
 if ($Client -in @('All', 'Claude')) {
     $claudeExecutable = Find-ClaudeCommand
     $installed = Invoke-Client $claudeExecutable @('plugin', 'list', '--json') | ConvertFrom-Json
@@ -79,4 +183,4 @@ if ($Client -in @('All', 'Claude')) {
         if (-not $updated -or $updated.enabled -ne $plugin.enabled) { throw "Plugin selection changed unexpectedly: $($plugin.id)" }
     }
 }
-Write-Output 'Marketplace synchronized from Git. Open new Claude and Codex chats to load the updated plugins.'
+Write-Output 'Marketplace synchronized from Git. Open new Claude and Codex chats; in Kimi open a new chat or run /plugins reload.'

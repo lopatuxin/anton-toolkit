@@ -1,0 +1,10 @@
+{
+  "name": "anton-toolkit",
+  "version": "0.35.0-kimi.h91f6d5da3adf",
+  "description": "Personal toolkit with custom skills for Anton",
+  "author": {
+    "name": "Anton"
+  },
+  "skills": "./skills/",
+  "agents": "./agents/"
+}

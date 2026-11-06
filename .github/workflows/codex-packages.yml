@@ -1,4 +1,4 @@
-name: Build Codex packages
+name: Build Codex and Kimi packages
 
 on:
   push:
@@ -7,6 +7,7 @@ on:
       - 'plugins/**'
       - 'adapters/**'
       - 'scripts/build-codex.mjs'
+      - 'scripts/build-kimi.mjs'
       - 'tests/**'
       - 'package*.json'
       - '.claude-plugin/marketplace.json'
@@ -18,7 +19,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: codex-packages-${{ github.ref }}
+  group: client-packages-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -39,9 +40,9 @@ jobs:
       - name: Publish generated packages on main
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         run: |
-          git add -- codex .agents/plugins/marketplace.json
+          git add -- codex .agents/plugins/marketplace.json kimi
           if git diff --cached --quiet; then exit 0; fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'Обновил сборку плагинов для Codex'
+          git commit -m 'Обновил сборку плагинов для Codex и Kimi'
           git push origin HEAD:main

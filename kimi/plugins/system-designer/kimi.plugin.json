@@ -1,0 +1,10 @@
+{
+  "name": "system-designer",
+  "version": "0.7.2-kimi.h7f6c425deae5",
+  "description": "Designs personal development projects as short reference documentation in the Obsidian vault: concept, architecture hub with diagrams, area notes and phase outlines",
+  "author": {
+    "name": "Anton"
+  },
+  "skills": "./skills/",
+  "agents": "./agents/"
+}

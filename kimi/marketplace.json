@@ -1,0 +1,45 @@
+{
+  "version": "2",
+  "plugins": [
+    {
+      "id": "anton-toolkit",
+      "displayName": "Personal toolkit with custom skills for Anton",
+      "source": "./plugins/anton-toolkit"
+    },
+    {
+      "id": "blender-modeling",
+      "displayName": "Builds game-ready 3D models in Blender from reference images, split into parts that builder agents work out in parallel to measured gates, with a fresh-eyes reviewer against the reference, and bakes layered materials checked against the reference",
+      "source": "./plugins/blender-modeling"
+    },
+    {
+      "id": "character-animation",
+      "displayName": "Finds real motion references for owner approval, measures the chosen video and transfers the movement to a rigged 3D character in the game engine animation stand",
+      "source": "./plugins/character-animation"
+    },
+    {
+      "id": "lichnost",
+      "displayName": "Personal development loop in the Obsidian vault: daily diary (dnevnik), ideas and goals (idea), weekly/monthly/yearly reviews with checked advice that also keep the owner's portrait, goals and finances current (itogi), and film curation (film)",
+      "source": "./plugins/lichnost"
+    },
+    {
+      "id": "plugin-builder",
+      "displayName": "Creates, extends, and fixes plugins in the anton-toolkit-marketplace via task-centric interviews. `create-plugin` scaffolds a new plugin, `extend-plugin` adds to an existing one, and `improve-plugin` applies reactive point fixes after an in-session incident.",
+      "source": "./plugins/plugin-builder"
+    },
+    {
+      "id": "system-designer",
+      "displayName": "Designs personal development projects as short reference documentation in the Obsidian vault: concept, architecture hub with diagrams, area notes and phase outlines",
+      "source": "./plugins/system-designer"
+    },
+    {
+      "id": "vibe-coding-course",
+      "displayName": "Helps the teacher run a vibe-coding course: an interview-driven roadmap builder and a beginner-friendly per-lesson writer that save Russian Markdown files into the Obsidian vault's Курс/ folder",
+      "source": "./plugins/vibe-coding-course"
+    },
+    {
+      "id": "youtube-toolkit",
+      "displayName": "Toolkit for running a Russian-language IT/vibe-coding YouTube channel: own-channel analytics, competitor analysis, idea generation, content planning, script writing, editing sheets, recorded-voice video assembly, motion clips, SEO, thumbnails, and on-channel lead generation",
+      "source": "./plugins/youtube-toolkit"
+    }
+  ]
+}
