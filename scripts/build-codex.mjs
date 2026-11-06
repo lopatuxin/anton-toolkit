@@ -48,6 +48,11 @@ export function convertSkill(text, sourcePath, plugin, runtime, model, isAgent) 
     if (data.tools) launch += `Source role tool allowlist (map to available native equivalents): ${JSON.stringify(data.tools)}.\n`;
     if (data.disallowedTools) launch += `Source role prohibited tools/capabilities: ${JSON.stringify(data.disallowedTools)}. Preserve these restrictions.\n`;
   }
+  if (!isAgent && plugin === 'anton-toolkit' && data.name === 'task-build') {
+    launch = `\n## Required chat model\n\n
+Run SKILL_DIR/scripts/check-astra.ps1 from its absolute path in a separate PowerShell process before step 1 and at the start of each resumed turn. Continue with task-build, including its feature-planner dialog, only if the check exits 0.\n
+If the check fails or the model is unknown, stop before doing task work and say: «Для task-build выбери GPT-6 Astra под полем ввода и повтори запрос.» Do not substitute another model or delegate the planning dialog.\n`;
+  }
   return `---\n${stringify(header, { lineWidth: 0 }).trimEnd()}\n---\n\n` +
     `<!-- Generated from ${sourcePath}; edit that source, then run npm run build. -->\n\n` +
     `## Codex runtime\n\nRead PLUGIN_ROOT/codex-runtime.md before using this procedure. ${runtime}\n` +

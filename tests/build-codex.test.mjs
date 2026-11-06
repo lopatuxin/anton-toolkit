@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve, sep } from 'node:path';
 import test from 'node:test';
@@ -29,6 +30,53 @@ test('all eight plugins and source agents are packaged with preserved launch req
       assert.ok(content.length > 100);
       assert.doesNotMatch(content, /C:\/projects\/obsidian\/\.codex-sync\/marketplace/);
     }
+  }
+});
+
+test('task-build requires Astra in the current turn', () => {
+  const skillPath = 'codex/plugins/anton-toolkit/skills/task-build/';
+  const output = buildFiles(repositoryRoot);
+  assert.match(output.get(skillPath + 'SKILL.md'), /check-astra\.ps1.*each resumed turn/);
+
+  const fixture = mkdtempSync(join(tmpdir(), 'anton-toolkit-model-'));
+  try {
+    const threadId = '12345678-1234-1234-1234-123456789abc';
+    const sessions = join(fixture, 'sessions');
+    mkdirSync(sessions);
+    const transcript = join(sessions, `rollout-test-${threadId}.jsonl`);
+    const script = join(fixture, 'check-astra.ps1');
+    writeFileSync(script, output.get(skillPath + 'scripts/check-astra.ps1'));
+
+    function runCheck(model, currentTurnStarted = true) {
+      const records = [
+        { type: 'event_msg', payload: { type: 'task_started', turn_id: 'previous' } },
+        { type: 'turn_context', payload: { turn_id: 'previous', model: 'gpt-6-astra' } },
+      ];
+      if (currentTurnStarted) {
+        records.push({ type: 'event_msg', payload: { type: 'task_started', turn_id: 'current' } });
+      } else {
+        records.push({ type: 'event_msg', payload: { type: 'task_complete', turn_id: 'previous' } });
+      }
+      if (model) records.push({ type: 'turn_context', payload: { turn_id: 'current', model } });
+      writeFileSync(transcript, records.map(record => JSON.stringify(record)).join('\n'));
+      const shell = process.platform === 'win32' ? 'powershell.exe' : 'pwsh';
+      const result = spawnSync(shell, ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', script, '-CodexDirectory', fixture], {
+        encoding: 'utf8',
+        env: { ...process.env, CODEX_THREAD_ID: threadId },
+        timeout: 10000,
+      });
+      assert.ifError(result.error);
+      assert.equal(result.stderr, '');
+      return result.status;
+    }
+
+    assert.equal(runCheck('gpt-6-astra'), 0);
+    assert.equal(runCheck('gpt-6.1-sol'), 1);
+    assert.equal(runCheck(), 2);
+    assert.equal(runCheck(undefined, false), 2);
+  } finally {
+    assert.ok(resolve(fixture).startsWith(resolve(tmpdir()) + sep));
+    rmSync(fixture, { recursive: true, force: true });
   }
 });
 

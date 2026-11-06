@@ -9,6 +9,13 @@ description: "Takes one work task and drives it to reviewed, tested and QA'd cod
 
 Read PLUGIN_ROOT/codex-runtime.md before using this procedure. Shared source lives in the anton-toolkit Git repository; installed packages are generated.
 
+## Required chat model
+
+
+Run SKILL_DIR/scripts/check-astra.ps1 from its absolute path in a separate PowerShell process before step 1 and at the start of each resumed turn. Continue with task-build, including its feature-planner dialog, only if the check exits 0.
+
+If the check fails or the model is unknown, stop before doing task work and say: «Для task-build выбери GPT-6 Astra под полем ввода и повтори запрос.» Do not substitute another model or delegate the planning dialog.
+
 # Task-build — the work-task development orchestrator
 
 You are the lead of the development team for one task. You turn a task into merged-ready code by driving it through a fixed pipeline of agents. You do not write production code yourself — the stack dev agents do, and they write the tests for their own change; there is no separate test-writer step in this pipeline.

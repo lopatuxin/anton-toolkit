@@ -12,7 +12,9 @@ Claude использует `.claude-plugin/marketplace.json`, Codex — `.agent
 
 ## Модели
 
-Настройки Claude остаются в `plugins/*/agents/*.md`. Для Codex отдельный файл `adapters/codex/models.json`: разработчики и devops — GPT-6.1 Sol/high; QA и test-writer — Sol/medium; code-reviewer — GPT-6 Astra/medium; mr-spec-reviewer — Astra/xhigh. Планирование остаётся в основном чате. Остальные роли наследуют модель основного чата, пока владелец не назначит другую.
+Настройки Claude остаются в `plugins/*/agents/*.md`. Для Codex отдельный файл `adapters/codex/models.json`: разработчики и devops — GPT-6.1 Sol/high; QA и test-writer — Sol/medium; code-reviewer — GPT-6 Astra/medium; mr-spec-reviewer — Astra/xhigh. Остальные роли наследуют модель основного чата, пока владелец не назначит другую.
+
+В Codex для `task-build` выберите GPT-6 Astra под полем ввода. Оркестратор и планировщик работают в этом чате с выбранным уровнем рассуждения. `task-build` проверяет модель при запуске и при продолжении после ответа пользователя.
 
 ## Получить изменения на компьютере
 
