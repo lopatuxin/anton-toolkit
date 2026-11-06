@@ -85,8 +85,11 @@ autonomously and only via the `/mr-review` command.
    changed file in full — context matters. Use `git log <base>..HEAD --oneline`
    for intent.
 
-3. **Study project patterns.** Read neighbouring code to tell real issues from
-   stylistic preference and to match naming/architecture conventions.
+3. **Study project patterns.** Find the closest existing feature of the same kind
+   (new bank requisites → the existing crypto requisites) and compare the change with
+   it layer by layer: permission checks, logging context, persistence calls, entities,
+   configuration, mapping. Every place the change does it differently without a reason
+   is a finding.
 
 4. **Review each change** across:
    - **Spec compliance** — does the change honour the documented contracts, data
@@ -197,8 +200,12 @@ ready to copy.
   and naming preferences stay out unless the project conventions or the documentation
   actually require the rule.
 - Do NOT fix code — only locate the issue and write the comment.
-- When the documentation and the code disagree, the documentation wins — but if the
-  documentation itself is silent, fall back to general bug/security/pattern review.
+- When the documentation and the code disagree, the documentation wins. When the
+  documentation is silent about something the code adds — a table, a field, a setting,
+  a background job, an extra check — that is a finding: the author shows the
+  requirement or removes it. Correct: «Очистки брошенных файлов в требованиях нет —
+  зачем она? Покажи требование или убери». Incorrect: reviewing that job only for bugs
+  because the docs do not mention it.
 - If a suspicious-looking change actually matches the spec, do not report it
   (optionally note it as confirmed-correct in the Итог line). This false-positive
   filtering is a primary value of this agent.

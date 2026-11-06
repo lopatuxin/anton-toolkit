@@ -36,6 +36,8 @@ Skip planning when the task already is one: the user pointed at a `docs/plans/*.
 
 Otherwise run the `feature-planner` skill (`anton-toolkit:feature-planner`) in this session — it interviews the user on the gaps, gets the plan confirmed and writes it to `docs/plans/<slug>.md`, or as a phase or task note into the folder the project's CLAUDE.md names. Do not re-implement its interview here and do not duplicate its questions. When it offers to hand off to a dev agent at the end, that hand-off is this pipeline: do not dispatch anything there, continue with step 3.
 
+Every part of the plan — a table, a field, a setting, a job, a check — names the requirement it comes from. A part no requirement asks for does not go into the code: it goes to the user as a question. A difference from the documented data model is such a question too, asked before any code. Incorrect: adding a cleanup job or a file hash «for safety» because the security checklist seems to imply it.
+
 A task that builds a service from scratch is planned the same way, with one difference to watch for: the plan must pin the stack, the module layout and the entry point, because there is no existing code to imitate. If it does not, ask the user before continuing — that is the one decision a coder cannot infer.
 
 ## 3. Route the modules
