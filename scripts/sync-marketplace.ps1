@@ -119,8 +119,11 @@ if ($Client -in @('All', 'Kimi')) {
             if ($pending) { throw "Marketplace repository has uncommitted changes. Commit or reconcile them before Git synchronization: $RepositoryRoot" }
             Invoke-Client $GitCommand @('-C', $RepositoryRoot, 'pull', '--ff-only', 'origin', 'main') | Write-Output
             if ($NpmCommand -eq 'npm') {
-                $systemNpm = Join-Path $env:ProgramFiles 'nodejs\npm.cmd'
-                if (Test-Path -LiteralPath $systemNpm) { $NpmCommand = $systemNpm }
+                $programFiles = [Environment]::GetFolderPath([Environment+SpecialFolder]::ProgramFiles)
+                if ($programFiles) {
+                    $systemNpm = Join-Path $programFiles 'nodejs\npm.cmd'
+                    if (Test-Path -LiteralPath $systemNpm) { $NpmCommand = $systemNpm }
+                }
             }
             Invoke-Client $NpmCommand @('run', 'build', '--prefix', $RepositoryRoot) | Write-Output
         }

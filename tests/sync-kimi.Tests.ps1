@@ -22,12 +22,14 @@ function Write-Json([string]$Path, $Value) {
     [IO.File]::WriteAllText($Path, ($Value | ConvertTo-Json -Depth 20), (New-Object System.Text.UTF8Encoding($false)))
 }
 $fixture = Join-Path ([IO.Path]::GetTempPath()) ('anton-toolkit-kimi-sync-' + [guid]::NewGuid().ToString('N'))
+$programFilesBefore = $env:ProgramFiles
 try {
     $repository = Join-Path $fixture 'repository'
     $kimiHomeFixture = Join-Path $fixture 'kimi-home'
     New-Item -ItemType Directory -Force -Path $repository,$kimiHomeFixture | Out-Null
     $names = @('anton-toolkit', 'blender-modeling', 'character-animation', 'lichnost', 'plugin-builder', 'system-designer', 'vibe-coding-course', 'youtube-toolkit')
     Write-Json (Join-Path $repository '.claude-plugin\marketplace.json') @{ plugins = @($names | ForEach-Object { @{ name = $_; source = "./plugins/$_" } }) }
+    Write-Json (Join-Path $repository 'package.json') @{ private = $true; scripts = @{ build = 'node --version' } }
     foreach ($name in $names) {
         $package = Join-Path $repository "kimi\plugins\$name"
         Write-Json (Join-Path $package 'kimi.plugin.json') @{ name = $name; version = '1.0.0-kimi.test'; skills = './skills/' }
@@ -65,8 +67,13 @@ try {
     catch { $blocked = $_.Exception.Message -like '*uncommitted changes*' }
     if (-not $blocked) { throw 'Dirty repository was not rejected' }
     if (@($global:kimiSyncEvents | Where-Object { $_ -like '* pull --ff-only origin main' }).Count -ne $pullsBefore) { throw 'Git pull ran in a dirty repository' }
+
+    $global:kimiSyncDirty = $false
+    $env:ProgramFiles = $null
+    & $sync -Client Kimi -RepositoryRoot $repository -KimiHomes @($kimiHomeFixture) -GitCommand Mock-Git | Out-Null
     Write-Output 'Kimi Git synchronization, backups and plugin selection checks passed.'
 } finally {
+    $env:ProgramFiles = $programFilesBefore
     Remove-Variable -Name kimiSyncEvents,kimiSyncDirty -Scope Global -ErrorAction SilentlyContinue
     if (Test-Path -LiteralPath $fixture) { Remove-Item -LiteralPath $fixture -Recurse -Force }
 }
