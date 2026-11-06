@@ -118,14 +118,23 @@ if ($Client -in @('All', 'Kimi')) {
             $pending = (Invoke-Client $GitCommand @('-C', $RepositoryRoot, 'status', '--porcelain') | Out-String).Trim()
             if ($pending) { throw "Marketplace repository has uncommitted changes. Commit or reconcile them before Git synchronization: $RepositoryRoot" }
             Invoke-Client $GitCommand @('-C', $RepositoryRoot, 'pull', '--ff-only', 'origin', 'main') | Write-Output
-            if ($NpmCommand -eq 'npm') {
-                $programFiles = [Environment]::GetFolderPath([Environment+SpecialFolder]::ProgramFiles)
-                if ($programFiles) {
-                    $systemNpm = Join-Path $programFiles 'nodejs\npm.cmd'
-                    if (Test-Path -LiteralPath $systemNpm) { $NpmCommand = $systemNpm }
+            $pathBeforeBuild = $env:PATH
+            try {
+                if ($NpmCommand -eq 'npm') {
+                    $programFiles = [Environment]::GetFolderPath([Environment+SpecialFolder]::ProgramFiles)
+                    if ($programFiles) {
+                        $nodeHome = Join-Path $programFiles 'nodejs'
+                        $systemNpm = Join-Path $nodeHome 'npm.cmd'
+                        if (Test-Path -LiteralPath $systemNpm) {
+                            $env:PATH = $nodeHome + [IO.Path]::PathSeparator + $env:PATH
+                            $NpmCommand = $systemNpm
+                        }
+                    }
                 }
+                Invoke-Client $NpmCommand @('run', 'build', '--prefix', $RepositoryRoot) | Write-Output
+            } finally {
+                $env:PATH = $pathBeforeBuild
             }
-            Invoke-Client $NpmCommand @('run', 'build', '--prefix', $RepositoryRoot) | Write-Output
         }
         $catalog = Get-Content -LiteralPath (Join-Path $RepositoryRoot '.claude-plugin\marketplace.json') -Raw | ConvertFrom-Json
         $catalogNames = @($catalog.plugins | ForEach-Object { $_.name })

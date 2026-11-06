@@ -70,7 +70,9 @@ try {
 
     $global:kimiSyncDirty = $false
     $env:ProgramFiles = $null
+    $pathBeforeSync = $env:PATH
     & $sync -Client Kimi -RepositoryRoot $repository -KimiHomes @($kimiHomeFixture) -GitCommand Mock-Git | Out-Null
+    if ($env:PATH -ne $pathBeforeSync) { throw 'Build PATH was not restored' }
     Write-Output 'Kimi Git synchronization, backups and plugin selection checks passed.'
 } finally {
     $env:ProgramFiles = $programFilesBefore
