@@ -1,47 +1,46 @@
 ---
 name: game-level-design
 description: >
-  Designs, improves, and builds playable game levels with AI-assisted exploration,
-  spatial constraints, blockouts, visual hierarchy, and in-game evaluation. Use for
-  a level, map, encounter space, route, or playable environment in any genre.
-  Use for requests such as "сделай левел-дизайн" or "улучши карту". An isolated texture, model, animation, or game mechanic belongs to its own workflow.
+  Designs or revises game levels through an approved text placement proposal,
+  visual reference, spatial scheme, and detailed implementation brief. Use for
+  a level, map, encounter space, route, or playable environment in any genre,
+  including requests such as "сделай левел-дизайн" or "улучши карту".
+  This skill designs and hands off; scene construction belongs to a separate workflow.
 when_to_use: >
   "сделай левел-дизайн", "спроектируй уровень", "переделай карту", "улучши локацию"
 ---
 
 # Game Level Design
 
-Make places that serve the player's actions and the game's intended experience. Work in the game's existing engine, editor, data formats, and art direction. Adapt the method to the genre, camera, mechanics, stage of production, and the user's requested scope.
+Design a playable place for the game's actual camera, rules, and player actions. Keep the dialog in the main conversation. This skill finishes with an agreed design, not a built scene. If the user asks only for research or critique, answer at that scope.
 
-## Scope and evidence
+## Ground the proposal
 
-- For a request to research, critique, or propose options, inspect the current level when one exists and return findings and alternatives. Do not turn a discussion into a scene edit. For a build request, implement and evaluate the selected design against working game rules. If a required mechanic does not exist, establish its minimum contract and whether building it is in scope; otherwise deliver the level design and state the playtest gap. Do not call a render or placeholder playable.
-- Read the project's relevant decisions, current scene and assets, then observe the level in the running game when possible. Record gaps between documentation and behavior. Preserve approved constraints and existing work unless a demonstrated problem calls for revisiting them.
-- Identify the player loop, camera, controls, movement and combat scale, objectives, obstacles, enemy behavior, resources, and the level's place in progression. Distinguish working mechanics from planned ones.
-- Study a small set of relevant games, studio breakdowns, or research before proposing a new direction. Extract the transferable mechanism and its cost; do not copy a map or visual composition. Verify changeable tool capabilities before recommending them.
+- Read the relevant project decisions, current scene and assets; observe the running game when one exists. Distinguish approved choices from temporary work and working mechanics from planned ones. Preserve the owner's accepted changes.
+- Identify the player loop, scale, camera, controls, objectives, routes, obstacles, enemy behavior, and level's place in progression. Research a few relevant games or studio breakdowns when a new direction needs comparison; extract useful principles rather than copying their maps.
+- Begin at the first stage that lacks approval. Reuse an already approved text brief, reference, or scheme instead of repeating it.
 
-## Design the experience
+## Approval order
 
-1. State the level's purpose in terms of what the player will do, notice, decide, and feel. Sketch the sequence of meaningful beats and a simple route graph before detailed art. Include alternative routes only when they create a real choice for this game.
-2. Compare a few materially different layouts or revisions when the direction is open. Compare movement, encounter options, navigation, visual clarity, production cost, and fit with the game's rules. Recommend one. Ask the owner only for a consequential creative choice that the existing brief does not settle.
-3. Build a playable blockout at actual player scale and camera using editable native objects. Place landmarks, routes, boundaries, obstacles, cover, objectives, spawns, and retreat paths according to the chosen beats. Iterate on the layout through play before detailed set dressing.
-4. Establish a visual reading order suited to the genre and current action: player, threats, routes, and objectives get attention before atmosphere and surface detail. Concentrate contrast and fine detail around intentional focal points; give traversal and combat areas enough quiet space. Use props, material changes, light, sound, and traces of past events to make each place distinct and legible.
-5. Populate with reusable assets or procedural rules only inside explicit zones. Exclude paths, sightlines, interaction areas, and spawn safety space as needed. Match every generated or placed asset to collision, scale, perspective, and the actual camera.
+1. **Text placement first.** Describe in plain Russian where the player starts; where the routes, landmarks, objectives, threats, cover, interactable objects, and quiet areas are; what the player does in each area; and why the arrangement supports the intended experience. Show a few meaningful alternatives when direction is open, recommend one, and wait for the owner's corrections or approval. Do not make a visual reference or spatial scheme yet.
+2. **Visual reference second.** From the approved text and existing approved style cues, create or select one target frame at the game's camera and player scale. It shows the intended visual hierarchy and atmosphere; it is not a placement diagram or final ground asset. Inspect it against the text before showing it. Wait for the owner to approve this specific reference. If rejected, revise that reference before proceeding; generate images one at a time.
+3. **Spatial scheme third.** After reference approval, draw an editable, legible plan with positions, dimensions, routes, boundaries, interaction zones, obstacles, sightlines, spawns, and relevant height differences. Reconcile it with both the approved text and visual reference. Show it to the owner and revise until approved.
+4. **Agree on implementation details.** Resolve only the details needed to build this level: object roles and sizes, collision and navigation, encounters and timing, materials and asset needs, camera and lighting, and acceptance checks. Where mechanics do not exist yet, mark the design hypotheses that cannot be tested. Save the agreed brief in the project's designated plan location when the project calls for one. Get approval of the complete design before handing it to construction.
 
-## Use AI where it adds control
+For example, on a camp redesign first describe where the tower, gate, and routes go; generating a map image or editing scene files before that text is approved skips the first decision gate.
 
-- Use a language model for divergent layout ideas, beat maps, critique, and translation of a selected brief into structured placements and constraints. Keep goals, dimensions, forbidden regions, routes, and object roles explicit and editable.
-- Prefer the sequence **intent → structured spatial constraints → editable scene → automated checks → playtest** for AI-assisted construction. A convincing image alone does not establish reachability, combat flow, or playability.
-- Use image generation for concepts, surface art, and individual assets after the spatial intent is clear. Supply the approved camera, blockout, style reference, and fixed geometry. Inspect output at gameplay scale; repair mismatched art through the appropriate asset workflow rather than silently changing level geometry to fit an image.
-- Use procedural placement for repetitive dressing and local variation. Rules should preserve the authored layout and allow selective manual changes. Do not use uniform scatter where it erases focal areas or makes the ground visually noisy.
-- Use AI to suggest risks from screenshots, play traces, or logs, and to explore counterexamples. Geometry, collision, and reachability need checks against the game's real rules. Human play remains the test of interest, tension, and clarity.
-- Keep accepted human edits persistent between iterations. Offer variation within the remaining design space instead of regenerating the whole level after each correction.
+Do not edit game scene files, make final game assets, assemble a blockout in the engine, or start a build while using this skill. After the complete design is approved, hand it to the appropriate implementation workflow. If the user's current request already authorizes construction, continue there after approval; otherwise stop with the approved brief.
 
-## Evaluate in the game
+## Use AI with control
 
-Check the level from its ordinary gameplay camera and through the actions it is built for. Test reachability, scale, navigation, collision, sightlines, enemy routes, cover, objective visibility, pacing, and readable threats where those mechanics exist. Inspect actions, not only a still overview. For puzzles and gated objectives, check solvability through actual state transitions, deadlocks, unintended bypasses, and whether an introductory level teaches its intended action. Use automated probes for measurable constraints and live play for experience; describe what each actually established. Revise the level or art when evidence contradicts the intended experience.
+- Use a language model for placement alternatives, player-beat analysis, critique, and conversion of approved choices into explicit spatial constraints. Keep all accepted decisions persistent across iterations.
+- Use image generation for the visual reference with the approved text, camera, scale, and style as controls. A beautiful image does not establish collision, reachability, or encounter flow; the later scheme must make those relationships explicit.
+- Use read-only calculations or simulations to challenge a proposed scheme where possible. For puzzles and gated objectives, reason through full state transitions, deadlocks, unintended bypasses, and the introductory learning step. Record what remains unverified until the level is built and played.
+- Plan visual reading order for the genre and current action: player, threats, routes, and objectives should remain clear against the atmosphere. Reserve fine detail and contrast for chosen focal areas rather than scattering them uniformly.
 
-When reporting, give the resulting level or proposals, the reason for the chosen layout, the relevant test observations, and the remaining decisions or untested mechanics. Do not claim that an automated solver or a good-looking render proves the level is fun.
+## Handoff
+
+Deliver the approved text, visual reference, spatial scheme, and build brief together. State which gameplay assumptions remain untested and which checks the implementation workflow must perform in the running game. Do not call the design playable merely because its plan is reachable or its reference looks convincing.
 
 ## Research behind this workflow
 
@@ -49,5 +48,5 @@ When reporting, give the resulting level or proposals, the reason for the chosen
 - [Blizzard: Diablo IV environment art](https://news.blizzard.com/en-us/article/23788294/diablo-iv-quarterly-updatemarch-2022) describes adding or removing detail for the fixed game camera, navigation, combat, and narrative intent.
 - [Valve: illustrative rendering in Team Fortress 2](https://cdn.steamstatic.com/apps/valve/2007/NPAR07_IllustrativeRenderingInTeamFortress2.pdf) explains why restrained high-frequency texture and geometry help visual composition and gameplay reading.
 - [Valve: Left 4 Dead AI systems](https://steamcdn-a.akamaihd.net/apps/valve/2009/GDC2009_ReplayableCooperativeGameDesign_Left4Dead.pdf) shows deliberate peaks and rests in threat pacing and structured variation.
-- [Xu and Verbrugge, FDG 2025](https://pcgworkshop.com/archive/xu2025constraint.pdf) demonstrates language-to-constraints-to-optimization-to-simulation for 3D layouts; its automated validity result is not a substitute for human playtesting.
+- [Xu and Verbrugge, FDG 2025](https://pcgworkshop.com/archive/xu2025constraint.pdf) demonstrates language-to-constraints-to-optimization-to-simulation for 3D layouts; automated validity does not replace human playtesting.
 - [Microsoft Research and Ninja Theory, 2025](https://pmc.ncbi.nlm.nih.gov/articles/PMC11839478/) identifies diversity, consistency, and persistence of user edits as important to AI-supported game ideation.
