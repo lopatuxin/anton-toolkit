@@ -41,7 +41,7 @@ Read the sheet's «Оформление» and «Заметки» and skim the jo
 
 Before planning replacements, inspect the episode's existing assets and approved earlier clips. Carry the sheet's takeaway, visual action and reuse decision into each scene. Reuse or annotate a good clip; retime its phases when only synchronization is wrong. Keep its geometry, camera and actual component motion. An image-generation asset is an illustration unless its provenance establishes otherwise, never substitute proof of the experiment.
 
-If a cleaned voice master exists, use its transcript now and follow step 8 before animating. If only a raw recording exists during a whole-video task, return to yt-montage's voice cleanup first. Keep provisional estimates only for scenes without recorded timing.
+If a voice master exists, including a recording explicitly accepted as-is, use its transcript now and follow step 8 before animating. If only an unreviewed raw recording exists during a whole-video task, return to yt-montage's recording-treatment decision first. Keep provisional estimates only for scenes without recorded timing.
 
 ## 2. Scene list
 
@@ -53,13 +53,19 @@ Scaffold only missing scenes; preserve existing projects and their approved anim
 2. Per scene: copy `_template` to `scenes\<id>\`, write its `scene.json`, copy the media its block lists into its `assets\`.
 3. Run `node SKILL_DIR/scripts/retime.mjs motion/scenes --voice <clean-transcript>.json` when cleaned word timings exist (step 8). Only otherwise omit `--voice` for a labelled estimate at 130 words a minute.
 
-The owner already approved what is on screen when he approved the sheet; the plan is not shown to him. His first look is the style round.
+An approved sheet settles the intended content, not the readability of a newly drawn scene. Keep the internal plan out of the owner's review; show the relevant visual or motion sample instead.
 
 ## 3. Style round
 
 Follow `SKILL_DIR/references/style-round.md`: 2–4 candidates as `frame.md` specs, each sketched on the same sample scene by a worker, a page for the owner, his pick saved to the library. A library style the owner names, or the already approved style of this video, replaces the round. Revisions preserve that style unless the owner asks to change it.
 
 Then copy the chosen fonts into every scene's `assets\fonts\`; every scene now draws to `motion\frame.md`. When the round ran, copy the winning candidate's `index.html` and `keyframe.png` into the sample scene's folder (never a library style's sample — it belongs to another video) — the owner chose that drawing, so its animate pass starts from it — and run `retime.mjs motion/scenes` again with the same `--voice` input when available, which puts the scene's own timing into the copied file without reverting to estimated timing.
+
+## Comprehension sample
+
+For a new explanation approach without a comparable approved animated example, or after the user rejects its clarity, build one short representative excerpt before expanding the affected scenes into the full film. Use the actual voice when available. Without a recording, use explicitly provisional script-cue timing without inventing a voice track; acceptance then covers the visual approach only, and speech synchronization remains to be checked once the recording exists. Choose the hardest interaction to understand, not just the easiest attractive shot. Follow the Visual explanation principles in `PLUGIN_ROOT/skills/yt-montage/SKILL.md`: the sample must show recognizable parts, a focused action and its consequence; a still can judge the look but not this sequence.
+
+Show the timed excerpt for the owner's assessment. Acceptance covers the demonstrated approach, not unseen scenes or the full export. A comparable approved motion sample can be reused; routine corrections within that accepted approach do not reopen approval. If the sample is rejected, correct the explanatory approach rather than merely increasing surface detail. Keep the pending whole-video assembly active and continue it after the choice.
 
 ## 4. The full plan
 
@@ -84,7 +90,7 @@ Render one scene at a time — each render runs its own browser — in the backg
 npx --yes hyperframes@<version> render --quality delivery --fps 30 --browser-timeout 60 --output "<episode>/assets/motion/<id>.mp4"
 ```
 
-run from each scene's folder (`--browser-timeout 60`: the page's first load fetches GSAP from the CDN, which sometimes takes longer than the default). After rendering, confirm with `ffprobe` that every clip exists, lasts its `timing.duration` and has an audio stream.
+run from each scene's folder (`--browser-timeout 60`: the page's first load fetches GSAP from the CDN, which sometimes takes longer than the default). After rendering, confirm with `ffprobe` that every clip exists and lasts its `timing.duration`; require an audio stream for planned effects, and no unintended audio when the plan specifies `sound: none`.
 
 Inspect the rendered clips at each planned action's start, midpoint and result, plus their transitions, against `acceptance` and the spoken phrase. The final MP4 may differ from browser snapshots; check a short exported sequence for movement, not just the keyframe.
 
@@ -98,7 +104,7 @@ When the owner accepts standalone clips, or the assembly receives passing clips 
 
 ## 8. Timing from the cleaned voice
 
-The voice may exist before any motion work. Use the cleaned master, never raw timestamps after cuts. If only a raw recording exists, follow `PLUGIN_ROOT/skills/yt-montage/references/assembly.md` for cleanup first. Its transcript is a whisper.cpp JSON with word times; if there is none yet, make it from the clean master from `C:\projects\youtube-video`:
+The voice may exist before any motion work. Use the chosen master, whether cleaned or explicitly accepted as-is, never pre-edit timestamps after cuts. For an unreviewed raw recording, follow `PLUGIN_ROOT/skills/yt-montage/references/assembly.md` to decide its treatment first. Its transcript is a whisper.cpp JSON with word times; if there is none yet, make it from that master using a separate analysis copy from `C:\projects\youtube-video`:
 
 ```bash
 ffmpeg -i <voice.wav> -ar 16000 -ac 1 <voice16.wav>
@@ -113,7 +119,7 @@ Then `node SKILL_DIR/scripts/retime.mjs motion/scenes --voice <out>.json`. For e
 - cue words interpolated — said differently or misheard: snapshot those beats after rendering and check they still land;
 - a negative `voiceStart` — the phrase starts the recording: lower that scene's `lead` to the time before its first word.
 
-In every scene folder whose timing changed run `node sfx.mjs` — its effects track was built for the old cues and would play every sound in the old place — then re-render those scenes and update the «Моушен» line in the sheet. For editable compositions, retime the cues and re-render. For an existing rendered animation, map source phases to the same speech cues: keep active moves readable and adjust holds or individual phases. Record that mapping and inspect the result. Do not globally stretch the whole clip, which also slows every move. A later voice edit invalidates the old cue timing.
+In scene folders whose timing changed and whose plan includes effects, run `node sfx.mjs`: the old effects track follows the old cues. Skip that command for `sound: none`. Re-render every scene with changed timing, including effect-free scenes, and update the montage sheet. For editable compositions, retime the cues and re-render. For an existing rendered animation, map source phases to the same speech cues: keep active moves readable and adjust holds or individual phases. Record that mapping and inspect the result. Do not globally stretch the whole clip, which also slows every move. A later voice edit invalidates the old cue timing.
 
 ## Running the workflow
 
@@ -139,9 +145,9 @@ Workflow({
 - Every font must cover Cyrillic, checked on the file with `SKILL_DIR/scripts/cyrillic.mjs`: a Latin-only face renders Russian words in a fallback that the check may not flag.
 - `check`, `snapshot` and `render` each start a headless browser: checks of several scenes in parallel are fine, renders go one at a time.
 - Use a contact image to compare overall style; it does not replace action-phase and final-export checks where motion carries the explanation.
-- Clips carry the scene's own sound effects — the quill, the paper, the knock, the room — and no voice, no music and no exit animation unless planned: the edit owns voice, music and the cuts. The owner rejected a silent clip (2026-10-16).
+- Clips carry the effects assigned by the approved plan, with `sound: none` as an explicit exception. Do not omit requested effects or add unrequested ones. The edit owns narration, music and cuts; no exit animation unless planned.
 - The render reads media timing from the HTML before the page script runs: an `<audio>` whose `data-start` the script sets plays at 0. Effects are laid on their cues by the scene's `sfx.mjs` into one track that plays from 0 for the whole scene.
 - Use `envelope.mjs` for level and spectral measurements, and listen when playback is available. Those measurements cannot prove the sound matches its source or that a join sounds natural; report any unperformed listening.
 - `check` and `snapshot` fail with "Navigation timeout" when GSAP loads slowly from the CDN: `check --timeout 30000`, and re-run a snapshot.
 - A scene's timing lives in its CUES line and root `data-duration`; anything placed at a literal second will not follow the voice. The checker flags it — do not wave it through.
-- Plan the right source before dispatch: code for diagrams/overlays, image generation for illustrations, Blender for actual geometry, screencasts for editor actions. List the asset and its role in the plan; workers compose supplied material instead of replacing it with easier but less faithful drawings.
+- Plan the right source before dispatch: code for diagrams/overlays, image generation for illustrations, Blender or a suitable deterministic 3D runtime for geometry, screencasts for editor actions. List the asset and its role in the plan; workers compose supplied material instead of replacing it with easier but less faithful drawings.

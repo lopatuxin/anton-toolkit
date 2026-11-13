@@ -35,7 +35,9 @@ A scene is one clip. Consecutive sheet rows that form one continuous motion mome
 - rows: «В этот раз я решил внять заветам предков…» | «…а они говорят, что игру начинают с прототипа…» | «…на которой проверяют, интересно ли вообще играть в твой будущий шедевр»
 - phrase: В этот раз я решил внять заветам предков, а они говорят, что игру начинают с {gold}прототипа, то есть с самой простой версии, на которой проверяют, интересно ли вообще играть в твой будущий {roll}шедевр
 - takeaway: <the one thing the viewer should understand>
-- action: <what visibly changes or is inspected, and on which spoken cue>
+- action: <changed input/condition, visible interaction and resulting consequence, on their spoken cues>
+- focus: <whole-object orientation, successive close-ups or comparison states; which detail can be omitted>
+- numbers: <quantity, unit/baseline, actual referent, reveal cue and counter/data source; none when absent>
 - reuse: <reuse | retime | annotate | create; source path and why>
 - acceptance: <observable start, intermediate and result states; what would fail the explanation>
 - key_at: gold
@@ -55,14 +57,16 @@ A scene is one clip. Consecutive sheet rows that form one continuous motion mome
 - `rows` — the sheet's phrases this scene covers, verbatim; they are how the sheet gets marked after delivery.
 - `phrase` — the spoken text from the cleaned recording when available, otherwise the script, verbatim and whole (the sheet abbreviates with «…»), with `{name}` in front of every word a beat lands on. Cue names are Latin identifiers (`gold`, `rollUp`) — the worker writes them as `CUES.<name>`, and `retime.mjs` refuses any other. Copied into the scene's `scene.json`; `retime.mjs` turns it into seconds.
 - `takeaway` / `action` — the explanation and the visible operation that delivers it. A heading plus an unrelated still is insufficient: silhouette matching shows alignment and actual discrepancies; part allocation shows pieces leaving the assembled object.
+- `focus` — the shot-level progression inside this scene, even when it is one long composition. State what new information each view reveals and which holds let the viewer inspect it; an idle loop is not a progression. Preserve part identity and keep the working area visible throughout motion.
+- `numbers` — bind each value and leader to its actual object or series, including moving targets. Specify the state or data that drives a counter; do not use an independent decorative counter.
 - `reuse` — inspect earlier approved assets first. For retiming, record source phase ranges and destination cue ranges (hold, separation, hold, assembly, hold); preserve geometry, camera and component identity. State why new material is needed when replacing an existing asset.
 - `acceptance` — observable checks at action start, an intermediate state and its result, used for snapshots and the exported clip. Specify marker targets, comparison view/scale and speech anchors. The checker must flag a plan that contradicts its own takeaway or the spoken claim, not merely reproduce it.
 - `key_at` — the cue (or second) of the scene's key moment: the fullest, most telling frame. The worker draws it first and builds the motion around it; the style round sketches it; the director's contact image shows it.
 - `start` / `end` — concrete: which elements, where, in which state. For a seam they repeat the **Стыки** line word for word.
 - `assets` — files from the episode's `assets\` the scene shows, or `none`; identify evidence versus illustration and link the asset ledger for source/license/attribution. Keep these narrative fields in the storyboard; they do not change the retime script's `scene.json` schema.
 - `motion` — ids from `hyperframes-animation/rules-index.md` and `blueprints-index.md`, never invented names; the worker reads their bodies.
-- `text` — every on-screen word, verbatim, in Russian.
-- `sound` — the scene's own effects, each tied to the beat that makes it, plus an ambient bed if the place has one; no voice, no music. The worker builds it per `sound.md`. A scene with nothing physical happening (a pure diagram) still gets a sound for each of its reveals.
+- `text` — every on-screen word, verbatim, in Russian. Prefer part names, actions and necessary conditions. Do not fill the frame with narration or routine notes about how the illustration was rendered; retain a limitation or attribution when it affects interpretation.
+- `sound` — the scene's own effects, each tied to the beat that makes it, plus an ambient bed if the place has one; no voice, no music. The worker builds it per `sound.md`. When effects are part of the approved treatment, a pure diagram can use sounds for its reveals. Set `sound: none` when that treatment excludes scene effects; this is not permission to omit narration from the final assembly.
 
 ## `scene.json` in each scene folder
 

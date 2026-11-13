@@ -26,7 +26,7 @@ Three candidates by default, four when the direction is wide open, two when the 
 
 ## The sample scene
 
-One scene from the plan, the one hardest for a style: a drawn character with an on-screen word beats a diagram, because a style that can draw the character can also draw the boxes, and not the other way round. Name it in the plan above the first scene.
+Choose the scene whose subject and explanation are hardest to render clearly: a character when characterization carries the film, a spatial interaction when depth or contact matters, or an actual screen sequence when a workflow is the subject. Do not assume that drawing a character proves the style can explain a diagram. Name the sample and its difficulty in the plan. The still round settles the look; when understanding depends on movement, use the timed comprehension sample in `PLUGIN_ROOT/skills/yt-motion/SKILL.md` before scaling the approach to the full film.
 
 ## Showing the owner
 
