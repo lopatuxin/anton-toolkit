@@ -11,7 +11,7 @@ test('all eight Kimi plugins contain native skills, agents and manifests', () =>
   const catalog = JSON.parse(output.get('kimi/marketplace.json'));
   assert.equal(catalog.version, '2');
   assert.equal(catalog.plugins.length, 8);
-  assert.equal([...output.keys()].filter(path => /kimi\/plugins\/[^/]+\/skills\/[^/]+\/SKILL\.md$/.test(path)).length, 42);
+  assert.equal([...output.keys()].filter(path => /kimi\/plugins\/[^/]+\/skills\/[^/]+\/SKILL\.md$/.test(path)).length, 43);
   assert.equal([...output.keys()].filter(path => /kimi\/plugins\/[^/]+\/agents\/[^/]+\.md$/.test(path)).length, 17);
 
   const reviewer = output.get('kimi/plugins/anton-toolkit/agents/code-reviewer.md');
