@@ -1,11 +1,11 @@
 ---
 name: game-build
 description: >
-  Takes a new game from the first idea to playable builds, or resumes an existing game from
-  its latest build. Use for whole-game production ("хочу сделать игру", "продолжим игру").
-  Keeps decisions and player feedback in one conversation and assigns design, levels,
-  art and implementation to focused agents. Use game-design for a design-only discussion
-  and game-level-design for a standalone level design.
+  Use to plan, start, or continue a whole game, including discussions about what to do next,
+  which work to prioritize, or what the next playable build should accomplish
+  ("что будем делать дальше с игрой", "дальнейшие действия по проекту платформера").
+  Takes a new game from the first idea to playable builds or resumes work from the latest build ("хочу сделать игру", "продолжим игру").
+  Use game-design for concept or gameplay design and game-level-design for a standalone level.
 when_to_use: >
   "хочу сделать игру", "продолжим разработку игры", "доведи игру до играбельной версии"
 ---
@@ -13,8 +13,19 @@ when_to_use: >
 # Game Build
 
 Keep the owner's dialogue, approvals, and playtest feedback in this conversation. Assign each
-production stage to an agent with a focused brief. Apply the owner's rules for discussion-only
-requests before searching, delegating, or writing. Speak to the owner in plain Russian.
+production stage to an agent with a focused brief. Speak to the owner in plain Russian.
+
+## Select the next playable result
+
+Use this skill when the owner asks to discuss the roadmap, priorities, or next step for an
+existing game. For a discussion-only request, apply the owner's limits on searching, delegating,
+and writing. Use the context already available to propose the next result the owner can try
+in the game and identify any decision needed from them. Follow the production steps below
+when the owner asks to advance the build.
+
+For a question about what to do next with the platformer, open this skill and propose a playable
+result in the conversation. Skipping this skill because the request is a discussion misses that
+planning step.
 
 ## Find the current build
 
