@@ -5,11 +5,11 @@ description: >
   concept (pitch card, falsifiable pillars, anti-pillars, mechanics list) through a short
   interview, invents signature hooks and mechanic twists, reads a playtest verdict, and checks
   that a build is a game rather than a tech demo and that its systems do not fight each other.
-  Use when the owner starts a new game, wants ideas for a game, reports how a play session
-  felt, or asks whether the game holds together. A single level or map is game-level-design;
-  engine architecture is system-designer; building the game is a dev workflow.
+  Use for a design-only conversation, ideas, a playtest verdict, or a game-ness check.
+  A whole-game build from idea through implementation starts in game-build.
+  A single level or map is game-level-design; engine architecture is system-designer.
 when_to_use: >
-  "хочу сделать игру", "придумаем игру", "придумай фишки", "поиграл, скучно", "это уже игра?"
+  "обсудим идею игры", "придумаем игру", "придумай фишки", "поиграл, скучно", "это уже игра?"
 ---
 
 # Game Design
@@ -27,6 +27,14 @@ Before anything, read what already exists: the game's project notes (concept, de
 journal), the code or data of the game if it runs, and earlier rejected ideas. What the owner
 has already said or recorded is decided — never ask it again, and start at the first entry
 point below that is not yet done.
+
+## Delegated preparation for game-build
+
+When a game-build assignment names this mode, work in a fresh context from the approved brief
+and linked inputs. For the concept, return the open decisions or a pitch draft and the player
+action the first build can test. For a playtest, return the relevant observation, its proposed
+cause, and the next playable change to try. Send proposals to the coordinator. The coordinator
+holds the owner's discussion, records approvals, and writes the approved concept note.
 
 ## Entry points
 

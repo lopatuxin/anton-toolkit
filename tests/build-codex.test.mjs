@@ -21,6 +21,10 @@ test('all eight plugins and source agents are packaged with preserved launch req
   const mr = output.get('codex/plugins/anton-toolkit/skills/mr-spec-reviewer/SKILL.md');
   assert.match(mr, /reasoning_effort="xhigh"/);
   assert.match(output.get('codex/plugins/anton-toolkit/skills/task-build/SKILL.md'), /the plan also pins the design/);
+  const gameBuild = output.get('codex/plugins/anton-toolkit/skills/game-build/SKILL.md');
+  assert.match(gameBuild, /fork_turns="none"/);
+  assert.match(gameBuild, /SKILL_DIR\/references\/tools-and-handoffs\.md/);
+  assert.ok(output.has('codex/plugins/anton-toolkit/skills/game-build/references/tools-and-handoffs.md'));
   const film = output.get('codex/plugins/lichnost/skills/film/SKILL.md');
   assert.match(film, /disable-model-invocation: true/);
   for (const [path, content] of output) {

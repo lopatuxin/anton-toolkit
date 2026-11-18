@@ -14,6 +14,13 @@ when_to_use: >
 
 Design a playable place for the game's actual camera, rules, and player actions. Keep the dialog in the main conversation. This skill finishes with an agreed design, not a built scene. If the user asks only for research or critique, answer at that scope.
 
+## Delegated preparation for game-build
+
+When a game-build assignment names this mode, start from the approved layout inputs it names.
+Prepare the next unapproved item in order and return it to the coordinator with its checks.
+The coordinator presents it for the owner's approval. The complete approved brief goes to
+a separate scene assembly assignment with the project's editor or scene data.
+
 ## Ground the proposal
 
 - Read the relevant project decisions, current scene and assets; observe the running game when one exists. Distinguish approved choices from temporary work and working mechanics from planned ones. Preserve the owner's accepted changes.
