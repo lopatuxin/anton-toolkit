@@ -28,7 +28,7 @@ Read the task the user gave: inline text, a ticket, a file, a link. When it name
 
 ## 2. Plan the task
 
-The plan is the specification the whole pipeline builds against, so it exists before any agent is dispatched.
+The plan is the specification the whole pipeline builds against, so it exists before any agent is dispatched. When the user names a documented feature, read its applicable specification and accepted decisions before judging the scope. Carry each required result into the plan with an observable acceptance check, preserving the user's explicit scope limits and recording open decisions separately.
 
 Skip planning when the task already is one: the user pointed at a `docs/plans/*.md` file or at a phase or task note in the folder the project's CLAUDE.md names, or handed over a ticket detailed enough that nothing would be guessed. Say so in one Russian line and go to step 3. A note that says what the system must do is a specification, not yet a plan: the plan also pins the design — which package each part lives in, which standard mechanism of the framework or library it uses, and the reference code to imitate. When only the design is missing, write it yourself into the plan file without an interview: you design, the dev agents run on a smaller model and copy whatever pattern they meet first.
 
@@ -89,7 +89,7 @@ Tell the user in one short Russian line that the build is running. It runs in th
 
 `reviewTarget` is the working tree by default. Pass a branch range (`git diff main...HEAD`) instead when the task's code is already committed on the branch — otherwise the reviewer sees nothing.
 
-If the run returns `ok: false`, report in Russian which stage failed and stop. The code stays on disk as the agents left it; a repeat run starts from the plan again.
+If the run returns `ok: false`, identify the failing stage, fix recoverable failures within the authorized scope, and rerun the affected checks. Complete independent work while a blocker remains. If the remaining work cannot advance, report the blocker and what is needed to proceed in Russian.
 
 ## 5. Close what the run handed back
 
@@ -101,7 +101,9 @@ The run returns what it could not decide alone. Work through it in this order:
 4. **`blockersRejected`** — Critical findings the adversarial check judged false, or that the checker never answered, each with the checker's reason. They were not fixed. List them to the user as disputed, with the reason in plain words: he decides whether the reviewer or the checker was right.
 5. **`findings`** — Warnings and Info. These are listed to the user, not auto-fixed: he decides what is worth a change. This is the rule for every review in this toolkit — blockers get fixed, the rest gets reported.
 
-## 6. Report and stop before the commit
+## 6. Accept the result and report before the commit
+
+Match every required result from the original request and governing documents to evidence from the final version. Exercise the behavior through its normal entry point. Keep working on each missing or unverified requirement while an authorized action can advance it, and rerun the affected checks. A passing code review and the existing tests only cover the behavior they actually checked. For a character screen that must support equipment, verify the preview and equip interaction and the resulting numbers in the running game.
 
 Once the implementation is complete and blocking findings are resolved, add or refresh links to the verified code and tests in the affected sections of the Obsidian plan and any project-owned vault notes explicitly identified by the task or plan. Follow Note Conventions in `C:/projects/obsidian/CLAUDE.md`.
 
@@ -125,7 +127,7 @@ Report in Russian, briefly, to a reader who did not watch the run. The first sen
 
 ## When NOT to use this skill
 
-- The task is a one-sentence change → make it in the main session with the loaded conventions.
+- The request is a small, localized change with one verifiable result after checking the applicable requirements → make it in the main session with the loaded conventions. A short request for a documented feature with several required results follows this workflow.
 - Only a plan is wanted, no code → `feature-planner`.
 - Something fails and the cause is unknown → `debug` first, then bring the proven fix here or apply it directly.
 - Designing a whole system's documentation → `system-designer`.
