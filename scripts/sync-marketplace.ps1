@@ -1,7 +1,8 @@
 param(
-    [ValidateSet('All', 'Claude', 'Codex', 'Kimi')][string]$Client = 'All',
+    [ValidateSet('All', 'Claude', 'Codex', 'Kimi', 'Qwen')][string]$Client = 'All',
     [string]$ClaudeCommand,
     [string]$CodexCommand = 'codex',
+    [string]$QwenCommand,
     [string]$RepositoryRoot = (Join-Path $PSScriptRoot '..'),
     [string[]]$KimiHomes = @(),
     [string]$GitCommand = 'git',
@@ -30,6 +31,43 @@ function Write-Text([string]$Path, [string]$Text) {
 function Set-JsonProperty([psobject]$Object, [string]$Name, $Value) {
     if ($Object.PSObject.Properties.Name -contains $Name) { $Object.$Name = $Value }
     else { $Object | Add-Member -NotePropertyName $Name -NotePropertyValue $Value }
+}
+
+$script:RepositoryUpdated = $false
+function Update-MarketplaceRepository {
+    $script:RepositoryRoot = (Resolve-Path -LiteralPath $RepositoryRoot).Path
+    if ($script:RepositoryUpdated -or $SkipRepositoryUpdate) { return }
+    $pending = (Invoke-Client $GitCommand @('-C', $RepositoryRoot, 'status', '--porcelain') | Out-String).Trim()
+    if ($pending) { throw "Marketplace repository has uncommitted changes. Commit or reconcile them before Git synchronization: $RepositoryRoot" }
+    Invoke-Client $GitCommand @('-C', $RepositoryRoot, 'pull', '--ff-only', 'origin', 'main') | Write-Output
+    $pathBeforeBuild = $env:PATH
+    try {
+        $npm = $NpmCommand
+        if ($NpmCommand -eq 'npm') {
+            $programFiles = [Environment]::GetFolderPath([Environment+SpecialFolder]::ProgramFiles)
+            if ($programFiles) {
+                $nodeHome = Join-Path $programFiles 'nodejs'
+                $systemNpm = Join-Path $nodeHome 'npm.cmd'
+                if (Test-Path -LiteralPath $systemNpm) {
+                    $env:PATH = $nodeHome + [IO.Path]::PathSeparator + $env:PATH
+                    $npm = $systemNpm
+                }
+            }
+        }
+        Invoke-Client $npm @('run', 'build', '--prefix', $RepositoryRoot) | Write-Output
+    } finally {
+        $env:PATH = $pathBeforeBuild
+    }
+    $script:RepositoryUpdated = $true
+}
+
+function Find-QwenCommand {
+    if ($QwenCommand) { return $QwenCommand }
+    $command = Get-Command qwen -ErrorAction SilentlyContinue
+    if ($command) { return $command.Source }
+    $desktopCli = Join-Path $env:LOCALAPPDATA 'Qwen Code Desktop\runtime\qwen-code\bin\qwen.cmd'
+    if (Test-Path -LiteralPath $desktopCli) { return $desktopCli }
+    throw 'Qwen Code CLI was not found. Pass -QwenCommand with the path to qwen.cmd.'
 }
 
 function Install-KimiPackage([string]$Name, [string]$Source, [string]$KimiHome, [string]$Backup, [psobject]$Installed, [psobject]$Existing) {
@@ -113,29 +151,7 @@ if ($Client -in @('All', 'Kimi')) {
         if ($Client -eq 'Kimi') { throw 'No Kimi home found. Start Kimi Code once or pass -KimiHomes.' }
         Write-Output 'Kimi Code is not installed; skipped Kimi synchronization.'
     } else {
-        $RepositoryRoot = (Resolve-Path -LiteralPath $RepositoryRoot).Path
-        if (-not $SkipRepositoryUpdate) {
-            $pending = (Invoke-Client $GitCommand @('-C', $RepositoryRoot, 'status', '--porcelain') | Out-String).Trim()
-            if ($pending) { throw "Marketplace repository has uncommitted changes. Commit or reconcile them before Git synchronization: $RepositoryRoot" }
-            Invoke-Client $GitCommand @('-C', $RepositoryRoot, 'pull', '--ff-only', 'origin', 'main') | Write-Output
-            $pathBeforeBuild = $env:PATH
-            try {
-                if ($NpmCommand -eq 'npm') {
-                    $programFiles = [Environment]::GetFolderPath([Environment+SpecialFolder]::ProgramFiles)
-                    if ($programFiles) {
-                        $nodeHome = Join-Path $programFiles 'nodejs'
-                        $systemNpm = Join-Path $nodeHome 'npm.cmd'
-                        if (Test-Path -LiteralPath $systemNpm) {
-                            $env:PATH = $nodeHome + [IO.Path]::PathSeparator + $env:PATH
-                            $NpmCommand = $systemNpm
-                        }
-                    }
-                }
-                Invoke-Client $NpmCommand @('run', 'build', '--prefix', $RepositoryRoot) | Write-Output
-            } finally {
-                $env:PATH = $pathBeforeBuild
-            }
-        }
+        Update-MarketplaceRepository
         $catalog = Get-Content -LiteralPath (Join-Path $RepositoryRoot '.claude-plugin\marketplace.json') -Raw | ConvertFrom-Json
         $catalogNames = @($catalog.plugins | ForEach-Object { $_.name })
         foreach ($kimiHome in @($KimiHomes | Sort-Object -Unique)) {
@@ -168,6 +184,41 @@ if ($Client -in @('All', 'Kimi')) {
     }
 }
 
+if ($Client -in @('All', 'Qwen')) {
+    $qwenExecutable = $null
+    try { $qwenExecutable = Find-QwenCommand } catch {
+        if ($Client -eq 'Qwen') { throw }
+        Write-Output 'Qwen Code CLI was not found; skipped Qwen synchronization.'
+    }
+    if ($qwenExecutable) {
+        Update-MarketplaceRepository
+        $catalog = Get-Content -LiteralPath (Join-Path $RepositoryRoot '.claude-plugin\marketplace.json') -Raw | ConvertFrom-Json
+        $catalogNames = @($catalog.plugins | ForEach-Object { $_.name })
+        $qwenExtensionsRoot = Join-Path $env:USERPROFILE '.qwen\extensions'
+        $linked = @()
+        if (Test-Path -LiteralPath $qwenExtensionsRoot) {
+            $linked = @(Get-ChildItem -LiteralPath $qwenExtensionsRoot -Directory | Where-Object { $catalogNames -contains $_.Name } | ForEach-Object { $_.Name })
+        }
+        $selected = @($linked)
+        if ($InstallDefaults) { $selected += $defaults }
+        foreach ($name in @($selected | Sort-Object -Unique)) {
+            $source = Join-Path $RepositoryRoot "qwen\plugins\$name"
+            if (-not (Test-Path -LiteralPath (Join-Path $source 'qwen-extension.json'))) { throw "Qwen package is missing: $source" }
+            if ($linked -contains $name) {
+                Write-Output "Qwen ${name}: already linked; rebuilt files apply live"
+                continue
+            }
+            # The generated manifests carry no `settings` prompts, so a single consent answer suffices.
+            $linkOutput = ('y' | & $qwenExecutable extensions link $source 2>&1 | Out-String)
+            if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath (Join-Path $qwenExtensionsRoot $name))) {
+                throw "Qwen extensions link failed for ${name}: $linkOutput"
+            }
+            Write-Output "Qwen ${name}: linked from $source"
+        }
+        Write-Output 'Qwen extensions synchronized. Enable/disable choices in extension-enablement.json are kept. Restart Qwen Code to load them.'
+    }
+}
+
 if ($Client -in @('All', 'Claude')) {
     $claudeExecutable = Find-ClaudeCommand
     $installed = Invoke-Client $claudeExecutable @('plugin', 'list', '--json') | ConvertFrom-Json
@@ -195,4 +246,4 @@ if ($Client -in @('All', 'Claude')) {
         if (-not $updated -or $updated.enabled -ne $plugin.enabled) { throw "Plugin selection changed unexpectedly: $($plugin.id)" }
     }
 }
-Write-Output 'Marketplace synchronized from Git. Open new Claude and Codex chats; in Kimi open a new chat or run /plugins reload.'
+Write-Output 'Marketplace synchronized from Git. Open new Claude and Codex chats; in Kimi open a new chat or run /plugins reload; restart Qwen Code for linked extensions.'

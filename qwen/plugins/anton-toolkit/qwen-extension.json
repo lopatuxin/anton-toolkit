@@ -1,0 +1,11 @@
+{
+  "name": "anton-toolkit",
+  "version": "0.39.1-qwen.h487a6fa3b77f",
+  "description": "Personal toolkit with custom skills for Anton",
+  "author": {
+    "name": "Anton"
+  },
+  "skills": "./skills/",
+  "agents": "./agents/",
+  "hooks": "hooks/hooks.json"
+}
