@@ -67,7 +67,7 @@ One workflow run, not a chain of dispatches you drive by hand: dev agents write 
 
 ```
 Workflow({
-  scriptPath: "${CLAUDE_PLUGIN_ROOT}/workflows/task-build.js",
+  name: "anton-toolkit:task-build-pipeline",
   args: {
     repo: "<repo root>",
     task: "<задача одним абзацем>",
@@ -84,6 +84,8 @@ Workflow({
   }
 })
 ```
+
+Pass `args` as the object above, never the task text as a string: a string reaches the script without `modules`, and the run aborts with «не передан ни один модуль». Incorrect: `args: "вот задача, реализуй"`.
 
 Tell the user in one short Russian line that the build is running. It runs in the background and notifies you when it finishes — wait for the notification, do not poll it and do not start a second run.
 
